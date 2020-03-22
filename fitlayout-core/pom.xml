@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>cz.vutbr.fit.layout</groupId>
+		<artifactId>fitlayout</artifactId>
+		<version>2.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>layout-api</artifactId>
+
+	<name>FitLayout Core</name>
+	<description>
+		An extensible web page segmentation and analysis framework. Framework core and shared APIs.
+	</description>
+	<url>https://github.com/FitLayout/FitLayout</url>
+
+	<developers>
+		<developer>
+			<name>Radek Burget</name>
+			<roles>
+				<role>Main developer &amp; project leader</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://github.com/FitLayout/api</url>
+		<connection>scm:git:git@github.com:FitLayout/api.git</connection>
+		<developerConnection>scm:git:git@github.com:FitLayout/api.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+
+	<build>
+		<sourceDirectory>src/main/java</sourceDirectory>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>

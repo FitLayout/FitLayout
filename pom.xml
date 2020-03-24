@@ -46,8 +46,9 @@
 	<modules>
 		<module>fitlayout-core</module>
 		<module>fitlayout-render-cssbox</module>
-    <module>fitlayout-segm-base</module>
-  </modules>
+		<module>fitlayout-segm-base</module>
+		<module>fitlayout-tools</module>
+	</modules>
 
 	<build>
 		<plugins>
@@ -101,6 +102,16 @@
 			<dependency>
 				<groupId>cz.vutbr.fit.layout</groupId>
 				<artifactId>fitlayout-render-cssbox</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>cz.vutbr.fit.layout</groupId>
+				<artifactId>fitlayout-segm-base</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>cz.vutbr.fit.layout</groupId>
+				<artifactId>fitlayout-tools</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 

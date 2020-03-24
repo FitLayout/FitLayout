@@ -17,17 +17,26 @@ public class Units
     
     public static Color toColor(java.awt.Color clr)
     {
-        return new Color(clr.getRed(), clr.getGreen(), clr.getBlue(), clr.getAlpha());
+        if (clr == null)
+            return null;
+        else
+            return new Color(clr.getRed(), clr.getGreen(), clr.getBlue(), clr.getAlpha());
     }
     
     public static Color toColor(cz.vutbr.web.csskit.Color clr)
     {
-        return new Color(clr.getRGB());
+        if (clr == null)
+            return null;
+        else
+            return new Color(clr.getRGB());
     }
 
     public static Rectangular toRectangular(java.awt.Rectangle src)
     {
-        return new Rectangular(src.x, src.y, src.x + src.width - 1, src.y + src.height - 1);
+        if (src == null)
+            return null;
+        else
+            return new Rectangular(src.x, src.y, src.x + src.width - 1, src.y + src.height - 1);
     }
     
 }

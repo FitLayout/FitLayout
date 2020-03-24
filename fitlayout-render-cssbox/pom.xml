@@ -19,22 +19,6 @@
 	</description>
 	<url>https://github.com/FitLayout/FitLayout</url>
 
-	<developers>
-		<developer>
-			<name>Radek Burget</name>
-			<roles>
-				<role>Main developer &amp; project leader</role>
-			</roles>
-		</developer>
-	</developers>
-
-	<scm>
-		<url>https://github.com/FitLayout/api</url>
-		<connection>scm:git:git@github.com:FitLayout/api.git</connection>
-		<developerConnection>scm:git:git@github.com:FitLayout/api.git</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
-
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 	</build>

@@ -8,7 +8,7 @@
 		<version>2.0.0-SNAPSHOT</version>
 	</parent>
 	
-	<artifactId>fitlayou-segm-base</artifactId>
+	<artifactId>fitlayout-segm-base</artifactId>
 	
 	<name>FitLayout Basic Segmentation</name>
 	<description>
@@ -16,30 +16,6 @@
 	</description>
 	<url>https://github.com/FitLayout/FitLayout</url>
 
-	<licenses>
-		<license>
-			<name>GNU Lesser General Public License 3.0</name>
-			<url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-
-	<developers>
-		<developer>
-			<name>Radek Burget</name>
-			<roles>
-				<role>Main developer &amp; project leader</role>
-			</roles>
-		</developer>
-	</developers>
-
-	<scm>
-		<url>https://github.com/FitLayout/segmentation</url>
-		<connection>scm:git:git@github.com:FitLayout/segmentation.git</connection>
-		<developerConnection>scm:git:git@github.com:FitLayout/segmentation.git</developerConnection>
-		<tag>HEAD</tag>
-    </scm>
-    
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 	</build>

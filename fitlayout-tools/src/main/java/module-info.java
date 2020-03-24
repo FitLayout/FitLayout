@@ -6,7 +6,9 @@ module cz.vutbr.fit.layout.tools
     requires org.slf4j;
     
     requires cz.vutbr.fit.layout.core;
+    requires cz.vutbr.fit.layout.cssbox;
     requires cz.vutbr.fit.layout.segm;
-    requires cssbox; //TODO get rid of the cssbox dependency
+    
+    requires net.sf.cssbox; //TODO get rid of the cssbox dependency
     requires jline;
 }

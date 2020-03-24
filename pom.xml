@@ -47,6 +47,7 @@
 
 	<modules>
 		<module>fitlayout-core</module>
+		<module>fitlayout-render-cssbox</module>
 	</modules>
 
 	<build>
@@ -93,6 +94,17 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>cz.vutbr.fit.layout</groupId>
+				<artifactId>fitlayout-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>cz.vutbr.fit.layout</groupId>
+				<artifactId>fitlayout-render-cssbox</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>

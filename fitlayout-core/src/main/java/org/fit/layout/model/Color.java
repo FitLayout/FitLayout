@@ -38,6 +38,15 @@ public class Color
         this.value = ((alpha & 0xFF) << 24) | ((red & 0xFF) << 16)
                 | ((green & 0xFF) << 8) | ((blue & 0xFF));
     }
+    
+    /**
+     * Creates a color from an RGB value
+     * @param rgb the RGB value
+     */
+    public Color(int rgb)
+    {
+        this.value = rgb;
+    }
 
     /**
      * Returns the RGB value representing the color.

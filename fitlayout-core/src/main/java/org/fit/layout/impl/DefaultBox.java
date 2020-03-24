@@ -5,12 +5,12 @@
  */
 package org.fit.layout.impl;
 
-import java.awt.Color;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.fit.layout.model.Box;
+import org.fit.layout.model.Color;
 import org.fit.layout.model.ContentObject;
 import org.fit.layout.model.Rectangular;
 

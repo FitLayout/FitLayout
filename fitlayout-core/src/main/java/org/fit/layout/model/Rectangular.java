@@ -61,14 +61,6 @@ public class Rectangular implements Rect
 		this.y2 = src.y2;
 	}
 	
-	public Rectangular(java.awt.Rectangle src)
-	{
-		this.x1 = src.x;
-		this.x2 = src.x + src.width - 1;
-		this.y1 = src.y;
-		this.y2 = src.y + src.height - 1;
-	}
-	
     public void copy(Rectangular src)
     {
         this.x1 = src.x1;

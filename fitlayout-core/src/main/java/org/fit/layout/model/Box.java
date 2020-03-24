@@ -5,7 +5,6 @@
  */
 package org.fit.layout.model;
 
-import java.awt.Color;
 import java.util.Map;
 
 /**

@@ -5,7 +5,6 @@
  */
 package cz.vutbr.fit.layout.cssbox;
 
-import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -14,6 +13,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,10 +25,13 @@ import org.fit.cssbox.io.DefaultDOMSource;
 import org.fit.cssbox.io.DefaultDocumentSource;
 import org.fit.cssbox.io.DocumentSource;
 import org.fit.cssbox.layout.Box;
-import org.fit.cssbox.layout.BrowserCanvas;
+import org.fit.cssbox.layout.BrowserConfig;
+import org.fit.cssbox.layout.Dimension;
 import org.fit.cssbox.layout.ElementBox;
+import org.fit.cssbox.layout.Engine;
+import org.fit.cssbox.layout.GraphicsEngine;
 import org.fit.cssbox.layout.Viewport;
-import org.fit.cssbox.pdf.PdfBrowserCanvas;
+import org.fit.cssbox.pdf.PdfEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -100,13 +103,13 @@ public class CSSBoxTreeBuilder
     public void parse(URL url) throws IOException, SAXException
     {
         //render the page
-        BrowserCanvas canvas = renderUrl(url, pageSize);
-        viewport = canvas.getViewport();
+        Engine engine = renderUrl(url, pageSize);
+        viewport = engine.getViewport();
         PageImpl pg = page = new PageImpl(pageUrl);
         pg.setTitle(pageTitle);
         
         //construct the box tree
-        ElementBox rootbox = canvas.getViewport();
+        ElementBox rootbox = engine.getViewport();
         BoxNode root = buildTree(rootbox);
         
         //initialize the page
@@ -129,8 +132,8 @@ public class CSSBoxTreeBuilder
         {
             log.info("Parsing: {}", url);
             //render the page
-            BrowserCanvas canvas = renderUrl(url, pageSize);
-            ElementBox rootbox = canvas.getViewport();
+            Engine engine = renderUrl(url, pageSize);
+            ElementBox rootbox = engine.getViewport();
             BoxNode root = buildTree(rootbox);
             
             //wrap the page with a new block box
@@ -189,18 +192,9 @@ public class CSSBoxTreeBuilder
         return page;
     }
     
-    /**
-     * Obtains the CSSBox viewport of the rendered page. 
-     * @return the viewport or {@code null} when no page was rendered or multiple pages were rendered.
-     */
-    public Viewport getViewport()
-    {
-        return viewport;
-    }
-    
     //===================================================================
     
-    protected BrowserCanvas renderUrl(URL url, Dimension pageSize) throws IOException, SAXException
+    protected Engine renderUrl(URL url, Dimension pageSize) throws IOException, SAXException
     {
         DocumentSource src = new DefaultDocumentSource(url);
         pageUrl = src.getURL();
@@ -216,10 +210,10 @@ public class CSSBoxTreeBuilder
         if (mime.equals("application/pdf"))
         {
             PDDocument doc = loadPdf(is);
-            BrowserCanvas canvas = new PdfBrowserCanvas(doc, null, pageSize, src.getURL());
+            Engine engine = new PdfEngine(doc, null, pageSize, src.getURL());
             doc.close();
             pageTitle = "";
-            return canvas;
+            return engine;
         }
         else
         {
@@ -243,18 +237,30 @@ public class CSSBoxTreeBuilder
             da.addStyleSheet(null, CSSNorm.formsStyleSheet(), DOMAnalyzer.Origin.AGENT);
             da.getStyleSheets();
             
-            BrowserCanvas contentCanvas = new BrowserCanvas(da.getRoot(), da, src.getURL());
-            contentCanvas.getConfig().setLoadImages(false);
-            contentCanvas.getConfig().setLoadBackgroundImages(false);
-            contentCanvas.getConfig().setLoadFonts(false);
-            contentCanvas.getConfig().setReplaceImagesWithAlt(replaceImagesWithAlt);
-            contentCanvas.createLayout(pageSize);
+            Engine engine = new GraphicsEngine(da.getRoot(), da, src.getURL());
+            engine.setAutoMediaUpdate(false);
+            engine.getConfig().setLoadImages(false);
+            engine.getConfig().setLoadBackgroundImages(false);
+            engine.getConfig().setLoadFonts(false);
+            engine.getConfig().setReplaceImagesWithAlt(replaceImagesWithAlt);
+            defineLogicalFonts(engine.getConfig());
+            engine.createLayout(pageSize);
             
             src.close();
 
-            return contentCanvas;
+            return engine;
         }
         
+    }
+    
+    /**
+     * Sets some common fonts as the defaults for generic font families.
+     */
+    protected void defineLogicalFonts(BrowserConfig config)
+    {
+        config.setLogicalFont(BrowserConfig.SERIF, Arrays.asList("Times", "Times New Roman"));
+        config.setLogicalFont(BrowserConfig.SANS_SERIF, Arrays.asList("Arial", "Helvetica"));
+        config.setLogicalFont(BrowserConfig.MONOSPACE, Arrays.asList("Courier New", "Courier"));
     }
     
     private PDDocument loadPdf(InputStream is) throws IOException

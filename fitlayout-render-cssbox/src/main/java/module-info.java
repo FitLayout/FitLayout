@@ -7,8 +7,11 @@ module cz.vutbr.fit.layout.cssbox
     requires net.sf.cssbox;
     requires net.sf.cssbox.jstyleparser;
     requires net.sf.cssbox.pdf2dom;
+    requires net.sf.cssbox.pdf2domcssbox;
     
-    requires cz.vutbr.fit.layout.core;
+    requires transitive cz.vutbr.fit.layout.core;
+    
+    exports cz.vutbr.fit.layout.cssbox;
     
     provides cz.vutbr.fit.layout.api.BoxTreeProvider with cz.vutbr.fit.layout.cssbox.CSSBoxTreeProvider;
 }

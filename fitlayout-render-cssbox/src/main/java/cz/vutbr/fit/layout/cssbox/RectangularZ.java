@@ -5,6 +5,8 @@
  */
 package cz.vutbr.fit.layout.cssbox;
 
+import org.fit.cssbox.layout.Rectangle;
+
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
@@ -14,24 +16,20 @@ import cz.vutbr.fit.layout.model.Rectangular;
 public class RectangularZ extends Rectangular
 {
     
-    public RectangularZ(java.awt.Rectangle src, float zoomFactor)
+    public RectangularZ(Rectangle src, float zoomFactor)
     {
-        super(Units.toRectangular(src));
-        zoom(zoomFactor);
+        x1 = Math.round(x1 * zoomFactor);
+        y1 = Math.round(y1 * zoomFactor);
+        x2 = Math.round(x2 * zoomFactor);
+        y2 = Math.round(y2 * zoomFactor);
     }
     
-    public RectangularZ(int x1, int y1, float zoomFactor)
+    public RectangularZ(float x1, float y1, float zoomFactor)
     {
-        super(x1, y1);
-        zoom(zoomFactor);
+        this.x1 = Math.round(x1 * zoomFactor);
+        this.y1 = Math.round(y1 * zoomFactor);
+        this.x2 = this.x1 - 1;
+        this.y2 = this.y1 - 1;
     }
     
-    private void zoom(float zoom)
-    {
-        x1 = Math.round(x1 * zoom);
-        y1 = Math.round(y1 * zoom);
-        x2 = Math.round(x2 * zoom);
-        y2 = Math.round(y2 * zoom);
-    }
-
 }

@@ -31,7 +31,7 @@ public class Units
             return new Color(clr.getRGB());
     }
 
-    public static Rectangular toRectangular(java.awt.Rectangle src)
+    public static Rectangular toRectangular(java.awt.Rectangle src) //TODO remove later?
     {
         if (src == null)
             return null;

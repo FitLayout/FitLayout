@@ -5,7 +5,6 @@
  */
 package cz.vutbr.fit.layout.cssbox;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,6 +16,7 @@ import org.fit.cssbox.layout.Box;
 import org.fit.cssbox.layout.ElementBox;
 import org.fit.cssbox.layout.InlineReplacedBox;
 import org.fit.cssbox.layout.ListItemBox;
+import org.fit.cssbox.layout.Rectangle;
 import org.fit.cssbox.layout.ReplacedBox;
 import org.fit.cssbox.layout.ReplacedContent;
 import org.fit.cssbox.layout.ReplacedImage;
@@ -474,7 +474,7 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
     {
         Box box = getBox();
         if (box instanceof ElementBox)
-            return ((ElementBox) box).getBorder().top;
+            return zoom(((ElementBox) box).getBorder().top);
         else
             return 0;
     }
@@ -501,7 +501,7 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
     {
         Box box = getBox();
         if (box instanceof ElementBox)
-            return ((ElementBox) box).getBorder().bottom;
+            return zoom(((ElementBox) box).getBorder().bottom);
         else
             return 0;
     }
@@ -528,7 +528,7 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
     {
         Box box = getBox();
         if (box instanceof ElementBox)
-            return ((ElementBox) box).getBorder().left;
+            return zoom(((ElementBox) box).getBorder().left);
         else
             return 0;
     }
@@ -555,7 +555,7 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
     {
         Box box = getBox();
         if (box instanceof ElementBox)
-            return ((ElementBox) box).getBorder().right;
+            return zoom(((ElementBox) box).getBorder().right);
         else
             return 0;
     }
@@ -1076,19 +1076,19 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
     @Override
     public float getFontSize()
     {
-        return getBox().getVisualContext().getFont().getSize2D();
+        return getBox().getVisualContext().getFontInfo().getSize();
     }
 
     @Override
     public float getFontStyle()
     {
-        return getBox().getVisualContext().getFont().isItalic() ? 1.0f : 0.0f;
+        return getBox().getVisualContext().getFontInfo().isItalic() ? 1.0f : 0.0f;
     }
 
     @Override
     public float getFontWeight()
     {
-        return getBox().getVisualContext().getFont().isBold() ? 1.0f : 0.0f;
+        return getBox().getVisualContext().getFontInfo().isBold() ? 1.0f : 0.0f;
     }
 
     @Override
@@ -1148,7 +1148,7 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
     @Override
     public String getFontFamily()
     {
-        return getBox().getVisualContext().getFont().getName();
+        return getBox().getVisualContext().getFontInfo().getFamily();
     }
 
     @Override
@@ -1355,8 +1355,8 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
         {
             Rectangular ret = new Rectangular(getVisualBounds());
             int origin = ret.getX1();
-            int startOfs = ((TextBox) box).getCharOffsetX(startPos);
-            int endOfs = ((TextBox) box).getCharOffsetX(endPos);
+            int startOfs = zoom(((TextBox) box).getCharOffsetX(startPos));
+            int endOfs = zoom(((TextBox) box).getCharOffsetX(endPos));
             ret.setX1(origin + startOfs);
             ret.setX2(origin + endOfs);
             return ret;
@@ -1365,7 +1365,7 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
             return null;
     }
 
-    private int zoom(int src)
+    private int zoom(float src)
     {
         return Math.round(src * zoom);
     }

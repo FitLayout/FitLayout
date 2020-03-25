@@ -5,13 +5,12 @@
  */
 package cz.vutbr.fit.layout.cssbox;
 
-import java.awt.Dimension;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.fit.cssbox.layout.Viewport;
+import org.fit.cssbox.layout.Dimension;
 import org.xml.sax.SAXException;
 
 import cz.vutbr.fit.layout.api.Parameter;
@@ -174,12 +173,4 @@ public class CSSBoxTreeProvider extends BaseBoxTreeProvider
         }
     }
     
-    public Viewport getViewport()
-    {
-        if (builder != null)
-            return builder.getViewport();
-        else
-            return null;
-    }
-
 }

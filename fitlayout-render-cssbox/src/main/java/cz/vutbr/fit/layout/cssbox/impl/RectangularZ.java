@@ -18,10 +18,10 @@ public class RectangularZ extends Rectangular
     
     public RectangularZ(Rectangle src, float zoomFactor)
     {
-        x1 = Math.round(x1 * zoomFactor);
-        y1 = Math.round(y1 * zoomFactor);
-        x2 = Math.round(x2 * zoomFactor);
-        y2 = Math.round(y2 * zoomFactor);
+        x1 = Math.round(src.getX() * zoomFactor);
+        y1 = Math.round(src.getY() * zoomFactor);
+        x2 = Math.round((src.getX() + src.getWidth() - 1) * zoomFactor);
+        y2 = Math.round((src.getY() + src.getHeight() - 1) * zoomFactor);
     }
     
     public RectangularZ(float x1, float y1, float zoomFactor)

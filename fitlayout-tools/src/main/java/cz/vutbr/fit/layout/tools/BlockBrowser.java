@@ -13,8 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import org.fit.cssbox.layout.BrowserCanvas;
-import org.fit.cssbox.layout.BrowserConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +100,6 @@ public class BlockBrowser implements Browser
     public static final float TAG_PROBABILITY_THRESHOLD = 0.3f; 
     private static final java.awt.Color selectionColor = new java.awt.Color(127, 127, 255, 127);
     
-    private BrowserConfig config;
     private GUIProcessor proc;
     private URL currentUrl = null;
     private boolean dispFinished = false;
@@ -185,7 +182,6 @@ public class BlockBrowser implements Browser
 
     public BlockBrowser()
     {
-        config = new BrowserConfig();
         areaListeners = new LinkedList<>();
         treeListeners = new LinkedList<>();
         rectangleListeners = new LinkedList<>();
@@ -219,16 +215,6 @@ public class BlockBrowser implements Browser
         return currentUrl.toString();
     }
 
-    public void setLoadImages(boolean b)
-    {
-        config.setLoadImages(b);
-    }
-    
-    public boolean getLoadImages()
-    {
-        return config.getLoadImages();
-    }
-    
     //=============================================================================================================
     
     @Override
@@ -1008,11 +994,6 @@ public class BlockBrowser implements Browser
     }
     
     //===========================================================================
-    
-    public BrowserCanvas getBrowserCanvas()
-    {
-        return (BrowserCanvas) contentCanvas;
-    }
     
     public void initPlugins()
     {
@@ -2239,7 +2220,6 @@ public class BlockBrowser implements Browser
                 try
                 {
                     browser = new BlockBrowser();
-                    browser.setLoadImages(false);
                     JFrame main = browser.getMainWindow();
                     //main.setSize(1000,600);
                     //main.setMinimumSize(new Dimension(1200, 600));

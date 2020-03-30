@@ -9,6 +9,5 @@ module cz.vutbr.fit.layout.tools
     requires cz.vutbr.fit.layout.cssbox;
     requires cz.vutbr.fit.layout.segm;
     
-    requires net.sf.cssbox; //TODO get rid of the cssbox dependency
     requires jline;
 }

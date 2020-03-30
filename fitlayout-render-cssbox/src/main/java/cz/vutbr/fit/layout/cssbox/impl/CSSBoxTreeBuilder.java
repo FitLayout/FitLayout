@@ -3,7 +3,7 @@
  *
  * Created on 24. 10. 2014, 23:52:25 by burgetr
  */
-package cz.vutbr.fit.layout.cssbox;
+package cz.vutbr.fit.layout.cssbox.impl;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

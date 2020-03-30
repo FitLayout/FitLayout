@@ -3,7 +3,7 @@
  *
  * Created on 22. 11. 2016, 18:43:16 by burgetr
  */
-package cz.vutbr.fit.layout.cssbox;
+package cz.vutbr.fit.layout.cssbox.impl;
 
 import java.awt.Rectangle;
 import java.awt.Shape;

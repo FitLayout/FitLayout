@@ -3,7 +3,7 @@
  *
  * Created on 24. 3. 2020, 12:12:00 by burgetr
  */
-package cz.vutbr.fit.layout.cssbox;
+package cz.vutbr.fit.layout.cssbox.impl;
 
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.Rectangular;

@@ -3,7 +3,7 @@
  *
  * Created on 22. 10. 2014, 14:25:28 by burgetr
  */
-package cz.vutbr.fit.layout.cssbox;
+package cz.vutbr.fit.layout.cssbox.impl;
 
 import java.net.URL;
 

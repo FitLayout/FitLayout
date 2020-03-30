@@ -3,7 +3,7 @@
  *
  * Created on 27. 3. 2019, 15:19:58 by burgetr
  */
-package cz.vutbr.fit.layout.cssbox;
+package cz.vutbr.fit.layout.cssbox.impl;
 
 import org.fit.cssbox.layout.Rectangle;
 

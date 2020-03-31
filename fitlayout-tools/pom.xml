@@ -46,7 +46,7 @@
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>org.fit.layout.tools.BlockBrowser</mainClass>
+									<mainClass>cz.vutbr.fit.layout.tools.BlockBrowser</mainClass>
 								</transformer>
 							</transformers>
 							<finalName>LayoutTools</finalName>

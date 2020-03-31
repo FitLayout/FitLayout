@@ -1076,7 +1076,7 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
     @Override
     public float getFontSize()
     {
-        return getBox().getVisualContext().getFontInfo().getSize();
+        return getBox().getVisualContext().getFontSize();
     }
 
     @Override

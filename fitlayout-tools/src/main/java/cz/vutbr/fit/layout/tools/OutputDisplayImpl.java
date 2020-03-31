@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
@@ -54,6 +55,7 @@ public class OutputDisplayImpl implements OutputDisplay
     @Override
     public void drawPage(Page page)
     {
+        setupGraphics();
         recursivelyDrawBoxes(page.getRoot());
     }
 
@@ -76,7 +78,7 @@ public class OutputDisplayImpl implements OutputDisplay
             //setup the font
             Font font = new Font("Serif", Font.PLAIN, 12);
             String fmlspec = box.getFontFamily();
-            float fontsize = box.getFontSize();
+            float fontsize = (box.getFontSize() * 96.0f) / 72.0f; //AWT font assumes 72dpi
             int fs = Font.PLAIN;
             if (box.getFontWeight() > 0.5f)
                 fs = Font.BOLD;
@@ -217,6 +219,17 @@ public class OutputDisplayImpl implements OutputDisplay
         }
     }
 
+    /**
+     * Configures the graphics context for drawing the boxes. This method is normally called
+     * from {@link #drawPage(Page)} before the actual drawing starts.
+     */
+    protected void setupGraphics()
+    {
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+    }
+    
     protected Color stringColor(String cname)                                 
     {                                                                            
             if (cname == null || cname.equals(""))       

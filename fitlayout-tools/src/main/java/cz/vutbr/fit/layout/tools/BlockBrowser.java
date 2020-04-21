@@ -159,7 +159,8 @@ public class BlockBrowser implements Browser
     private JScrollPane probabilityScroll;
     private JTable probTable;
     private JTabbedPane toolTabs;
-    private JPanel sourcesTab;
+    private JPanel boxTreeTab;
+    private JPanel segmentationTab;
     private JLabel rendererLabel;
     private JComboBox<BoxTreeProvider> rendererCombo;
     private JPanel rendererChoicePanel;
@@ -1898,20 +1899,21 @@ public class BlockBrowser implements Browser
         if (toolTabs == null)
         {
             toolTabs = new JTabbedPane(JTabbedPane.TOP);
-            toolTabs.addTab("Sources", null, getSourcesTab(), null);
+            toolTabs.addTab("Box tree", null, getBoxTreeTab(), null);
+            toolTabs.addTab("Segmentation", null, getSegmentationTab(), null);
         }
         return toolTabs;
     }
 
-    private JPanel getSourcesTab()
+    private JPanel getBoxTreeTab()
     {
-        if (sourcesTab == null)
+        if (boxTreeTab == null)
         {
-            sourcesTab = new JPanel();
+            boxTreeTab = new JPanel();
             GridBagLayout gbl_sourcesTab = new GridBagLayout();
             gbl_sourcesTab.columnWeights = new double[] { 1.0 };
             gbl_sourcesTab.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 1.0 };
-            sourcesTab.setLayout(gbl_sourcesTab);
+            boxTreeTab.setLayout(gbl_sourcesTab);
             GridBagConstraints gbc_rendererChoicePanel = new GridBagConstraints();
             gbc_rendererChoicePanel.weightx = 1.0;
             gbc_rendererChoicePanel.anchor = GridBagConstraints.EAST;
@@ -1919,14 +1921,31 @@ public class BlockBrowser implements Browser
             gbc_rendererChoicePanel.insets = new Insets(0, 0, 1, 0);
             gbc_rendererChoicePanel.gridx = 0;
             gbc_rendererChoicePanel.gridy = 0;
-            sourcesTab.add(getRendererChoicePanel(), gbc_rendererChoicePanel);
+            boxTreeTab.add(getRendererChoicePanel(), gbc_rendererChoicePanel);
             GridBagConstraints gbc_rendererParamsPanel = new GridBagConstraints();
             gbc_rendererParamsPanel.weightx = 1.0;
             gbc_rendererParamsPanel.fill = GridBagConstraints.BOTH;
             gbc_rendererParamsPanel.insets = new Insets(0, 0, 2, 0);
             gbc_rendererParamsPanel.gridx = 0;
             gbc_rendererParamsPanel.gridy = 1;
-            sourcesTab.add(getRendererParamsPanel(), gbc_rendererParamsPanel);
+            boxTreeTab.add(getRendererParamsPanel(), gbc_rendererParamsPanel);
+
+            BoxTreeProvider p = (BoxTreeProvider) rendererCombo.getSelectedItem();
+            if (p != null)
+                ((ParamsPanel) rendererParamsPanel).setOperation(p, null);
+        }
+        return boxTreeTab;
+    }
+
+    private JPanel getSegmentationTab()
+    {
+        if (segmentationTab == null)
+        {
+            segmentationTab = new JPanel();
+            GridBagLayout gbl_sourcesTab = new GridBagLayout();
+            gbl_sourcesTab.columnWeights = new double[] { 1.0 };
+            gbl_sourcesTab.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 1.0 };
+            segmentationTab.setLayout(gbl_sourcesTab);
             GridBagConstraints gbc_segmChoicePanel = new GridBagConstraints();
             gbc_segmChoicePanel.weightx = 1.0;
             gbc_segmChoicePanel.anchor = GridBagConstraints.EAST;
@@ -1934,40 +1953,36 @@ public class BlockBrowser implements Browser
             gbc_segmChoicePanel.insets = new Insets(0, 0, 1, 0);
             gbc_segmChoicePanel.gridx = 0;
             gbc_segmChoicePanel.gridy = 2;
-            sourcesTab.add(getSegmChoicePanel(), gbc_segmChoicePanel);
+            segmentationTab.add(getSegmChoicePanel(), gbc_segmChoicePanel);
             GridBagConstraints gbc_segmParamsPanel = new GridBagConstraints();
             gbc_segmParamsPanel.insets = new Insets(0, 0, 2, 0);
             gbc_segmParamsPanel.weightx = 1.0;
             gbc_segmParamsPanel.fill = GridBagConstraints.BOTH;
             gbc_segmParamsPanel.gridx = 0;
             gbc_segmParamsPanel.gridy = 3;
-            sourcesTab.add(getSegmParamsPanel(), gbc_segmParamsPanel);
+            segmentationTab.add(getSegmParamsPanel(), gbc_segmParamsPanel);
             GridBagConstraints gbc_logicalChoicePanel = new GridBagConstraints();
             gbc_logicalChoicePanel.insets = new Insets(0, 0, 1, 0);
             gbc_logicalChoicePanel.fill = GridBagConstraints.BOTH;
             gbc_logicalChoicePanel.gridx = 0;
             gbc_logicalChoicePanel.gridy = 4;
-            sourcesTab.add(getLogicalChoicePanel(), gbc_logicalChoicePanel);
+            segmentationTab.add(getLogicalChoicePanel(), gbc_logicalChoicePanel);
             GridBagConstraints gbc_logicalParamsPanel = new GridBagConstraints();
             gbc_logicalParamsPanel.fill = GridBagConstraints.BOTH;
             gbc_logicalParamsPanel.gridx = 0;
             gbc_logicalParamsPanel.gridy = 5;
-            sourcesTab.add(getLogicalParamsPanel(), gbc_logicalParamsPanel);
+            segmentationTab.add(getLogicalParamsPanel(), gbc_logicalParamsPanel);
 
-            BoxTreeProvider p = (BoxTreeProvider) rendererCombo.getSelectedItem();
-            if (p != null)
-                ((ParamsPanel) rendererParamsPanel).setOperation(p, null);
             AreaTreeProvider ap = (AreaTreeProvider) segmentatorCombo.getSelectedItem();
             if (ap != null)
                 ((ParamsPanel) segmParamsPanel).setOperation(ap, null);
             LogicalTreeProvider lp = (LogicalTreeProvider) logicalCombo.getSelectedItem();
             if (lp != null)
                 ((ParamsPanel) logicalParamsPanel).setOperation(lp, null);
-            
         }
-        return sourcesTab;
+        return segmentationTab;
     }
-
+    
     private JLabel getRendererLabel()
     {
         if (rendererLabel == null)

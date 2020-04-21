@@ -344,7 +344,7 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
             //consider the background if different from the parent
             if (isBackgroundSeparated())
             {
-                Rectangular bg = new RectangularZ(elem.getAbsoluteBackgroundBounds().intersection(elem.getClipBlock().getClippedContentBounds()), zoom);
+                Rectangular bg = new RectangularZ(elem.getAbsolutePaddingBounds().intersection(elem.getClipBlock().getClippedContentBounds()), zoom);
                 if (ret == null)
                     ret = bg;
                 else
@@ -419,7 +419,7 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
             //no border
             else
             {
-                ret = new RectangularZ(elem.getAbsoluteBackgroundBounds(), zoom);
+                ret = new RectangularZ(elem.getAbsolutePaddingBounds(), zoom);
             }
         }
         else //not an element - return the whole box

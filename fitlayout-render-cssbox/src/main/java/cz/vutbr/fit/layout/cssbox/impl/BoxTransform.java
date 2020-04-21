@@ -117,7 +117,7 @@ public class BoxTransform
     
     protected AffineTransform createTransform(ElementBox elem)
     {
-        return org.fit.cssbox.render.Transform.createTransform(elem);
+        return org.fit.cssbox.awt.Transform.createTransform(elem);
     }
     
 }

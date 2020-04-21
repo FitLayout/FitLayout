@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.fit.cssbox.awt.GraphicsEngine;
 import org.fit.cssbox.css.CSSNorm;
 import org.fit.cssbox.css.DOMAnalyzer;
 import org.fit.cssbox.io.DOMSource;
@@ -29,7 +30,6 @@ import org.fit.cssbox.layout.BrowserConfig;
 import org.fit.cssbox.layout.Dimension;
 import org.fit.cssbox.layout.ElementBox;
 import org.fit.cssbox.layout.Engine;
-import org.fit.cssbox.layout.GraphicsEngine;
 import org.fit.cssbox.layout.Viewport;
 import org.fit.cssbox.pdf.PdfEngine;
 import org.slf4j.Logger;

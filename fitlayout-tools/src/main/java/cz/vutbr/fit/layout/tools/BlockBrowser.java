@@ -4,14 +4,12 @@
 package cz.vutbr.fit.layout.tools;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,19 +25,18 @@ import cz.vutbr.fit.layout.gui.BrowserPlugin;
 import cz.vutbr.fit.layout.gui.CanvasClickListener;
 import cz.vutbr.fit.layout.gui.RectangleSelectionListener;
 import cz.vutbr.fit.layout.gui.TreeListener;
-import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Box;
-import cz.vutbr.fit.layout.model.Color;
-import cz.vutbr.fit.layout.model.LogicalArea;
 import cz.vutbr.fit.layout.model.LogicalAreaTree;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.process.GUIProcessor;
 import cz.vutbr.fit.layout.tools.gui.BoxSourcePanel;
-import cz.vutbr.fit.layout.tools.gui.SegmentationPanel;
+import cz.vutbr.fit.layout.tools.gui.BoxTreeTab;
+import cz.vutbr.fit.layout.tools.gui.BrowserTab;
+import cz.vutbr.fit.layout.tools.gui.SegmentationTab;
 
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
@@ -57,10 +54,10 @@ import javax.swing.JTextField;
 
 import java.awt.GridLayout;
 
-import javax.swing.JTree;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Rectangle;
@@ -74,10 +71,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
-
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.tree.TreePath;
 
 import java.awt.Insets;
 import java.awt.event.ActionListener;
@@ -98,8 +91,6 @@ public class BlockBrowser implements Browser
     
     private GUIProcessor proc;
     private URL currentUrl = null;
-    private boolean areasync = true;
-    private boolean logsync = true;
     private boolean rectSelection = false; //rectangle area selection in progress
     private int rectX1, rectY1; //rectangle selection start point
     private Selection selection; //selection box
@@ -111,49 +102,34 @@ public class BlockBrowser implements Browser
     private List<RectangleSelectionListener> rectangleListeners;
     private List<CanvasClickListener> canvasClickAlwaysListeners;
     private Map<JToggleButton, CanvasClickListener> canvasClickToggleListeners;
+    
+    //main tabs
+    private List<BrowserTab> browserTabs;
+    private BoxTreeTab boxTreeTab;
+    private SegmentationTab segmentationTab;
 
+    //basic UI components
     private JFrame mainWindow = null;  //  @jve:decl-index=0:visual-constraint="-239,28"
     private JPanel container = null;
     private JPanel mainPanel = null;
     private JPanel contentPanel = null;
-    private JPanel structurePanel = null;
     private JPanel statusPanel = null;
     private JTextField statusText = null;
     private JTabbedPane sidebarPane = null;
-    private JPanel boxTreePanel = null;
-    private JScrollPane boxTreeScroll = null;
-    private JTree boxTree = null;
     private JScrollPane contentScroll = null;
     private JPanel contentCanvas = null;
     private JSplitPane mainSplitter = null;
     private JToolBar showToolBar = null;
     private JButton redrawButton = null;
-	private JPanel areaTreePanel = null;
-	private JScrollPane areaTreeScroll = null;
-	private JTree areaJTree = null;
     private JButton showBoxButton = null;
     private JButton showAreaButton = null;
     private JToolBar lookupToolBar = null;
     private JPanel toolPanel = null;
-    private JPanel logicalTreePanel = null;
-    private JScrollPane logicalTreeScroll = null;
-    private JTree logicalTree = null;
     private JButton refreshButton = null;
     private JSplitPane infoSplitter = null;
-    private JPanel objectInfoPanel = null;
-    private JScrollPane objectInfoScroll = null;
-    private JTable infoTable = null;
     private JButton showArtAreaButton = null;
     private JButton showColumnsButton = null;
-    private JPanel pathsPanel;
-    private JScrollPane pathListScroll;
-    private JScrollPane extractionScroll;
-    private JTable extractionTable;
-    private JScrollPane probabilityScroll;
-    private JTable probTable;
-    private JTabbedPane toolTabs;
-    private JPanel boxTreeTab;
-    private JPanel segmentationTab;
+    private JTabbedPane toolTabs = null;
 
 
     public BlockBrowser()
@@ -163,6 +139,7 @@ public class BlockBrowser implements Browser
         rectangleListeners = new LinkedList<>();
         canvasClickAlwaysListeners = new LinkedList<>();
         canvasClickToggleListeners = new HashMap<>();
+        browserTabs = new LinkedList<>();
         proc = new GUIProcessor() {
             @Override
             protected void treesCompleted()
@@ -182,8 +159,8 @@ public class BlockBrowser implements Browser
     
     public void setLocation(String url)
     {
-        ((BoxSourcePanel) getBoxTreeTab()).setUrl(url);
-        ((BoxSourcePanel) getBoxTreeTab()).displaySelectedURL();
+        ((BoxSourcePanel) boxTreeTab.getTabPanel()).setUrl(url);
+        ((BoxSourcePanel) boxTreeTab.getTabPanel()).displaySelectedURL();
     }
     
     public String getLocation()
@@ -196,20 +173,9 @@ public class BlockBrowser implements Browser
     @Override
     public void refreshView()
     {
-        boxTree.setModel(new BoxTreeModel(proc.getPage().getRoot()));
-        if (proc.getAreaTree() != null)
+        for (BrowserTab tab : browserTabs)
         {
-            TreePath path = areaJTree.getSelectionPath();
-            areaJTree.setModel(new AreaTreeModel(proc.getAreaTree().getRoot()));
-            if (path != null)
-                areaJTree.setSelectionPath(path);
-        }
-        if (proc.getLogicalAreaTree() != null)
-        {
-            TreePath path = logicalTree.getSelectionPath();
-            logicalTree.setModel(new LogicalTreeModel(proc.getLogicalAreaTree().getRoot()));
-            if (path != null)
-                logicalTree.setSelectionPath(path);
+            tab.refreshView();
         }
     }
     
@@ -253,7 +219,7 @@ public class BlockBrowser implements Browser
     @Override
     public void addInfoPanel(JComponent component, double weighty)
     {
-        GridBagConstraints constraints = new GridBagConstraints();
+        /*GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(0, 0, 5, 0);
         constraints.fill = GridBagConstraints.BOTH;
         constraints.gridy = GridBagConstraints.RELATIVE;
@@ -261,7 +227,8 @@ public class BlockBrowser implements Browser
         constraints.weighty = weighty;
         constraints.gridx = 0;
         
-        objectInfoPanel.add(component, constraints);
+        objectInfoPanel.add(component, constraints);*/
+        //TODO
     }
 
     @Override
@@ -286,16 +253,13 @@ public class BlockBrowser implements Browser
     @Override
     public Area getSelectedArea()
     {
-        if (areaJTree == null)
-            return null;
-        else                   
-            return (Area) areaJTree.getLastSelectedPathComponent();
+        return segmentationTab.getSelectedArea();
     }
 
     @Override
     public void displayAreaDetails(Area area)
     {
-        displayAreaInfo(area);
+        segmentationTab.displayAreaInfo(area);
     }
 
     @Override
@@ -371,7 +335,7 @@ public class BlockBrowser implements Browser
             public void mouseMoved(MouseEvent e) 
             { 
                 String s = "Absolute: " + e.getX() + ":" + e.getY();
-                Area node = (Area) areaJTree.getLastSelectedPathComponent();
+                Area node = segmentationTab.getSelectedArea();
                 if (node != null)
                 {
                     Area area = (Area) node;
@@ -395,7 +359,7 @@ public class BlockBrowser implements Browser
         });
         contentScroll.setViewportView(contentCanvas);
         
-        boxTree.setModel(new BoxTreeModel(proc.getPage().getRoot()));
+        refreshView();
         notifyBoxTreeUpdate();
 	}
 
@@ -439,15 +403,25 @@ public class BlockBrowser implements Browser
     
     public void reloadServiceParams()
     {
-        //reloadServicePanel(rendererParamsPanel); //TODO
-        //reloadServicePanel(segmParamsPanel);
-        //reloadServicePanel(logicalParamsPanel);
+        for (BrowserTab tab : browserTabs)
+        {
+            tab.reloadServiceParams();
+        }
     }
     
-    private void reloadServicePanel(JPanel panel)
+    public void addTab(BrowserTab tab)
     {
-        if (panel instanceof ParamsPanel)
-            ((ParamsPanel) panel).reloadParams();
+        browserTabs.add(tab);
+        getToolTabs().addTab(tab.getTitle(), null, tab.getTabPanel(), null);
+    }
+    
+    private void tabSelected(int index)
+    {
+        BrowserTab tab = browserTabs.get(index);
+        getMainSplitter().setLeftComponent(tab.getStructurePanel());
+        getInfoSplitter().setRightComponent(tab.getPropertiesPanel());
+        for (int i = 0; i < browserTabs.size(); i++)
+            browserTabs.get(i).setActive(i == index);
     }
     
     //=============================================================================================================
@@ -631,60 +605,6 @@ public class BlockBrowser implements Browser
         selection.setVisible(false);
     }
     
-    private void showBoxInTree(Box node)
-    {
-        //find the path to root
-        int len = 0;
-        for (Box b = node; b != null; b = b.getParent())
-            len++;
-        Box[] path = new Box[len];
-        for (Box b = node; b != null; b = b.getParent())
-            path[--len] = b;
-        
-        TreePath select = new TreePath(path);
-        boxTree.setSelectionPath(select);
-        //boxTree.expandPath(select);
-        boxTree.scrollPathToVisible(new TreePath(path));
-    }
-    
-    private void showAreaInTree(Area node)
-    {
-        //find the path to root
-        int len = 0;
-        for (Area a = node; a != null; a = a.getParent())
-            len++;
-        Area[] path = new Area[len];
-        for (Area a = node; a != null; a = a.getParent())
-            path[--len] = a;
-        
-        TreePath select = new TreePath(path);
-        areaJTree.setSelectionPath(select);
-        //areaTree.expandPath(select);
-        areaJTree.scrollPathToVisible(new TreePath(path));
-    }
-    
-    private void showAreaInLogicalTree(Area node)
-    {
-        if (proc.getLogicalAreaTree() != null && proc.getLogicalAreaTree().getRoot() != null)
-        {
-            LogicalArea lnode = proc.getLogicalAreaTree().getRoot().findArea(node);
-            if (lnode != null)
-            {
-                //find the path to root
-                int len = 0;
-                for (LogicalArea a = lnode; a != null; a = a.getParent())
-                    len++;
-                LogicalArea[] path = new LogicalArea[len];
-                for (LogicalArea a = lnode; a != null; a = a.getParent())
-                    path[--len] = a;
-                TreePath select = new TreePath(path);
-                logicalTree.setSelectionPath(select);
-                //logicalTree.expandPath(select);
-                logicalTree.scrollPathToVisible(new TreePath(path));
-            }
-        }
-    }
-    
     private void showAllBoxes(Box root)
     {
         getOutputDisplay().drawExtent(root);
@@ -700,173 +620,7 @@ public class BlockBrowser implements Browser
             showAreas(root.getChildAt(i), name);
     }
     
-    private void displayAreaInfo(Area area)
-    {
-        Vector<String> cols = infoTableData("Property", "Value");
-        
-        Vector<Vector <String>> vals = new Vector<Vector <String>>();
-        //vals.add(infoTableData("Layout", area.getLayoutType().toString()));
-        if (area.getParent() == null)
-            vals.add(infoTableData("GP", "---"));
-        else
-            vals.add(infoTableData("GP", area.getParent().getTopology().getPosition(area).toString()));
-        vals.add(infoTableData("Tags", tagProbabilityString(area.getTags())));
-        //if (proc.getVisualClassifier() != null)
-        //    vals.add(infoTableData("V. class", proc.getVisualClassifier().classifyArea(area)));
-        //vals.add(infoTableData("Style probs", tagProbabilityString(proc.getMsa() != null ? proc.getMsa().classifyNode(area) : null)));
-        //vals.add(infoTableData("Total probs", tagProbabilityString(proc.getTagPredictor() != null ? proc.getTagPredictor().getTagProbabilities(area) : null)));
-        //vals.add(infoTableData("Importance", String.valueOf(area.getImportance())));
-        //vals.add(infoTableData("Separated", (area.isSeparated()) ? "true" : "false"));
-        //vals.add(infoTableData("Atomic", (area.isAtomic()) ? "true" : "false"));
-        //vals.add(infoTableData("Indent scale", area.getTopology().getMinIndent() + " - " + area.getTopology().getMaxIndent()));
-        //vals.add(infoTableData("Indent value", String.valueOf(proc.getFeatures().getIndentation(area))));
-        //vals.add(infoTableData("Centered", (area.isCentered()) ? "true" : "false"));
-        //vals.add(infoTableData("Coherent", (area.isCoherent()) ? "true" : "false"));
-        //vals.add(infoTableData("Parent perc.", String.valueOf(area.getParentPercentage())));
-        
-        //vals.add(infoTableData("Name", area.getName()));
-        vals.add(infoTableData("Bounds", area.getBounds().toString()));
-        //vals.add(infoTableData("Content", (a.getContentBounds() == null) ? "" : a.getContentBounds().toString()));
-        //vals.add(infoTableData("Level", String.valueOf(a.getLevel())));
-        vals.add(infoTableData("Borders", borderString(area)));
-        vals.add(infoTableData("Bg separated", (area.isBackgroundSeparated()) ? "true" : "false"));
-        vals.add(infoTableData("Is hor. sep.", (area.isHorizontalSeparator()) ? "true" : "false"));
-        vals.add(infoTableData("Is vert. sep.", (area.isVerticalSeparator()) ? "true" : "false"));
-        vals.add(infoTableData("Avg. fsize", String.valueOf(area.getFontSize())));
-        vals.add(infoTableData("Avg. fweight", String.valueOf(area.getFontWeight())));
-        vals.add(infoTableData("Avg. fstyle", String.valueOf(area.getFontStyle())));
-        //vals.add(infoTableData("Decl. fsize", String.valueOf(area.getDeclaredFontSize())));
-        //vals.add(infoTableData("Luminosity", String.valueOf(area.getColorLuminosity())));
-        //vals.add(infoTableData("Start color", colorString(a.getBoxes().firstElement().getStartColor())));
-        if (area.getBoxes().size() > 0)
-            vals.add(infoTableData("First box clr", colorString(area.getBoxes().get(0).getColor())));
-        vals.add(infoTableData("Bg color", colorString(area.getBackgroundColor())));
-        vals.add(infoTableData("Efficient bg", colorString(area.getEffectiveBackgroundColor())));
-        
-        //vals.add(infoTableData("Fg color", colorString(area.getBoxes().firstElement().getColor())));
-        
-        //markednessText.setText(String.format("%.2f", proc.getFeatures().getMarkedness(area)));
-
-        //classification result
-        displayProbabilityTable(area);
-        
-        /*Vector<Vector <String>> fvals = new Vector<Vector <String>>();
-        FeatureVector f = proc.getFeatures().getFeatureVector(area);
-        if (f != null)
-        {
-            Method[] methods = f.getClass().getMethods();
-            for (Method m : methods)
-            {
-                try
-                {
-                    if (m.getName().startsWith("get") && !m.equals("getClass"))
-                    {
-                        Object ret = m.invoke(f, (Object []) null);
-                        if (ret != null)
-                            fvals.add(infoTableData(m.getName().substring(3), ret.toString()));
-                    }
-                    if (m.getName().startsWith("is"))
-                    {
-                        Object ret = m.invoke(f, (Object []) null);
-                        if (ret != null)
-                            fvals.add(infoTableData(m.getName().substring(2), ret.toString()));
-                    }
-                } catch (Exception e) {}
-            }
-        }*/
-        
-        DefaultTableModel tab = new DefaultTableModel(vals, cols);
-        infoTable.setModel(tab);
-        //DefaultTableModel ftab = new DefaultTableModel(fvals, cols);
-        //featureTable.setModel(ftab);
-    }
-    
-    private String borderString(Area a)
-    {
-        String bs = "";
-        if (a.hasTopBorder()) bs += "^";
-        if (a.hasLeftBorder()) bs += "<";
-        if (a.hasRightBorder()) bs += ">";
-        if (a.hasBottomBorder()) bs += "_";
-        return bs;
-    }
-    
-    private String colorString(Color color)
-    {
-        if (color == null)
-            return "- transparent -";
-        else
-            return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
-    }
-    
-    private String tagString(Map<Tag, Float> tags)
-    {
-        String ret = "";
-        for (Map.Entry<Tag, Float> entry : tags.entrySet())
-            ret += entry.getKey() + " ";
-        return ret;
-    }
-    
-    private String tagProbabilityString(Map<Tag, Float> map)
-    {
-        String ret = "";
-        if (map != null)
-        {
-            for (Map.Entry<Tag, Float> entry : map.entrySet())
-            {
-                if (entry.getValue() > TAG_PROBABILITY_THRESHOLD)
-                    ret += entry.getKey() + " (" + String.format("%1.2f", entry.getValue()) + ") "; 
-            }
-        }
-        return ret;
-    }
-    
-    private Vector<String> infoTableData(String prop, String value)
-    {
-        Vector<String> cols = new Vector<String>(2);
-        cols.add(prop);
-        cols.add(value);
-        return cols;
-    }
-    
-    private void displayProbabilityTable(Area area)
-    {
-        Vector<String> cols = new Vector<String>(tagNames);
-        Collections.sort(cols);
-        cols.insertElementAt("Type", 0);
-        Vector<String> types = new Vector<String>(tagTypes);
-        Collections.sort(types);
-
-        Vector<Vector <String>> lines = new Vector<Vector <String>>(types.size());
-        for (String type : types)
-            lines.add(getProbTableLine(type, cols, area.getTags()));
-        probTable.setModel(new DefaultTableModel(lines, cols));
-    }
-    
-    private Vector<String> getProbTableLine(String type, List<String> names, Map<Tag, Float> data)
-    {
-        Vector<String> ret = new Vector<String>();
-        boolean first = true;
-        for (String name : names)
-        {
-            if (first)
-            {
-                ret.add(type);
-                first = false;
-            }
-            else
-            {
-                Tag search = new DefaultTag(type, name);
-                if (data.containsKey(search))
-                    ret.add(String.format("%1.2f", data.get(search)));
-                else
-                    ret.add("");
-            }
-        }
-        return ret;
-    }
-    
-    private void notifyAreaSelection(Area area)
+    public void notifyAreaSelection(Area area)
     {
         //notify area listeners
         for (AreaSelectionListener listener : areaListeners)
@@ -891,29 +645,16 @@ public class BlockBrowser implements Browser
             listener.logicalAreaTreeUpdated(getLogicalTree());
     }
     
-    private void showArea(Area area)
+    public Set<String> getTagTypes()
     {
-        ((BrowserPanel) contentCanvas).getOutputDisplay().drawExtent(area);
-        contentCanvas.repaint();
-        
-        //show the info table
-        displayAreaInfo(area);
+        return tagTypes;
     }
 
-    private void showLogicalArea(LogicalArea lnode)
+    public Set<String> getTagNames()
     {
-        boolean first = true;
-        for (Area area : lnode.getAreas())
-        {
-            if (first)
-                showArea(area);
-            else
-                ((BrowserPanel) contentCanvas).getOutputDisplay().drawExtent(area);
-            first = false;
-        }
-        contentCanvas.repaint();
+        return tagNames;
     }
-    
+
     private void updateTagLists(AreaTree tree)
     {
         tagNames = new HashSet<String>();
@@ -948,45 +689,11 @@ public class BlockBrowser implements Browser
      */
     protected void initGUI()
     {
-        //add the default selection buttons
-        addCanvasClickListener("Boxes", new CanvasClickListener()
-        {
-            @Override
-            public void canvasClicked(int x, int y)
-            {
-                Box node = proc.getPage().getBoxAt(x, y);
-                if (node != null)
-                    showBoxInTree(node);
-            }
-        }, false);
-        addCanvasClickListener("Areas", new CanvasClickListener()
-        {
-            @Override
-            public void canvasClicked(int x, int y)
-            {
-                List<Area> nodes = proc.getAreaTree().getAreasAt(x, y);
-                if (!nodes.isEmpty())
-                {
-                    System.out.println("All: " + nodes);
-                    Area node = nodes.get(nodes.size() - 1);
-                    if (getSelectedArea() != null)
-                    {
-                        int i = nodes.indexOf(getSelectedArea());
-                        if (i != -1) //already selected; try the previous one
-                        {
-                            if (i == 0)
-                                i = nodes.size() - 1;
-                            else
-                                i = i - 1;
-                            node = nodes.get(i);
-                        }
-                    }
-                    System.out.println("Using: " + node);
-                    showAreaInTree(node);
-                    showAreaInLogicalTree(node);
-                }
-            }
-        }, true);
+        //add the default tabs
+        boxTreeTab = new BoxTreeTab(this);
+        addTab(boxTreeTab);
+        segmentationTab = new SegmentationTab(this);
+        addTab(segmentationTab);
     }
     
     //===========================================================================
@@ -1087,25 +794,6 @@ public class BlockBrowser implements Browser
     }
 
     /**
-     * This method initializes jPanel1	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getStructurePanel()
-    {
-        if (structurePanel == null)
-        {
-            GridLayout gridLayout = new GridLayout();
-            gridLayout.setRows(1);
-            structurePanel = new JPanel();
-            structurePanel.setPreferredSize(new Dimension(200, 408));
-            structurePanel.setLayout(gridLayout);
-            structurePanel.add(getSidebarPane(), null);
-        }
-        return structurePanel;
-    }
-
-    /**
      * This method initializes jPanel2	
      * 	
      * @return javax.swing.JPanel	
@@ -1141,86 +829,6 @@ public class BlockBrowser implements Browser
             statusText.setText("Browser ready.");
         }
         return statusText;
-    }
-
-    /**
-     * This method initializes jTabbedPane	
-     * 	
-     * @return javax.swing.JTabbedPane	
-     */
-    private JTabbedPane getSidebarPane()
-    {
-        if (sidebarPane == null)
-        {
-            sidebarPane = new JTabbedPane();
-            sidebarPane.addTab("Area tree", null, getJPanel(), null);
-            sidebarPane.addTab("Logical tree", null, getLogicalTreePanel(), null);
-            sidebarPane.addTab("Box tree", null, getBoxTreePanel(), null);
-            sidebarPane.addTab("Paths", null, getPathsPanel(), null);
-        }
-        return sidebarPane;
-    }
-
-    /**
-     * This method initializes jPanel	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getBoxTreePanel()
-    {
-        if (boxTreePanel == null)
-        {
-            GridLayout gridLayout2 = new GridLayout();
-            gridLayout2.setRows(1);
-            boxTreePanel = new JPanel();
-            boxTreePanel.setLayout(gridLayout2);
-            boxTreePanel.add(getBoxTreeScroll(), null);
-        }
-        return boxTreePanel;
-    }
-
-    /**
-     * This method initializes jScrollPane	
-     * 	
-     * @return javax.swing.JScrollPane	
-     */
-    private JScrollPane getBoxTreeScroll()
-    {
-        if (boxTreeScroll == null)
-        {
-            boxTreeScroll = new JScrollPane();
-            boxTreeScroll.setViewportView(getBoxTree());
-        }
-        return boxTreeScroll;
-    }
-
-    /**
-     * This method initializes jTree	
-     * 	
-     * @return javax.swing.JTree	
-     */
-    private JTree getBoxTree()
-    {
-        if (boxTree == null)
-        {
-            boxTree = new JTree();
-            boxTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener()
-            {
-                public void valueChanged(javax.swing.event.TreeSelectionEvent e)
-                {
-                    Box node = (Box) boxTree.getLastSelectedPathComponent();
-                    if (node != null)
-                    {
-	                    //node.drawExtent((BrowserCanvas) contentCanvas);
-                        System.out.println("Node:" + node);
-                        ((BrowserPanel) contentCanvas).getOutputDisplay().drawExtent(node);
-                        contentCanvas.repaint();
-                        //boxTree.scrollPathToVisible(new TreePath(node.getPath()));
-                    }
-                }
-            });
-        }
-        return boxTree;
     }
 
     /**
@@ -1278,7 +886,7 @@ public class BlockBrowser implements Browser
         {
             mainSplitter = new JSplitPane();
             mainSplitter.setDividerLocation(250);
-            mainSplitter.setLeftComponent(getStructurePanel());
+            mainSplitter.setLeftComponent(new JPanel());
             mainSplitter.setRightComponent(getInfoSplitter());
         }
         return mainSplitter;
@@ -1330,73 +938,6 @@ public class BlockBrowser implements Browser
     }
 
     /**
-	 * This method initializes jPanel	
-	 * 	
-	 * @return javax.swing.JPanel	
-	 */
-	private JPanel getJPanel()
-	{
-		if (areaTreePanel == null)
-		{
-			GridLayout gridLayout4 = new GridLayout();
-			gridLayout4.setRows(1);
-			gridLayout4.setColumns(1);
-			areaTreePanel = new JPanel();
-			areaTreePanel.setLayout(gridLayout4);
-			areaTreePanel.add(getJScrollPane(), null);
-		}
-		return areaTreePanel;
-	}
-
-	/**
-	 * This method initializes jScrollPane	
-	 * 	
-	 * @return javax.swing.JScrollPane	
-	 */
-	private JScrollPane getJScrollPane()
-	{
-		if (areaTreeScroll == null)
-		{
-			areaTreeScroll = new JScrollPane();
-			areaTreeScroll.setViewportView(getAreaJTree());
-		}
-		return areaTreeScroll;
-	}
-
-	/**
-	 * This method initializes jTree	
-	 * 	
-	 * @return javax.swing.JTree	
-	 */
-	private JTree getAreaJTree()
-	{
-		if (areaJTree == null)
-		{
-			areaJTree = new JTree();
-			areaJTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener()
-			{
-				public void valueChanged(javax.swing.event.TreeSelectionEvent e)
-				{
-                    if (logsync)
-                    {
-	                    Area node = (Area) areaJTree.getLastSelectedPathComponent();
-	                    if (node != null)
-	                    {
-	                        showArea(node);
-                        	areasync = false;
-                        	showAreaInLogicalTree(node);
-                        	areasync = true;
-	                    }
-	                    notifyAreaSelection(node);
-                    }
-				}
-			});
-			areaJTree.setModel(new AreaTreeModel(null));
-		}
-		return areaJTree;
-	}
-
-    /**
      * This method initializes showBoxButton	
      * 	
      * @return javax.swing.JButton	
@@ -1412,7 +953,7 @@ public class BlockBrowser implements Browser
             {
 				public void actionPerformed(java.awt.event.ActionEvent e)
                 {
-                    Box node = (Box) boxTree.getLastSelectedPathComponent();
+                    Box node = boxTreeTab.getSelectedBox();
                     if (node != null)
                     {
                         showAllBoxes(node);
@@ -1440,7 +981,7 @@ public class BlockBrowser implements Browser
             {
 				public void actionPerformed(java.awt.event.ActionEvent e)
                 {
-                    Area node = (Area) areaJTree.getLastSelectedPathComponent();
+                    Area node = segmentationTab.getSelectedArea();
                     if (node != null)
                     {
                         showAreas(node, null);
@@ -1487,74 +1028,6 @@ public class BlockBrowser implements Browser
         return toolPanel;
     }
 
-    /**
-     * This method initializes jPanel	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getLogicalTreePanel()
-    {
-        if (logicalTreePanel == null)
-        {
-            GridBagConstraints gridBagConstraints8 = new GridBagConstraints();
-            gridBagConstraints8.fill = GridBagConstraints.BOTH;
-            gridBagConstraints8.gridy = 0;
-            gridBagConstraints8.weightx = 1.0;
-            gridBagConstraints8.weighty = 1.0;
-            gridBagConstraints8.gridx = 0;
-            logicalTreePanel = new JPanel();
-            logicalTreePanel.setLayout(new GridBagLayout());
-            logicalTreePanel.add(getLogicalTreeScroll(), gridBagConstraints8);
-        }
-        return logicalTreePanel;
-    }
-
-    /**
-     * This method initializes jScrollPane	
-     * 	
-     * @return javax.swing.JScrollPane	
-     */
-    private JScrollPane getLogicalTreeScroll()
-    {
-        if (logicalTreeScroll == null)
-        {
-            logicalTreeScroll = new JScrollPane();
-            logicalTreeScroll.setViewportView(getLogicalJTree());
-        }
-        return logicalTreeScroll;
-    }
-
-    /**
-     * This method initializes logicalTree	
-     * 	
-     * @return javax.swing.JTree	
-     */
-    private JTree getLogicalJTree()
-    {
-        if (logicalTree == null)
-        {
-            logicalTree = new JTree();
-            logicalTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener()
-                    {
-                        public void valueChanged(javax.swing.event.TreeSelectionEvent e)
-                        {
-                        	if (areasync)
-                        	{
-	                            LogicalArea node = (LogicalArea) logicalTree.getLastSelectedPathComponent();
-	                            if (node != null)
-	                            {
-	                            	showLogicalArea((LogicalArea) node);
-                            		logsync = false;
-                            		showAreaInTree(((LogicalArea) node).getFirstArea());
-                            		logsync = true;
-	                            }
-                        	}
-                        }
-                    });
-            logicalTree.setModel(new LogicalTreeModel(null));
-        }
-        return logicalTree;
-    }
 
     /**
      * This method initializes refreshButton	
@@ -1592,74 +1065,12 @@ public class BlockBrowser implements Browser
             infoSplitter.setResizeWeight(1.0);
             infoSplitter.setDividerLocation(1050);
             infoSplitter.setLeftComponent(getContentPanel());
-            infoSplitter.setRightComponent(getObjectInfoPanel());
+            infoSplitter.setRightComponent(new JPanel());
         }
         return infoSplitter;
     }
 
-    /**
-     * This method initializes objectInfoPanel	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getObjectInfoPanel()
-    {
-        if (objectInfoPanel == null)
-        {
-            GridBagConstraints gridBagConstraints10 = new GridBagConstraints();
-            gridBagConstraints10.insets = new Insets(0, 0, 5, 0);
-            gridBagConstraints10.fill = GridBagConstraints.BOTH;
-            gridBagConstraints10.gridy = 0;
-            gridBagConstraints10.weightx = 1.0;
-            gridBagConstraints10.weighty = 0.5;
-            gridBagConstraints10.gridx = 0;
-            objectInfoPanel = new JPanel();
-            GridBagLayout gbl_objectInfoPanel = new GridBagLayout();
-            gbl_objectInfoPanel.rowWeights = new double[]{0.0, 0.0};
-            gbl_objectInfoPanel.columnWeights = new double[]{1.0};
-            objectInfoPanel.setLayout(gbl_objectInfoPanel);
-            objectInfoPanel.add(getJScrollPane4(), gridBagConstraints10);
-            GridBagConstraints gbc_probabilityScroll = new GridBagConstraints();
-            gbc_probabilityScroll.weighty = 0.25;
-            gbc_probabilityScroll.weightx = 1.0;
-            gbc_probabilityScroll.insets = new Insets(0, 0, 5, 0);
-            gbc_probabilityScroll.fill = GridBagConstraints.BOTH;
-            gbc_probabilityScroll.gridx = 0;
-            gbc_probabilityScroll.gridy = 1;
-            objectInfoPanel.add(getProbabilityScroll(), gbc_probabilityScroll);
-        }
-        return objectInfoPanel;
-    }
 
-    /**
-     * This method initializes jScrollPane	
-     * 	
-     * @return javax.swing.JScrollPane	
-     */
-    private JScrollPane getJScrollPane4()
-    {
-        if (objectInfoScroll == null)
-        {
-            objectInfoScroll = new JScrollPane();
-            objectInfoScroll.setViewportView(getInfoTable());
-        }
-        return objectInfoScroll;
-    }
-
-    /**
-     * This method initializes infoTable	
-     * 	
-     * @return javax.swing.JTable	
-     */
-    private JTable getInfoTable()
-    {
-        if (infoTable == null)
-        {
-            infoTable = new JTable();
-        }
-        return infoTable;
-    }
-    
     /**
      * This method initializes showArtAreaButton	
      * 	
@@ -1676,7 +1087,7 @@ public class BlockBrowser implements Browser
             {
                 public void actionPerformed(java.awt.event.ActionEvent e)
                 {
-                    Area node = (Area) areaJTree.getLastSelectedPathComponent();
+                    Area node = segmentationTab.getSelectedArea();
                     if (node != null)
                     {
                         showAreas(node, "<area");
@@ -1704,7 +1115,7 @@ public class BlockBrowser implements Browser
           {
               public void actionPerformed(java.awt.event.ActionEvent e)
               {
-                  Area node = (Area) areaJTree.getLastSelectedPathComponent();
+                  Area node = segmentationTab.getSelectedArea();
                   if (node != null)
                   {
                       showAreas(node, "<chunk");
@@ -1716,129 +1127,22 @@ public class BlockBrowser implements Browser
         return showColumnsButton;
     }
 
-    private JPanel getPathsPanel()
-    {
-        if (pathsPanel == null)
-        {
-            pathsPanel = new JPanel();
-            GridBagLayout gbl_pathsPanel = new GridBagLayout();
-            gbl_pathsPanel.columnWidths = new int[] { 0, 0 };
-            gbl_pathsPanel.rowHeights = new int[] { 0, 0, 0 };
-            gbl_pathsPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-            gbl_pathsPanel.rowWeights = new double[] { 1.0, 1.0,
-                    Double.MIN_VALUE };
-            pathsPanel.setLayout(gbl_pathsPanel);
-            GridBagConstraints gbc_pathListScroll = new GridBagConstraints();
-            gbc_pathListScroll.insets = new Insets(0, 0, 5, 0);
-            gbc_pathListScroll.fill = GridBagConstraints.BOTH;
-            gbc_pathListScroll.gridx = 0;
-            gbc_pathListScroll.gridy = 0;
-            pathsPanel.add(getPathListScroll(), gbc_pathListScroll);
-            GridBagConstraints gbc_extractionScroll = new GridBagConstraints();
-            gbc_extractionScroll.fill = GridBagConstraints.BOTH;
-            gbc_extractionScroll.gridx = 0;
-            gbc_extractionScroll.gridy = 1;
-            pathsPanel.add(getExtractionScroll(), gbc_extractionScroll);
-        }
-        return pathsPanel;
-    }
-
-    private JScrollPane getPathListScroll()
-    {
-        if (pathListScroll == null)
-        {
-            pathListScroll = new JScrollPane();
-        }
-        return pathListScroll;
-    }
-
-    private JScrollPane getExtractionScroll()
-    {
-        if (extractionScroll == null)
-        {
-            extractionScroll = new JScrollPane();
-            extractionScroll.setViewportView(getExtractionTable());
-        }
-        return extractionScroll;
-    }
-
-    private JScrollPane getProbabilityScroll()
-    {
-        if (probabilityScroll == null)
-        {
-            probabilityScroll = new JScrollPane();
-            probabilityScroll.setViewportView(getProbTable());
-        }
-        return probabilityScroll;
-    }
-
-    private JTable getProbTable()
-    {
-        if (probTable == null)
-        {
-            probTable = new JTable();
-            probTable.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer()
-            {
-                private static final long serialVersionUID = 1L;
-                @Override
-                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
-                {
-                    Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                    try {
-                        Double d = Double.parseDouble(value.toString().replace(',', '.'));
-                        if (d <= TAG_PROBABILITY_THRESHOLD)
-                            c.setForeground(new java.awt.Color(180, 180, 180));
-                        else
-                            c.setForeground(java.awt.Color.BLACK);
-                    } catch (NumberFormatException e) {
-                        c.setForeground(java.awt.Color.BLACK);
-                    }
-                    return c;
-                }
-            });
-        }
-        return probTable;
-    }
-
-    private JTable getExtractionTable()
-    {
-        if (extractionTable == null)
-        {
-            extractionTable = new JTable();
-        }
-        return extractionTable;
-    }
-    
 
     private JTabbedPane getToolTabs()
     {
         if (toolTabs == null)
         {
             toolTabs = new JTabbedPane(JTabbedPane.TOP);
-            toolTabs.addTab("Box tree", null, getBoxTreeTab(), null);
-            toolTabs.addTab("Segmentation", null, getSegmentationTab(), null);
+            toolTabs.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
+                    System.out.println("Tab: " + toolTabs.getSelectedIndex());
+                    tabSelected(toolTabs.getSelectedIndex());
+                }
+            });
         }
         return toolTabs;
     }
 
-    private JPanel getBoxTreeTab()
-    {
-        if (boxTreeTab == null)
-        {
-            boxTreeTab = new BoxSourcePanel(this);
-        }
-        return boxTreeTab;
-    }
-
-    private JPanel getSegmentationTab()
-    {
-        if (segmentationTab == null)
-        {
-            segmentationTab = new SegmentationPanel(this);
-        }
-        return segmentationTab;
-    }
-    
     private class Selection extends JPanel
     {
         private static final long serialVersionUID = 1L;

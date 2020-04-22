@@ -80,6 +80,11 @@ public class SegmentationPanel extends JPanel
         }
     }
     
+    public void reloadServiceParams()
+    {
+        ((ParamsPanel) getSegmParamsPanel()).reloadParams();
+    }
+    
     //====================================================================================================
     
     private JPanel getSegmChoicePanel()

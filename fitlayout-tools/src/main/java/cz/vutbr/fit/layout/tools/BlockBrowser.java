@@ -27,7 +27,6 @@ import cz.vutbr.fit.layout.gui.BrowserPlugin;
 import cz.vutbr.fit.layout.gui.CanvasClickListener;
 import cz.vutbr.fit.layout.gui.RectangleSelectionListener;
 import cz.vutbr.fit.layout.gui.TreeListener;
-import cz.vutbr.fit.layout.impl.DefaultContentRect;
 import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
@@ -39,17 +38,17 @@ import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.process.GUIProcessor;
+import cz.vutbr.fit.layout.tools.gui.BoxSourcePanel;
+import cz.vutbr.fit.layout.tools.gui.SegmentationPanel;
 
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 
 import java.awt.GridBagConstraints;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -84,9 +83,6 @@ import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-import javax.swing.JComboBox;
-import javax.swing.JCheckBox;
-
 /**
  * @author burgetr
  *
@@ -102,7 +98,6 @@ public class BlockBrowser implements Browser
     
     private GUIProcessor proc;
     private URL currentUrl = null;
-    private boolean dispFinished = false;
     private boolean areasync = true;
     private boolean logsync = true;
     private boolean rectSelection = false; //rectangle area selection in progress
@@ -124,7 +119,6 @@ public class BlockBrowser implements Browser
     private JPanel structurePanel = null;
     private JPanel statusPanel = null;
     private JTextField statusText = null;
-    private JButton okButton = null;
     private JTabbedPane sidebarPane = null;
     private JPanel boxTreePanel = null;
     private JScrollPane boxTreeScroll = null;
@@ -155,30 +149,11 @@ public class BlockBrowser implements Browser
     private JScrollPane pathListScroll;
     private JScrollPane extractionScroll;
     private JTable extractionTable;
-    private JFrame treeCompWindow;
     private JScrollPane probabilityScroll;
     private JTable probTable;
     private JTabbedPane toolTabs;
     private JPanel boxTreeTab;
     private JPanel segmentationTab;
-    private JLabel rendererLabel;
-    private JComboBox<BoxTreeProvider> rendererCombo;
-    private JPanel rendererChoicePanel;
-    private JPanel rendererParamsPanel;
-    private JPanel segmChoicePanel;
-    private JPanel segmParamsPanel;
-    private JLabel lblSegmentator;
-    private JComboBox<AreaTreeProvider> segmentatorCombo;
-    private JCheckBox segmAutorunCheckbox;
-    private JButton segmRunButton;
-    private JButton btnOperators;
-    private JFrame operatorWindow;
-    private JPanel logicalChoicePanel;
-    private JPanel logicalParamsPanel;
-    private JLabel lblLogicalBuilder;
-    private JComboBox<LogicalTreeProvider> logicalCombo;
-    private JButton logicalRunButton;
-    private JCheckBox logicalAutorunCheckbox;
 
 
     public BlockBrowser()
@@ -207,8 +182,8 @@ public class BlockBrowser implements Browser
     
     public void setLocation(String url)
     {
-        ((ParamsPanel) rendererParamsPanel).setParam("url", url);
-        displaySelectedURL();
+        ((BoxSourcePanel) getBoxTreeTab()).setUrl(url);
+        ((BoxSourcePanel) getBoxTreeTab()).displaySelectedURL();
     }
     
     public String getLocation()
@@ -365,7 +340,6 @@ public class BlockBrowser implements Browser
     @Override
 	public void setPage(Page page) 
     {
-    	
     	proc.setPage(page);
     	contentCanvas = createContentCanvas();
         
@@ -423,7 +397,6 @@ public class BlockBrowser implements Browser
         
         boxTree.setModel(new BoxTreeModel(proc.getPage().getRoot()));
         notifyBoxTreeUpdate();
-        dispFinished = true;
 	}
 
 	@Override
@@ -466,9 +439,9 @@ public class BlockBrowser implements Browser
     
     public void reloadServiceParams()
     {
-        reloadServicePanel(rendererParamsPanel);
-        reloadServicePanel(segmParamsPanel);
-        reloadServicePanel(logicalParamsPanel);
+        //reloadServicePanel(rendererParamsPanel); //TODO
+        //reloadServicePanel(segmParamsPanel);
+        //reloadServicePanel(logicalParamsPanel);
     }
     
     private void reloadServicePanel(JPanel panel)
@@ -479,66 +452,31 @@ public class BlockBrowser implements Browser
     
     //=============================================================================================================
     
-    public void displaySelectedURL()
+    public void renderPage(BoxTreeProvider btp, Map<String, Object> params)
     {
-        dispFinished = false;
-        if (treeCompWindow != null)
-        {
-            treeCompWindow.setVisible(false);
-            treeCompWindow.dispose();
-            treeCompWindow = null;
-        }
-        
-        try {
-            int i = rendererCombo.getSelectedIndex();
-            if (i != -1)
-            {
-                BoxTreeProvider btp = rendererCombo.getItemAt(i);
-                Page page = proc.renderPage(btp, ((ParamsPanel) rendererParamsPanel).getParams());
-                setPage(page);
-                
-                if (segmAutorunCheckbox.isSelected())
-                {
-                    segmentPage();
-                }
-                if (logicalAutorunCheckbox.isSelected())
-                {
-                    buildLogicalTree();
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("*** Error: "+e.getMessage());
-            e.printStackTrace();
-        }
+        Page page = proc.renderPage(btp, params);
+        setPage(page);
     }
     
     /**
      * Segments the page using the chosen provider and parametres.
      */
-    private void segmentPage()
+    public void segmentPage(AreaTreeProvider provider)
     {
-        DefaultContentRect.resetId(); //reset the default ID generator to obtain the same IDs for every segmentation
-        if (segmentatorCombo.getSelectedIndex() != -1)
-        {
-            AreaTreeProvider provider = segmentatorCombo.getItemAt(segmentatorCombo.getSelectedIndex());
-            proc.segmentPage(provider, null); //the parametres should have been set through the GUI
-            setAreaTree(proc.getAreaTree());
-        }
+        proc.segmentPage(provider, null); //the parametres should have been set through the GUI
+        setAreaTree(proc.getAreaTree());
     }
     
     /**
      * Builds the logical tree the chosen provider and parametres.
      */
-    private void buildLogicalTree()
+    public void buildLogicalTree(LogicalTreeProvider provider)
     {
-        if (logicalCombo.getSelectedIndex() != -1)
-        {
-            LogicalTreeProvider provider = logicalCombo.getItemAt(logicalCombo.getSelectedIndex());
-            proc.buildLogicalTree(provider, null); //the parametres should have been set through the GUI
-            setLogicalTree(proc.getLogicalAreaTree());
-        }
+        proc.buildLogicalTree(provider, null); //the parametres should have been set through the GUI
+        setLogicalTree(proc.getLogicalAreaTree());
     }
     
+    //=============================================================================================================
     
     /** Creates the appropriate canvas based on the file type */
     private JPanel createContentCanvas()
@@ -1203,28 +1141,6 @@ public class BlockBrowser implements Browser
             statusText.setText("Browser ready.");
         }
         return statusText;
-    }
-
-    /**
-     * This method initializes jButton	
-     * 	
-     * @return javax.swing.JButton	
-     */
-    private JButton getOkButton()
-    {
-        if (okButton == null)
-        {
-            okButton = new JButton();
-            okButton.setText("Go!");
-            okButton.addActionListener(new java.awt.event.ActionListener()
-            {
-                public void actionPerformed(java.awt.event.ActionEvent e)
-                {
-                    displaySelectedURL();
-                }
-            });
-        }
-        return okButton;
     }
 
     /**
@@ -1909,30 +1825,7 @@ public class BlockBrowser implements Browser
     {
         if (boxTreeTab == null)
         {
-            boxTreeTab = new JPanel();
-            GridBagLayout gbl_sourcesTab = new GridBagLayout();
-            gbl_sourcesTab.columnWeights = new double[] { 1.0 };
-            gbl_sourcesTab.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 1.0 };
-            boxTreeTab.setLayout(gbl_sourcesTab);
-            GridBagConstraints gbc_rendererChoicePanel = new GridBagConstraints();
-            gbc_rendererChoicePanel.weightx = 1.0;
-            gbc_rendererChoicePanel.anchor = GridBagConstraints.EAST;
-            gbc_rendererChoicePanel.fill = GridBagConstraints.BOTH;
-            gbc_rendererChoicePanel.insets = new Insets(0, 0, 1, 0);
-            gbc_rendererChoicePanel.gridx = 0;
-            gbc_rendererChoicePanel.gridy = 0;
-            boxTreeTab.add(getRendererChoicePanel(), gbc_rendererChoicePanel);
-            GridBagConstraints gbc_rendererParamsPanel = new GridBagConstraints();
-            gbc_rendererParamsPanel.weightx = 1.0;
-            gbc_rendererParamsPanel.fill = GridBagConstraints.BOTH;
-            gbc_rendererParamsPanel.insets = new Insets(0, 0, 2, 0);
-            gbc_rendererParamsPanel.gridx = 0;
-            gbc_rendererParamsPanel.gridy = 1;
-            boxTreeTab.add(getRendererParamsPanel(), gbc_rendererParamsPanel);
-
-            BoxTreeProvider p = (BoxTreeProvider) rendererCombo.getSelectedItem();
-            if (p != null)
-                ((ParamsPanel) rendererParamsPanel).setOperation(p, null);
+            boxTreeTab = new BoxSourcePanel(this);
         }
         return boxTreeTab;
     }
@@ -1941,279 +1834,11 @@ public class BlockBrowser implements Browser
     {
         if (segmentationTab == null)
         {
-            segmentationTab = new JPanel();
-            GridBagLayout gbl_sourcesTab = new GridBagLayout();
-            gbl_sourcesTab.columnWeights = new double[] { 1.0 };
-            gbl_sourcesTab.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 1.0 };
-            segmentationTab.setLayout(gbl_sourcesTab);
-            GridBagConstraints gbc_segmChoicePanel = new GridBagConstraints();
-            gbc_segmChoicePanel.weightx = 1.0;
-            gbc_segmChoicePanel.anchor = GridBagConstraints.EAST;
-            gbc_segmChoicePanel.fill = GridBagConstraints.BOTH;
-            gbc_segmChoicePanel.insets = new Insets(0, 0, 1, 0);
-            gbc_segmChoicePanel.gridx = 0;
-            gbc_segmChoicePanel.gridy = 2;
-            segmentationTab.add(getSegmChoicePanel(), gbc_segmChoicePanel);
-            GridBagConstraints gbc_segmParamsPanel = new GridBagConstraints();
-            gbc_segmParamsPanel.insets = new Insets(0, 0, 2, 0);
-            gbc_segmParamsPanel.weightx = 1.0;
-            gbc_segmParamsPanel.fill = GridBagConstraints.BOTH;
-            gbc_segmParamsPanel.gridx = 0;
-            gbc_segmParamsPanel.gridy = 3;
-            segmentationTab.add(getSegmParamsPanel(), gbc_segmParamsPanel);
-            GridBagConstraints gbc_logicalChoicePanel = new GridBagConstraints();
-            gbc_logicalChoicePanel.insets = new Insets(0, 0, 1, 0);
-            gbc_logicalChoicePanel.fill = GridBagConstraints.BOTH;
-            gbc_logicalChoicePanel.gridx = 0;
-            gbc_logicalChoicePanel.gridy = 4;
-            segmentationTab.add(getLogicalChoicePanel(), gbc_logicalChoicePanel);
-            GridBagConstraints gbc_logicalParamsPanel = new GridBagConstraints();
-            gbc_logicalParamsPanel.fill = GridBagConstraints.BOTH;
-            gbc_logicalParamsPanel.gridx = 0;
-            gbc_logicalParamsPanel.gridy = 5;
-            segmentationTab.add(getLogicalParamsPanel(), gbc_logicalParamsPanel);
-
-            AreaTreeProvider ap = (AreaTreeProvider) segmentatorCombo.getSelectedItem();
-            if (ap != null)
-                ((ParamsPanel) segmParamsPanel).setOperation(ap, null);
-            LogicalTreeProvider lp = (LogicalTreeProvider) logicalCombo.getSelectedItem();
-            if (lp != null)
-                ((ParamsPanel) logicalParamsPanel).setOperation(lp, null);
+            segmentationTab = new SegmentationPanel(this);
         }
         return segmentationTab;
     }
     
-    private JLabel getRendererLabel()
-    {
-        if (rendererLabel == null)
-        {
-            rendererLabel = new JLabel("Renderer");
-        }
-        return rendererLabel;
-    }
-
-    protected JComboBox<BoxTreeProvider> getRendererCombo()
-    {
-        if (rendererCombo == null)
-        {
-            rendererCombo = new JComboBox<BoxTreeProvider>();
-            rendererCombo.addActionListener(new ActionListener()
-            {
-                public void actionPerformed(ActionEvent e)
-                {
-                    BoxTreeProvider p = (BoxTreeProvider) rendererCombo.getSelectedItem();
-                    if (p != null)
-                        ((ParamsPanel) rendererParamsPanel).setOperation(p, null);
-                }
-            });
-            Vector<BoxTreeProvider> providers = new Vector<BoxTreeProvider>(proc.getBoxProviders().values());
-            DefaultComboBoxModel<BoxTreeProvider> model = new DefaultComboBoxModel<BoxTreeProvider>(providers);
-            rendererCombo.setModel(model);
-        }
-        return rendererCombo;
-    }
-
-    private JPanel getRendererChoicePanel()
-    {
-        if (rendererChoicePanel == null)
-        {
-            rendererChoicePanel = new JPanel();
-            FlowLayout flowLayout = (FlowLayout) rendererChoicePanel.getLayout();
-            flowLayout.setAlignment(FlowLayout.LEFT);
-            rendererChoicePanel.add(getRendererLabel());
-            rendererChoicePanel.add(getRendererCombo());
-            rendererChoicePanel.add(getOkButton());
-        }
-        return rendererChoicePanel;
-    }
-
-    private JPanel getRendererParamsPanel()
-    {
-        if (rendererParamsPanel == null)
-        {
-            rendererParamsPanel = new ParamsPanel();
-        }
-        return rendererParamsPanel;
-    }
-
-    private JPanel getSegmChoicePanel()
-    {
-        if (segmChoicePanel == null)
-        {
-            segmChoicePanel = new JPanel();
-            FlowLayout flowLayout = (FlowLayout) segmChoicePanel.getLayout();
-            flowLayout.setAlignment(FlowLayout.LEFT);
-            segmChoicePanel.add(getLblSegmentator());
-            segmChoicePanel.add(getSegmentatorCombo());
-            segmChoicePanel.add(getSegmRunButton());
-            segmChoicePanel.add(getSegmAutorunCheckbox());
-            segmChoicePanel.add(getBtnOperators());
-        }
-        return segmChoicePanel;
-    }
-
-    private JPanel getSegmParamsPanel()
-    {
-        if (segmParamsPanel == null)
-        {
-            segmParamsPanel = new ParamsPanel();
-        }
-        return segmParamsPanel;
-    }
-
-    private JLabel getLblSegmentator()
-    {
-        if (lblSegmentator == null)
-        {
-            lblSegmentator = new JLabel("Segmentator");
-        }
-        return lblSegmentator;
-    }
-
-    protected JComboBox<AreaTreeProvider> getSegmentatorCombo()
-    {
-        if (segmentatorCombo == null)
-        {
-            segmentatorCombo = new JComboBox<AreaTreeProvider>();
-            segmentatorCombo.addActionListener(new ActionListener()
-            {
-                public void actionPerformed(ActionEvent e)
-                {
-                    AreaTreeProvider ap = (AreaTreeProvider) segmentatorCombo.getSelectedItem();
-                    if (ap != null)
-                        ((ParamsPanel) segmParamsPanel).setOperation(ap, null);
-                }
-            });
-            Vector<AreaTreeProvider> providers = new Vector<AreaTreeProvider>(proc.getAreaProviders().values());
-            DefaultComboBoxModel<AreaTreeProvider> model = new DefaultComboBoxModel<AreaTreeProvider>(providers);
-            segmentatorCombo.setModel(model);
-        }
-        return segmentatorCombo;
-    }
-
-    private JButton getSegmRunButton()
-    {
-        if (segmRunButton == null)
-        {
-            segmRunButton = new JButton("Run");
-            segmRunButton.addActionListener(new ActionListener()
-            {
-                public void actionPerformed(ActionEvent e)
-                {
-                    segmentPage();
-                }
-            });
-        }
-        return segmRunButton;
-    }
-    
-    protected JCheckBox getSegmAutorunCheckbox()
-    {
-        if (segmAutorunCheckbox == null)
-        {
-            segmAutorunCheckbox = new JCheckBox("Run automatically");
-        }
-        return segmAutorunCheckbox;
-    }
-    
-    private JButton getBtnOperators()
-    {
-        if (btnOperators == null)
-        {
-            btnOperators = new JButton("Operators...");
-            btnOperators.addActionListener(new ActionListener()
-            {
-                public void actionPerformed(ActionEvent e)
-                {
-                    if (operatorWindow == null)
-                        operatorWindow = new OperatorConfigWindow(proc);
-                    operatorWindow.pack();
-                    operatorWindow.setVisible(true);
-                }
-            });
-        }
-        return btnOperators;
-    }
-    
-    private JPanel getLogicalChoicePanel()
-    {
-        if (logicalChoicePanel == null)
-        {
-            logicalChoicePanel = new JPanel();
-            FlowLayout flowLayout = (FlowLayout) logicalChoicePanel.getLayout();
-            flowLayout.setAlignment(FlowLayout.LEFT);
-            logicalChoicePanel.add(getLblLogicalBuilder());
-            logicalChoicePanel.add(getLogicalCombo());
-            logicalChoicePanel.add(getLogicalRunButton());
-            logicalChoicePanel.add(getLogicalAutorunCheckbox());
-            if (getLogicalCombo().getModel().getSize() == 0)
-                logicalChoicePanel.setVisible(false);
-        }
-        return logicalChoicePanel;
-    }
-
-    private JPanel getLogicalParamsPanel()
-    {
-        if (logicalParamsPanel == null)
-        {
-            logicalParamsPanel = new ParamsPanel();
-        }
-        return logicalParamsPanel;
-    }
-
-    private JLabel getLblLogicalBuilder()
-    {
-        if (lblLogicalBuilder == null)
-        {
-            lblLogicalBuilder = new JLabel("Logical builder");
-        }
-        return lblLogicalBuilder;
-    }
-
-    protected JComboBox<LogicalTreeProvider> getLogicalCombo()
-    {
-        if (logicalCombo == null)
-        {
-            logicalCombo = new JComboBox<LogicalTreeProvider>();
-            logicalCombo.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) 
-                {
-                    LogicalTreeProvider lp = (LogicalTreeProvider) logicalCombo.getSelectedItem();
-                    if (lp != null)
-                        ((ParamsPanel) logicalParamsPanel).setOperation(lp, null);
-                }
-            });
-            Vector<LogicalTreeProvider> providers = new Vector<LogicalTreeProvider>(proc.getLogicalProviders().values());
-            DefaultComboBoxModel<LogicalTreeProvider> model = new DefaultComboBoxModel<LogicalTreeProvider>(providers);
-            logicalCombo.setModel(model);
-        }
-        return logicalCombo;
-    }
-
-    private JButton getLogicalRunButton()
-    {
-        if (logicalRunButton == null)
-        {
-            logicalRunButton = new JButton("Run");
-            logicalRunButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) 
-                {
-                    buildLogicalTree();
-                }
-            });
-        }
-        return logicalRunButton;
-    }
-
-    protected JCheckBox getLogicalAutorunCheckbox()
-    {
-        if (logicalAutorunCheckbox == null)
-        {
-            logicalAutorunCheckbox = new JCheckBox("Run automatically");
-        }
-        return logicalAutorunCheckbox;
-    }
-
     private class Selection extends JPanel
     {
         private static final long serialVersionUID = 1L;

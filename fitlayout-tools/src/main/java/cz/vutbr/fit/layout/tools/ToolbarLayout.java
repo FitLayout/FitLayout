@@ -34,14 +34,17 @@ public class ToolbarLayout extends FlowLayout
             int nComponents = parent.getComponentCount();
             if (nComponents > 0)
             {
-                int firstY = parent.getComponent(0).getY();
+                Component first = parent.getComponent(0);
+                int firstY = first.getY();
                 Component last = parent.getComponent(nComponents - 1);
                 int lastY = last.getY();
 
-                if (lastY != firstY)
+                if (lastY > firstY && lastY + last.getHeight() > firstY + first.getHeight())
                 {
                     size = new Dimension((int) size.getWidth(), lastY + last.getHeight());
                 }
+                else
+                    size = super.preferredLayoutSize(parent);
             }
 
             return size;

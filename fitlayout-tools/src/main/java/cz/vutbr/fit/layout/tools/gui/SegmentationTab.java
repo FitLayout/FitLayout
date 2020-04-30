@@ -27,7 +27,6 @@ import javax.swing.tree.TreePath;
 import cz.vutbr.fit.layout.gui.CanvasClickListener;
 import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.model.Area;
-import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.tools.AreaTreeModel;
 import cz.vutbr.fit.layout.tools.BlockBrowser;
@@ -174,7 +173,7 @@ public class SegmentationTab extends BrowserTabBase implements CanvasClickListen
         vals.add(infoTableData("Bounds", area.getBounds().toString()));
         //vals.add(infoTableData("Content", (a.getContentBounds() == null) ? "" : a.getContentBounds().toString()));
         //vals.add(infoTableData("Level", String.valueOf(a.getLevel())));
-        vals.add(infoTableData("Borders", borderString(area)));
+        vals.add(infoTableData("Borders", Utils.borderString(area)));
         vals.add(infoTableData("Bg separated", (area.isBackgroundSeparated()) ? "true" : "false"));
         vals.add(infoTableData("Is hor. sep.", (area.isHorizontalSeparator()) ? "true" : "false"));
         vals.add(infoTableData("Is vert. sep.", (area.isVerticalSeparator()) ? "true" : "false"));
@@ -185,9 +184,9 @@ public class SegmentationTab extends BrowserTabBase implements CanvasClickListen
         //vals.add(infoTableData("Luminosity", String.valueOf(area.getColorLuminosity())));
         //vals.add(infoTableData("Start color", colorString(a.getBoxes().firstElement().getStartColor())));
         if (area.getBoxes().size() > 0)
-            vals.add(infoTableData("First box clr", colorString(area.getBoxes().get(0).getColor())));
-        vals.add(infoTableData("Bg color", colorString(area.getBackgroundColor())));
-        vals.add(infoTableData("Efficient bg", colorString(area.getEffectiveBackgroundColor())));
+            vals.add(infoTableData("First box clr", Utils.colorString(area.getBoxes().get(0).getColor())));
+        vals.add(infoTableData("Bg color", Utils.colorString(area.getBackgroundColor())));
+        vals.add(infoTableData("Efficient bg", Utils.colorString(area.getEffectiveBackgroundColor())));
         
         //vals.add(infoTableData("Fg color", colorString(area.getBoxes().firstElement().getColor())));
         
@@ -271,15 +270,7 @@ public class SegmentationTab extends BrowserTabBase implements CanvasClickListen
         cols.add(value);
         return cols;
     }
-
-    private String colorString(Color color)
-    {
-        if (color == null)
-            return "- transparent -";
-        else
-            return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
-    }
-
+    
     private String tagProbabilityString(Map<Tag, Float> map)
     {
         String ret = "";
@@ -294,25 +285,6 @@ public class SegmentationTab extends BrowserTabBase implements CanvasClickListen
         return ret;
     }
 
-    private String borderString(Area a)
-    {
-        String bs = "";
-        if (a.hasTopBorder()) bs += "^";
-        if (a.hasLeftBorder()) bs += "<";
-        if (a.hasRightBorder()) bs += ">";
-        if (a.hasBottomBorder()) bs += "_";
-        return bs;
-    }
-    
-    @SuppressWarnings("unused")
-    private String tagString(Map<Tag, Float> tags)
-    {
-        String ret = "";
-        for (Map.Entry<Tag, Float> entry : tags.entrySet())
-            ret += entry.getKey() + " ";
-        return ret;
-    }
-    
     @Override
     public void refreshView()
     {

@@ -10,12 +10,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.util.Vector;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.TreePath;
 
 import cz.vutbr.fit.layout.gui.CanvasClickListener;
@@ -96,16 +98,6 @@ public class BoxTreeTab extends BrowserTabBase implements CanvasClickListener
         }
     }
 
-    //=================================================================================================
-    
-    public Box getSelectedBox()
-    {
-        if (boxTree == null)
-            return null;
-        else                   
-            return (Box) boxTree.getLastSelectedPathComponent();
-    }
-    
     private void showBoxInTree(Box node)
     {
         //find the path to root
@@ -121,7 +113,67 @@ public class BoxTreeTab extends BrowserTabBase implements CanvasClickListener
         //boxTree.expandPath(select);
         boxTree.scrollPathToVisible(new TreePath(path));
     }
+    
+    //=================================================================================================
+    
+    public Box getSelectedBox()
+    {
+        if (boxTree == null)
+            return null;
+        else                   
+            return (Box) boxTree.getLastSelectedPathComponent();
+    }
+    
+    public void showBox(Box node)
+    {
+        //System.out.println("Node:" + node);
+        browser.getOutputDisplay().drawExtent(node);
+        browser.updateDisplay();
+        displayBoxInfo(node);
+    }
+    
+    public void displayBoxInfo(Box box)
+    {
+        Vector<String> cols = infoTableData("Property", "Value");
+        
+        Vector<Vector <String>> vals = new Vector<Vector <String>>();
 
+        vals.add(infoTableData("Id", String.valueOf(box.getId())));
+        vals.add(infoTableData("Src id", String.valueOf(box.getSourceNodeId())));
+        vals.add(infoTableData("Tag", box.getTagName()));
+        
+        vals.add(infoTableData("Type", box.getType().toString()));
+        vals.add(infoTableData("Display", box.getDisplayType() == null ? "-" : box.getDisplayType().toString()));
+        vals.add(infoTableData("Visible", box.isVisible() ? "true" : "false"));
+        
+        vals.add(infoTableData("Bounds", box.getBounds().toString()));
+        vals.add(infoTableData("C.Bounds", box.getContentBounds().toString()));
+        vals.add(infoTableData("V.Bounds", box.getVisualBounds().toString()));
+
+        vals.add(infoTableData("Color", Utils.colorString(box.getColor())));
+        vals.add(infoTableData("Bg color", Utils.colorString(box.getBackgroundColor())));
+        vals.add(infoTableData("Borders", Utils.borderString(box)));
+        vals.add(infoTableData("Bg separated", (box.isBackgroundSeparated()) ? "true" : "false"));
+        
+        vals.add(infoTableData("Font", box.getFontFamily()));
+        vals.add(infoTableData("Font size", String.valueOf(box.getFontSize())));
+        vals.add(infoTableData("Font weight", String.valueOf(box.getFontWeight())));
+        vals.add(infoTableData("Font style", String.valueOf(box.getFontStyle())));
+        vals.add(infoTableData("Underline", String.valueOf(box.getUnderline())));
+        vals.add(infoTableData("Line through", String.valueOf(box.getLineThrough())));
+        
+        DefaultTableModel tab = new DefaultTableModel(vals, cols);
+        infoTable.setModel(tab);
+    }
+    
+    private Vector<String> infoTableData(String prop, String value)
+    {
+        Vector<String> cols = new Vector<String>(2);
+        cols.add(prop);
+        cols.add(value);
+        return cols;
+    }
+    
     //=================================================================================================
     
     private JPanel createStructurePanel()
@@ -168,11 +220,7 @@ public class BoxTreeTab extends BrowserTabBase implements CanvasClickListener
                     Box node = (Box) boxTree.getLastSelectedPathComponent();
                     if (node != null)
                     {
-                        //node.drawExtent((BrowserCanvas) contentCanvas);
-                        System.out.println("Node:" + node);
-                        browser.getOutputDisplay().drawExtent(node);
-                        browser.updateDisplay();
-                        //boxTree.scrollPathToVisible(new TreePath(node.getPath()));
+                        showBox(node);
                     }
                 }
             });

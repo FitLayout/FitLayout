@@ -418,8 +418,15 @@ public class BlockBrowser implements Browser
     private void tabSelected(int index)
     {
         BrowserTab tab = browserTabs.get(index);
-        getMainSplitter().setLeftComponent(tab.getStructurePanel());
-        getInfoSplitter().setRightComponent(tab.getPropertiesPanel());
+        if (tab != null)
+        {
+            int mpos = getMainSplitter().getDividerLocation();
+            int ipos = getInfoSplitter().getDividerLocation();
+            getMainSplitter().setLeftComponent(tab.getStructurePanel());
+            getInfoSplitter().setRightComponent(tab.getPropertiesPanel());
+            getMainSplitter().setDividerLocation(mpos);
+            getInfoSplitter().setDividerLocation(ipos);
+        }
         for (int i = 0; i < browserTabs.size(); i++)
             browserTabs.get(i).setActive(i == index);
     }

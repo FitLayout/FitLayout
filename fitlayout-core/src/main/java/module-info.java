@@ -1,6 +1,6 @@
 module cz.vutbr.fit.layout.core
 {
-    requires java.desktop;
+    requires transitive java.desktop;
     requires org.slf4j;
     
     exports cz.vutbr.fit.layout.api;

@@ -5,7 +5,7 @@ module cz.vutbr.fit.layout.segm
 
     requires cz.vutbr.fit.layout.core;
 
-    provides cz.vutbr.fit.layout.impl.BaseAreaTreeProvider
+    provides cz.vutbr.fit.layout.api.AreaTreeProvider
             with cz.vutbr.fit.layout.segm.Provider;
 
     provides cz.vutbr.fit.layout.api.AreaTreeOperator

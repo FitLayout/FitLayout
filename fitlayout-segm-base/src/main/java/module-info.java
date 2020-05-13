@@ -4,6 +4,8 @@ module cz.vutbr.fit.layout.segm
     requires org.slf4j;
 
     requires cz.vutbr.fit.layout.core;
+    
+    exports cz.vutbr.fit.layout.segm;
 
     provides cz.vutbr.fit.layout.api.AreaTreeProvider
             with cz.vutbr.fit.layout.segm.Provider;

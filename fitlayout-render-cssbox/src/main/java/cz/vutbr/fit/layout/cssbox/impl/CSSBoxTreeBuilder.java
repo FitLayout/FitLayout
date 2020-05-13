@@ -25,11 +25,10 @@ import org.fit.cssbox.io.DOMSource;
 import org.fit.cssbox.io.DefaultDOMSource;
 import org.fit.cssbox.io.DefaultDocumentSource;
 import org.fit.cssbox.io.DocumentSource;
-import org.fit.cssbox.layout.Box;
 import org.fit.cssbox.layout.BrowserConfig;
 import org.fit.cssbox.layout.Dimension;
-import org.fit.cssbox.layout.ElementBox;
 import org.fit.cssbox.layout.Engine;
+import org.fit.cssbox.layout.Rectangle;
 import org.fit.cssbox.layout.Viewport;
 import org.fit.cssbox.pdf.PdfEngine;
 import org.slf4j.Logger;
@@ -75,9 +74,6 @@ public class CSSBoxTreeBuilder
     /** Replace the images with their {@code alt} text */
     protected boolean replaceImagesWithAlt;
     
-    /** a counter for assigning the box order */
-    private int order_counter;
-    
     private float zoom;
     
    
@@ -109,7 +105,7 @@ public class CSSBoxTreeBuilder
         pg.setTitle(pageTitle);
         
         //construct the box tree
-        ElementBox rootbox = engine.getViewport();
+        Viewport rootbox = engine.getViewport();
         BoxNode root = buildTree(rootbox);
         
         //initialize the page
@@ -131,9 +127,9 @@ public class CSSBoxTreeBuilder
         for (URL url : list)
         {
             log.info("Parsing: {}", url);
-            //render the page
+            //render the page using custom renderer
             Engine engine = renderUrl(url, pageSize);
-            ElementBox rootbox = engine.getViewport();
+            Viewport rootbox = engine.getViewport();
             BoxNode root = buildTree(rootbox);
             
             //wrap the page with a new block box
@@ -244,7 +240,7 @@ public class CSSBoxTreeBuilder
             engine.getConfig().setLoadFonts(false);
             engine.getConfig().setReplaceImagesWithAlt(replaceImagesWithAlt);
             defineLogicalFonts(engine.getConfig());
-            engine.createLayout(pageSize);
+            engine.createLayout(pageSize, new Rectangle(pageSize), false);
             
             src.close();
 
@@ -288,28 +284,27 @@ public class CSSBoxTreeBuilder
     
     //===================================================================
     
-    protected BoxNode buildTree(ElementBox rootbox)
+    protected BoxNode buildTree(Viewport vp)
     {
         //create the working list of nodes
         log.trace("LIST");
-        List<BoxNode> boxlist = new ArrayList<BoxNode>();
-        order_counter = 1;
-        createBoxList(rootbox, boxlist);
+        List<BoxNode> boxlist = createBoxList(vp);
+        BoxNode rootNode = boxlist.remove(0);
         
         //create the tree
         if (useVisualBounds)
         {
             //two-phase algorithm considering the visual bounds
             log.trace("A1");
-            BoxNode root = createBoxTree(rootbox, boxlist, true, true, true); //create a nesting tree based on the content bounds
+            BoxNode root = createBoxTree(rootNode, boxlist, true, true, true); //create a nesting tree based on the content bounds
             log.trace("A2");
-            Color bg = Units.toColor(rootbox.getBgcolor());
+            Color bg = Units.toColor(vp.getBgcolor());
             if (bg == null) bg = Color.WHITE;
             computeBackgrounds(root, bg); //compute the efficient background colors
             log.trace("A2.5");
             root.recomputeVisualBounds(); //compute the visual bounds for the whole tree
             log.trace("A3");
-            root = createBoxTree(rootbox, boxlist, true, true, preserveAux); //create the nesting tree based on the visual bounds or content bounds depending on the settings
+            root = createBoxTree(rootNode, boxlist, true, true, preserveAux); //create the nesting tree based on the visual bounds or content bounds depending on the settings
             root.recomputeVisualBounds(); //compute the visual bounds for the whole tree
             root.recomputeBounds(); //compute the real bounds of each node
             log.trace("A4");
@@ -319,8 +314,8 @@ public class CSSBoxTreeBuilder
         else
         {
             //simplified algorihm - use the original box nesting
-            BoxNode root = createBoxTree(rootbox, boxlist, false, true, true);
-            Color bg = Units.toColor(rootbox.getBgcolor());
+            BoxNode root = createBoxTree(rootNode, boxlist, false, true, true);
+            Color bg = Units.toColor(vp.getBgcolor());
             if (bg == null) bg = Color.WHITE;
             computeBackgrounds(root, bg); //compute the efficient background colors
             root.recomputeVisualBounds(); //compute the visual bounds for the whole tree
@@ -331,29 +326,16 @@ public class CSSBoxTreeBuilder
     }
     
     /**
-     * Recursively creates a list of all the visible boxes in a box subtree. The nodes are 
-     * added to the end of a specified list. The previous content of the list 
-     * remains unchanged. The 'viewport' box is ignored.
-     * @param root the source root box
-     * @param list the list that will be filled with the nodes
+     * Creates a list of all the visible boxes in a box subtree using a renderer. The viewport node
+     * is always the first element in the resulting list.
+     * @param vp the viewport to render
      */
-    private void createBoxList(Box root, List<BoxNode> list)
+    private List<BoxNode> createBoxList(Viewport vp)
     {
-        if (root.isDisplayed())
-        {
-            if (!(root instanceof Viewport) && root.isVisible())
-            {
-                BoxNode newnode = new BoxNode(root, page, zoom);
-                newnode.setOrder(order_counter++);
-                list.add(newnode);
-            }
-            if (root instanceof ElementBox)
-            {
-                ElementBox elem = (ElementBox) root;
-                for (int i = elem.getStartChild(); i < elem.getEndChild(); i++)
-                    createBoxList(elem.getSubBox(i), list);
-            }
-        }
+        BoxListRenderer renderer = new BoxListRenderer(page, zoom);
+        renderer.init(vp);
+        vp.draw(renderer);
+        return renderer.getBoxList();
     }
 
     /**
@@ -368,13 +350,13 @@ public class CSSBoxTreeBuilder
      * @param preserveAux when set to {@code true}, all boxes are preserved. Otherwise, only the visually
      * distinguished ones are preserved.
      */
-    private BoxNode createBoxTree(ElementBox rootbox, List<BoxNode> boxlist, boolean useBounds, boolean useVisualBounds, boolean preserveAux)
+    private BoxNode createBoxTree(BoxNode root, List<BoxNode> boxlist, boolean useBounds, boolean useVisualBounds, boolean preserveAux)
     {
         //a working copy of the box list
         List<BoxNode> list = new ArrayList<BoxNode>(boxlist);
 
         //an artificial root node
-        BoxNode root = new BoxNode(rootbox, page, zoom);
+        //BoxNode root = new BoxNode(rootbox, page, zoom);
         root.setOrder(0);
         //detach the nodes from any old trees
         for (BoxNode node : list)

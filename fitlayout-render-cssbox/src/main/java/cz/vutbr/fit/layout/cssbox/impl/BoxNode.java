@@ -85,22 +85,44 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
     protected Color efficientBackground = null;
     
     /** Potential nearest parent node in the box tree */
-    public BoxNode nearestParent = null;
+    private BoxNode nearestParent = null;
+    
+    /** Computed background color */
+    private Color bgColor;
     
     /** Zoom relative to original box sizes */
-    public float zoom;
+    private float zoom;
     
     //===================================================================================
     
     /**
-     * Creates a new node containing a box.
+     * Creates a new node containing a box with a transparent background.
+     * 
      * @param box the contained box
+     * @param page containing page
+     * @param zoom zoom factor to apply
      */
     public BoxNode(Box box, Page page, float zoom)
+    {
+        this(box, page, null, zoom);
+    }
+    
+    /**
+     * Creates a new node containing a box with a computed background. The background
+     * is computed separately when creating the nodes because the Viewport (and some
+     * table elements) are treated in a special way.
+     * 
+     * @param box the contained box
+     * @param page containing page
+     * @param bgColor computed backgound color to be used for the box
+     * @param zoom zoom factor to apply
+     */
+    public BoxNode(Box box, Page page, Color bgColor, float zoom)
     {
         super(cz.vutbr.fit.layout.model.Box.class);
         this.box = box;
         this.page = page;
+        this.bgColor = bgColor;
         this.zoom = zoom;
         //copy the bounds from the box
         if (box != null)
@@ -685,19 +707,7 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
     @Override
     public cz.vutbr.fit.layout.model.Color getBackgroundColor()
     {
-        if (getBox() instanceof ElementBox)
-        {
-            Color clr = Units.toColor(((ElementBox) getBox()).getBgcolor());
-            if (clr != null)
-            {
-                cz.vutbr.fit.layout.model.Color nclr = new cz.vutbr.fit.layout.model.Color(clr.getRed(), clr.getGreen(), clr.getBlue(), clr.getAlpha());
-                return nclr;
-            }
-            else
-                return null;
-        }
-        else
-            return null;
+        return bgColor;
     }
     
     public void applyTransform(BoxTransform trans)

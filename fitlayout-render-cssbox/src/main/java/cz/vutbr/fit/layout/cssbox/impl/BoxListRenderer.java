@@ -92,8 +92,11 @@ public class BoxListRenderer extends StructuredRenderer
         BackgroundDecoder bg = findBackgroundSource(elem);
         Color bgColor = (bg == null) ? null : Units.toColor(bg.getBgcolor());
         BoxNode newnode = new BoxNode(elem, page, bgColor, zoom);
-        newnode.setOrder(orderCounter++);
-        boxList.add(newnode);
+        if (newnode.isVisible())
+        {
+            newnode.setOrder(orderCounter++);
+            boxList.add(newnode);
+        }
     }
 
     @Override
@@ -106,8 +109,11 @@ public class BoxListRenderer extends StructuredRenderer
     public void renderTextContent(TextBox text)
     {
         BoxNode newnode = new BoxNode(text, page, zoom);
-        newnode.setOrder(orderCounter++);
-        boxList.add(newnode);
+        if (newnode.isVisible())
+        {
+            newnode.setOrder(orderCounter++);
+            boxList.add(newnode);
+        }
     }
 
     @Override

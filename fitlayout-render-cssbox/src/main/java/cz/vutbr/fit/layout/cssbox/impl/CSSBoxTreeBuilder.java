@@ -298,7 +298,7 @@ public class CSSBoxTreeBuilder
             log.trace("A1");
             BoxNode root = createBoxTree(rootNode, boxlist, true, true, true); //create a nesting tree based on the content bounds
             log.trace("A2");
-            Color bg = Units.toColor(vp.getBgcolor());
+            Color bg = rootNode.getBackgroundColor();
             if (bg == null) bg = Color.WHITE;
             computeBackgrounds(root, bg); //compute the efficient background colors
             log.trace("A2.5");

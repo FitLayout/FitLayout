@@ -312,7 +312,7 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
             //if nothing has been found return an empty rectangle at the top left corner
             if (ret == null)
             {
-                Rectangle b = box.getAbsoluteBounds().intersection(box.getClipBlock().getClippedContentBounds());
+                Rectangle b = box.getAbsoluteContentBounds().intersection(box.getClipBlock().getClippedContentBounds());
             	return new RectangularZ(b.x, b.y, zoom);
             }
             else
@@ -375,7 +375,7 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
             //no visual separators, consider the contents
             else
             {
-                Rectangular cont  = getMinimalVisualBounds();
+                Rectangular cont = getMinimalVisualBounds();
                 if (ret == null)
                     ret = cont;
                 else

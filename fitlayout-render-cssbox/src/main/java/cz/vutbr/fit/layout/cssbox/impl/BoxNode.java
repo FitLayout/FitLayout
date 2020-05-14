@@ -79,7 +79,7 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
     protected Rectangular visual = null;
     
     /** Is the box separated by background */
-    protected boolean backgroundSeparated = false;
+    protected boolean backgroundSeparated;
     
     /** Efficient background color */
     protected Color efficientBackground = null;
@@ -131,6 +131,11 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
 	        content = computeContentBounds();
 	        bounds = new Rectangular(content); //later, this will be recomputed using recomputeBounds()
         }
+        //initially, the box is considered to be background-separated if it has a declared background
+        //later this is recomputed when the box tree is built and the efficient backgrounds are
+        //computed
+        this.backgroundSeparated =
+                (box instanceof ElementBox && ((ElementBox) box).getBgcolor() != null);
     }
 
     @Override

@@ -8,9 +8,12 @@ package cz.vutbr.fit.layout.impl;
 import java.net.URL;
 import java.util.Vector;
 
+import org.eclipse.rdf4j.model.IRI;
+
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
+import cz.vutbr.fit.layout.ontology.BOX;
 
 /**
  * Default generic page implementation.
@@ -40,6 +43,12 @@ public class DefaultPage implements Page
         height = src.getHeight();
     }
     
+    @Override
+    public IRI getArtifactType()
+    {
+        return BOX.Page;
+    }
+
     @Override
     public URL getSourceURL()
     {

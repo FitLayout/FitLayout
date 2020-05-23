@@ -5,9 +5,12 @@
  */
 package cz.vutbr.fit.layout.impl;
 
+import org.eclipse.rdf4j.model.IRI;
+
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.LogicalArea;
 import cz.vutbr.fit.layout.model.LogicalAreaTree;
+import cz.vutbr.fit.layout.ontology.SEGM;
 
 /**
  * Default implementation of the logical area tree.
@@ -28,6 +31,12 @@ public class DefaultLogicalAreaTree implements LogicalAreaTree
     public AreaTree getAreaTree()
     {
         return atree;
+    }
+
+    @Override
+    public IRI getArtifactType()
+    {
+        return SEGM.LogicalAreaTree;
     }
 
     @Override

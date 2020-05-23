@@ -10,7 +10,7 @@ package cz.vutbr.fit.layout.model;
  * 
  * @author burgetr
  */
-public interface LogicalAreaTree
+public interface LogicalAreaTree extends Artifact
 {
     
     /**

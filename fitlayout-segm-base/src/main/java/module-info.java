@@ -3,7 +3,7 @@ module cz.vutbr.fit.layout.segm
     requires java.desktop;
     requires org.slf4j;
 
-    requires cz.vutbr.fit.layout.core;
+    requires transitive cz.vutbr.fit.layout.core;
     
     exports cz.vutbr.fit.layout.segm;
 

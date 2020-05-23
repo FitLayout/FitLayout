@@ -8,11 +8,14 @@ package cz.vutbr.fit.layout.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.rdf4j.model.IRI;
+
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
+import cz.vutbr.fit.layout.ontology.SEGM;
 
 /**
  * Default Page implementation.
@@ -35,6 +38,12 @@ public class DefaultAreaTree implements AreaTree
         root = src.getRoot();
     }
     
+    @Override
+    public IRI getArtifactType()
+    {
+        return SEGM.AreaTree;
+    }
+
     @Override
     public Page getPage()
     {

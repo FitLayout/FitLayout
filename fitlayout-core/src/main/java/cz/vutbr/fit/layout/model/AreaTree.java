@@ -12,7 +12,7 @@ import java.util.List;
  * 
  * @author burgetr
  */
-public interface AreaTree extends SearchableAreaContainer
+public interface AreaTree extends Artifact, SearchableAreaContainer
 {
 
     /**

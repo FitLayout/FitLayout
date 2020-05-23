@@ -13,7 +13,7 @@ import java.util.Vector;
  * 
  * @author burgetr
  */
-public interface Page
+public interface Page extends Artifact
 {
 
     /**

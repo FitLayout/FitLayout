@@ -17,20 +17,19 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  * 
  * @author burgetr
  */
-public class DefaultLogicalAreaTree implements LogicalAreaTree
+public class DefaultLogicalAreaTree extends BaseArtifact implements LogicalAreaTree
 {
-    private AreaTree atree;
     private LogicalArea root;
     
     public DefaultLogicalAreaTree(AreaTree atree)
     {
-        this.atree = atree;
+        super(atree);
     }
     
     @Override
     public AreaTree getAreaTree()
     {
-        return atree;
+        return (AreaTree) getParent();
     }
 
     @Override

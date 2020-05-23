@@ -20,7 +20,7 @@ import cz.vutbr.fit.layout.ontology.BOX;
  * 
  * @author burgetr
  */
-public class DefaultPage implements Page
+public class DefaultPage extends BaseArtifact implements Page
 {
     protected URL url;
     protected String title;
@@ -31,11 +31,13 @@ public class DefaultPage implements Page
 
     public DefaultPage(URL url)
     {
+        super(null);
         this.url = url;
     }
     
     public DefaultPage(Page src)
     {
+        super(null);
         url = src.getSourceURL();
         title = new String(src.getTitle());
         root = src.getRoot();

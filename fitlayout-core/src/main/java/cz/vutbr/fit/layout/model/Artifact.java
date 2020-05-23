@@ -21,4 +21,10 @@ public interface Artifact
      */
     public IRI getArtifactType();
     
+    /**
+     * Gets the parent artifact - the artifact this one was created from.
+     * @return the parent artifact or {@code null} when this is an initial artifact.
+     */
+    public Artifact getParent();
+    
 }

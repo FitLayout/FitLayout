@@ -22,19 +22,20 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  *  
  * @author burgetr
  */
-public class DefaultAreaTree implements AreaTree
+public class DefaultAreaTree extends BaseArtifact implements AreaTree
 {
     protected Page page;
     private Area root;
 
     public DefaultAreaTree(Page page)
     {
+        super(page);
         this.page = page;
     }
     
     public DefaultAreaTree(AreaTree src)
     {
-        page = src.getPage();
+        super(src.getPage());
         root = src.getRoot();
     }
     

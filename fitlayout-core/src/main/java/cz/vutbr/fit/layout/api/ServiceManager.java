@@ -12,6 +12,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.stream.Collectors;
+
+import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.gui.BrowserPlugin;
 
@@ -23,9 +26,7 @@ import cz.vutbr.fit.layout.gui.BrowserPlugin;
 public class ServiceManager
 {
     private static List<BrowserPlugin> browserPlugins;
-    private static Map<String, BoxTreeProvider> boxProviders;
-    private static Map<String, AreaTreeProvider> areaProviders;
-    private static Map<String, LogicalTreeProvider> logicalProviders;
+    private static Map<String, ArtifactService> artifactServices;
     private static Map<String, AreaTreeOperator> operators;
     private static Map<String, PageStorage> pageStorages;
     
@@ -39,9 +40,7 @@ public class ServiceManager
         parametrizedServices = new HashMap<String, ParametrizedOperation>();
         //load services of standard types
         browserPlugins = loadBrowserPlugins();
-        boxProviders = loadServicesByType(BoxTreeProvider.class);
-        areaProviders = loadServicesByType(AreaTreeProvider.class);
-        logicalProviders = loadServicesByType(LogicalTreeProvider.class);
+        artifactServices = loadServicesByType(ArtifactService.class);
         operators = loadServicesByType(AreaTreeOperator.class);
         pageStorages = loadServicesByType(PageStorage.class);
         //load the remaining script objects - this should be the last step
@@ -58,30 +57,24 @@ public class ServiceManager
     }    
     
     /**
-     * Discovers all the BoxTreeProvider service implementations.
+     * Discovers all the ArtifactService implementations.
      * @return A map that assigns the service {@code id} to the appropriate implementation.
      */
-    public static Map<String, BoxTreeProvider> findBoxTreeProviders()
+    public static Map<String, ArtifactService> findArtifactSevices()
     {
-        return boxProviders;
+        return artifactServices;
     }
     
     /**
-     * Discovers all the AreaTreeProvider service implementations.
+     * Discovers all the ArtifactService implementations that produce a given artifact type.
+     * @param artifactType the artifact type to produce 
      * @return A map that assigns the service {@code id} to the appropriate implementation.
      */
-    public static Map<String, AreaTreeProvider> findAreaTreeProviders()
+    public static Map<String, ArtifactService> findArtifactProviders(IRI artifactType)
     {
-        return areaProviders;
-    }
-    
-    /**
-     * Discovers all the LogicalTreeProvider service implementations.
-     * @return A map that assigns the service {@code id} to the appropriate implementation.
-     */
-    public static Map<String, LogicalTreeProvider> findLogicalTreeProviders()
-    {
-        return logicalProviders;
+        return artifactServices.entrySet().stream()
+                .filter(x -> artifactType.equals(x.getValue().getProduces()))
+                .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
     }
     
     /**

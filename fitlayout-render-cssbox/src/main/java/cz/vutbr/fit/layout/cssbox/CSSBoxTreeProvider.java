@@ -10,24 +10,27 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.rdf4j.model.IRI;
 import org.fit.cssbox.layout.Dimension;
 import org.xml.sax.SAXException;
 
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.cssbox.impl.CSSBoxTreeBuilder;
-import cz.vutbr.fit.layout.impl.BaseBoxTreeProvider;
+import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.impl.ParameterBoolean;
 import cz.vutbr.fit.layout.impl.ParameterFloat;
 import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.impl.ParameterString;
+import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
+import cz.vutbr.fit.layout.ontology.BOX;
 
 /**
  * A box tree provider implementation based on CSSBox 
  * 
  * @author burgetr
  */
-public class CSSBoxTreeProvider extends BaseBoxTreeProvider
+public class CSSBoxTreeProvider extends BaseArtifactService
 {
     private String urlstring;
     private int width;
@@ -161,6 +164,23 @@ public class CSSBoxTreeProvider extends BaseBoxTreeProvider
     }
 
     @Override
+    public IRI getConsumes()
+    {
+        return null;
+    }
+
+    @Override
+    public IRI getProduces()
+    {
+        return BOX.Page;
+    }
+
+    @Override
+    public Artifact process(Artifact input)
+    {
+        return getPage();
+    }
+
     public Page getPage()
     {
         builder = new CSSBoxTreeBuilder(new Dimension(width, height), useVisualBounds, preserveAux, replaceImagesWithAlt);

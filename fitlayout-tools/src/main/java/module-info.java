@@ -14,4 +14,5 @@ module cz.vutbr.fit.layout.tools
     exports cz.vutbr.fit.layout.tools.io;
     
     requires jline;
+    requires rdf4j.model;
 }

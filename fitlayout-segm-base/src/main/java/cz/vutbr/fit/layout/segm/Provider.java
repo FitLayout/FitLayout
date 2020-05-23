@@ -8,18 +8,24 @@ package cz.vutbr.fit.layout.segm;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.rdf4j.model.IRI;
+
 import cz.vutbr.fit.layout.api.Parameter;
-import cz.vutbr.fit.layout.impl.BaseAreaTreeProvider;
+import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.impl.ParameterBoolean;
 import cz.vutbr.fit.layout.model.AreaTree;
+import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
+import cz.vutbr.fit.layout.ontology.BOX;
+import cz.vutbr.fit.layout.ontology.SEGM;
 
 /**
- * An AreaTreeProvider for the default FitLayout Segmentation algorithm based on grouping.
+ * An artifact service provider for transforming the box tree to the area tree. It implements a basic
+ * algorithm that only selects the visually separated boxes as the areas.
  * 
  * @author burgetr
  */
-public class Provider extends BaseAreaTreeProvider
+public class Provider extends BaseArtifactService
 {
     /** Preserve the auxiliary areas that have no visual impact */
     private boolean preserveAuxAreas;
@@ -54,6 +60,23 @@ public class Provider extends BaseAreaTreeProvider
     }
 
     @Override
+    public IRI getConsumes()
+    {
+        return BOX.Page;
+    }
+
+    @Override
+    public IRI getProduces()
+    {
+        return SEGM.AreaTree;
+    }
+
+    @Override
+    public Artifact process(Artifact input)
+    {
+        return createAreaTree((Page) input);
+    }
+
     public AreaTree createAreaTree(Page page)
     {
         SegmentationAreaTree atree = new SegmentationAreaTree(page, preserveAuxAreas);

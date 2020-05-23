@@ -11,9 +11,7 @@ module cz.vutbr.fit.layout.core
     exports cz.vutbr.fit.layout.ontology;
     
     uses cz.vutbr.fit.layout.gui.BrowserPlugin;
-    uses cz.vutbr.fit.layout.api.BoxTreeProvider;
-    uses cz.vutbr.fit.layout.api.AreaTreeProvider;
-    uses cz.vutbr.fit.layout.api.LogicalTreeProvider;
+    uses cz.vutbr.fit.layout.api.ArtifactService;
     uses cz.vutbr.fit.layout.api.AreaTreeOperator;
     uses cz.vutbr.fit.layout.api.PageStorage;
     uses cz.vutbr.fit.layout.api.ScriptObject;

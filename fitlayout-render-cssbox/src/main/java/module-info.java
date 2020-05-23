@@ -13,5 +13,5 @@ module cz.vutbr.fit.layout.cssbox
     
     exports cz.vutbr.fit.layout.cssbox;
     
-    provides cz.vutbr.fit.layout.api.BoxTreeProvider with cz.vutbr.fit.layout.cssbox.CSSBoxTreeProvider;
+    provides cz.vutbr.fit.layout.api.ArtifactService with cz.vutbr.fit.layout.cssbox.CSSBoxTreeProvider;
 }

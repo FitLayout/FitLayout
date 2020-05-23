@@ -7,15 +7,16 @@ package cz.vutbr.fit.layout.process;
 
 import java.util.Map;
 
+import org.eclipse.rdf4j.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.api.AreaTreeOperator;
-import cz.vutbr.fit.layout.api.AreaTreeProvider;
-import cz.vutbr.fit.layout.api.BoxTreeProvider;
-import cz.vutbr.fit.layout.api.LogicalTreeProvider;
+import cz.vutbr.fit.layout.api.ArtifactService;
+import cz.vutbr.fit.layout.api.ParametrizedOperation;
 import cz.vutbr.fit.layout.api.ServiceManager;
 import cz.vutbr.fit.layout.model.AreaTree;
+import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.LogicalAreaTree;
 import cz.vutbr.fit.layout.model.Page;
 
@@ -28,11 +29,6 @@ public abstract class BaseProcessor
 {
     private static Logger log = LoggerFactory.getLogger(BaseProcessor.class);
     
-    private Map<String, BoxTreeProvider> boxProviders;
-    private Map<String, AreaTreeProvider> areaProviders;
-    private Map<String, LogicalTreeProvider> logicalProviders;
-    private Map<String, AreaTreeOperator> operators;
-
     private Page page;
     private AreaTree atree;
     private LogicalAreaTree ltree;
@@ -40,30 +36,16 @@ public abstract class BaseProcessor
 
     public BaseProcessor()
     {
-        boxProviders = ServiceManager.findBoxTreeProviders();
-        areaProviders = ServiceManager.findAreaTreeProviders();
-        logicalProviders = ServiceManager.findLogicalTreeProviders();
-        operators = ServiceManager.findAreaTreeOperators();
     }
     
-    public Map<String, BoxTreeProvider> getBoxProviders()
+    public Map<String, ArtifactService> getArtifactProviders(IRI artifactType)
     {
-        return boxProviders;
+        return ServiceManager.findArtifactProviders(artifactType);
     }
 
-    public Map<String, AreaTreeProvider> getAreaProviders()
-    {
-        return areaProviders;
-    }
-    
-    public Map<String, LogicalTreeProvider> getLogicalProviders()
-    {
-        return logicalProviders;
-    }
-    
     public Map<String, AreaTreeOperator> getOperators()
     {
-        return operators;
+        return ServiceManager.findAreaTreeOperators();
     }
 
     public Page getPage()
@@ -111,26 +93,11 @@ public abstract class BaseProcessor
     
     //======================================================================================================
     
-    public Page renderPage(BoxTreeProvider provider, Map<String, Object> params)
+    public Artifact processArtifact(Artifact input, ArtifactService provider, Map<String, Object> params)
     {
-        ServiceManager.setServiceParams(provider, params);
-        page = provider.getPage();
-        atree = null; //destroy the old area tree if any
-        return page;
-    }
-    
-    public AreaTree initAreaTree(AreaTreeProvider provider, Map<String, Object> params)
-    {
-        ServiceManager.setServiceParams(provider, params);
-        atree = provider.createAreaTree(page);
-        return atree;
-    }
-    
-    public LogicalAreaTree initLogicalTree(LogicalTreeProvider provider, Map<String, Object> params)
-    {
-        ServiceManager.setServiceParams(provider, params);
-        ltree = provider.createLogicalTree(atree);
-        return ltree;
+        if (provider instanceof ParametrizedOperation)
+            ServiceManager.setServiceParams((ParametrizedOperation) provider, params);
+        return provider.process(input);
     }
     
     public void apply(AreaTreeOperator op, Map<String, Object> params)

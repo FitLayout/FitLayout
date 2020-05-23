@@ -7,7 +7,7 @@ module cz.vutbr.fit.layout.segm
     
     exports cz.vutbr.fit.layout.segm;
 
-    provides cz.vutbr.fit.layout.api.AreaTreeProvider
+    provides cz.vutbr.fit.layout.api.ArtifactService
             with cz.vutbr.fit.layout.segm.Provider;
 
     provides cz.vutbr.fit.layout.api.AreaTreeOperator

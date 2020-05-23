@@ -2,6 +2,7 @@ module cz.vutbr.fit.layout.core
 {
     requires transitive java.desktop;
     requires org.slf4j;
+    requires rdf4j.model;
     
     exports cz.vutbr.fit.layout.api;
     exports cz.vutbr.fit.layout.gui;

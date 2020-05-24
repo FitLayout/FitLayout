@@ -21,21 +21,22 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.api.AreaTreeOperator;
-import cz.vutbr.fit.layout.api.AreaTreeProvider;
-import cz.vutbr.fit.layout.api.BoxTreeProvider;
-import cz.vutbr.fit.layout.api.LogicalTreeProvider;
+import cz.vutbr.fit.layout.api.ArtifactService;
 import cz.vutbr.fit.layout.api.OutputDisplay;
 import cz.vutbr.fit.layout.api.ParametrizedOperation;
 import cz.vutbr.fit.layout.api.ScriptObject;
 import cz.vutbr.fit.layout.api.ServiceManager;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
+import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.LogicalAreaTree;
-import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.tools.ImageOutputDisplay;
 
 /**
@@ -68,19 +69,11 @@ public class ScriptableProcessor extends BaseProcessor
         return new ArrayList<String>(getOperators().keySet());
     }
     
-    public List<String> getBoxProviderIds()
+    public List<String> getArtifactProviderIds(String artifactTypeIRI)
     {
-        return new ArrayList<String>(getBoxProviders().keySet());
-    }
-    
-    public List<String> getAreaProviderIds()
-    {
-        return new ArrayList<String>(getAreaProviders().keySet());
-    }
-    
-    public List<String> getLogicalProviderIds()
-    {
-        return new ArrayList<String>(getLogicalProviders().keySet());
+        ValueFactory vf = SimpleValueFactory.getInstance();
+        IRI artifactType = vf.createIRI(artifactTypeIRI);
+        return new ArrayList<String>(getArtifactProviders(artifactType).keySet());
     }
     
     public void setServiceParams(String serviceName, Map<String, Object> params)
@@ -92,12 +85,12 @@ public class ScriptableProcessor extends BaseProcessor
             log.error("setServiceParams: Unknown service: {}", serviceName);
     }
     
-    public Page renderPage(String providerName, Map<String, Object> params)
+    public Artifact processArtifact(Artifact input, String providerName, Map<String, Object> params)
     {
-        BoxTreeProvider provider = getBoxProviders().get(providerName);
+        ArtifactService provider = getArtifactServices().get(providerName);
         if (provider != null)
         {
-            return renderPage(provider, params);
+            return processArtifact(input, provider, params);
         }
         else
         {
@@ -106,21 +99,7 @@ public class ScriptableProcessor extends BaseProcessor
         }
     }
     
-    public AreaTree initAreaTree(String providerName, Map<String, Object> params)
-    {
-        AreaTreeProvider provider = getAreaProviders().get(providerName);
-        if (provider != null)
-        {
-            return initAreaTree(provider, params);
-        }
-        else
-        {
-            log.error("Unknown area tree provider: " + providerName);
-            return null;
-        }
-    }
-    
-    public void apply(String operatorName, Map<String, Object> params)
+    public void apply(AreaTree atree, String operatorName, Map<String, Object> params)
     {
         /*System.out.println("Apply: " + operatorName + " : " + params);
         System.out.println(params.keySet());
@@ -130,56 +109,14 @@ public class ScriptableProcessor extends BaseProcessor
         AreaTreeOperator op = getOperators().get(operatorName);
         if (op != null)
         {
-            apply(op, params);
+            apply(atree, op, params);
         }
         else
             log.error("Unknown operator " + operatorName);
         
     }
     
-    public LogicalAreaTree initLogicalTree(String providerName, Map<String, Object> params)
-    {
-        LogicalTreeProvider provider = getLogicalProviders().get(providerName);
-        if (provider != null)
-        {
-            return initLogicalTree(provider, params);
-        }
-        else
-        {
-            log.error("Unknown logical tree provider: " + providerName);
-            return null;
-        }
-    }
-
     //========================================================================
-    
-    @Override
-    public AreaTree segmentPage()
-    {
-        try
-        {
-            setAreaTree(null);
-            execInternal("default_segm.js");
-        } catch (ScriptException e) {
-            log.error("Couldn't execute default segmentation script: " + e.getMessage());
-        }
-        treesCompleted();
-        return getAreaTree();
-    }
-    
-    @Override
-    public LogicalAreaTree buildLogicalTree()
-    {
-        try
-        {
-            setLogicalAreaTree(null);
-            execInternal("default_logical.js");
-        } catch (ScriptException e) {
-            log.error("Couldn't execute default segmentation script: " + e.getMessage());
-        }
-        treesCompleted();
-        return getLogicalAreaTree();
-    }
     
     /**
      * Draws the current page to an image file.
@@ -187,14 +124,15 @@ public class ScriptableProcessor extends BaseProcessor
      */
     public void drawToImage(String path)
     {
-        try
+        /*try
         {
             ImageOutputDisplay disp = new ImageOutputDisplay(getPage().getWidth(), getPage().getHeight());
             disp.drawPage(getPage());
             disp.saveTo(path);
         } catch (IOException e) {
             log.error("Couldn't write to " + path + ": " + e.getMessage());
-        }
+        }*/
+        //TODO
     }
     
     /**
@@ -204,7 +142,7 @@ public class ScriptableProcessor extends BaseProcessor
      */
     public void drawToImageWithAreas(String path, String areaNames)
     {
-        try
+        /*try
         {
             ImageOutputDisplay disp = new ImageOutputDisplay(getPage().getWidth(), getPage().getHeight());
             disp.drawPage(getPage());
@@ -212,7 +150,8 @@ public class ScriptableProcessor extends BaseProcessor
             disp.saveTo(path);
         } catch (IOException e) {
             log.error("Couldn't write to " + path + ": " + e.getMessage());
-        }
+        }*/
+        //TODO
     }
     
     private void showAreas(OutputDisplay disp, Area root, String nameSubstring)

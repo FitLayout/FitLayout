@@ -5,13 +5,14 @@
  */
 package cz.vutbr.fit.layout.gui;
 
+import java.util.List;
+
 import javax.swing.JComponent;
 import javax.swing.JToolBar;
 
 import cz.vutbr.fit.layout.api.OutputDisplay;
 import cz.vutbr.fit.layout.model.Area;
-import cz.vutbr.fit.layout.model.AreaTree;
-import cz.vutbr.fit.layout.model.LogicalAreaTree;
+import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 
@@ -112,39 +113,28 @@ public interface Browser
     public void removeRectangleSelectionListener(RectangleSelectionListener listener);
     
     /**
-     * Sets page model from the external source
+     * Adds a page artifact from the external source
      * @param page
      */
-    public void setPage(Page page);
+    public void addPage(Page page);
     
     /**
-     * Gets the actual page model
-     * @return the actual page model
+     * Gets existing page models
+     * @return existing page models
      */
-    public Page getPage();
-    
-    
-    /**
-     * Gets the area tree of the current page
-     * @return the current area tree or {@code null} if the tree has not been built yet
-     */
-    public AreaTree getAreaTree();
+    public List<Page> getPages();
     
     /**
-     * Gets the logical area tree of the actual page
-     * @return the current logical tree or {@code null} if the tree has not been built yet
+     * Gets the currently selected page.
+     * @return currently selected page or {@code null}.
      */
-    public LogicalAreaTree getLogicalTree();
+    public Page getSelectedPage();
     
     /**
-     * Sets area tree from external source
+     * Gets the currently selected artifact.
+     * @return currently selected artifact or {@code null}.
      */
-    public void setAreaTree(AreaTree areaTree);
-    
-    /**
-     * Sets logical area tree from external source
-     */
-    public void setLogicalTree(LogicalAreaTree logicalTree);
+    public Artifact getSelectedArtifact();
     
     /**
      * Updates the tree views after some trees have been changed.

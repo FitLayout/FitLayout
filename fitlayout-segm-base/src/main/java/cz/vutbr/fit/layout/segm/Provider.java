@@ -27,6 +27,8 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  */
 public class Provider extends BaseArtifactService
 {
+    private static int id_cnt = 1;
+    
     /** Preserve the auxiliary areas that have no visual impact */
     private boolean preserveAuxAreas;
     
@@ -82,6 +84,7 @@ public class Provider extends BaseArtifactService
         SegmentationAreaTree atree = new SegmentationAreaTree(page, preserveAuxAreas);
         atree.findBasicAreas();
         atree.setParent(page);
+        atree.setId(getId() + "." + (id_cnt++));
         return atree; 
     }
 

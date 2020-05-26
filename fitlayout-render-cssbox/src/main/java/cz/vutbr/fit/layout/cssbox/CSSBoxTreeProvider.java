@@ -32,6 +32,8 @@ import cz.vutbr.fit.layout.ontology.BOX;
  */
 public class CSSBoxTreeProvider extends BaseArtifactService
 {
+    private static int id_cnt = 1;
+    
     private String urlstring;
     private int width;
     private int height;
@@ -187,6 +189,7 @@ public class CSSBoxTreeProvider extends BaseArtifactService
         builder.setZoom(zoom);
         try {
             builder.parse(urlstring);
+            builder.setPageId(getId() + "." + (id_cnt++));
             return builder.getPage();
         } catch (IOException | SAXException e) {
             e.printStackTrace();

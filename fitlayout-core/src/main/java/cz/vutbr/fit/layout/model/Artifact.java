@@ -14,6 +14,12 @@ import org.eclipse.rdf4j.model.IRI;
  */
 public interface Artifact
 {
+    
+    /**
+     * Gets a unique artifact ID
+     * @return the ID
+     */
+    public String getId();
 
     /**
      * Gets the artifact type. 

@@ -144,5 +144,19 @@ public class DefaultPage extends BaseArtifact implements Page
                 recursiveGetBoxesInRegion(root.getChildAt(i), r, result);
         }
     }
+
+    @Override
+    public String toString()
+    {
+        String ret = "";
+        if (getSourceURL() != null)
+            ret += getSourceURL().toString();
+        else
+            ret += "- unknown URL -";
+        
+        ret += " [" + getId() + "]";
+        
+        return ret;
+    }
     
 }

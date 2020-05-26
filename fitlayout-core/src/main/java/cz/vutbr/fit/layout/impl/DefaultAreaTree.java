@@ -68,6 +68,12 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
         //no default implementation
     }
 
+    @Override
+    public String toString()
+    {
+        return "AreaTree [" + getId() + "]";
+    }
+
     //=================================================================================
     // node search
     //=================================================================================

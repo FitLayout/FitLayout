@@ -95,6 +95,12 @@ public class CSSBoxTreeBuilder
     {
         this.zoom = zoom;
     }
+    
+    public void setPageId(String id)
+    {
+        if (page != null)
+            page.setId(id);
+    }
 
     public void parse(URL url) throws IOException, SAXException
     {

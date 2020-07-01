@@ -22,6 +22,4 @@ module cz.vutbr.fit.layout.segm
             cz.vutbr.fit.layout.segm.op.GroupByDOMOperator,
             cz.vutbr.fit.layout.segm.op.FlattenTreeOperator;
 
-    //provides cz.vutbr.fit.layout.gui.BrowserPlugin
-    //        with cz.vutbr.fit.layout.segm.gui.SegmentatorPlugin;
 }

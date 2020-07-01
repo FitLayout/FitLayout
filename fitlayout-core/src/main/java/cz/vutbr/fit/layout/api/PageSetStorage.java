@@ -5,14 +5,12 @@
  */
 package cz.vutbr.fit.layout.api;
 
-import cz.vutbr.fit.layout.gui.GUIUpdateSource;
-
 /**
  * A service that is able to manage a list of pages that are being processed.
  * It may load the next/previous page when available.
  * @author burgetr
  */
-public interface PageSetStorage extends Service, GUIUpdateSource
+public interface PageSetStorage extends Service
 {
 
     /**

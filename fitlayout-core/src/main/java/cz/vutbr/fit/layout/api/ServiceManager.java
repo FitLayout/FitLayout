@@ -5,18 +5,14 @@
  */
 package cz.vutbr.fit.layout.api;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 import org.eclipse.rdf4j.model.IRI;
-
-import cz.vutbr.fit.layout.gui.BrowserPlugin;
 
 /**
  * This class provides static methods for managing the global services.
@@ -25,7 +21,6 @@ import cz.vutbr.fit.layout.gui.BrowserPlugin;
  */
 public class ServiceManager
 {
-    private static List<BrowserPlugin> browserPlugins;
     private static Map<String, ArtifactService> artifactServices;
     private static Map<String, AreaTreeOperator> operators;
     private static Map<String, PageStorage> pageStorages;
@@ -39,22 +34,12 @@ public class ServiceManager
         scriptObjects = new HashMap<String, ScriptObject>();
         parametrizedServices = new HashMap<String, ParametrizedOperation>();
         //load services of standard types
-        browserPlugins = loadBrowserPlugins();
         artifactServices = loadServicesByType(ArtifactService.class);
         operators = loadServicesByType(AreaTreeOperator.class);
         pageStorages = loadServicesByType(PageStorage.class);
         //load the remaining script objects - this should be the last step
         loadScriptObjects();
     }
-    
-    /**
-     * Discovers all the BrowserPlugin service implementations.
-     * @return A list of all browser plugins.
-     */
-    public static List<BrowserPlugin> findBrowserPlugins()
-    {
-        return browserPlugins;
-    }    
     
     /**
      * Discovers all the ArtifactService implementations.
@@ -122,21 +107,6 @@ public class ServiceManager
                 addParametrizedService(op.getId(), (ParametrizedOperation) op);
             if (op instanceof ScriptObject)
                 addScriptObject(((ScriptObject) op).getVarName(), (ScriptObject) op);
-        }
-        return ret;
-    }
-    
-    private static List<BrowserPlugin> loadBrowserPlugins()
-    {
-        ServiceLoader<BrowserPlugin> loader = ServiceLoader.load(BrowserPlugin.class);
-        Iterator<BrowserPlugin> it = loader.iterator();
-        List<BrowserPlugin> ret = new ArrayList<BrowserPlugin>();
-        while (it.hasNext())
-        {
-            BrowserPlugin plugin = it.next();
-            ret.add(plugin);
-            if (plugin instanceof ScriptObject)
-                addScriptObject(((ScriptObject) plugin).getVarName(), (ScriptObject) plugin);
         }
         return ret;
     }

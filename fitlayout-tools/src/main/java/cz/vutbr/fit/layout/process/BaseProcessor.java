@@ -27,24 +27,37 @@ public abstract class BaseProcessor
 {
     private static Logger log = LoggerFactory.getLogger(BaseProcessor.class);
     
+    private ServiceManager serviceManager;
+    
 
     public BaseProcessor()
     {
+        serviceManager = ServiceManager.createAndDiscover();
     }
     
+    public ServiceManager getServiceManager()
+    {
+        return serviceManager;
+    }
+
+    public void setServiceManager(ServiceManager serviceManager)
+    {
+        this.serviceManager = serviceManager;
+    }
+
     public Map<String, ArtifactService> getArtifactServices()
     {
-        return ServiceManager.findArtifactSevices();
+        return getServiceManager().findArtifactSevices();
     }
 
     public Map<String, ArtifactService> getArtifactProviders(IRI artifactType)
     {
-        return ServiceManager.findArtifactProviders(artifactType);
+        return getServiceManager().findArtifactProviders(artifactType);
     }
 
     public Map<String, AreaTreeOperator> getOperators()
     {
-        return ServiceManager.findAreaTreeOperators();
+        return getServiceManager().findAreaTreeOperators();
     }
     
     //======================================================================================================
@@ -52,7 +65,7 @@ public abstract class BaseProcessor
     public Artifact processArtifact(Artifact input, ArtifactService provider, Map<String, Object> params)
     {
         if (provider instanceof ParametrizedOperation)
-            ServiceManager.setServiceParams((ParametrizedOperation) provider, params);
+            getServiceManager().setServiceParams((ParametrizedOperation) provider, params);
         return provider.process(input);
     }
     
@@ -60,7 +73,7 @@ public abstract class BaseProcessor
     {
         if (atree != null)
         {
-            ServiceManager.setServiceParams(op, params);
+            getServiceManager().setServiceParams(op, params);
             op.apply(atree);
         }
         else

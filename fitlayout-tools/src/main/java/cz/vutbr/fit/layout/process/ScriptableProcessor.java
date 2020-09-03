@@ -78,9 +78,9 @@ public class ScriptableProcessor extends BaseProcessor
     
     public void setServiceParams(String serviceName, Map<String, Object> params)
     {
-        ParametrizedOperation op = ServiceManager.findParmetrizedService(serviceName);
+        ParametrizedOperation op = getServiceManager().findParmetrizedService(serviceName);
         if (op != null)
-            ServiceManager.setServiceParams(op, params);
+            getServiceManager().setServiceParams(op, params);
         else
             log.error("setServiceParams: Unknown service: {}", serviceName);
     }
@@ -181,7 +181,7 @@ public class ScriptableProcessor extends BaseProcessor
                 e.printStackTrace();
             }
             
-            Map<String, ScriptObject> scriptObjects = ServiceManager.findScriptObjects();
+            Map<String, ScriptObject> scriptObjects = getServiceManager().findScriptObjects();
             for (Map.Entry<String, ScriptObject> obj : scriptObjects.entrySet())
             {
                 engine.put(obj.getKey(), obj.getValue());
@@ -201,7 +201,7 @@ public class ScriptableProcessor extends BaseProcessor
         ctx.setWriter(wout);
         ctx.setErrorWriter(werr);
         
-        for (ScriptObject obj : ServiceManager.findScriptObjects().values())
+        for (ScriptObject obj : getServiceManager().findScriptObjects().values())
             obj.setIO(in, out, err);
     }
     

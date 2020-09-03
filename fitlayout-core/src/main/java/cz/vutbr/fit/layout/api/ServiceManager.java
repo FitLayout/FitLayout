@@ -15,24 +15,48 @@ import java.util.stream.Collectors;
 import org.eclipse.rdf4j.model.IRI;
 
 /**
- * This class provides static methods for managing the global services.
+ * This class provides access to registered services.
  * 
  * @author burgetr
  */
 public class ServiceManager
 {
-    private static Map<String, ArtifactService> artifactServices;
-    private static Map<String, AreaTreeOperator> operators;
-    private static Map<String, PageStorage> pageStorages;
+    private static ServiceManager globalInstance;
+    
+    private Map<String, ArtifactService> artifactServices;
+    private Map<String, AreaTreeOperator> operators;
+    private Map<String, PageStorage> pageStorages;
     
     /** All the parametrized services */
-    private static Map<String, ParametrizedOperation> parametrizedServices;
+    private Map<String, ParametrizedOperation> parametrizedServices;
     /** All the script objects (may coexist with other service types) */
-    private static Map<String, ScriptObject> scriptObjects;
+    private Map<String, ScriptObject> scriptObjects;
 
-    static {
-        scriptObjects = new HashMap<String, ScriptObject>();
-        parametrizedServices = new HashMap<String, ParametrizedOperation>();
+    //===============================================================================================
+    
+    public static ServiceManager instance()
+    {
+        if (globalInstance == null)
+            globalInstance = createAndDiscover();
+        return globalInstance;
+    }
+    
+    /**
+     * Creates a new service manager which is initialized by the automatic service discovery.
+     * 
+     * @return A ServiceManager instance
+     */
+    public static ServiceManager createAndDiscover() 
+    {
+        ServiceManager mgr = new ServiceManager();
+        mgr.initAndDiscover();
+        return mgr;
+    }
+    
+    protected void initAndDiscover()
+    {
+        scriptObjects = new HashMap<>();
+        parametrizedServices = new HashMap<>();
         //load services of standard types
         artifactServices = loadServicesByType(ArtifactService.class);
         operators = loadServicesByType(AreaTreeOperator.class);
@@ -42,10 +66,45 @@ public class ServiceManager
     }
     
     /**
+     * Creates a new empty service manager with no services.
+     * 
+     * @return A ServiceManager instance
+     */
+    public static ServiceManager create()
+    {
+        ServiceManager mgr = new ServiceManager();
+        mgr.initEmpty();
+        return mgr;
+    }
+    
+    protected void initEmpty()
+    {
+        scriptObjects = new HashMap<>();
+        parametrizedServices = new HashMap<>();
+        //load services of standard types
+        artifactServices = new HashMap<>();
+        operators = new HashMap<>();
+        pageStorages = new HashMap<>();
+        //load the remaining script objects - this should be the last step
+        loadScriptObjects();
+    }
+    
+    //===============================================================================================
+    
+    /**
+     * Adds a new artifact service to the manager.
+     * @param op The service to add.
+     */
+    public void addArtifactService(ArtifactService op)
+    {
+        addTypedOperation(op, artifactServices);
+    }
+    
+    /**
      * Discovers all the ArtifactService implementations.
      * @return A map that assigns the service {@code id} to the appropriate implementation.
      */
-    public static Map<String, ArtifactService> findArtifactSevices()
+    public Map<String, ArtifactService> findArtifactSevices()
     {
         return artifactServices;
     }
@@ -55,7 +114,7 @@ public class ServiceManager
      * @param artifactType the artifact type to produce 
      * @return A map that assigns the service {@code id} to the appropriate implementation.
      */
-    public static Map<String, ArtifactService> findArtifactProviders(IRI artifactType)
+    public Map<String, ArtifactService> findArtifactProviders(IRI artifactType)
     {
         return artifactServices.entrySet().stream()
                 .filter(x -> artifactType.equals(x.getValue().getProduces()))
@@ -63,10 +122,19 @@ public class ServiceManager
     }
     
     /**
+     * Adds a new area tree operator to the manager.
+     * @param op The operator to add.
+     */
+    public void addAreaTreeOperator(AreaTreeOperator op)
+    {
+        addTypedOperation(op, operators);
+    }
+    
+    /**
      * Discovers all the AreaTreeOperator service implementations.
      * @return A map that assigns the service {@code id} to the appropriate implementation.
      */
-    public static Map<String, AreaTreeOperator> findAreaTreeOperators()
+    public Map<String, AreaTreeOperator> findAreaTreeOperators()
     {
         return operators;
     }
@@ -75,7 +143,7 @@ public class ServiceManager
      * Discovers all the ScriptObject service implementations.
      * @return A map that assigns the service {@code id} to the appropriate implementation.
      */
-    public static Map<String, ScriptObject> findScriptObjects()
+    public Map<String, ScriptObject> findScriptObjects()
     {
         return scriptObjects;
     }
@@ -84,7 +152,7 @@ public class ServiceManager
      * Discovers all the PageStorage service implementations.
      * @return A map that assigns the service {@code id} to the appropriate implementation.
      */
-    public static Map<String, PageStorage> findPageStorages()
+    public Map<String, PageStorage> findPageStorages()
     {
         return pageStorages;
     }
@@ -94,7 +162,7 @@ public class ServiceManager
      * @param clazz the class of the required services
      * @return A map that maps the services to their identifiers
      */
-    public static <T extends Service> Map<String, T> loadServicesByType(Class<T> clazz)
+    public <T extends Service> Map<String, T> loadServicesByType(Class<T> clazz)
     {
         ServiceLoader<T> loader = ServiceLoader.load(clazz);
         Iterator<T> it = loader.iterator();
@@ -102,16 +170,12 @@ public class ServiceManager
         while (it.hasNext())
         {
             T op = it.next();
-            ret.put(op.getId(), op);
-            if (op instanceof ParametrizedOperation)
-                addParametrizedService(op.getId(), (ParametrizedOperation) op);
-            if (op instanceof ScriptObject)
-                addScriptObject(((ScriptObject) op).getVarName(), (ScriptObject) op);
+            addTypedOperation(op, ret);
         }
         return ret;
     }
-    
-    private static Map<String, ScriptObject> loadScriptObjects()
+
+    private Map<String, ScriptObject> loadScriptObjects()
     {
         ServiceLoader<ScriptObject> loader = ServiceLoader.load(ScriptObject.class);
         Iterator<ScriptObject> it = loader.iterator();
@@ -130,7 +194,7 @@ public class ServiceManager
      * @param op The operation whose parametres should be set
      * @param params A map that assigns values to parameter names
      */
-    public static void setServiceParams(ParametrizedOperation op, Map<String, Object> params)
+    public void setServiceParams(ParametrizedOperation op, Map<String, Object> params)
     {
         if (params != null)
         {
@@ -146,7 +210,7 @@ public class ServiceManager
      * @param op The operation whose parametres should be set
      * @return A map that assigns values to parameter names
      */
-    public static Map<String, Object> getServiceParams(ParametrizedOperation op)
+    public Map<String, Object> getServiceParams(ParametrizedOperation op)
     {
         Map<String, Object> ret = new HashMap<String, Object>();
         for (Parameter param : op.getParams())
@@ -161,7 +225,7 @@ public class ServiceManager
      * @param id the service ID.
      * @return the parametrized operation object or {@code null} when the service does not exist.
      */
-    public static ParametrizedOperation findParmetrizedService(String id)
+    public ParametrizedOperation findParmetrizedService(String id)
     {
         if (parametrizedServices == null)
             return null;
@@ -170,16 +234,37 @@ public class ServiceManager
     }
     
     /**
+     * Adds an operation to a corresponding map and updates the ParametrizedOperation and ScriptObject maps
+     * when necessary.
+     * @param <T> Operation tyoe
+     * @param op the operation to add
+     * @param dest the destination map to add to.
+     */
+    private <T extends Service> void addTypedOperation(T op, Map<String, T> dest)
+    {
+        dest.put(op.getId(), op);
+        if (op instanceof ParametrizedOperation)
+            addParametrizedService(op.getId(), (ParametrizedOperation) op);
+        if (op instanceof ScriptObject)
+            addScriptObject(((ScriptObject) op).getVarName(), (ScriptObject) op);
+    }
+    
+    /**
      * Adds a new parametrized operation to the list of all parametrized operations.
      * @param id
      * @param op
      */
-    private static void addParametrizedService(String id, ParametrizedOperation op)
+    private void addParametrizedService(String id, ParametrizedOperation op)
     {
         parametrizedServices.put(id, op);
     }
     
-    private static void addScriptObject(String id, ScriptObject op)
+    /**
+     * Adds a new script object to the manager.
+     * @param id
+     * @param op
+     */
+    public void addScriptObject(String id, ScriptObject op)
     {
         if (!scriptObjects.containsKey(id))
             scriptObjects.put(id, op);
@@ -192,7 +277,7 @@ public class ServiceManager
      * @return the fisrt service in the collection that is instance of the given class or {@code null} when
      * no such servise is present in the collection. 
      */
-    public static <T> T findByClass(Collection<?> services, Class<T> clazz)
+    public <T> T findByClass(Collection<?> services, Class<T> clazz)
     {
         for (Object serv : services)
         {

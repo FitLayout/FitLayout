@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>cz.vutbr.fit.layout</groupId>
+		<artifactId>fitlayout</artifactId>
+		<version>2.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>fitlayout-storage-rdf</artifactId>
+
+	<name>FitLayout RDF bindings</name>
+	<description>
+		FitLayout - RDF bindings
+	</description>
+	<url>https://github.com/FitLayout/FitLayout</url>
+
+	<build>
+		<sourceDirectory>src/main/java</sourceDirectory>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>cz.vutbr.fit.layout</groupId>
+			<artifactId>fitlayout-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.eclipse.rdf4j</groupId>
+		    <artifactId>rdf4j-http-client</artifactId>
+		    <version>${rdf4j.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.rdf4j</groupId>
+		    <artifactId>rdf4j-repository-http</artifactId>
+		    <version>${rdf4j.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.rdf4j</groupId>
+		    <artifactId>rdf4j-repository-sparql</artifactId>
+		    <version>${rdf4j.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.eclipse.rdf4j</groupId>
+		    <artifactId>rdf4j-queryalgebra-evaluation</artifactId>
+		    <version>${rdf4j.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.unbescape</groupId>
+			<artifactId>unbescape</artifactId>
+		</dependency>
+		
+	</dependencies>
+
+</project>

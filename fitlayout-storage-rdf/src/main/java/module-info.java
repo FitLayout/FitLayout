@@ -9,7 +9,7 @@ module cz.vutbr.fit.layout.rdf
     requires rdf4j.repository.api;
     requires rdf4j.repository.http;
     requires rdf4j.repository.sparql;
-    requires rdf4j.rio.api;
+    requires transitive rdf4j.rio.api;
     requires rdf4j.util;
     requires unbescape;
     

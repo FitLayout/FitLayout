@@ -43,6 +43,11 @@ public class RESOURCE
         return factory.createIRI(NAMESPACE, "page" + seq);
     }
     
+    public static IRI createPageURI(String id)
+    {
+        return factory.createIRI(NAMESPACE, "page-" + id);
+    }
+    
     public static IRI createBoxURI(IRI pageUri, Box box)
     {
         return factory.createIRI(pageUri.toString() + '#' + box.getId());

@@ -9,7 +9,7 @@ import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
-import org.eclipse.rdf4j.query.algebra.evaluation.function.rdfterm.UUID;
+//import org.eclipse.rdf4j.query.algebra.evaluation.function.rdfterm.UUID;
 
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Border.Side;
@@ -138,7 +138,7 @@ public class BoxModelBuilder
 		else if (box.getType() == Type.REPLACED_CONTENT)
 		{
 		    ContentObject obj = box.getContentObject();
-            IRI objuri = (new UUID()).evaluate(vf);
+            IRI objuri = null;//(new UUID()).evaluate(vf); //TODO
             if (obj instanceof ContentImage)
             {
                 graph.add(objuri, RDF.TYPE, BOX.Image);

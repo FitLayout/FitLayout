@@ -6,8 +6,6 @@ module cz.vutbr.fit.layout.rdf
     requires transitive rdf4j.rio.api;
     requires rdf4j.http.client;
     requires rdf4j.query;
-    //requires rdf4j.queryalgebra.evaluation;
-    requires rdf4j.queryalgebra.evaluation;
     requires rdf4j.queryalgebra.model;
     requires rdf4j.repository.api;
     requires rdf4j.repository.http;

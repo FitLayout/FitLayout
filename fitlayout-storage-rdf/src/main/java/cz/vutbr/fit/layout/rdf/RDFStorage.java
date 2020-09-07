@@ -44,6 +44,10 @@ import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.FL;
 import cz.vutbr.fit.layout.ontology.SEGM;
+import cz.vutbr.fit.layout.rdf.io.RDFConnector;
+import cz.vutbr.fit.layout.rdf.io.RDFConnectorHTTP;
+import cz.vutbr.fit.layout.rdf.io.RDFConnectorMemory;
+import cz.vutbr.fit.layout.rdf.io.RDFConnectorNative;
 import cz.vutbr.fit.layout.rdf.model.RDFAreaTree;
 import cz.vutbr.fit.layout.rdf.model.RDFPage;
 import cz.vutbr.fit.layout.rdf.model.RDFPageSet;
@@ -68,29 +72,41 @@ public class RDFStorage
 	private RDFConnector db;
 
 	/**
-	 * Creates a new RDFStorage for a given SPARQL endpoint.
-	 * @param url the SPARQL endpoint URL
+	 * Use the create functions for creating the instances
 	 * @throws RepositoryException
 	 */
-	public RDFStorage(String url) throws RepositoryException
+	protected RDFStorage(RDFConnector connector) throws RepositoryException
 	{
-	    if (url.startsWith("sesame:"))
-	        db = new RDFConnectorSesame(url.substring(7));
-	    else if (url.startsWith("blazegraph:"))
-	        db = new RDFConnectorBlazegraph(url.substring(11));
-	    else
-	    {
-	        log.warn("RDFStorage: no provider specified, using generic SPARQL endpoint: {}", url);
-	        db = new RDFConnector(url);
-	    }
+	    db = connector;
 	}
+	
+	public static RDFStorage createMemory(String dataDir)
+	{
+        log.info("Using memory storage in {}", dataDir);
+	    RDFStorage storage = new RDFStorage(new RDFConnectorMemory(dataDir));
+	    return storage;
+	}
+	
+    public static RDFStorage createNative(String dataDir)
+    {
+        log.info("Using native storage in {}", dataDir);
+        RDFStorage storage = new RDFStorage(new RDFConnectorNative(dataDir));
+        return storage;
+    }
+    
+    public static RDFStorage createHTTP(String serverUrl, String repositoryId)
+    {
+        log.info("Using HTTP storage in {} : {}", serverUrl, repositoryId);
+        RDFStorage storage = new RDFStorage(new RDFConnectorHTTP(serverUrl, repositoryId));
+        return storage;
+    }
 
 	/**
 	 * Obtains a connection to the current repository.
 	 * @return the repository connection.
 	 * @throws RepositoryException 
 	 */
-	public RepositoryConnection getConnection() throws RepositoryException 
+	protected RepositoryConnection getConnection() throws RepositoryException 
 	{
 		return db.getConnection();
 	}

@@ -1,4 +1,4 @@
-package cz.vutbr.fit.layout.rdf;
+package cz.vutbr.fit.layout.rdf.io;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Namespace;
@@ -17,32 +17,27 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
 import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.eclipse.rdf4j.repository.config.RepositoryConfigException;
-import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 
 /**
- * 
+ * A basic abstract RDF connector
  * 
  * @author milicka
  * @author burgetr
  */
-public class RDFConnector
+public abstract class RDFConnector
 {
-	protected String endpointUrl;
 	protected RepositoryConnection connection;
 	protected Repository repo;
 	protected ValueFactory vf;
 
 	/**
 	 * Establishes a connection to the SPARQL endpoint.
-	 * @param endpoint the SPARQL endpoint URL
 	 * @throws RepositoryException
 	 */
-	public RDFConnector(String endpoint) throws RepositoryException 
+	public RDFConnector() throws RepositoryException 
 	{
-		endpointUrl = endpoint;
 		connection = null;
 		vf = SimpleValueFactory.getInstance();
-		initRepository();
 	}
 	
     /**
@@ -70,15 +65,12 @@ public class RDFConnector
     }
     
     /**
-     * Creates a new connection.
+     * Creates a new repository connection.
+     * 
      * @throws RepositoryException
      * @throws RepositoryConfigException 
      */
-    protected void initRepository() throws RepositoryException
-    {
-        repo = new SPARQLRepository(endpointUrl);
-        repo.initialize();
-    }
+    protected abstract void initRepository() throws RepositoryException;
     
 	/**
 	 * Adds single tripple to the repository.
@@ -123,7 +115,6 @@ public class RDFConnector
 	}
 	
 	/**
-	 * in BigData 1.4 it is unimplemented function
 	 * @param newNamespace
 	 */
 	public void addNamespace(String newNamespace) 

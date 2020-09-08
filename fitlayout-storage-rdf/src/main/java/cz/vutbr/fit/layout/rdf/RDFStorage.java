@@ -65,6 +65,7 @@ public class RDFStorage
     
     private static final String PREFIXES =
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " + 
             "PREFIX box: <" + BOX.NAMESPACE + "> " +        
             "PREFIX segm: <" + SEGM.NAMESPACE + "> " +
             "PREFIX layout: <" + FL.NAMESPACE + ">";
@@ -116,7 +117,36 @@ public class RDFStorage
 	    db.closeConnection();
 	}
 	
-	//==============================================================================
+	//Artifact functions=============================================================
+	
+    public Set<IRI> getArtifactIRIs() throws RepositoryException
+    {
+        final String query = PREFIXES
+                + "SELECT ?pg "
+                + "WHERE {"
+                + "  ?pg rdf:type ?type . "
+                + "  ?type rdfs:subClassOf layout:Artifact "
+                + "}";
+        
+        log.debug("QUERY: {}", query);
+        TupleQueryResult data = executeSafeTupleQuery(query);
+        Set<IRI> ret = new HashSet<IRI>();
+        try
+        {
+            while (data.hasNext())
+            {
+                BindingSet binding = data.next();
+                Binding b = binding.getBinding("pg");
+                ret.add((IRI) b.getValue());
+            }
+        } catch (QueryEvaluationException e) {
+            e.printStackTrace();
+        }
+        return ret;
+    }
+
+	
+    //==============================================================================
 	
 	public void createPageSet(String name) throws RepositoryException
 	{
@@ -741,7 +771,13 @@ public class RDFStorage
 	
     public void importTurtle(String query) throws RDFParseException, RepositoryException, IOException 
     {
-        getConnection().add(new StringReader(query), null, RDFFormat.TURTLE);
+        getConnection().add(new StringReader(query), "http://fitlayout.github.io/ontology/render.owl#", RDFFormat.TURTLE);
+        closeConnection();
+    }
+
+    public void importXML(String query) throws RDFParseException, RepositoryException, IOException 
+    {
+        getConnection().add(new StringReader(query), "http://fitlayout.github.io/ontology/render.owl#", RDFFormat.RDFXML);
         closeConnection();
     }
 

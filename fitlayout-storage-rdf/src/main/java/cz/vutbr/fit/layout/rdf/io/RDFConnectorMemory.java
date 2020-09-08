@@ -34,8 +34,15 @@ public class RDFConnectorMemory extends RDFConnector
     @Override
     protected void initRepository() throws RepositoryException
     {
-        File data = new File(dataDir);
-        repo = new SailRepository(new MemoryStore(data));
+        if (dataDir != null)
+        {
+            File data = new File(dataDir);
+            repo = new SailRepository(new MemoryStore(data));
+        }
+        else
+        {
+            repo = new SailRepository(new MemoryStore());
+        }
         connection = repo.getConnection();
     }
 

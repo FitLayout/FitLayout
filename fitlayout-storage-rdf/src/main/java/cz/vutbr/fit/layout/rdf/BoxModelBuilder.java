@@ -1,6 +1,7 @@
 package cz.vutbr.fit.layout.rdf;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
@@ -138,7 +139,9 @@ public class BoxModelBuilder
 		else if (box.getType() == Type.REPLACED_CONTENT)
 		{
 		    ContentObject obj = box.getContentObject();
-            IRI objuri = null;//(new UUID()).evaluate(vf); //TODO
+            //IRI objuri = null;//(new UUID()).evaluate(vf); //TODO
+		    UUID uuid = UUID.randomUUID(); //TODO check duplicates
+            IRI objuri = vf.createIRI("urn:uuid:" + uuid.toString());
             if (obj instanceof ContentImage)
             {
                 graph.add(objuri, RDF.TYPE, BOX.Image);

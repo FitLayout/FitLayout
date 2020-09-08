@@ -1,0 +1,222 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://fitlayout.github.io/ontology/segmentation.owl#"
+     xml:base="http://fitlayout.github.io/ontology/segmentation.owl"
+     xmlns:box="http://fitlayout.github.io/ontology/render.owl#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:segm="http://fitlayout.github.io/ontology/segmentation.owl#">
+    <owl:Ontology rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#belongsTo -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#belongsTo">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
+        <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#containsArea -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#containsArea">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea"/>
+        <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#containsBox -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#containsBox">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
+        <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasAreaTree -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasAreaTree">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalAreaTree"/>
+        <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasSourcePage -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasSourcePage">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree"/>
+        <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/render.owl#Page"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasTag -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasTag">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea"/>
+        <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Tag"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#isChildOf -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#isChildOf">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
+        <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#isSubordinateTo -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#isSubordinateTo">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea"/>
+        <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasName -->
+
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasName">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Tag"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasText -->
+
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasText">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasType -->
+
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasType">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Tag"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#support -->
+
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#support">
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#tagSupport -->
+
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#tagSupport">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/render.owl#Box -->
+
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/render.owl#Box"/>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/render.owl#Page -->
+
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/render.owl#Page"/>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/render.owl#Rectangle -->
+
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#Area -->
+
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#Area">
+        <rdfs:subClassOf rdf:resource="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
+    </owl:Class>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#AreaTree -->
+
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree">
+        <rdfs:comment>A tree of visual areas created from a rendered page by page segmentation.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea -->
+
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea">
+        <rdfs:comment>Logical area represents a set of areas that form a single semantic entity. Logical areas are organized in a tree where the parent-child relationships have some semantic meaning instead of representing the actual layout.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#LogicalAreaTree -->
+
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#LogicalAreaTree">
+        <rdfs:comment>A tree of logical areas created from an area tree by some kind of logical structure analysis.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#Tag -->
+
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#Tag"/>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+

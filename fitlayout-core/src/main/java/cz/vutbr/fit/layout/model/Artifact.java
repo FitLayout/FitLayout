@@ -19,7 +19,7 @@ public interface Artifact
      * Gets a unique artifact ID
      * @return the ID
      */
-    public String getId();
+    public IRI getIri();
 
     /**
      * Gets the artifact type. 
@@ -28,9 +28,9 @@ public interface Artifact
     public IRI getArtifactType();
     
     /**
-     * Gets the parent artifact - the artifact this one was created from.
-     * @return the parent artifact or {@code null} when this is an initial artifact.
+     * Gets the IRI of the parent artifact - the artifact this one was created from.
+     * @return the parent artifact IRI or {@code null} when this is an initial artifact.
      */
-    public Artifact getParent();
+    public IRI getParentIri();
     
 }

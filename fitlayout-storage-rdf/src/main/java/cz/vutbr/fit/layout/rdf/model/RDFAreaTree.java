@@ -11,7 +11,6 @@ import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.impl.DefaultAreaTree;
 import cz.vutbr.fit.layout.model.AreaTree;
-import cz.vutbr.fit.layout.model.Page;
 
 /**
  * 
@@ -19,42 +18,20 @@ import cz.vutbr.fit.layout.model.Page;
  */
 public class RDFAreaTree extends DefaultAreaTree implements RDFResource
 {
-    protected IRI iri;
     protected Map<IRI, RDFArea> areaIris;
     protected Map<IRI, RDFLogicalArea> logicalAreaIris;
 
 
-    public RDFAreaTree(Page page, IRI iri)
+    public RDFAreaTree(IRI pageIri)
     {
-        super(page);
-        this.iri = iri;
+        super(pageIri);
     }
     
-    public RDFAreaTree(AreaTree src, IRI iri)
+    public RDFAreaTree(AreaTree src)
     {
         super(src);
-        this.iri = iri;
     }
 
-    @Override
-    public IRI getIri()
-    {
-        return iri;
-    }
-
-    public void setIri(IRI iri)
-    {
-        this.iri = iri;
-    }
-
-    public IRI getPageIri()
-    {
-        if (getPage() != null && getPage() instanceof RDFPage)
-            return ((RDFPage) getPage()).getIri();
-        else
-            return null;
-    }
-    
     public Map<IRI, RDFArea> getAreaUris()
     {
         return areaIris;

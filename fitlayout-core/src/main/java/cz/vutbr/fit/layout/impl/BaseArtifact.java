@@ -5,6 +5,8 @@
  */
 package cz.vutbr.fit.layout.impl;
 
+import org.eclipse.rdf4j.model.IRI;
+
 import cz.vutbr.fit.layout.model.Artifact;
 
 /**
@@ -14,33 +16,35 @@ import cz.vutbr.fit.layout.model.Artifact;
  */
 public abstract class BaseArtifact implements Artifact
 {
-    private String id;
-    private Artifact parent;
+    private IRI iri;
+    private IRI parentIri;
     
 
-    public BaseArtifact(Artifact parent)
+    public BaseArtifact(IRI parentIri)
     {
-        this.parent = parent;
+        this.parentIri = parentIri;
     }
 
-    public String getId()
+    @Override
+    public IRI getIri()
     {
-        return id;
+        return iri;
     }
 
-    public void setId(String id)
+    public void setIri(IRI iri)
     {
-        this.id = id;
+        this.iri = iri;
     }
 
-    public Artifact getParent()
+    @Override
+    public IRI getParentIri()
     {
-        return parent;
+        return parentIri;
     }
 
-    public void setParent(Artifact parent)
+    public void setParentIRI(IRI parentIri)
     {
-        this.parent = parent;
+        this.parentIri = parentIri;
     }
 
     @Override
@@ -48,7 +52,9 @@ public abstract class BaseArtifact implements Artifact
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((iri == null) ? 0 : iri.hashCode());
+        result = prime * result
+                + ((parentIri == null) ? 0 : parentIri.hashCode());
         return result;
     }
 
@@ -59,12 +65,17 @@ public abstract class BaseArtifact implements Artifact
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
         BaseArtifact other = (BaseArtifact) obj;
-        if (id == null)
+        if (iri == null)
         {
-            if (other.id != null) return false;
+            if (other.iri != null) return false;
         }
-        else if (!id.equals(other.id)) return false;
+        else if (!iri.equals(other.iri)) return false;
+        if (parentIri == null)
+        {
+            if (other.parentIri != null) return false;
+        }
+        else if (!parentIri.equals(other.parentIri)) return false;
         return true;
     }
-    
+
 }

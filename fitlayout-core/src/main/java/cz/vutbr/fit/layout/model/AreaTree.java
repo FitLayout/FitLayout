@@ -16,12 +16,6 @@ public interface AreaTree extends Artifact, SearchableAreaContainer
 {
 
     /**
-     * Obtains the source page for this area tree.
-     * @return The source page.
-     */
-    public Page getPage();
-    
-    /**
      * Obtains the root node of the area tree.
      * 
      * @return the root node of the tree of areas

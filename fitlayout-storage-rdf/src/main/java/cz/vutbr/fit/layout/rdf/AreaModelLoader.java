@@ -48,7 +48,7 @@ public class AreaModelLoader extends ModelLoader
 
     private RDFStorage storage;
     private IRI areaTreeIri;
-    private RDFPage page;
+    private IRI pageIri;
     
     private Model borderModel;
     private Model tagInfoModel;
@@ -57,11 +57,12 @@ public class AreaModelLoader extends ModelLoader
     private RDFAreaTree areaTree;
     private LogicalAreaTree logicalAreaTree;
     
-    public AreaModelLoader(RDFStorage storage, IRI areaTreeIri, RDFPage srcPage)
+    public AreaModelLoader(RDFStorage storage, IRI areaTreeIri, IRI pageIri)
     {
         this.storage = storage;
         this.areaTreeIri = areaTreeIri;
-        this.page = srcPage;
+        this.pageIri = pageIri;
+        //TODO load page from the storage in order to reconstruct the boxes
     }
     
     public RDFAreaTree getAreaTree() throws RepositoryException
@@ -90,7 +91,8 @@ public class AreaModelLoader extends ModelLoader
         Model model = storage.getAreaModelForAreaTree(areaTreeIri);
         if (model.size() > 0)
         {
-            RDFAreaTree atree = new RDFAreaTree(page, areaTreeIri);
+            RDFAreaTree atree = new RDFAreaTree(pageIri);
+            atree.setIri(areaTreeIri);
             Map<IRI, RDFArea> areaUris = new LinkedHashMap<IRI, RDFArea>();
             RDFArea root = constructVisualAreaTree(model, areaUris);
             recursiveUpdateTopologies(root);
@@ -304,7 +306,7 @@ public class AreaModelLoader extends ModelLoader
         Model model = storage.getLogicalAreaModelForAreaTree(areaTreeIri);
         if (model.size() > 0)
         {
-            DefaultLogicalAreaTree atree = new DefaultLogicalAreaTree(areaTree);
+            DefaultLogicalAreaTree atree = new DefaultLogicalAreaTree(areaTreeIri);
             Map<IRI, RDFLogicalArea> areaUris = new LinkedHashMap<IRI, RDFLogicalArea>();
             RDFLogicalArea root = constructLogicalAreaTree(model, areaUris);
             atree.setRoot(root);

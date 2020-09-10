@@ -154,7 +154,7 @@ public class DefaultPage extends BaseArtifact implements Page
         else
             ret += "- unknown URL -";
         
-        ret += " [" + getId() + "]";
+        ret += " [" + getIri() + "]";
         
         return ret;
     }

@@ -20,7 +20,6 @@ import cz.vutbr.fit.layout.model.Page;
  */
 public class RDFPage extends DefaultPage implements RDFResource
 {
-    protected IRI iri;
     protected Date createdOn;
     protected Map<IRI, RDFBox> boxIris;
     
@@ -30,28 +29,15 @@ public class RDFPage extends DefaultPage implements RDFResource
         super(url);
     }
 
-    public RDFPage(URL url, IRI uri, Date createdOn)
+    public RDFPage(URL url, Date createdOn)
     {
         super(url);
-        this.iri = uri;
         this.createdOn = createdOn;
     }
     
-    public RDFPage(Page src, IRI uri)
+    public RDFPage(Page src)
     {
         super(src);
-        this.iri = uri;
-    }
-
-    @Override
-    public IRI getIri()
-    {
-        return iri;
-    }
-
-    public void setIri(IRI uri)
-    {
-        this.iri = uri;
     }
 
     public Date getCreatedOn()

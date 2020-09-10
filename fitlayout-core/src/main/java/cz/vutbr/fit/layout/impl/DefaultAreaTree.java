@@ -27,15 +27,14 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
     protected Page page;
     private Area root;
 
-    public DefaultAreaTree(Page page)
+    public DefaultAreaTree(IRI pageIri)
     {
-        super(page);
-        this.page = page;
+        super(pageIri);
     }
     
     public DefaultAreaTree(AreaTree src)
     {
-        super(src.getPage());
+        super(src.getParentIri());
         root = src.getRoot();
     }
     
@@ -45,12 +44,6 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
         return SEGM.AreaTree;
     }
 
-    @Override
-    public Page getPage()
-    {
-        return page;
-    }
-    
     @Override
     public Area getRoot()
     {
@@ -71,7 +64,7 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
     @Override
     public String toString()
     {
-        return "AreaTree [" + getId() + "]";
+        return "AreaTree [" + getIri() + "]";
     }
 
     //=================================================================================

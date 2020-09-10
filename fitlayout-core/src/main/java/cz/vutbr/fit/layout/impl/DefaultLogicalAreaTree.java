@@ -7,7 +7,6 @@ package cz.vutbr.fit.layout.impl;
 
 import org.eclipse.rdf4j.model.IRI;
 
-import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.LogicalArea;
 import cz.vutbr.fit.layout.model.LogicalAreaTree;
 import cz.vutbr.fit.layout.ontology.SEGM;
@@ -21,17 +20,11 @@ public class DefaultLogicalAreaTree extends BaseArtifact implements LogicalAreaT
 {
     private LogicalArea root;
     
-    public DefaultLogicalAreaTree(AreaTree atree)
+    public DefaultLogicalAreaTree(IRI parentIRI)
     {
-        super(atree);
+        super(parentIRI);
     }
     
-    @Override
-    public AreaTree getAreaTree()
-    {
-        return (AreaTree) getParent();
-    }
-
     @Override
     public IRI getArtifactType()
     {

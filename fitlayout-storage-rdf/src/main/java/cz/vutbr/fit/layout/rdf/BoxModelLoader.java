@@ -78,7 +78,8 @@ public class BoxModelLoader extends ModelLoader
                     srcURL = null;
                 }
             }
-            RDFPage page = new RDFPage(srcURL, info.getId(), info.getDate());
+            RDFPage page = new RDFPage(srcURL, info.getDate());
+            page.setIri(info.getId());
             if (info.getTitle() != null)
                 page.setTitle(info.getTitle());
             

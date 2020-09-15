@@ -42,7 +42,7 @@ public abstract class BaseArtifact implements Artifact
         return parentIri;
     }
 
-    public void setParentIRI(IRI parentIri)
+    public void setParentIri(IRI parentIri)
     {
         this.parentIri = parentIri;
     }

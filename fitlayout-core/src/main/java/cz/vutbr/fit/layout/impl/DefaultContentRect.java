@@ -5,11 +5,12 @@
  */
 package cz.vutbr.fit.layout.impl;
 
+import org.eclipse.rdf4j.model.IRI;
+
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.GenericTreeNode;
-import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Border.Side;
 import cz.vutbr.fit.layout.model.Border.Style;
@@ -26,7 +27,7 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
     private static int nextid = 1;
     
     private int id;
-    private Page page;
+    private IRI pageIri;
     private Rectangular bounds;
     private Color backgroundColor;
     private float underline;
@@ -57,7 +58,7 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
     {
         super(myType);
         id = nextid++;
-        page = src.page;
+        pageIri = src.pageIri;
         bounds = new Rectangular(src.bounds);
         backgroundColor = (src.backgroundColor == null) ? null : new Color(src.backgroundColor.getRed(), src.backgroundColor.getGreen(), src.backgroundColor.getBlue());
         underline = src.underline;
@@ -83,14 +84,14 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
     }
     
     @Override
-    public Page getPage()
+    public IRI getPageIri()
     {
-        return page;
+        return pageIri;
     }
     
-    public void setPage(Page page)
+    public void setPageIri(IRI pageIri)
     {
-        this.page = page;
+        this.pageIri = pageIri;
     }
     
     @Override

@@ -5,6 +5,8 @@
  */
 package cz.vutbr.fit.layout.model;
 
+import org.eclipse.rdf4j.model.IRI;
+
 /**
  * A generic rectangular content within a page
  * 
@@ -20,10 +22,10 @@ public interface ContentRect extends Rect
     public int getId();
     
     /**
-     * Obtains the page this block belongs to.
-     * @return the page
+     * Obtains the IRI of the page this block belongs to.
+     * @return the page IRI
      */
-    public Page getPage();
+    public IRI getPageIri();
     
     /**
      * Obtains the pixel position within in the page.

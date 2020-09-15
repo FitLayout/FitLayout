@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.rdf4j.model.IRI;
 import org.fit.cssbox.layout.BlockReplacedBox;
 import org.fit.cssbox.layout.Box;
 import org.fit.cssbox.layout.ElementBox;
@@ -30,7 +31,6 @@ import cz.vutbr.fit.layout.impl.DefaultTreeNode;
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.ContentObject;
-import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Border.Side;
 import cz.vutbr.fit.layout.model.Border.Style;
@@ -54,7 +54,7 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
     protected Box box;
     
     /** The page this box belongs to. */
-    protected Page page;
+    protected IRI pageIri;
     
     /** Order in the box tree. It is assumed that the box tree obtained from the
      * rendering engine is sorted so that the siblings in the bottom are before the
@@ -99,12 +99,12 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
      * Creates a new node containing a box with a transparent background.
      * 
      * @param box the contained box
-     * @param page containing page
+     * @param pageIri containing page IRI
      * @param zoom zoom factor to apply
      */
-    public BoxNode(Box box, Page page, float zoom)
+    public BoxNode(Box box, IRI pageIri, float zoom)
     {
-        this(box, page, null, zoom);
+        this(box, pageIri, null, zoom);
     }
     
     /**
@@ -113,15 +113,15 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
      * table elements) are treated in a special way.
      * 
      * @param box the contained box
-     * @param page containing page
+     * @param pageIri containing page IRI
      * @param bgColor computed backgound color to be used for the box
      * @param zoom zoom factor to apply
      */
-    public BoxNode(Box box, Page page, Color bgColor, float zoom)
+    public BoxNode(Box box, IRI pageIri, Color bgColor, float zoom)
     {
         super(cz.vutbr.fit.layout.model.Box.class);
         this.box = box;
-        this.page = page;
+        this.pageIri = pageIri;
         this.bgColor = bgColor;
         this.zoom = zoom;
         //copy the bounds from the box
@@ -996,9 +996,9 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
     //==================================================================================
     
     @Override
-    public Page getPage()
+    public IRI getPageIri()
     {
-        return page;
+        return pageIri;
     }
 
     @Override

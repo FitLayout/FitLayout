@@ -96,7 +96,7 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
     public DefaultArea(Box box)
     {
         this(box.getBounds());
-        setPage(box.getPage());
+        setPageIri(box.getPageIri());
         addBox(box);
         setBounds(new Rectangular(contentBounds)); //update bounds to the box content bounds
         setName(getBoxDescription(box));

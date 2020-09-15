@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.rdf4j.model.IRI;
 import org.fit.cssbox.awt.Transform;
 import org.fit.cssbox.css.BackgroundDecoder;
 import org.fit.cssbox.layout.ElementBox;
@@ -21,7 +22,6 @@ import org.fit.cssbox.layout.TextBox;
 import org.fit.cssbox.render.StructuredRenderer;
 
 import cz.vutbr.fit.layout.model.Color;
-import cz.vutbr.fit.layout.model.Page;
 
 /**
  * A CSSBox renderer that produces a list of boxes.
@@ -30,7 +30,7 @@ import cz.vutbr.fit.layout.model.Page;
  */
 public class BoxListRenderer extends StructuredRenderer
 {
-    private Page page;
+    private IRI pageIri;
     private float zoom;
     
     /** the resulting list */
@@ -45,9 +45,9 @@ public class BoxListRenderer extends StructuredRenderer
     private int orderCounter;
     
     
-    public BoxListRenderer(Page page, float zoom)
+    public BoxListRenderer(IRI pageIri, float zoom)
     {
-        this.page = page;
+        this.pageIri = pageIri;
         this.zoom = zoom;
         boxList = new ArrayList<>();
         savedTransforms = new HashMap<ElementBox, AffineTransform>();
@@ -91,7 +91,7 @@ public class BoxListRenderer extends StructuredRenderer
         // background color is computed by the renderer in order to treat special Viewport behavior
         BackgroundDecoder bg = findBackgroundSource(elem);
         Color bgColor = (bg == null) ? null : Units.toColor(bg.getBgcolor());
-        BoxNode newnode = new BoxNode(elem, page, bgColor, zoom);
+        BoxNode newnode = new BoxNode(elem, pageIri, bgColor, zoom);
         if (newnode.isVisible())
         {
             newnode.setOrder(orderCounter++);
@@ -108,7 +108,7 @@ public class BoxListRenderer extends StructuredRenderer
     @Override
     public void renderTextContent(TextBox text)
     {
-        BoxNode newnode = new BoxNode(text, page, zoom);
+        BoxNode newnode = new BoxNode(text, pageIri, zoom);
         if (newnode.isVisible())
         {
             newnode.setOrder(orderCounter++);

@@ -127,7 +127,7 @@ public class CSSBoxTreeBuilder
 
         page = new PageImpl(list.get(0));
         DefaultBox main = new DefaultBox();
-        main.setPage(page);
+        main.setPageIri(page.getIri());
         main.setTagName("pageset");
         
         for (URL url : list)
@@ -140,7 +140,7 @@ public class CSSBoxTreeBuilder
             
             //wrap the page with a new block box
             DefaultBox pageBox = new DefaultBox();
-            pageBox.setPage(page);
+            pageBox.setPageIri(page.getIri());
             pageBox.appendChild(root);
             pageBox.setTagName("page");
             pageBox.setDisplayType(DisplayType.BLOCK);
@@ -338,7 +338,7 @@ public class CSSBoxTreeBuilder
      */
     private List<BoxNode> createBoxList(Viewport vp)
     {
-        BoxListRenderer renderer = new BoxListRenderer(page, zoom);
+        BoxListRenderer renderer = new BoxListRenderer(page.getIri(), zoom);
         renderer.init(vp);
         vp.draw(renderer);
         return renderer.getBoxList();

@@ -37,8 +37,10 @@ import org.eclipse.rdf4j.rio.RDFParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.api.PageSet;
 import cz.vutbr.fit.layout.model.AreaTree;
+import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.LogicalAreaTree;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.ontology.BOX;
@@ -59,7 +61,7 @@ import cz.vutbr.fit.layout.rdf.model.RDFPageSet;
  * @author milicka
  * @author burgetr
  */
-public class RDFStorage 
+public class RDFStorage implements ArtifactRepository
 {
     private static Logger log = LoggerFactory.getLogger(RDFStorage.class);
     
@@ -144,11 +146,31 @@ public class RDFStorage
         }
         return ret;
     }
+	
+	@Override
+    public Artifact getArtifact(IRI artifactIri)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	
+    @Override
+    public void addArtifact(Artifact artifact)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public IRI createArtifactIri(Artifact artifact)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     //==============================================================================
-	
-	public void createPageSet(String name) throws RepositoryException
+    
+    public void createPageSet(String name) throws RepositoryException
 	{
         Model graph = new LinkedHashModel(); // it holds whole model
         ValueFactory vf = SimpleValueFactory.getInstance();
@@ -508,9 +530,9 @@ public class RDFStorage
      * methods for obtaining the trees.
      * @throws RepositoryException
      */
-    public AreaModelLoader loadAreaTrees(IRI areaTreeId, RDFPage srcPage) throws RepositoryException
+    public AreaModelLoader loadAreaTrees(IRI areaTreeId, IRI srcPageIri) throws RepositoryException
     {
-        return new AreaModelLoader(this, areaTreeId, srcPage);
+        return new AreaModelLoader(this, areaTreeId, srcPageIri);
     }
     
     /**

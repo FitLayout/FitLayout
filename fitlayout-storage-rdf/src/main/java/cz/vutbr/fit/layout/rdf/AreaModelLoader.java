@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import cz.vutbr.fit.layout.impl.DefaultLogicalAreaTree;
 import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.model.Area;
+import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Border.Side;
 import cz.vutbr.fit.layout.model.LogicalAreaTree;
@@ -49,6 +50,7 @@ public class AreaModelLoader extends ModelLoader
     private RDFStorage storage;
     private IRI areaTreeIri;
     private IRI pageIri;
+    private RDFPage sourcePage;
     
     private Model borderModel;
     private Model tagInfoModel;
@@ -62,7 +64,10 @@ public class AreaModelLoader extends ModelLoader
         this.storage = storage;
         this.areaTreeIri = areaTreeIri;
         this.pageIri = pageIri;
-        //TODO load page from the storage in order to reconstruct the boxes
+        //load page from the storage in order to reconstruct the boxes
+        Artifact sourceArtifact = storage.getArtifact(pageIri);
+        if (sourceArtifact instanceof RDFPage)
+            sourcePage = (RDFPage) sourceArtifact;
     }
     
     public RDFAreaTree getAreaTree() throws RepositoryException
@@ -244,9 +249,9 @@ public class AreaModelLoader extends ModelLoader
             }
             else if (SEGM.containsBox.equals(pred))
             {
-                if (value instanceof IRI)
+                if (value instanceof IRI && sourcePage != null)
                 {
-                    RDFBox box = page.findBoxByIri((IRI) value);
+                    RDFBox box = sourcePage.findBoxByIri((IRI) value);
                     if (box != null)
                         area.addBox(box);
                 }

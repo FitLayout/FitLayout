@@ -13,7 +13,6 @@ import org.eclipse.rdf4j.model.IRI;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Box;
-import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.ontology.SEGM;
 
@@ -24,7 +23,6 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  */
 public class DefaultAreaTree extends BaseArtifact implements AreaTree
 {
-    protected Page page;
     private Area root;
 
     public DefaultAreaTree(IRI pageIri)

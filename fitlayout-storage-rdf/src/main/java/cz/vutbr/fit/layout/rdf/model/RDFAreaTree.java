@@ -27,9 +27,10 @@ public class RDFAreaTree extends DefaultAreaTree implements RDFResource
         super(pageIri);
     }
     
-    public RDFAreaTree(AreaTree src)
+    public RDFAreaTree(AreaTree src, IRI targetIri)
     {
         super(src);
+        setIri(targetIri);
     }
 
     public Map<IRI, RDFArea> getAreaUris()

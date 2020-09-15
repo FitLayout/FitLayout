@@ -35,9 +35,10 @@ public class RDFPage extends DefaultPage implements RDFResource
         this.createdOn = createdOn;
     }
     
-    public RDFPage(Page src)
+    public RDFPage(Page src, IRI pageIri)
     {
         super(src);
+        setIri(pageIri);
     }
 
     public Date getCreatedOn()

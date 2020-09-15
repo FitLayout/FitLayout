@@ -26,6 +26,7 @@ import cz.vutbr.fit.layout.model.Box.Type;
  */
 public class SegmentationAreaTree extends DefaultAreaTree
 {
+    private Page page;
     /** Preserve the auxiliary areas that have no visual impact */
     private boolean preserveAuxAreas;
     
@@ -35,13 +36,14 @@ public class SegmentationAreaTree extends DefaultAreaTree
      * @param preserveAuxAreas preserve the auxiliary areas that are not visually separated but
      * they are used as containers containing other ares.
      */
-    public SegmentationAreaTree(Page srcpage, boolean preserveAuxAreas)
+    public SegmentationAreaTree(Page srcPage, boolean preserveAuxAreas)
     {
-        super(srcpage);
+        super(srcPage.getIri());
+        this.page = srcPage;
         this.preserveAuxAreas = preserveAuxAreas;
         AreaImpl rootarea = new AreaImpl(0, 0, 0, 0);
         rootarea.setAreaTree(this);
-        rootarea.setPage(srcpage);
+        rootarea.setPageIri(srcPage.getIri());
         setRoot(rootarea);
     }
     
@@ -54,7 +56,7 @@ public class SegmentationAreaTree extends DefaultAreaTree
         AreaImpl rootarea = new AreaImpl(0, 0, 0, 0);
         setRoot(rootarea);
         rootarea.setAreaTree(this);
-        rootarea.setPage(page);
+        rootarea.setPageIri(getParentIri());
         for (int i = 0; i < page.getRoot().getChildCount(); i++)
         {
             Box cbox = page.getRoot().getChildAt(i);

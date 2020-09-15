@@ -83,7 +83,7 @@ public class Provider extends BaseArtifactService
     {
         SegmentationAreaTree atree = new SegmentationAreaTree(page, preserveAuxAreas);
         atree.findBasicAreas();
-        atree.setParent(page);
+        atree.setParentIri(page.getIri());
         atree.setId(getId() + "." + (id_cnt++));
         return atree; 
     }

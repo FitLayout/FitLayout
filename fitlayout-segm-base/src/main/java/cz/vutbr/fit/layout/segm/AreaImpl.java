@@ -468,7 +468,7 @@ public class AreaImpl extends DefaultArea
         //create the new area
         AreaImpl area = new AreaImpl(abspos);
         area.setName(name);
-        area.setPage(getPage());
+        area.setPageIri(getPageIri());
         if (getChildCount() > 0 && selected.size() > 0)
         {
             int index = getIndex(selected.get(0));

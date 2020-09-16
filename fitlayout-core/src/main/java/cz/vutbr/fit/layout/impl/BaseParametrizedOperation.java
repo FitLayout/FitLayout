@@ -20,7 +20,7 @@ import cz.vutbr.fit.layout.api.ParametrizedOperation;
  * 
  * @author burgetr
  */
-public abstract class BaseParametrizedOperation implements ParametrizedOperation
+public abstract class BaseParametrizedOperation extends BaseService implements ParametrizedOperation
 {
     private static Logger log = LoggerFactory.getLogger(BaseParametrizedOperation.class);
     

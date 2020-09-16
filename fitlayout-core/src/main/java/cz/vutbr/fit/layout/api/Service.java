@@ -28,5 +28,11 @@ public interface Service
      */
     public String getDescription();
     
-
+    /**
+     * Assigns a service manager to the service. This is typically called by the service manager
+     * itself during the service initialization.
+     * @param manager The service manager to be set.
+     */
+    public void setServiceManager(ServiceManager manager);
+    
 }

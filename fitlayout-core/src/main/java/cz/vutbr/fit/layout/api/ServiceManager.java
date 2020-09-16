@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 
 import org.eclipse.rdf4j.model.IRI;
 
+import cz.vutbr.fit.layout.impl.DefaultArtifactRepository;
+
 /**
  * This class provides access to registered services.
  * 
@@ -22,6 +24,9 @@ import org.eclipse.rdf4j.model.IRI;
 public class ServiceManager
 {
     private static ServiceManager globalInstance;
+    
+    /** The used artifact repository */
+    private ArtifactRepository artifactRepository;
     
     private Map<String, ArtifactService> artifactServices;
     private Map<String, AreaTreeOperator> operators;
@@ -55,6 +60,7 @@ public class ServiceManager
     
     protected void initAndDiscover()
     {
+        artifactRepository = new DefaultArtifactRepository();
         scriptObjects = new HashMap<>();
         parametrizedServices = new HashMap<>();
         //load services of standard types
@@ -79,14 +85,33 @@ public class ServiceManager
     
     protected void initEmpty()
     {
+        artifactRepository = new DefaultArtifactRepository();
         scriptObjects = new HashMap<>();
         parametrizedServices = new HashMap<>();
-        //load services of standard types
+        //empty service lists
         artifactServices = new HashMap<>();
         operators = new HashMap<>();
         pageStorages = new HashMap<>();
         //load the remaining script objects - this should be the last step
         loadScriptObjects();
+    }
+    
+    /**
+     * Gets the artifact repository currently used by the services. By default, an instance of {@link DefaultArtifactRepository} is used.
+     * @return The artifact repository.
+     */
+    public ArtifactRepository getArtifactRepository()
+    {
+        return artifactRepository;
+    }
+    
+    /**
+     * Changes the artifact repository used by the services.
+     * @param repository the repository to be used
+     */
+    public void setArtifactRepository(ArtifactRepository repository)
+    {
+        artifactRepository = repository;
     }
     
     //===============================================================================================
@@ -242,6 +267,7 @@ public class ServiceManager
      */
     private <T extends Service> void addTypedOperation(T op, Map<String, T> dest)
     {
+        op.setServiceManager(this);
         dest.put(op.getId(), op);
         if (op instanceof ParametrizedOperation)
             addParametrizedService(op.getId(), (ParametrizedOperation) op);

@@ -135,7 +135,8 @@ public class XMLOutputOperator extends BaseOperator
     {
         if (produceHeader)
             out.println("<?xml version=\"1.0\"?>");
-        out.println("<areaTree base=\"" + HTMLEntities(tree.getRoot().getPage().getSourceURL().toString()) + "\">");
+        //out.println("<areaTree base=\"" + HTMLEntities(tree.getRoot().getPage().getSourceURL().toString()) + "\">");
+        out.println("<areaTree>");
         recursiveDump(tree.getRoot(), 1, out);
         out.println("</areaTree>");
     }

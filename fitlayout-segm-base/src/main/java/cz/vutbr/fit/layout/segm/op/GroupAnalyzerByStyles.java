@@ -92,7 +92,7 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
         Rectangular abspos = getTopology().toPixelPosition(mingp);
         abspos.move(parent.getX1(), parent.getY1());
         AreaImpl area = new AreaImpl(abspos);
-        area.setPage(sub.getPage());
+        area.setPageIri(sub.getPageIri());
         //area.setBorders(true, true, true, true);
         area.setLevel(1);
         //if (!mingp.equals(sub.getGridPosition()))

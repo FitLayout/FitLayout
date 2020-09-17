@@ -31,6 +31,7 @@ public abstract class BaseArtifact implements Artifact
         return iri;
     }
 
+    @Override
     public void setIri(IRI iri)
     {
         this.iri = iri;

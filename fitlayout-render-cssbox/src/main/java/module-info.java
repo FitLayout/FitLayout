@@ -10,6 +10,7 @@ module cz.vutbr.fit.layout.cssbox
     requires net.sf.cssbox.pdf2domcssbox;
     
     requires transitive cz.vutbr.fit.layout.core;
+    requires rdf4j.model;
     
     exports cz.vutbr.fit.layout.cssbox;
     

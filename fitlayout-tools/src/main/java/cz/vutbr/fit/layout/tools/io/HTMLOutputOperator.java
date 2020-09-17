@@ -138,11 +138,12 @@ public class HTMLOutputOperator extends BaseOperator
     {
         try
         {
+            Page page = (Page) getServiceManager().getArtifactRepository().getArtifact(atree.getParentIri());
             PrintWriter out = new PrintWriter(filename);
             if (boxTreeOnly)
-                dumpTo(atree.getPage(), out);
+                dumpTo(page, out);
             else
-                dumpTo(atree, out);
+                dumpTo(atree, page, out);
             out.close();
         } catch (FileNotFoundException e) {
             System.err.println("Couldn't create output HTML file " + filename);
@@ -156,14 +157,15 @@ public class HTMLOutputOperator extends BaseOperator
      * @param tree the area tree to be printed
      * @param out a writer to be used for output
      */
-    public void dumpTo(AreaTree tree, PrintWriter out)
+    public void dumpTo(AreaTree tree, Page sourcePage, PrintWriter out)
     {
         if (produceHeader)
         {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>" + tree.getRoot().getPage().getTitle() + "</title>");
+            if (sourcePage != null)
+                out.println("<title>" + sourcePage.getTitle() + "</title>");
             out.println("<meta charset=\"utf-8\">");
             out.println("<meta name=\"generator\" content=\"FITLayout - area tree dump\">");
             out.println("</head>");

@@ -244,7 +244,7 @@ public class SeparatorSetHVS extends SeparatorSet
                 {
                     AreaImpl newarea = new AreaImpl(area.getX1(), sy2 + 1,
                                                         area.getX2(), area.getY2());
-                    newarea.setPage(area.getPage());
+                    newarea.setPageIri(area.getPageIri());
                     newareas.add(newarea);
                     area.getBounds().setY2(sy1 - 1);
                 }
@@ -326,7 +326,7 @@ public class SeparatorSetHVS extends SeparatorSet
                     {
                         AreaImpl newarea = new AreaImpl(area.getX1(), sy1,
                                                             area.getX2(), area.getY2());
-                        newarea.setPage(area.getPage());
+                        newarea.setPageIri(area.getPageIri());
                         newareas.add(newarea);
                         area.getBounds().setY2(sy1 - 1);
                     }
@@ -396,7 +396,7 @@ public class SeparatorSetHVS extends SeparatorSet
         
         Vector<Area> areas = new Vector<Area>();
         AreaImpl init = new AreaImpl(base.getX1(), base.getY1(), base.getX2(), base.getY2());
-        init.setPage(base.getPage());
+        init.setPageIri(base.getPageIri());
         areas.add(init);
         for (Separator sep : hsep)
             considerSeparator(areas, sep, true);

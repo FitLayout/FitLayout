@@ -22,6 +22,12 @@ public interface Artifact
     public IRI getIri();
 
     /**
+     * Sets the IRI of the artifact.
+     * @param iri the new artifact IRI
+     */
+    public void setIri(IRI iri);
+    
+    /**
      * Gets the artifact type. 
      * @return the IRI of the artifact type.
      */

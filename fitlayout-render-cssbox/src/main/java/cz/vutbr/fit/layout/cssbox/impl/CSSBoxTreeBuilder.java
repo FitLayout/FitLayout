@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.eclipse.rdf4j.model.IRI;
 import org.fit.cssbox.awt.GraphicsEngine;
 import org.fit.cssbox.css.CSSNorm;
 import org.fit.cssbox.css.DOMAnalyzer;
@@ -96,10 +97,10 @@ public class CSSBoxTreeBuilder
         this.zoom = zoom;
     }
     
-    public void setPageId(String id)
+    public void setPageIri(IRI pageIri)
     {
         if (page != null)
-            page.setId(id);
+            page.setIri(pageIri);
     }
 
     public void parse(URL url) throws IOException, SAXException

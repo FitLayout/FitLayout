@@ -13,7 +13,10 @@ import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 import cz.vutbr.fit.layout.api.ArtifactRepository;
+import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
+import cz.vutbr.fit.layout.model.LogicalAreaTree;
+import cz.vutbr.fit.layout.model.Page;
 
 /**
  * Default simple in-memory implementation of an ArtifactRepository
@@ -48,7 +51,17 @@ public class DefaultArtifactRepository implements ArtifactRepository
     @Override
     public IRI createArtifactIri(Artifact artifact)
     {
-        return vf.createIRI("urn:artifact:" + String.valueOf(idCounter++));
+        String atype;
+        if (artifact instanceof Page)
+            atype = "boxtree";
+        else if (artifact instanceof AreaTree)
+            atype = "areatree";
+        else if (artifact instanceof LogicalAreaTree)
+            atype = "logicaltree";
+        else
+            atype = "artifact";
+        
+        return vf.createIRI("urn:" + atype + ":" + String.valueOf(idCounter++));
     }
 
 }

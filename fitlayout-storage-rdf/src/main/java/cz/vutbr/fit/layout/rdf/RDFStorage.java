@@ -3,6 +3,7 @@ package cz.vutbr.fit.layout.rdf;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -121,7 +122,7 @@ public class RDFStorage implements ArtifactRepository
 	
 	//Artifact functions=============================================================
 	
-    public Set<IRI> getArtifactIRIs() throws RepositoryException
+    public Collection<IRI> getArtifactIRIs() throws RepositoryException
     {
         final String query = PREFIXES
                 + "SELECT ?pg "
@@ -157,8 +158,9 @@ public class RDFStorage implements ArtifactRepository
     @Override
     public void addArtifact(Artifact artifact)
     {
+        if (artifact.getIri() == null)
+            artifact.setIri(createArtifactIri(artifact));
         // TODO Auto-generated method stub
-        
     }
 
     @Override

@@ -20,10 +20,10 @@ public interface ArtifactRepository
 {
 
     /**
-     * Obtains a list of all artifacts in the repository.
+     * Obtains a list of all artifact IRIs in the repository.
      * @return The list of all artifacts.
      */
-    public Collection<Artifact> getArtifacts();
+    public Collection<IRI> getArtifactIRIs();
     
     /**
      * Obtains an artifact from the repository.
@@ -33,7 +33,8 @@ public interface ArtifactRepository
     public Artifact getArtifact(IRI artifactIri);
     
     /**
-     * Adds an artifact to the repository.
+     * Adds an artifact to the repository. If the artifact IRI, a new IRI is generated
+     * using {@link #createArtifactIri(Artifact)}.
      * @param artifact the artifact to add
      */
     public void addArtifact(Artifact artifact);

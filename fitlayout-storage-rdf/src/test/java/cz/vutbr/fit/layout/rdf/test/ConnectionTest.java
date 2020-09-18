@@ -8,7 +8,7 @@ package cz.vutbr.fit.layout.rdf.test;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.Collection;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.repository.RepositoryException;
@@ -41,7 +41,7 @@ public class ConnectionTest
         //load testing artifacts
         String page = Utils.loadResource("/rdf/page.ttl");
         storage.importTurtle(page);
-        Set<IRI> pages = storage.getArtifactIRIs();
+        Collection<IRI> pages = storage.getArtifactIRIs();
         
         assertEquals("One page has been loaded", 1, pages.size());
     }

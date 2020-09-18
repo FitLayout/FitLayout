@@ -38,9 +38,9 @@ public class DefaultArtifactRepository implements ArtifactRepository
     }
 
     @Override
-    public Collection<Artifact> getArtifacts()
+    public Collection<IRI> getArtifactIRIs()
     {
-        return repo.values();
+        return repo.keySet();
     }
 
     @Override
@@ -52,6 +52,8 @@ public class DefaultArtifactRepository implements ArtifactRepository
     @Override
     public void addArtifact(Artifact artifact)
     {
+        if (artifact.getIri() == null)
+            artifact.setIri(createArtifactIri(artifact));
         repo.put(artifact.getIri(), artifact);
     }
 

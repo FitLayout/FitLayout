@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 
 import cz.vutbr.fit.layout.api.OutputDisplay;
-import cz.vutbr.fit.layout.impl.AreaGrid;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTopology;
 import cz.vutbr.fit.layout.model.Rectangular;

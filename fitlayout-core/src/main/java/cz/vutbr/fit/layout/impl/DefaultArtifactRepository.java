@@ -5,6 +5,7 @@
  */
 package cz.vutbr.fit.layout.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +35,12 @@ public class DefaultArtifactRepository implements ArtifactRepository
     {
         idCounter = 1;
         repo = new HashMap<>();
+    }
+
+    @Override
+    public Collection<Artifact> getArtifacts()
+    {
+        return repo.values();
     }
 
     @Override

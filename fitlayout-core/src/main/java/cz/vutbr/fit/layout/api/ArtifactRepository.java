@@ -5,6 +5,8 @@
  */
 package cz.vutbr.fit.layout.api;
 
+import java.util.Collection;
+
 import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.model.Artifact;
@@ -17,6 +19,12 @@ import cz.vutbr.fit.layout.model.Artifact;
 public interface ArtifactRepository
 {
 
+    /**
+     * Obtains a list of all artifacts in the repository.
+     * @return The list of all artifacts.
+     */
+    public Collection<Artifact> getArtifacts();
+    
     /**
      * Obtains an artifact from the repository.
      * @param artifactIri the artifact IRI

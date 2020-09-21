@@ -5,6 +5,8 @@
  */
 package cz.vutbr.fit.layout.model;
 
+import org.eclipse.rdf4j.model.IRI;
+
 /**
  * A tree of logical areas.
  * 
@@ -12,6 +14,12 @@ package cz.vutbr.fit.layout.model;
  */
 public interface LogicalAreaTree extends Artifact
 {
+    
+    /**
+     * Gets the IRI of the corresponding area tree.
+     * @return the area tree IRI
+     */
+    public IRI getAreaTreeIri();
     
     /**
      * Obtains the root node of the logical area tree.

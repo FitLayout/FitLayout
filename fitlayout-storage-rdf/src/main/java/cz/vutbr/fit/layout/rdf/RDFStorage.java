@@ -40,10 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.api.PageSet;
-import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
-import cz.vutbr.fit.layout.model.LogicalAreaTree;
-import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.FL;
 import cz.vutbr.fit.layout.ontology.SEGM;
@@ -51,7 +48,6 @@ import cz.vutbr.fit.layout.rdf.io.RDFConnector;
 import cz.vutbr.fit.layout.rdf.io.RDFConnectorHTTP;
 import cz.vutbr.fit.layout.rdf.io.RDFConnectorMemory;
 import cz.vutbr.fit.layout.rdf.io.RDFConnectorNative;
-import cz.vutbr.fit.layout.rdf.model.RDFAreaTree;
 import cz.vutbr.fit.layout.rdf.model.RDFPage;
 import cz.vutbr.fit.layout.rdf.model.RDFPageSet;
 
@@ -402,38 +398,6 @@ public class RDFStorage implements ArtifactRepository
 	}
 	
 	/**
-	 * Inserts a new page model to the database.
-	 * @param page the Page to be stored.
-	 * @return the RDFPage implementation of the stored page
-	 * @throws RepositoryException 
-	 */
-	public RDFPage insertPageBoxModel(Page page) throws RepositoryException 
-	{
-	    long seq = getNextSequenceValue("page");
-        IRI pageUri = RESOURCE.createPageURI(seq);
-		BoxModelBuilder pgb = new BoxModelBuilder(page, pageUri);
-		insertGraph(pgb.getGraph());
-		if (page instanceof RDFPage)
-		    return (RDFPage) page;
-		else
-            return new RDFPage(page, pageUri);
-	}
-
-    /**
-     * Inserts a new page model to the database.
-     * @param page the Page to be updated.
-     * @return the RDFPage implementation of the stored page
-     * @throws RepositoryException 
-     */
-    public RDFPage updatePageBoxModel(RDFPage page) throws RepositoryException 
-    {
-        removePage(page.getIri());
-        BoxModelBuilder pgb = new BoxModelBuilder(page, page.getIri());
-        insertGraph(pgb.getGraph());
-        return page;
-    }
-
-	/**
 	 * Removes a page from the storage. 
 	 * @param pageUri the page IRI
 	 * @throws RepositoryException 
@@ -658,43 +622,6 @@ public class RDFStorage implements ArtifactRepository
         return ret;
 	}
 	
-    /**
-     * Adds an area tree to the repository. The tree is assigned to a given page that must be
-     * already stored in the repository. The IRI of the tree is generated automatically.
-     * @param targetUri the IRI of the new area tree
-     * @param atree the area tree to be stored
-     * @param ltree the logical area tree to be stored or {@code null} when there is no logical area tree.
-     * @param pageUri the IRI of the source page model (rendered page)
-     * @return the RDFAreaTree version of the given area tree
-     * @throws RepositoryException 
-     */
-	public RDFAreaTree insertAreaTree(AreaTree atree, LogicalAreaTree ltree, IRI pageUri) throws RepositoryException
-	{
-        long seq = getNextSequenceValue("areatree");
-        IRI targetUri = RESOURCE.createAreaTreeURI(seq);
-        return insertAreaTree(targetUri, atree, ltree, pageUri);
-	}
-
-    /**
-     * Adds an area tree to the repository. The tree is assigned to a given page that must be
-     * already stored in the repository.
-     * @param targetUri the IRI of the new area tree
-     * @param atree the area tree to be stored
-     * @param ltree the logical area tree to be stored or {@code null} when there is no logical area tree.
-     * @param pageUri the IRI of the source page model (rendered page)
-     * @return the RDFAreaTree version of the given area tree
-     * @throws RepositoryException 
-     */
-    public RDFAreaTree insertAreaTree(IRI targetUri, AreaTree atree, LogicalAreaTree ltree, IRI pageUri) throws RepositoryException
-    {
-        AreaModelBuilder pgb = new AreaModelBuilder(atree, ltree, pageUri, targetUri);
-        insertGraph(pgb.getGraph());
-        if (atree instanceof RDFAreaTree)
-            return (RDFAreaTree) atree;
-        else
-            return new RDFAreaTree(atree, targetUri);
-    }
-    
 	/**
 	 * Removes the area tree from the repository. 
 	 * @param areaTreeUri the IRI of the area tree

@@ -18,17 +18,36 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  */
 public class DefaultLogicalAreaTree extends BaseArtifact implements LogicalAreaTree
 {
+    private IRI areaTreeIri;
     private LogicalArea root;
     
     public DefaultLogicalAreaTree(IRI parentIRI)
     {
         super(parentIRI);
+        setAreaTreeIri(parentIRI);
+    }
+    
+    public DefaultLogicalAreaTree(IRI parentIRI, IRI areaTreeIri)
+    {
+        super(parentIRI);
+        setAreaTreeIri(areaTreeIri);
     }
     
     @Override
     public IRI getArtifactType()
     {
         return SEGM.LogicalAreaTree;
+    }
+
+    @Override
+    public IRI getAreaTreeIri()
+    {
+        return areaTreeIri;
+    }
+
+    public void setAreaTreeIri(IRI areaTreeIri)
+    {
+        this.areaTreeIri = areaTreeIri;
     }
 
     @Override

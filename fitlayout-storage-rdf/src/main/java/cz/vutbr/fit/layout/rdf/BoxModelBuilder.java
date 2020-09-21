@@ -12,6 +12,7 @@ import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 //import org.eclipse.rdf4j.query.algebra.evaluation.function.rdfterm.UUID;
 
+import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Border.Side;
 import cz.vutbr.fit.layout.model.Box;
@@ -28,36 +29,28 @@ import cz.vutbr.fit.layout.ontology.BOX;
  * @author milicka
  * @author burgetr 
  */
-public class BoxModelBuilder 
+public class BoxModelBuilder implements ModelBuilder
 {
-	private Model graph;
-	private Page page;
-	private String baseUrl;
 	private ValueFactory vf;
-	private IRI pageNode;
 	
 	private int next_order; //order counter
 
-	public BoxModelBuilder(Page page, IRI uri) 
+	public BoxModelBuilder() 
 	{
-	    this.page = page;
-		baseUrl = page.getSourceURL().toString();
-		pageNode = uri;
-		initializeGraph();
-		Box root = page.getRoot();
-		insertBox(root);
-		insertChildBoxes(root);
+        vf = SimpleValueFactory.getInstance();
 	}
 	
-	/**
-	 * Initializes the graph model
-	 * 
-	 * @return launch node for the element linking
-	 */
-	private IRI initializeGraph() 
+	@Override
+	public Model createGraph(Artifact artifact)
 	{
-		graph = new LinkedHashModel(); // it holds whole model
-		vf = SimpleValueFactory.getInstance();
+	    return createPageGraph((Page) artifact, artifact.getIri());
+	}
+	
+	private Model createPageGraph(Page page, IRI pageNode) 
+	{
+        String baseUrl = page.getSourceURL().toString();
+	    
+	    Model graph = new LinkedHashModel(); // it holds whole model
 		next_order = 0;
 		
 		// inicialization with launch node
@@ -67,20 +60,25 @@ public class BoxModelBuilder
 		if (page.getTitle() != null)
 		    graph.add(pageNode, BOX.hasTitle, vf.createLiteral(page.getTitle()));
 
-		return this.pageNode;
+        // recursively add the boxes
+		Box root = page.getRoot();
+        insertBox(root, pageNode, graph);
+        insertChildBoxes(root, pageNode, graph);
+		
+		return graph;
 	}
 
 	/**
 	 * Recursively inserts the child boxes of a root box into the grapgh.
 	 * @param root the root box of the subtree to be inserted
 	 */
-	private void insertChildBoxes(Box root) 
+	private void insertChildBoxes(Box root, IRI pageNode, Model graph) 
 	{
 		for (int i = 0; i < root.getChildCount(); i++)
 		{
 		    final Box child = root.getChildAt(i); 
-			insertBox(child);
-			insertChildBoxes(child);
+			insertBox(child, pageNode, graph);
+			insertChildBoxes(child, pageNode, graph);
 		}
 	}
 
@@ -88,7 +86,7 @@ public class BoxModelBuilder
 	 * Appends a single box into graph model.
 	 * @param box
 	 */
-	private void insertBox(Box box) 
+	private void insertBox(Box box, IRI pageNode, Model graph) 
 	{
 		// add BOX individual into graph
 		final IRI individual = RESOURCE.createBoxURI(pageNode, box);
@@ -110,7 +108,7 @@ public class BoxModelBuilder
 		Map<String, String> attrs = box.getAttributes();
 		for (Map.Entry<String, String> attr : attrs.entrySet())
 		{
-		    IRI attrUri = insertAttribute(individual, attr.getKey(), attr.getValue());
+		    IRI attrUri = insertAttribute(individual, attr.getKey(), attr.getValue(), graph);
 		    graph.add(individual, BOX.hasAttribute, attrUri);
 		}
 		
@@ -167,28 +165,28 @@ public class BoxModelBuilder
         
         if (box.getBorderStyle(Side.TOP) != null && box.hasTopBorder())
         {
-            IRI btop = insertBorder(box.getBorderStyle(Side.TOP), individual, "top");
+            IRI btop = insertBorder(box.getBorderStyle(Side.TOP), individual, "top", graph);
             graph.add(individual, BOX.hasTopBorder, btop);
         }
         if (box.getBorderStyle(Side.RIGHT) != null && box.hasRightBorder())
         {
-            IRI bright = insertBorder(box.getBorderStyle(Side.RIGHT), individual, "right");
+            IRI bright = insertBorder(box.getBorderStyle(Side.RIGHT), individual, "right", graph);
             graph.add(individual, BOX.hasRightBorder, bright);
         }
         if (box.getBorderStyle(Side.BOTTOM) != null && box.hasBottomBorder())
         {
-            IRI bbottom = insertBorder(box.getBorderStyle(Side.BOTTOM), individual, "bottom");
+            IRI bbottom = insertBorder(box.getBorderStyle(Side.BOTTOM), individual, "bottom", graph);
             graph.add(individual, BOX.hasBottomBorder, bbottom);
         }
         if (box.getBorderStyle(Side.LEFT) != null && box.hasLeftBorder())
         {
-            IRI bleft = insertBorder(box.getBorderStyle(Side.LEFT), individual, "left");
+            IRI bleft = insertBorder(box.getBorderStyle(Side.LEFT), individual, "left", graph);
             graph.add(individual, BOX.hasLeftBorder, bleft);
         }
 
 	}
 	
-	private IRI insertBorder(Border border, IRI boxUri, String side)
+	private IRI insertBorder(Border border, IRI boxUri, String side, Model graph)
 	{
 	    IRI uri = RESOURCE.createBorderURI(boxUri, side);
 	    graph.add(uri, RDF.TYPE, BOX.Border);
@@ -198,22 +196,12 @@ public class BoxModelBuilder
 	    return uri;
 	}
 	
-	private IRI insertAttribute(IRI boxUri, String name, String value)
+	private IRI insertAttribute(IRI boxUri, String name, String value, Model graph)
 	{
 	    IRI uri = RESOURCE.createAttributeURI(boxUri, name);
 	    graph.add(uri, RDFS.LABEL, vf.createLiteral(name));
 	    graph.add(uri, RDF.VALUE, vf.createLiteral(value));
 	    return uri;
 	}
-
-	public Model getGraph() 
-	{
-		return graph;
-	}
-
-	public IRI getLaunchNode()
-	{
-		return pageNode;
-	} 
 
 }

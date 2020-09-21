@@ -23,13 +23,34 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  */
 public class DefaultAreaTree extends BaseArtifact implements AreaTree
 {
+    private IRI pageIri;
     private Area root;
 
+    /**
+     * Creates an area tree from a page.
+     * @param pageIri the IRI of the source page
+     */
     public DefaultAreaTree(IRI pageIri)
     {
         super(pageIri);
+        setPageIri(pageIri);
     }
     
+    /**
+     * Creates an area tree from another artifact
+     * @param parentIri the parent artifact IRI
+     * @param pageIri the associated page IRI
+     */
+    public DefaultAreaTree(IRI parentIri, IRI pageIri)
+    {
+        super(parentIri);
+        setPageIri(pageIri);
+    }
+    
+    /**
+     * Creates a copy of an area tree.
+     * @param src the source area tree
+     */
     public DefaultAreaTree(AreaTree src)
     {
         super(src.getParentIri());
@@ -40,6 +61,17 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
     public IRI getArtifactType()
     {
         return SEGM.AreaTree;
+    }
+
+    @Override
+    public IRI getPageIri()
+    {
+        return pageIri;
+    }
+    
+    public void setPageIri(IRI pageIri)
+    {
+        this.pageIri = pageIri;
     }
 
     @Override

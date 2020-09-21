@@ -38,14 +38,14 @@ public class RESOURCE
         return factory.createIRI(NAMESPACE, "pset-" + res);
     }
     
-    public static IRI createPageURI(long seq)
+    public static IRI createArtifactIri(long seq)
     {
-        return factory.createIRI(NAMESPACE, "page" + seq);
+        return factory.createIRI(NAMESPACE, "art" + seq);
     }
     
-    public static IRI createPageURI(String id)
+    public static IRI createArtifactIri(String id)
     {
-        return factory.createIRI(NAMESPACE, "page-" + id);
+        return factory.createIRI(NAMESPACE, "art-" + id);
     }
     
     public static IRI createBoxURI(IRI pageUri, Box box)
@@ -63,11 +63,6 @@ public class RESOURCE
     {
         String localName = boxUri.getLocalName() + "-attr-" + name;
         return factory.createIRI(boxUri.getNamespace(), localName);
-    }
-    
-    public static IRI createAreaTreeURI(long seq)
-    {
-        return factory.createIRI(NAMESPACE, "atree" + seq);
     }
     
     public static IRI createAreaURI(IRI areaTreeNode, Area area) 

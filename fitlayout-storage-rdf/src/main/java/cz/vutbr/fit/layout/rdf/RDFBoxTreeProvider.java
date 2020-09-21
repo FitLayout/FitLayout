@@ -36,7 +36,7 @@ public class RDFBoxTreeProvider extends BaseArtifactService
     public RDFBoxTreeProvider() throws MalformedURLException
     {
 		urlDb = new URL("http://localhost:8080/rdf4j-server/repositories/user");
-		pageId = RESOURCE.createPageURI(1);
+		pageId = RESOURCE.createArtifactIri(1);
     }
     
     public RDFBoxTreeProvider(URL urlDb, IRI pageId)

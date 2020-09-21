@@ -5,8 +5,10 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -68,6 +70,8 @@ public class RDFStorage implements ArtifactRepository
             "PREFIX box: <" + BOX.NAMESPACE + "> " +        
             "PREFIX segm: <" + SEGM.NAMESPACE + "> " +
             "PREFIX layout: <" + FL.NAMESPACE + ">";
+
+    private Map<IRI, ModelBuilder> modelBuilders;
     
 	private RDFConnector db;
 
@@ -78,6 +82,8 @@ public class RDFStorage implements ArtifactRepository
 	protected RDFStorage(RDFConnector connector) throws RepositoryException
 	{
 	    db = connector;
+	    modelBuilders = new HashMap<>();
+	    initDefaultModelBuilders();
 	}
 	
 	public static RDFStorage createMemory(String dataDir)
@@ -116,7 +122,26 @@ public class RDFStorage implements ArtifactRepository
 	    db.closeConnection();
 	}
 	
-	//Artifact functions=============================================================
+    //Model builders =================================================================
+
+	protected void initDefaultModelBuilders()
+	{
+	    addModelBuilder(BOX.Page, new BoxModelBuilder());
+	    addModelBuilder(SEGM.AreaTree, new AreaModelBuilder());
+	    addModelBuilder(SEGM.LogicalAreaTree, new LogicalAreaModelBuilder());
+	}
+	
+	public void addModelBuilder(IRI artifactType, ModelBuilder builder)
+	{
+	    modelBuilders.put(artifactType, builder);
+	}
+	
+	public ModelBuilder getModelBuilder(IRI artifactType)
+	{
+	    return modelBuilders.get(artifactType);
+	}
+	
+	//Artifact functions =============================================================
 	
     public Collection<IRI> getArtifactIRIs() throws RepositoryException
     {
@@ -156,14 +181,24 @@ public class RDFStorage implements ArtifactRepository
     {
         if (artifact.getIri() == null)
             artifact.setIri(createArtifactIri(artifact));
-        // TODO Auto-generated method stub
+        
+        System.out.println("STORING " + artifact);
+        ModelBuilder builder = getModelBuilder(artifact.getArtifactType());
+        if (builder != null)
+        {
+            Model graph = builder.createGraph(artifact);
+            insertGraph(graph, artifact.getIri());
+        }
+        else
+            log.error("Could not find RDF model builder for artifact {}, type {}", artifact, artifact.getArtifactType());
     }
 
     @Override
     public IRI createArtifactIri(Artifact artifact)
     {
-        // TODO Auto-generated method stub
-        return null;
+        long seq = getNextSequenceValue("page");
+        IRI pageUri = RESOURCE.createArtifactIri(seq);
+        return pageUri;
     }
 
     //==============================================================================
@@ -932,4 +967,12 @@ public class RDFStorage implements ArtifactRepository
 		closeConnection();
 	}
 
+    private void insertGraph(Model graph, IRI contextIri) throws RepositoryException
+    {
+        getConnection().begin();
+        getConnection().add(graph, contextIri);
+        getConnection().commit();
+        closeConnection();
+    }
+    
 }

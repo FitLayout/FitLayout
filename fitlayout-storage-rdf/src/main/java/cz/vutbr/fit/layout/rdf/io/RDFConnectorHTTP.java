@@ -46,7 +46,7 @@ public class RDFConnectorHTTP extends RDFConnector
             connection = repo.getConnection();
         }
         else
-            throw new RepositoryException("Unknown endpoint URL format for Sesame; the expected format is <sevrer_url>/repositories/<repository_ID>");
+            throw new RepositoryException("Invalid server URL or repository ID specified");
     }
 
 }

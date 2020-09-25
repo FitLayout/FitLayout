@@ -1,5 +1,6 @@
 package cz.vutbr.fit.layout.rdf;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ import cz.vutbr.fit.layout.rdf.model.RDFPageSet;
  * @author milicka
  * @author burgetr
  */
-public class RDFStorage implements ArtifactRepository
+public class RDFStorage implements ArtifactRepository, Closeable
 {
     private static Logger log = LoggerFactory.getLogger(RDFStorage.class);
     
@@ -105,6 +106,12 @@ public class RDFStorage implements ArtifactRepository
         log.info("Using HTTP storage in {} : {}", serverUrl, repositoryId);
         RDFStorage storage = new RDFStorage(new RDFConnectorHTTP(serverUrl, repositoryId));
         return storage;
+    }
+    
+    @Override
+    public void close()
+    {
+        db.close();
     }
 
 	/**
@@ -182,7 +189,7 @@ public class RDFStorage implements ArtifactRepository
         if (artifact.getIri() == null)
             artifact.setIri(createArtifactIri(artifact));
         
-        System.out.println("STORING " + artifact);
+        log.debug("STORING {}", artifact);
         ModelBuilder builder = getModelBuilder(artifact.getArtifactType());
         if (builder != null)
         {

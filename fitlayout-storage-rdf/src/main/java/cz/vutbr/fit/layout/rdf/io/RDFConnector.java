@@ -1,5 +1,7 @@
 package cz.vutbr.fit.layout.rdf.io;
 
+import java.io.Closeable;
+
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Namespace;
 import org.eclipse.rdf4j.model.Resource;
@@ -24,7 +26,7 @@ import org.eclipse.rdf4j.repository.config.RepositoryConfigException;
  * @author milicka
  * @author burgetr
  */
-public abstract class RDFConnector
+public abstract class RDFConnector implements Closeable
 {
 	protected RepositoryConnection connection;
 	protected Repository repo;
@@ -38,6 +40,14 @@ public abstract class RDFConnector
 	{
 		connection = null;
 		vf = SimpleValueFactory.getInstance();
+	}
+	
+	@Override
+	public void close()
+	{
+	    closeConnection();
+	    if (repo != null)
+	        repo.shutDown();
 	}
 	
     /**

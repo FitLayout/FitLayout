@@ -36,6 +36,7 @@ public interface ArtifactService extends Service
      * @param source The input artifact or {@code null} when nothing is consumed
      * @return the output artifact {@code null} when nothing is produced
      */
-    public Artifact process(Artifact input);
+    public Artifact process(Artifact input)
+        throws ServiceException;
     
 }

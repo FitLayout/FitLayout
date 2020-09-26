@@ -11,6 +11,7 @@ import java.util.List;
 import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.api.Parameter;
+import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.impl.ParameterBoolean;
 import cz.vutbr.fit.layout.model.AreaTree;
@@ -72,7 +73,7 @@ public class Provider extends BaseArtifactService
     }
 
     @Override
-    public Artifact process(Artifact input)
+    public Artifact process(Artifact input) throws ServiceException
     {
         return createAreaTree((Page) input);
     }

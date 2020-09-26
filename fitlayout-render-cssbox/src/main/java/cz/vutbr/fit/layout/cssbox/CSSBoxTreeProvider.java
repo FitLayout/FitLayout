@@ -15,6 +15,7 @@ import org.fit.cssbox.layout.Dimension;
 import org.xml.sax.SAXException;
 
 import cz.vutbr.fit.layout.api.Parameter;
+import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.cssbox.impl.CSSBoxTreeBuilder;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.impl.ParameterBoolean;
@@ -176,25 +177,24 @@ public class CSSBoxTreeProvider extends BaseArtifactService
     }
 
     @Override
-    public Artifact process(Artifact input)
+    public Artifact process(Artifact input) throws ServiceException
     {
-        return getPage();
+        try {
+            return getPage();
+        } catch (IOException | SAXException e) {
+            throw new ServiceException("Page rendering failed", e);
+        }
     }
 
-    public Page getPage()
+    public Page getPage() throws IOException, SAXException
     {
         builder = new CSSBoxTreeBuilder(new Dimension(width, height), useVisualBounds, preserveAux, replaceImagesWithAlt);
         builder.setZoom(zoom);
-        try {
-            builder.parse(urlstring);
-            Page page = builder.getPage();
-            IRI pageIri = getServiceManager().getArtifactRepository().createArtifactIri(page);
-            page.setIri(pageIri);
-            return page;
-        } catch (IOException | SAXException e) {
-            e.printStackTrace();
-            return null;
-        }
+        builder.parse(urlstring);
+        Page page = builder.getPage();
+        IRI pageIri = getServiceManager().getArtifactRepository().createArtifactIri(page);
+        page.setIri(pageIri);
+        return page;
     }
     
 }

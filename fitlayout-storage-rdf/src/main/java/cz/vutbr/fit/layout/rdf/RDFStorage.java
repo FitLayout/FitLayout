@@ -65,13 +65,8 @@ public class RDFStorage implements ArtifactRepository, Closeable
 {
     private static Logger log = LoggerFactory.getLogger(RDFStorage.class);
     
-    private static final String PREFIXES =
-            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
-            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " + 
-            "PREFIX box: <" + BOX.NAMESPACE + "> " +        
-            "PREFIX segm: <" + SEGM.NAMESPACE + "> " +
-            "PREFIX layout: <" + FL.NAMESPACE + ">";
-
+    private Map<String, String> prefixUris; // prefix -> URI
+    private Map<String, String> uriPrefixes; // URI -> prefix
     private Map<IRI, ModelBuilder> modelBuilders;
     
 	private RDFConnector db;
@@ -148,11 +143,107 @@ public class RDFStorage implements ArtifactRepository, Closeable
 	    return modelBuilders.get(artifactType);
 	}
 	
-	//Artifact functions =============================================================
+	//Prefixes =======================================================================
+	
+	protected void initPrefixes()
+	{
+	    addPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+	    addPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+	    addPrefix("b", BOX.NAMESPACE);
+	    addPrefix("a", SEGM.NAMESPACE);
+	    addPrefix("fl", FL.NAMESPACE);
+        addPrefix("r", RESOURCE.NAMESPACE);
+	}
+	
+	/**
+	 * Adds a new prefix to be used.
+	 * @param prefix the prefix string
+	 * @param uri the corresponding IRI prefix
+	 */
+	public void addPrefix(String prefix, String uri)
+	{
+	    prefixUris.put(prefix, uri);
+	    uriPrefixes.put(uri, prefix);
+	}
+	
+	/**
+	 * Gets a map that assigns uris to prefix names.
+	 * @return the map
+	 */
+	public Map<String, String> getPrefixUris()
+	{
+	    return prefixUris;
+	}
+	
+    /**
+     * Gets a map that assigns prefix names to uris.
+     * @return the map
+     */
+	public Map<String, String> getUriPrefixes()
+	{
+	    return uriPrefixes;
+	}
+	
+	/**
+	 * Gets the prefix declaration string (e.g. for SPARQL) containing the currenly defined prefixes.
+	 * @return the prefix declaration string
+	 */
+	public String declarePrefixes()
+	{
+	    StringBuilder sb = new StringBuilder();
+	    for (Map.Entry<String, String> entry : prefixUris.entrySet())
+	    {
+	        sb.append("PREFIX ")
+	            .append(entry.getKey()).append(": <")
+	            .append(entry.getValue()).append("> ");
+	    }
+	    return sb.toString();
+	}
+	
+	/**
+	 * Converts an IRI to a prefixed string.
+	 * @param iri
+	 * @return
+	 */
+	public String encodeIri(IRI iri)
+	{
+	    String ret = iri.toString();
+        for (Map.Entry<String, String> entry : uriPrefixes.entrySet())
+        {
+            if (ret.startsWith(entry.getKey()))
+            {
+                ret = ret.replace(entry.getKey(), entry.getValue() + ":");
+                break;
+            }
+        }
+	    return ret;
+	}
+	
+	/**
+	 * Converts a prefixed string to an IRI
+	 * @param shortIri
+	 * @return
+	 */
+    public IRI decodeIri(String shortIri)
+    {
+        String ret = shortIri;
+        for (Map.Entry<String, String> entry : prefixUris.entrySet())
+        {
+            if (ret.startsWith(entry.getKey() + ":"))
+            {
+                ret.replace(entry.getKey() + ":", entry.getValue());
+                break;
+            }
+        }
+        ValueFactory vf = SimpleValueFactory.getInstance();
+        return vf.createIRI(ret);
+    }
+    
+    //Artifact functions =============================================================
 	
     public Collection<IRI> getArtifactIRIs() throws RepositoryException
     {
-        final String query = PREFIXES
+        final String query = declarePrefixes()
                 + "SELECT ?pg "
                 + "WHERE {"
                 + "  ?pg rdf:type ?type . "
@@ -262,7 +353,7 @@ public class RDFStorage implements ArtifactRepository, Closeable
 	
 	public List<IRI> getPagesForPageSet(IRI pageSetUri) throws RepositoryException
 	{
-        final String query = PREFIXES
+        final String query = declarePrefixes()
                 + "SELECT ?uri "
                 + "WHERE {"
                 + "  <" + pageSetUri.toString() + "> layout:containsPage ?uri . "
@@ -324,7 +415,7 @@ public class RDFStorage implements ArtifactRepository, Closeable
 	 */
 	public Set<IRI> getOrphanedPages() throws RepositoryException
 	{
-        final String query = PREFIXES
+        final String query = declarePrefixes()
                 + "SELECT ?pg "
                 + "WHERE {"
                 + "  ?pg rdf:type box:Page "
@@ -374,7 +465,7 @@ public class RDFStorage implements ArtifactRepository, Closeable
 	        IRI pageSetUri = RESOURCE.createPageSetURI(psetName);
 	        contClause = " . <" + pageSetUri.toString() + "> layout:containsPage ?page";
 	    }
-	    final String query = PREFIXES
+	    final String query = declarePrefixes()
 	            + " SELECT ?page ?tree ?date ?url ?title " 
                 + "WHERE {"
                 +     "?tree segm:sourcePage ?page . " 
@@ -471,7 +562,7 @@ public class RDFStorage implements ArtifactRepository, Closeable
 	 */
 	public Model getBoxModelForPage(IRI pageId) throws RepositoryException
 	{
-		final String query = PREFIXES
+		final String query = declarePrefixes()
 				+ "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
 				+ "?s rdf:type box:Box . "
 				+ "?s box:documentOrder ?ord . "
@@ -488,7 +579,7 @@ public class RDFStorage implements ArtifactRepository, Closeable
      */
     public Model getBorderModelForPage(IRI pageId) throws RepositoryException
     {
-        final String query = PREFIXES
+        final String query = declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o . "
                 + "?b rdf:type box:Box . " 
                 + "?b box:belongsTo <" + pageId.toString() + "> . "
@@ -504,7 +595,7 @@ public class RDFStorage implements ArtifactRepository, Closeable
      */
     public Model getAttributeModelForPage(IRI pageId) throws RepositoryException
     {
-        final String query = PREFIXES
+        final String query = declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o . "
                 + "?b rdf:type box:Box . " 
                 + "?b box:belongsTo <" + pageId.toString() + "> . "
@@ -575,7 +666,7 @@ public class RDFStorage implements ArtifactRepository, Closeable
 	 */
 	public Model getAreaModelForAreaTree(IRI areaTreeUri) throws RepositoryException
 	{
-		final String query = PREFIXES
+		final String query = declarePrefixes()
 				+ "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
 				+ "?s rdf:type segm:Area . "
                 + "?s box:documentOrder ?ord . "
@@ -592,7 +683,7 @@ public class RDFStorage implements ArtifactRepository, Closeable
      */
     public Model getLogicalAreaModelForAreaTree(IRI areaTreeUri) throws RepositoryException
     {
-        final String query = PREFIXES
+        final String query = declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
                 + "?s rdf:type segm:LogicalArea . "
                 + "?s box:documentOrder ?ord . "
@@ -609,7 +700,7 @@ public class RDFStorage implements ArtifactRepository, Closeable
      */
     public Model getBorderModelForAreaTree(IRI areaTreeUri) throws RepositoryException
     {
-        final String query = PREFIXES
+        final String query = declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o . "
                 + "?b rdf:type segm:Area . " 
                 + "?b segm:belongsTo <" + areaTreeUri.toString() + "> . "
@@ -625,7 +716,7 @@ public class RDFStorage implements ArtifactRepository, Closeable
      */
 	public Model getTagModelForAreaTree(IRI areaTreeUri) throws RepositoryException
 	{
-        final String query = PREFIXES
+        final String query = declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
                 + "{?a rdf:type segm:Area} UNION {?a rdf:type segm:LogicalArea} . "
                 + "?a segm:hasTag ?s . "
@@ -641,7 +732,7 @@ public class RDFStorage implements ArtifactRepository, Closeable
      */
     public Model getTagSupportModelForAreaTree(IRI areaTreeUri) throws RepositoryException
     {
-        final String query = PREFIXES
+        final String query = declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
                 + "?a rdf:type segm:Area . "
                 + "?a segm:tagSupport ?s . "

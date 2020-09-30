@@ -19,10 +19,11 @@ import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.impl.AbstractPageSet;
 import cz.vutbr.fit.layout.model.Page;
-import cz.vutbr.fit.layout.rdf.RDFStorage;
+import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
+import cz.vutbr.fit.layout.rdf.RDFPageSetRepository;
 
 /**
- * A page set stored in a RDF repository.
+ * A page set stored in an artifact repository.
  * 
  * @author burgetr
  */
@@ -30,14 +31,17 @@ public class RDFPageSet extends AbstractPageSet
 {
     private static Logger log = LoggerFactory.getLogger(RDFPageSet.class);
     
-    private RDFStorage storage;
+    private RDFArtifactRepository artRepo;
+    private RDFPageSetRepository setRepo;
     private IRI iri;
 
-    public RDFPageSet(String name, IRI iri, RDFStorage storage)
+    
+    public RDFPageSet(String name, IRI iri, RDFArtifactRepository artRepo, RDFPageSetRepository setRepo)
     {
         super(name);
         this.iri = iri;
-        this.storage = storage;
+        this.artRepo = artRepo;
+        this.setRepo = setRepo;
     }
 
     @Override
@@ -45,7 +49,7 @@ public class RDFPageSet extends AbstractPageSet
     {
         try
         {
-            return storage.getPagesForPageSet(iri).size();
+            return setRepo.getPagesForPageSet(iri).size();
         } catch (RepositoryException e) {
             log.error("Error: " + e.getMessage());
             return 0;
@@ -57,9 +61,9 @@ public class RDFPageSet extends AbstractPageSet
     {
         try
         {
-            List<IRI> uris = storage.getPagesForPageSet(iri);
+            List<IRI> uris = setRepo.getPagesForPageSet(iri);
             if (index < uris.size())
-                return storage.loadPage(uris.get(index));
+                return (Page) artRepo.getArtifact(uris.get(index));
             else
                 throw new IndexOutOfBoundsException("Page index out of bounds: " + index + " >= " + uris.size()); 
         } catch (RepositoryException e) {
@@ -74,7 +78,7 @@ public class RDFPageSet extends AbstractPageSet
         try
         {
             if (page instanceof RDFPage)
-                storage.addPageToPageSet(((RDFPage) page).getIri(), getName());
+                setRepo.addPageToPageSet(((RDFPage) page).getIri(), getName());
             else
                 log.error("addPage: The saved instance of the page is required.");
         } 
@@ -89,7 +93,7 @@ public class RDFPageSet extends AbstractPageSet
     {
         try
         {
-            return new PageIterator(storage, storage.getPagesForPageSet(iri));
+            return new PageIterator(setRepo.getPagesForPageSet(iri));
         } catch (RepositoryException e) {
             e.printStackTrace();
             return null;
@@ -107,7 +111,7 @@ public class RDFPageSet extends AbstractPageSet
         try
         {
             ArrayList<IRI> list = new ArrayList<IRI>();
-            TupleQueryResult data = storage.getAvailableTrees(getName());
+            TupleQueryResult data = setRepo.getAvailableTrees(getName());
             while (data.hasNext())
             {
                 BindingSet tuple = data.next();
@@ -127,15 +131,15 @@ public class RDFPageSet extends AbstractPageSet
         }
     }
     
+    //====================================================================================================
+    
     public class PageIterator implements Iterator<Page>
     {
-        private RDFStorage storage;
         private List<IRI> pageUris;
         private int currentIndex;
         
-        public PageIterator(RDFStorage storage, List<IRI> pageIris)
+        public PageIterator(List<IRI> pageIris)
         {
-            this.storage = storage;
             this.pageUris = pageIris;
             currentIndex = 0;
         }
@@ -153,7 +157,7 @@ public class RDFPageSet extends AbstractPageSet
             {
                 try
                 {
-                    return storage.loadPage(pageUris.get(currentIndex++));
+                    return (Page) artRepo.getArtifact(pageUris.get(currentIndex++));
                 } catch (RepositoryException e) {
                     e.printStackTrace();
                     return null;
@@ -167,7 +171,8 @@ public class RDFPageSet extends AbstractPageSet
         public void remove()
         {
         }
-        
     }
+    
+    
     
 }

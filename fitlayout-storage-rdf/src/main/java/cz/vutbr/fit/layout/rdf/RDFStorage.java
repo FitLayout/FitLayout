@@ -3,6 +3,7 @@ package cz.vutbr.fit.layout.rdf;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -64,6 +65,9 @@ public class RDFStorage implements Closeable
 	protected RDFStorage(RDFConnector connector) throws RepositoryException
 	{
 	    db = connector;
+	    prefixUris = new HashMap<>();
+	    uriPrefixes = new HashMap<>();
+	    initPrefixes();
 	}
 	
 	public static RDFStorage createMemory(String dataDir)
@@ -206,7 +210,7 @@ public class RDFStorage implements Closeable
 	 * @return
 	 * @throws RepositoryException
 	 */
-	private Model executeSafeQuery(String query) throws RepositoryException
+	public Model executeSafeQuery(String query) throws RepositoryException
 	{
         try
         {
@@ -377,9 +381,9 @@ public class RDFStorage implements Closeable
     {
         addPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         addPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-        addPrefix("b", BOX.NAMESPACE);
-        addPrefix("a", SEGM.NAMESPACE);
-        addPrefix("fl", FL.NAMESPACE);
+        addPrefix("box", BOX.NAMESPACE);
+        addPrefix("segm", SEGM.NAMESPACE);
+        addPrefix("layout", FL.NAMESPACE);
         addPrefix("r", RESOURCE.NAMESPACE);
     }
     

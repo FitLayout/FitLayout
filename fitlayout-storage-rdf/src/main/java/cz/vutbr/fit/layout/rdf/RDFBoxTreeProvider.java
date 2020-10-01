@@ -129,7 +129,8 @@ public class RDFBoxTreeProvider extends BaseArtifactService
     {
     	try {
 			RDFStorage storage = RDFStorage.createHTTP("http://localhost:8080/rdf4j-server/", "user"); //TODO make configurable
-			return storage.loadPage(pageId);
+			//return storage.loadPage(pageId);
+			return null; //TODO
 		} catch (RepositoryException e) {
 			e.printStackTrace();
 		}

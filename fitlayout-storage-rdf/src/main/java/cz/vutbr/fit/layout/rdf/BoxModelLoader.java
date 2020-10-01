@@ -22,6 +22,7 @@ import org.eclipse.rdf4j.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Border.Side;
 import cz.vutbr.fit.layout.model.Box;
@@ -37,33 +38,25 @@ import cz.vutbr.fit.layout.rdf.model.RDFPage;
  * This class implements creating a RDFPage from the RDF models.
  * @author burgetr
  */
-public class BoxModelLoader extends ModelLoader
+public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
 {
     private static Logger log = LoggerFactory.getLogger(BoxModelLoader.class);
     
-    private RDFStorage storage;
-    private IRI pageIri;
-    private Model borderModel;
-    private Model attributeModel;
-    private RDFPage page;
-    
 
-    public BoxModelLoader(RDFStorage storage, IRI pageIri)
+    public BoxModelLoader()
     {
-        this.storage = storage;
-        this.pageIri = pageIri;
     }
 
-    public RDFPage getPage() throws RepositoryException
+    @Override
+    public Artifact loadArtifact(IRI artifactIri, RDFStorage storage, Artifact parentArtifact)
+            throws RepositoryException
     {
-        if (page == null)
-            page = constructPage();
-        return page;
+        return constructPage(storage, artifactIri);
     }
-    
-    private RDFPage constructPage() throws RepositoryException
+
+    private RDFPage constructPage(RDFStorage storage, IRI pageIri) throws RepositoryException
     {
-        Model pageModel = storage.getPageInfo(pageIri);
+        Model pageModel = storage.getSubjectModel(pageIri);
         if (pageModel.size() > 0)
         {
             //create the page
@@ -84,9 +77,9 @@ public class BoxModelLoader extends ModelLoader
                 page.setTitle(info.getTitle());
             
             //create the box tree
-            Model boxTreeModel = storage.getBoxModelForPage(pageIri);
+            Model boxTreeModel = getBoxModelForPage(storage, pageIri);
             Map<IRI, RDFBox> boxes = new LinkedHashMap<IRI, RDFBox>();
-            RDFBox root = constructBoxTree(boxTreeModel, boxes); 
+            RDFBox root = constructBoxTree(storage, boxTreeModel, pageIri, boxes); 
             page.setRoot(root);
             page.setBoxIris(boxes);
             page.setWidth(root.getWidth());
@@ -106,14 +99,14 @@ public class BoxModelLoader extends ModelLoader
      * @return the root box or {@code null} if the provided model does not have a tree structure
      * @throws RepositoryException
      */
-    private RDFBox constructBoxTree(Model model, Map<IRI, RDFBox> boxes) throws RepositoryException
+    private RDFBox constructBoxTree(RDFStorage storage, Model model, IRI pageIri, Map<IRI, RDFBox> boxes) throws RepositoryException
     {
         //find all boxes
         for (Resource res : model.subjects())
         {
             if (res instanceof IRI)
             {
-                RDFBox box = createBoxFromModel(model, (IRI) res);
+                RDFBox box = createBoxFromModel(storage, model, pageIri, (IRI) res);
                 boxes.put((IRI) res, box);
             }
         }
@@ -141,19 +134,20 @@ public class BoxModelLoader extends ModelLoader
         }
     }
     
-    private RDFBox createBoxFromModel(Model model, IRI iri) throws RepositoryException
+    private RDFBox createBoxFromModel(RDFStorage storage, Model model, IRI pageIri, IRI boxIri) throws RepositoryException
     {
-        RDFBox box = new RDFBox(iri);
+        RDFBox box = new RDFBox(boxIri);
         box.setTagName("");
         box.setType(Box.Type.ELEMENT);
         box.setDisplayType(Box.DisplayType.BLOCK);
         int x = 0, y = 0, width = 0, height = 0;
         int vx = 0, vy = 0, vwidth = 0, vheight = 0;
         
-        for (Statement st : model.filter(iri, null, null))
+        for (Statement st : model.filter(boxIri, null, null))
         {
             final IRI pred = st.getPredicate();
             final Value value = st.getObject();
+            Model borderModel = null;
             
             if (BOX.documentOrder.equals(pred))
             {
@@ -210,7 +204,9 @@ public class BoxModelLoader extends ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    Border border = createBorder(getBorderModel(), (IRI) value);
+                    if (borderModel == null)
+                        borderModel = getBorderModelForPage(storage, pageIri);
+                    Border border = createBorder(borderModel, (IRI) value);
                     box.setBorderStyle(Side.BOTTOM, border);
                 }
             }
@@ -218,7 +214,9 @@ public class BoxModelLoader extends ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    Border border = createBorder(getBorderModel(), (IRI) value);
+                    if (borderModel == null)
+                        borderModel = getBorderModelForPage(storage, pageIri);
+                    Border border = createBorder(borderModel, (IRI) value);
                     box.setBorderStyle(Side.LEFT, border);
                 }
             }
@@ -226,7 +224,9 @@ public class BoxModelLoader extends ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    Border border = createBorder(getBorderModel(), (IRI) value);
+                    if (borderModel == null)
+                        borderModel = getBorderModelForPage(storage, pageIri);
+                    Border border = createBorder(borderModel, (IRI) value);
                     box.setBorderStyle(Side.RIGHT, border);
                 }
             }
@@ -234,7 +234,9 @@ public class BoxModelLoader extends ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    Border border = createBorder(getBorderModel(), (IRI) value);
+                    if (borderModel == null)
+                        borderModel = getBorderModelForPage(storage, pageIri);
+                    Border border = createBorder(borderModel, (IRI) value);
                     box.setBorderStyle(Side.TOP, border);
                 }
             }
@@ -319,7 +321,7 @@ public class BoxModelLoader extends ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    Map.Entry<String, String> attr = createAttribute(getAttributeModel(), (IRI) value);
+                    Map.Entry<String, String> attr = createAttribute(getAttributeModelForPage(storage, pageIri), (IRI) value);
                     if (attr != null)
                         box.setAttribute(attr.getKey(), attr.getValue());
                 }
@@ -332,18 +334,55 @@ public class BoxModelLoader extends ModelLoader
         return box;
     }
 
-    private Model getBorderModel() throws RepositoryException
+    /**
+     * Gets page box model from the unique page ID.
+     * @param storage 
+     * @param pageIri
+     * @return
+     * @throws RepositoryException 
+     */
+    private Model getBoxModelForPage(RDFStorage storage, IRI pageIri) throws RepositoryException
     {
-        if (borderModel == null)
-            borderModel = storage.getBorderModelForPage(pageIri);
-        return borderModel;
+        final String query = storage.declarePrefixes()
+                + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
+                + "?s rdf:type box:Box . "
+                + "?s box:documentOrder ?ord . "
+                + "?s box:belongsTo <" + pageIri.toString() + ">}"
+                + " ORDER BY ?ord";
+        return storage.executeSafeQuery(query);
     }
     
-    private Model getAttributeModel() throws RepositoryException
+    /**
+     * Gets page box model from the unique page ID.
+     * @param storage 
+     * @param pageIri
+     * @return
+     * @throws RepositoryException 
+     */
+    private Model getBorderModelForPage(RDFStorage storage, IRI pageIri) throws RepositoryException
     {
-        if (attributeModel == null)
-            attributeModel = storage.getAttributeModelForPage(pageIri);
-        return attributeModel;
+        final String query = storage.declarePrefixes()
+                + "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o . "
+                + "?b rdf:type box:Box . " 
+                + "?b box:belongsTo <" + pageIri.toString() + "> . "
+                + "{?b box:hasTopBorder ?s} UNION {?b box:hasRightBorder ?s} UNION {?b box:hasBottomBorder ?s} UNION {?b box:hasLeftBorder ?s}}";
+        return storage.executeSafeQuery(query);
     }
     
+    /**
+     * Gets page attribute model from the unique page ID.
+     * @param storage 
+     * @param pageIri
+     * @return
+     * @throws RepositoryException 
+     */
+    private Model getAttributeModelForPage(RDFStorage storage, IRI pageIri) throws RepositoryException
+    {
+        final String query = storage.declarePrefixes()
+                + "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o . "
+                + "?b rdf:type box:Box . " 
+                + "?b box:belongsTo <" + pageIri.toString() + "> . "
+                + "?b box:hasAttribute ?s}";
+        return storage.executeSafeQuery(query);
+    }
 }

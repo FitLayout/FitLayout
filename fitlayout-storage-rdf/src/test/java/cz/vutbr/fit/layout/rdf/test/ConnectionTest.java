@@ -15,6 +15,7 @@ import org.eclipse.rdf4j.repository.RepositoryException;
 import org.eclipse.rdf4j.rio.RDFParseException;
 import org.junit.Test;
 
+import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
 import cz.vutbr.fit.layout.rdf.RDFStorage;
 
 /**
@@ -39,9 +40,10 @@ public class ConnectionTest
         }
         
         //load testing artifacts
+        RDFArtifactRepository artRepo = new RDFArtifactRepository(storage);
         String page = Utils.loadResource("/rdf/page.ttl");
         storage.importTurtle(page);
-        Collection<IRI> pages = storage.getArtifactIRIs();
+        Collection<IRI> pages = artRepo.getArtifactIRIs();
         
         assertEquals("One page has been loaded", 1, pages.size());
     }

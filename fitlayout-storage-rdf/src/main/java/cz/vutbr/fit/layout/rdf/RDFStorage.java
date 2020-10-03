@@ -129,6 +129,30 @@ public class RDFStorage implements Closeable
 	}
 	
 	/**
+	 * Obtains all statements in a given context.
+	 * 
+	 * @param context the context IRI
+	 * @return
+	 * @throws RepositoryException
+	 */
+	public RepositoryResult<Statement> getContextStatements(Resource context) throws RepositoryException
+	{
+	    return getConnection().getStatements(null, null, null, context);
+	}
+	
+    /**
+     * Obtains a model containing all statements in a given context.
+     * 
+     * @param context the context IRI
+     * @return
+     * @throws RepositoryException
+     */
+    public Model getContextModel(Resource context) throws RepositoryException
+    {
+        return createModel(getContextStatements(context));
+    }
+    
+	/**
 	 * Obtains the value of the given predicate for the given subject.
 	 * @param subject the subject resource
 	 * @param predicate the predicate IRI
@@ -456,14 +480,14 @@ public class RDFStorage implements Closeable
      * @param shortIri
      * @return
      */
-    public IRI decodeIri(String shortIri)
+    public IRI decodeIri(String shortIri) throws IllegalArgumentException
     {
         String ret = shortIri;
         for (Map.Entry<String, String> entry : prefixUris.entrySet())
         {
             if (ret.startsWith(entry.getKey() + ":"))
             {
-                ret.replace(entry.getKey() + ":", entry.getValue());
+                ret = ret.replace(entry.getKey() + ":", entry.getValue());
                 break;
             }
         }

@@ -86,6 +86,12 @@ public class RDFArtifactRepository implements ArtifactRepository
         // TODO Auto-generated method stub
         return null;
     }
+    
+    public Model getArtifactModel(IRI artifactIri)
+    {
+        //we use a separate context for each artifact
+        return storage.getContextModel(artifactIri);
+    }
 
     @Override
     public void addArtifact(Artifact artifact)

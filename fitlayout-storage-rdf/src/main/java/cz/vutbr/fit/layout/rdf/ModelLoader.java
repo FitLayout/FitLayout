@@ -21,12 +21,11 @@ public interface ModelLoader
     /**
      * Loads an artifact from an RDF repository.
      * @param artifactIri
-     * @param storage
-     * @param parentArtifact
+     * @param artifactRepo
      * @throws RepositoryException
      * @return
      */
-    public Artifact loadArtifact(IRI artifactIri, RDFStorage storage, Artifact parentArtifact)
+    public Artifact loadArtifact(IRI artifactIri, RDFArtifactRepository artifactRepo)
         throws RepositoryException;
 
 }

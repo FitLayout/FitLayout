@@ -13,6 +13,8 @@ import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.query.Binding;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
@@ -37,12 +39,14 @@ public class RDFArtifactRepository implements ArtifactRepository
     
     private RDFStorage storage;
     private Map<IRI, ModelBuilder> modelBuilders;
+    private Map<IRI, ModelLoader> modelLoaders;
 
     
     public RDFArtifactRepository(RDFStorage storage)
     {
         this.storage = storage;
         modelBuilders = new HashMap<>();
+        modelLoaders = new HashMap<>();
         initDefaultModelBuilders();
     }
 
@@ -83,7 +87,21 @@ public class RDFArtifactRepository implements ArtifactRepository
     @Override
     public Artifact getArtifact(IRI artifactIri)
     {
-        // TODO Auto-generated method stub
+        Model model = getArtifactModel(artifactIri);
+        IRI type = getArtifactType(model, artifactIri);
+        if (type != null)
+        {
+            ModelLoader loader = getModelLoader(type);
+            if (loader != null)
+            {
+                Artifact artifact = loader.loadArtifact(artifactIri, this);
+                return artifact;
+            }
+            else
+                log.warn("No loader available for type {}", type);
+        }
+        else
+            log.warn("Artifact {} has no type", artifactIri);
         return null;
     }
     
@@ -118,6 +136,23 @@ public class RDFArtifactRepository implements ArtifactRepository
         return pageUri;
     }
     
+    /**
+     * Gets the artifact type from an artifact model.
+     * @param model the artifact model
+     * @param artifactIri the artifact IRI
+     * @return the type IRI or {@code null} when no type declaration (rdf:type) was found.
+     */
+    private IRI getArtifactType(Model model, IRI artifactIri)
+    {
+        Iterable<Statement> typeStatements = model.getStatements(artifactIri, RDF.TYPE, null);
+        for (Statement st : typeStatements)
+        {
+            if (st.getObject() instanceof IRI)
+                return (IRI) st.getObject();
+        }
+        return null; //no type statement found
+    }
+    
     //Model builders =================================================================
 
     protected void initDefaultModelBuilders()
@@ -125,6 +160,9 @@ public class RDFArtifactRepository implements ArtifactRepository
         addModelBuilder(BOX.Page, new BoxModelBuilder());
         addModelBuilder(SEGM.AreaTree, new AreaModelBuilder());
         addModelBuilder(SEGM.LogicalAreaTree, new LogicalAreaModelBuilder());
+        addModelLoader(BOX.Page, new BoxModelLoader());
+        addModelLoader(SEGM.AreaTree, new AreaModelLoader());
+        addModelLoader(SEGM.LogicalAreaTree, new LogicalAreaModelLoader());
     }
     
     public void addModelBuilder(IRI artifactType, ModelBuilder builder)
@@ -137,6 +175,14 @@ public class RDFArtifactRepository implements ArtifactRepository
         return modelBuilders.get(artifactType);
     }
     
+    public void addModelLoader(IRI artifactType, ModelLoader builder)
+    {
+        modelLoaders.put(artifactType, builder);
+    }
     
+    public ModelLoader getModelLoader(IRI artifactType)
+    {
+        return modelLoaders.get(artifactType);
+    }
 
 }

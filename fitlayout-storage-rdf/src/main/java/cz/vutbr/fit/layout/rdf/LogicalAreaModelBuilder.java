@@ -23,7 +23,7 @@ import cz.vutbr.fit.layout.ontology.SEGM;
 import cz.vutbr.fit.layout.rdf.model.RDFArea;
 
 /**
- * 
+ * TODO check the belongsTo relations and the assignment ot the LogicalAreaTree artifact
  * @author burgetr
  */
 public class LogicalAreaModelBuilder implements ModelBuilder
@@ -51,6 +51,8 @@ public class LogicalAreaModelBuilder implements ModelBuilder
         IRI areaTreeNode = logicalTree.getAreaTreeIri();
         Model graph = new LinkedHashModel();
         
+        graph.add(logicalAreaTreeNode, RDF.TYPE, SEGM.LogicalAreaTree);
+        graph.add(logicalAreaTreeNode, SEGM.hasAreaTree, areaTreeNode);
         next_order = 0;
         
         IRI lroot = addLogicalArea(logicalTree.getRoot(), null, areaTreeNode, graph);

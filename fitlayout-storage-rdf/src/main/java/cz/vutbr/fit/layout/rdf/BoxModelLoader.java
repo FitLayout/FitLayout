@@ -48,10 +48,10 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
     }
 
     @Override
-    public Artifact loadArtifact(IRI artifactIri, RDFStorage storage, Artifact parentArtifact)
+    public Artifact loadArtifact(IRI artifactIri, RDFArtifactRepository artifactRepo)
             throws RepositoryException
     {
-        return constructPage(storage, artifactIri);
+        return constructPage(artifactRepo.getStorage(), artifactIri);
     }
 
     private RDFPage constructPage(RDFStorage storage, IRI pageIri) throws RepositoryException

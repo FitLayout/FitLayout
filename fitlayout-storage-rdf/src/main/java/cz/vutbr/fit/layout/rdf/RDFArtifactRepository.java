@@ -136,6 +136,18 @@ public class RDFArtifactRepository implements ArtifactRepository
         return pageUri;
     }
     
+    @Override
+    public void removeArtifact(IRI artifactIri)
+    {
+        storage.clear(artifactIri);
+    }
+
+    @Override
+    public void clear()
+    {
+        storage.clear();
+    }
+
     /**
      * Gets the artifact type from an artifact model.
      * @param model the artifact model

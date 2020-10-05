@@ -20,7 +20,8 @@ import cz.vutbr.fit.layout.model.LogicalAreaTree;
 import cz.vutbr.fit.layout.model.Page;
 
 /**
- * Default simple in-memory implementation of an ArtifactRepository
+ * Default simple in-memory implementation of an ArtifactRepository.
+ * 
  * @author burgetr
  */
 public class DefaultArtifactRepository implements ArtifactRepository
@@ -71,6 +72,18 @@ public class DefaultArtifactRepository implements ArtifactRepository
             atype = "artifact";
         
         return vf.createIRI("urn:" + atype + ":" + String.valueOf(idCounter++));
+    }
+
+    @Override
+    public void removeArtifact(IRI artifactIri)
+    {
+        repo.remove(artifactIri);
+    }
+
+    @Override
+    public void clear()
+    {
+        repo.clear();
     }
 
 }

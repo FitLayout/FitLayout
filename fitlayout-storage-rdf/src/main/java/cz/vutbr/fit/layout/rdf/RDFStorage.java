@@ -197,16 +197,23 @@ public class RDFStorage implements Closeable
 		return tq.evaluate();
 	}
 	
-	
-	public void clearRDFDatabase() 
+	/**
+	 * Clears the entire RDF repository.
+	 */
+	public void clear() throws RepositoryException
 	{
-		try {
-			Update upd = getConnection().prepareUpdate(QueryLanguage.SPARQL, "DELETE WHERE { ?s ?p ?o }");
-			upd.execute();
-			closeConnection();
-		} catch (MalformedQueryException | RepositoryException | UpdateExecutionException e) {
-			e.printStackTrace();
-		}
+	    getConnection().clear();
+	    closeConnection();
+	}
+	
+	/**
+	 * Clears a given context from the repository.
+	 * @param context the context IRI to be cleared
+	 */
+	public void clear(IRI context) throws RepositoryException
+	{
+	    getConnection().clear(context);
+	    closeConnection();
 	}
 
 	public void execSparqlUpdate(String query) throws RepositoryException, MalformedQueryException, UpdateExecutionException 

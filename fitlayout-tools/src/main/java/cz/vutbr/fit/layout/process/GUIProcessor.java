@@ -14,7 +14,7 @@ import cz.vutbr.fit.layout.api.AreaTreeOperator;
  * 
  * @author burgetr
  */
-public class GUIProcessor extends ScriptableProcessor
+public class GUIProcessor extends BaseProcessor
 {
     //private static Logger log = LoggerFactory.getLogger(GUIProcessor.class);
 

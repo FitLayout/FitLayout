@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import cz.vutbr.fit.layout.api.AreaTreeOperator;
+import cz.vutbr.fit.layout.api.ArtifactRepository;
 
 /**
  * 
@@ -21,9 +22,9 @@ public class GUIProcessor extends BaseProcessor
     private Vector<AreaTreeOperator> selectedOperators;
     private Vector<Map<String, Object>> operatorParams;
     
-    public GUIProcessor()
+    public GUIProcessor(ArtifactRepository repository)
     {
-        super();
+        super(repository);
         selectedOperators = new Vector<AreaTreeOperator>();
         operatorParams = new Vector<Map<String, Object>>();
         loadConfig();

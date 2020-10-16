@@ -17,7 +17,8 @@ import org.eclipse.rdf4j.model.IRI;
 import cz.vutbr.fit.layout.impl.DefaultArtifactRepository;
 
 /**
- * This class provides access to registered services.
+ * This class provides access to registered services. It holds the instances of the available
+ * services and their configuration. 
  * 
  * @author burgetr
  */

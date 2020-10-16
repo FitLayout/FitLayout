@@ -4,7 +4,7 @@ module cz.vutbr.fit.layout.segm
     requires org.slf4j;
 
     requires transitive cz.vutbr.fit.layout.core;
-    requires rdf4j.model;
+    requires rdf4j.onejar;
     
     exports cz.vutbr.fit.layout.segm;
     exports cz.vutbr.fit.layout.segm.op;

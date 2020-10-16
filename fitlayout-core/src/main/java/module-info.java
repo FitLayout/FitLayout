@@ -1,7 +1,7 @@
 module cz.vutbr.fit.layout.core
 {
     requires transitive java.desktop;
-    requires transitive rdf4j.model;
+    requires transitive rdf4j.onejar;
     requires org.slf4j;
     
     exports cz.vutbr.fit.layout.api;

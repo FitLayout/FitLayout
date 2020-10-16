@@ -3,20 +3,7 @@ module cz.vutbr.fit.layout.rdf
     requires java.xml;
     requires java.desktop;
     requires org.slf4j;
-    requires transitive rdf4j.rio.api;
-    requires rdf4j.http.client;
-    requires rdf4j.model;
-    requires transitive rdf4j.query;
-    requires rdf4j.queryalgebra.model;
-    requires transitive rdf4j.repository.api;
-    requires rdf4j.repository.http;
-    requires rdf4j.repository.sparql;
-    requires rdf4j.repository.sail;
-    requires rdf4j.sail.api;
-    requires rdf4j.sail.base;
-    requires rdf4j.sail.memory;
-    requires rdf4j.sail.nativerdf;
-    requires rdf4j.util;
+    requires rdf4j.onejar;
     requires unbescape;
     
     requires transitive cz.vutbr.fit.layout.core;

@@ -61,14 +61,15 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
     
     private RDFAreaTree constructAreaTree(RDFArtifactRepository artifactRepo, IRI areaTreeIri) throws RepositoryException
     {
-        Model model = getAreaModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
-        if (model.size() > 0)
+        Model artifactModel = artifactRepo.getStorage().getSubjectModel(areaTreeIri);
+        if (artifactModel.size() > 0)
         {
-            IRI pageIri = getSourcePageIri(model, areaTreeIri);
+            IRI pageIri = getSourcePageIri(artifactModel, areaTreeIri);
             RDFAreaTree atree = new RDFAreaTree(pageIri);
             atree.setIri(areaTreeIri);
+            Model areaModel = getAreaModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
             Map<IRI, RDFArea> areaUris = new LinkedHashMap<IRI, RDFArea>();
-            RDFArea root = constructVisualAreaTree(artifactRepo, model, areaTreeIri, areaUris);
+            RDFArea root = constructVisualAreaTree(artifactRepo, areaModel, areaTreeIri, areaUris);
             recursiveUpdateTopologies(root);
             atree.setRoot(root);
             atree.setAreaIris(areaUris);

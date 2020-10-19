@@ -67,9 +67,14 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             IRI pageIri = getSourcePageIri(artifactModel, areaTreeIri);
             RDFAreaTree atree = new RDFAreaTree(pageIri);
             atree.setIri(areaTreeIri);
+            //load the models
             Model areaModel = getAreaModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
+            Model borderModel = getBorderModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
+            Model tagModel = getTagModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
+            Model tagSupportModel = getTagSupportModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
+            //construct the tree
             Map<IRI, RDFArea> areaUris = new LinkedHashMap<IRI, RDFArea>();
-            RDFArea root = constructVisualAreaTree(artifactRepo, areaModel, areaTreeIri, areaUris);
+            RDFArea root = constructVisualAreaTree(artifactRepo, areaModel, borderModel, tagModel, tagSupportModel, areaTreeIri, areaUris);
             recursiveUpdateTopologies(root);
             atree.setRoot(root);
             atree.setAreaIris(areaUris);
@@ -79,20 +84,21 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             return null;
     }
     
-    private RDFArea constructVisualAreaTree(RDFArtifactRepository artifactRepo, Model model, IRI areaTreeIri, Map<IRI, RDFArea> areas) throws RepositoryException
+    private RDFArea constructVisualAreaTree(RDFArtifactRepository artifactRepo, Model areaModel, Model borderModel, Model tagModel, Model tagSupportModel,
+            IRI areaTreeIri, Map<IRI, RDFArea> areas) throws RepositoryException
     {
         //find all areas
-        for (Resource res : model.subjects())
+        for (Resource res : areaModel.subjects())
         {
             if (res instanceof IRI)
             {
-                RDFArea area = createAreaFromModel(artifactRepo, model, areaTreeIri, (IRI) res);
+                RDFArea area = createAreaFromModel(artifactRepo, areaModel, borderModel, tagModel, tagSupportModel, areaTreeIri, (IRI) res);
                 areas.put((IRI) res, area);
             }
         }
         List<RDFArea> rootAreas = new ArrayList<RDFArea>(areas.values());
         //construct the tree
-        for (Statement st : model.filter(null, SEGM.isChildOf, null))
+        for (Statement st : areaModel.filter(null, SEGM.isChildOf, null))
         {
             if (st.getSubject() instanceof IRI && st.getObject() instanceof IRI)
             {
@@ -114,19 +120,16 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
         }
     }
     
-    private RDFArea createAreaFromModel(RDFArtifactRepository artifactRepo, Model model, 
+    private RDFArea createAreaFromModel(RDFArtifactRepository artifactRepo, Model areaModel, Model borderModel, Model tagModel, Model tagSupportModel,
             IRI areaTreeIri, IRI uri) throws RepositoryException
     {
         RDFArea area = new RDFArea(new Rectangular(), uri);
         int x = 0, y = 0, width = 0, height = 0;
         Map<IRI, Float> tagSupport = new HashMap<IRI, Float>(); //tagUri->support
         
-        Model borderModel = null;
-        Model tagInfoModel = null;
-        Model tagSupportModel = null;
         RDFPage sourcePage = null;
         
-        for (Statement st : model.filter(uri, null, null))
+        for (Statement st : areaModel.filter(uri, null, null))
         {
             final IRI pred = st.getPredicate();
             final Value value = st.getObject();
@@ -175,8 +178,6 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    if (borderModel == null)
-                        borderModel = getBorderModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
                     Border border = createBorder(borderModel, (IRI) value);
                     area.setBorderStyle(Side.BOTTOM, border);
                 }
@@ -185,8 +186,6 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    if (borderModel == null)
-                        borderModel = getBorderModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
                     Border border = createBorder(borderModel, (IRI) value);
                     area.setBorderStyle(Side.LEFT, border);
                 }
@@ -195,8 +194,6 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    if (borderModel == null)
-                        borderModel = getBorderModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
                     Border border = createBorder(borderModel, (IRI) value);
                     area.setBorderStyle(Side.RIGHT, border);
                 }
@@ -205,8 +202,6 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    if (borderModel == null)
-                        borderModel = getBorderModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
                     Border border = createBorder(borderModel, (IRI) value);
                     area.setBorderStyle(Side.TOP, border);
                 }
@@ -237,7 +232,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                 {
                     if (sourcePage == null)
                     {
-                        IRI pageIri = getSourcePageIri(model, areaTreeIri);
+                        IRI pageIri = getSourcePageIri(areaModel, areaTreeIri);
                         if (pageIri != null)
                             sourcePage = getSourcePage(pageIri, artifactRepo);
                     }
@@ -255,9 +250,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                 {
                     if (!tagSupport.containsKey(value))
                     {
-                        if (tagInfoModel == null)
-                            tagInfoModel = getTagModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
-                        Tag tag = createTag(tagInfoModel, (IRI) value);
+                        Tag tag = createTag(tagModel, (IRI) value);
                         if (tag != null)
                             area.addTag(tag, 1.0f); //spport is unkwnown (yet)
                     }
@@ -270,8 +263,6 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                     IRI tsUri = (IRI) value;
                     IRI tagUri = null;
                     Float support = null;
-                    if (tagSupportModel == null)
-                        tagSupportModel = getTagSupportModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
                     for (Statement sst : tagSupportModel.filter(tsUri, null, null))
                     {
                         if (SEGM.hasTag.equals(sst.getPredicate()) && sst.getObject() instanceof IRI)
@@ -281,9 +272,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                     }
                     if (tagUri != null && support != null)
                     {
-                        if (tagInfoModel == null)
-                            tagInfoModel = getTagModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
-                        Tag tag = createTag(tagInfoModel, (IRI) value);
+                        Tag tag = createTag(tagModel, (IRI) value);
                         if (tag != null)
                             area.addTag(tag, support);
                     }

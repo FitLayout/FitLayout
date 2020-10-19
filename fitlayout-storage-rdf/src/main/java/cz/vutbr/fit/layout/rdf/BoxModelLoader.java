@@ -76,10 +76,13 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             if (info.getTitle() != null)
                 page.setTitle(info.getTitle());
             
-            //create the box tree
+            //load the models
             Model boxTreeModel = getBoxModelForPage(storage, pageIri);
+            Model borderModel = getBorderModelForPage(storage, pageIri);
+            Model attributeModel = getAttributeModelForPage(storage, pageIri);
+            //create the box tree
             Map<IRI, RDFBox> boxes = new LinkedHashMap<IRI, RDFBox>();
-            RDFBox root = constructBoxTree(storage, boxTreeModel, pageIri, boxes); 
+            RDFBox root = constructBoxTree(storage, boxTreeModel, borderModel, attributeModel, pageIri, boxes); 
             page.setRoot(root);
             page.setBoxIris(boxes);
             page.setWidth(root.getWidth());
@@ -94,25 +97,26 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
     /**
      * Constructs a tree of boxes based on the given model. The URIs of the created boxes are put to
      * a map that allows to later obtain a box by its IRI.
-     * @param model the source model
+     * @param boxTreeModel the source model
      * @param boxes the destination map of URIs
      * @return the root box or {@code null} if the provided model does not have a tree structure
      * @throws RepositoryException
      */
-    private RDFBox constructBoxTree(RDFStorage storage, Model model, IRI pageIri, Map<IRI, RDFBox> boxes) throws RepositoryException
+    private RDFBox constructBoxTree(RDFStorage storage, Model boxTreeModel, Model borderModel, Model attributeModel,
+            IRI pageIri, Map<IRI, RDFBox> boxes) throws RepositoryException
     {
         //find all boxes
-        for (Resource res : model.subjects())
+        for (Resource res : boxTreeModel.subjects())
         {
             if (res instanceof IRI)
             {
-                RDFBox box = createBoxFromModel(storage, model, pageIri, (IRI) res);
+                RDFBox box = createBoxFromModel(storage, boxTreeModel, borderModel, attributeModel, pageIri, (IRI) res);
                 boxes.put((IRI) res, box);
             }
         }
         List<RDFBox> rootBoxes = new ArrayList<RDFBox>(boxes.values());
         //construct the tree
-        for (Statement st : model.filter(null, BOX.isChildOf, null))
+        for (Statement st : boxTreeModel.filter(null, BOX.isChildOf, null))
         {
             if (st.getSubject() instanceof IRI && st.getObject() instanceof IRI)
             {
@@ -134,7 +138,8 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
         }
     }
     
-    private RDFBox createBoxFromModel(RDFStorage storage, Model model, IRI pageIri, IRI boxIri) throws RepositoryException
+    private RDFBox createBoxFromModel(RDFStorage storage, Model boxTreeModel, Model borderModel, Model attributeModel, 
+            IRI pageIri, IRI boxIri) throws RepositoryException
     {
         RDFBox box = new RDFBox(boxIri);
         box.setTagName("");
@@ -143,11 +148,10 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
         int x = 0, y = 0, width = 0, height = 0;
         int vx = 0, vy = 0, vwidth = 0, vheight = 0;
         
-        for (Statement st : model.filter(boxIri, null, null))
+        for (Statement st : boxTreeModel.filter(boxIri, null, null))
         {
             final IRI pred = st.getPredicate();
             final Value value = st.getObject();
-            Model borderModel = null;
             
             if (BOX.documentOrder.equals(pred))
             {
@@ -204,8 +208,6 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    if (borderModel == null)
-                        borderModel = getBorderModelForPage(storage, pageIri);
                     Border border = createBorder(borderModel, (IRI) value);
                     box.setBorderStyle(Side.BOTTOM, border);
                 }
@@ -214,8 +216,6 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    if (borderModel == null)
-                        borderModel = getBorderModelForPage(storage, pageIri);
                     Border border = createBorder(borderModel, (IRI) value);
                     box.setBorderStyle(Side.LEFT, border);
                 }
@@ -224,8 +224,6 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    if (borderModel == null)
-                        borderModel = getBorderModelForPage(storage, pageIri);
                     Border border = createBorder(borderModel, (IRI) value);
                     box.setBorderStyle(Side.RIGHT, border);
                 }
@@ -234,8 +232,6 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    if (borderModel == null)
-                        borderModel = getBorderModelForPage(storage, pageIri);
                     Border border = createBorder(borderModel, (IRI) value);
                     box.setBorderStyle(Side.TOP, border);
                 }
@@ -321,7 +317,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    Map.Entry<String, String> attr = createAttribute(getAttributeModelForPage(storage, pageIri), (IRI) value);
+                    Map.Entry<String, String> attr = createAttribute(attributeModel, (IRI) value);
                     if (attr != null)
                         box.setAttribute(attr.getKey(), attr.getValue());
                 }

@@ -33,7 +33,7 @@ public class RDFAreaTree extends DefaultAreaTree implements RDFResource
         setIri(targetIri);
     }
 
-    public Map<IRI, RDFArea> getAreaUris()
+    public Map<IRI, RDFArea> getAreaIris()
     {
         return areaIris;
     }

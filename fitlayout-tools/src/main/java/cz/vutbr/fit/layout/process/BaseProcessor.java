@@ -8,8 +8,6 @@ package cz.vutbr.fit.layout.process;
 import java.util.Map;
 
 import org.eclipse.rdf4j.model.IRI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.api.AreaTreeOperator;
 import cz.vutbr.fit.layout.api.ArtifactRepository;
@@ -26,7 +24,7 @@ import cz.vutbr.fit.layout.model.Artifact;
  */
 public abstract class BaseProcessor
 {
-    private static Logger log = LoggerFactory.getLogger(BaseProcessor.class);
+    //private static Logger log = LoggerFactory.getLogger(BaseProcessor.class);
     
     private ServiceManager serviceManager;
     
@@ -121,13 +119,8 @@ public abstract class BaseProcessor
      */
     public void apply(AreaTree atree, AreaTreeOperator op, Map<String, Object> params)
     {
-        if (atree != null)
-        {
-            getServiceManager().setServiceParams(op, params);
-            op.apply(atree);
-        }
-        else
-            log.error("Couldn't apply " + op.getId() + ": no area tree");
+        getServiceManager().setServiceParams(op, params);
+        op.apply(atree);
     }
 
 }

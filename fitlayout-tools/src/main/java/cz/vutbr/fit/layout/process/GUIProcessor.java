@@ -44,8 +44,13 @@ public class GUIProcessor extends BaseProcessor
     
     public AreaTree applyOperators(AreaTree src)
     {
-        //TODO
-        return null;
+        for (int i = 0; i < selectedOperators.size(); i++)
+        {
+            var op = selectedOperators.get(i);
+            var params = operatorParams.get(i);
+            apply(src, op, params);
+        }
+        return src;
     }
 
     public void loadConfig()

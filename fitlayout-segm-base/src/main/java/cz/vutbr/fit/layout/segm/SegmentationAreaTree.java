@@ -6,7 +6,6 @@
 package cz.vutbr.fit.layout.segm;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import cz.vutbr.fit.layout.impl.DefaultAreaTree;
@@ -41,9 +40,8 @@ public class SegmentationAreaTree extends DefaultAreaTree
         super(srcPage.getIri());
         this.page = srcPage;
         this.preserveAuxAreas = preserveAuxAreas;
-        AreaImpl rootarea = new AreaImpl(0, 0, 0, 0);
+        Area rootarea = createArea(new Rectangular(0, 0, 0, 0));
         rootarea.setAreaTree(this);
-        rootarea.setPageIri(srcPage.getIri());
         setRoot(rootarea);
     }
     
@@ -53,14 +51,13 @@ public class SegmentationAreaTree extends DefaultAreaTree
      */
     public Area findBasicAreas()
     {
-        AreaImpl rootarea = new AreaImpl(0, 0, 0, 0);
+        Area rootarea = createArea(new Rectangular(0, 0, 0, 0));
         setRoot(rootarea);
         rootarea.setAreaTree(this);
-        rootarea.setPageIri(getParentIri());
         for (int i = 0; i < page.getRoot().getChildCount(); i++)
         {
             Box cbox = page.getRoot().getChildAt(i);
-            Area sub = new AreaImpl(cbox);
+            Area sub = createArea(cbox);
             if (sub.getWidth() > 1 || sub.getHeight() > 1)
             {
                 findStandaloneAreas(page.getRoot().getChildAt(i), sub);
@@ -69,28 +66,6 @@ public class SegmentationAreaTree extends DefaultAreaTree
         }
         createGrids(rootarea);
         return rootarea;
-    }
-    
-    //=================================================================================
-    // factory functions producing the AreaImpl areas
-    //=================================================================================
-    
-    @Override
-    public Area createArea(Rectangular r)
-    {
-        return new AreaImpl(r);
-    }
-
-    @Override
-    public Area createArea(Box box)
-    {
-        return new AreaImpl(box);
-    }
-
-    @Override
-    public Area createArea(List<Box> boxes)
-    {
-        return new AreaImpl(boxes);
     }
     
     //=================================================================================
@@ -113,7 +88,7 @@ public class SegmentationAreaTree extends DefaultAreaTree
 		        {
 	                if (isVisuallySeparated(child))
 	                {
-	                    Area newnode = new AreaImpl(child);
+	                    Area newnode = createArea(child);
 	                    if (newnode.getWidth() > 1 || newnode.getHeight() > 1)
 	                    {
                             findStandaloneAreas(child, newnode);
@@ -130,18 +105,18 @@ public class SegmentationAreaTree extends DefaultAreaTree
     @Override
     public void updateTopologies()
     {
-        createGrids((AreaImpl) getRoot());
+        createGrids(getRoot());
     }
 
     /**
      * Goes through all the areas in the tree and creates the grids in these areas
      * @param root the root node of the tree of areas
      */
-    protected void createGrids(AreaImpl root)
+    protected void createGrids(Area root)
     {
         root.updateTopologies();
         for (int i = 0; i < root.getChildCount(); i++)
-            createGrids((AreaImpl) root.getChildAt(i));
+            createGrids(root.getChildAt(i));
     }
 
     public boolean isVisuallySeparated(Box box)

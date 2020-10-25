@@ -19,7 +19,6 @@ import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTopology;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Rectangular;
-import cz.vutbr.fit.layout.segm.AreaImpl;
 import cz.vutbr.fit.layout.segm.AreaStyle;
 import cz.vutbr.fit.layout.segm.TreeOp;
 
@@ -31,6 +30,11 @@ import cz.vutbr.fit.layout.segm.TreeOp;
 public class FindLineOperator extends BaseOperator
 {
     private static Logger log = LoggerFactory.getLogger(FindLineOperator.class);
+    
+    /** Area attribute key for storing the next area on line */
+    public static final String LINE_NEXT = "core.line.next";
+    /** Area attribute key for storing the previous area on line */
+    public static final String LINE_PREV = "core.line.prev";
     
     /** Should the lines have a consistent visual style? */
     protected boolean useConsistentStyle;
@@ -109,13 +113,13 @@ public class FindLineOperator extends BaseOperator
     @Override
     public void apply(AreaTree atree)
     {
-        recursiveJoinAreas((AreaImpl) atree.getRoot());
+        recursiveJoinAreas(atree.getRoot());
     }
 
     @Override
     public void apply(AreaTree atree, Area root)
     {
-        recursiveJoinAreas((AreaImpl) root);
+        recursiveJoinAreas(root);
     }
     
     //==============================================================================
@@ -125,18 +129,18 @@ public class FindLineOperator extends BaseOperator
      * Goes through all the areas in the tree and tries to join their sub-areas into single
      * areas.
      */
-    protected void recursiveJoinAreas(AreaImpl root)
+    protected void recursiveJoinAreas(Area root)
     {
         joinAreas(root);
         for (int i = 0; i < root.getChildCount(); i++)
-            recursiveJoinAreas((AreaImpl) root.getChildAt(i));
+            recursiveJoinAreas(root.getChildAt(i));
     }
     
     /**
      * Goes through the grid of areas and joins the adjacent visual areas that are not
      * separated by anything
      */
-    protected void joinAreas(AreaImpl a)
+    protected void joinAreas(Area a)
     {
         //TODO: detekce radku by asi mela brat v uvahu separatory
         AreaTopology t = a.getTopology();
@@ -147,21 +151,21 @@ public class FindLineOperator extends BaseOperator
             change = false;
             for (int i = 0; i < a.getChildCount(); i++)
             {
-                AreaImpl node = (AreaImpl) a.getChildAt(i);
+                Area node = a.getChildAt(i);
                 Rectangular pos = t.getPosition(node);
                 int ny1 = pos.getY1();
                 int nx2 = pos.getX2();
                 int ny2 = pos.getY2();
                 
                 //try to expand to the right - find a neighbor
-                AreaImpl neigh = null;
+                Area neigh = null;
                 int dist = 1;
                 while (neigh == null && nx2 + dist < t.getTopologyWidth())
                 {
                     //try to find some node at the right in the given distance
                     for (int y = ny1; neigh == null && y <= ny2; y++)
                     {
-                        neigh = (AreaImpl) t.findAreaAt(nx2 + dist, y);
+                        neigh = t.findAreaAt(nx2 + dist, y);
                         if (neigh != null) //something found
                         {
                             if (!useConsistentStyle || AreaStyle.hasSameStyle(node, neigh))
@@ -176,8 +180,8 @@ public class FindLineOperator extends BaseOperator
                             {
                                 if (horizontalJoin(a, node, neigh, false)) //check if the nodes could be joined
                                 {
-                                    node.setNextOnLine(neigh);
-                                    neigh.setPreviousOnLine(node);
+                                    node.addUserAttribute(LINE_NEXT, neigh);
+                                    neigh.addUserAttribute(LINE_PREV, node);
                                 }
                             }
                         }
@@ -198,7 +202,7 @@ public class FindLineOperator extends BaseOperator
      *        When set to <code>false</code>, no changes are performed (only checking)
      * @return <code>true</code> when succeeded
      */
-    private boolean horizontalJoin(AreaImpl parent, AreaImpl n1, AreaImpl n2, boolean affect)
+    private boolean horizontalJoin(Area parent, Area n1, Area n2, boolean affect)
     {
         //System.out.println("HJoin: " + n1.toString() + " + " + n2.toString());
         //check the maximal distance between the nodes
@@ -274,14 +278,14 @@ public class FindLineOperator extends BaseOperator
      * @param except an area that shouldn't be considered for conflicts (e.g. an overlaping area)
      * @return <code>true</code> if the area can be expanded
      */
-    private boolean canExpandY(AreaImpl parent, AreaImpl node, int y, AreaImpl except)
+    private boolean canExpandY(Area parent, Area node, int y, Area except)
     {
         AreaTopology t = parent.getTopology();
         int gx = t.getPosition(node).getX1();
         int gw = t.getTopologyWidth();
         for (int x = gx; x < gx + gw; x++)
         {
-            AreaImpl cand = (AreaImpl) t.findAreaAt(x, y);
+            Area cand = t.findAreaAt(x, y);
             if (cand != null && cand != except)
                 return false; //something found - cannot expand
         }

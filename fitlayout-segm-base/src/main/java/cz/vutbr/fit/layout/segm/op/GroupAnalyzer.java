@@ -10,7 +10,6 @@ import java.util.List;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTopology;
 import cz.vutbr.fit.layout.model.Rectangular;
-import cz.vutbr.fit.layout.segm.AreaImpl;
 
 /**
  * A general analyzer to find area groups
@@ -51,7 +50,7 @@ public class GroupAnalyzer
     	/* This is a simple testing SuperArea implementation. It groups each 
     	 * subarea with its first sibling area.*/
         Area ret = sub.getAreaTree().createArea(new Rectangular(0, 0, 0, 0));
-        AreaImpl sibl = (AreaImpl) sub.getNextSibling();
+        Area sibl = sub.getNextSibling();
         selected.clear();
         selected.add(sub);
         if (sibl != null)

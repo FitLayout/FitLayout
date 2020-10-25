@@ -10,7 +10,6 @@ import java.util.Vector;
 
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Box;
-import cz.vutbr.fit.layout.segm.AreaImpl;
 
 /**
  * A generic set of horizontal and vertical separators for a page.
@@ -322,9 +321,8 @@ public abstract class SeparatorSet
         bsep = new Vector<Separator>();
         for (int i = 0; i < root.getChildCount(); i++)
         {
-            Area child = root.getChildAt(i);
-            if (child instanceof AreaImpl)
-            analyzeAreaSeparators((AreaImpl) child);
+            final Area child = root.getChildAt(i);
+            analyzeAreaSeparators(child);
         }
     }
     
@@ -332,7 +330,7 @@ public abstract class SeparatorSet
      * Analyzes the area and detects the separators that are implemented as borders
      * or background changes.
      */
-    private void analyzeAreaSeparators(AreaImpl area)
+    private void analyzeAreaSeparators(Area area)
     {
         boolean isep = area.isExplicitlySeparated() || area.isBackgroundSeparated();
         if (isep || area.hasTopBorder())

@@ -8,7 +8,6 @@ package cz.vutbr.fit.layout.segm.op;
 import cz.vutbr.fit.layout.impl.BaseOperator;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
-import cz.vutbr.fit.layout.segm.AreaImpl;
 import cz.vutbr.fit.layout.segm.TreeOp;
 
 /**
@@ -52,18 +51,18 @@ public class CollapseAreasOperator extends BaseOperator
     @Override
     public void apply(AreaTree atree)
     {
-        recursiveCollapseAreas((AreaImpl) atree.getRoot());
+        recursiveCollapseAreas(atree.getRoot());
     }
 
     @Override
     public void apply(AreaTree atree, Area root)
     {
-        recursiveCollapseAreas((AreaImpl) root);
+        recursiveCollapseAreas(root);
     }
     
     //==============================================================================
 
-    private void recursiveCollapseAreas(AreaImpl root)
+    private void recursiveCollapseAreas(Area root)
     {
         if (canCollapse(root))
         {
@@ -74,20 +73,20 @@ public class CollapseAreasOperator extends BaseOperator
         else
         {
             for (int i = 0; i < root.getChildCount(); i++)
-                recursiveCollapseAreas((AreaImpl) root.getChildAt(i));
+                recursiveCollapseAreas(root.getChildAt(i));
         }
     }
     
-    private boolean canCollapse(AreaImpl area)
+    private boolean canCollapse(Area area)
     {
         return (area.getChildCount() == 1 && area.getChildAt(0).isLeaf());
     }
 
-    private void recursiveCollapseSubtree(AreaImpl src, AreaImpl dest)
+    private void recursiveCollapseSubtree(Area src, Area dest)
     {
         for (int i = 0; i < src.getChildCount(); i++)
         {
-            AreaImpl child = (AreaImpl) src.getChildAt(i);
+            Area child = src.getChildAt(i);
             recursiveCollapseSubtree(child, dest);
             TreeOp.joinChild(dest, child);
         }

@@ -19,7 +19,6 @@ import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTopology;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Rectangular;
-import cz.vutbr.fit.layout.segm.AreaImpl;
 import cz.vutbr.fit.layout.segm.AreaStyle;
 import cz.vutbr.fit.layout.segm.TreeOp;
 
@@ -109,13 +108,13 @@ public class MultiLineOperator extends BaseOperator
     @Override
     public void apply(AreaTree atree)
     {
-        recursiveJoinAreas((AreaImpl) atree.getRoot());
+        recursiveJoinAreas(atree.getRoot());
     }
 
     @Override
     public void apply(AreaTree atree, Area root)
     {
-        recursiveJoinAreas((AreaImpl) root);
+        recursiveJoinAreas(root);
     }
     
     //==============================================================================
@@ -125,18 +124,18 @@ public class MultiLineOperator extends BaseOperator
      * Goes through all the areas in the tree and tries to join their sub-areas into single
      * areas.
      */
-    protected void recursiveJoinAreas(AreaImpl root)
+    protected void recursiveJoinAreas(Area root)
     {
         joinAreas(root);
         for (int i = 0; i < root.getChildCount(); i++)
-            recursiveJoinAreas((AreaImpl) root.getChildAt(i));
+            recursiveJoinAreas(root.getChildAt(i));
     }
     
     /**
      * Goes through the grid of areas and joins the adjacent visual areas that are not
      * separated by anything
      */
-    protected void joinAreas(AreaImpl a)
+    protected void joinAreas(Area a)
     {
         AreaTopology t = a.getTopology();
         
@@ -146,21 +145,21 @@ public class MultiLineOperator extends BaseOperator
             change = false;
             for (int i = 0; i < a.getChildCount(); i++)
             {
-                AreaImpl node = (AreaImpl) a.getChildAt(i);
+                Area node = a.getChildAt(i);
                 Rectangular pos = t.getPosition(node);
                 int nx1 = pos.getX1();
                 int nx2 = pos.getX2();
                 int ny2 = pos.getY2();
 
                 //try to expand down - find a neighbor
-                AreaImpl neigh = null;
+                Area neigh = null;
                 int dist = 1;
                 while (neigh == null && ny2 + dist < t.getTopologyHeight())
                 {
                     //try to find some node below in the given distance
                     for (int x = nx1; neigh == null && x <= nx2; x++)
                     {
-                        neigh = (AreaImpl) t.findAreaAt(x, ny2 + dist);
+                        neigh = t.findAreaAt(x, ny2 + dist);
                         if (neigh != null) //something found
                         {
                             if ((!useConsistentStyle || AreaStyle.hasSameStyle(node, neigh))
@@ -190,7 +189,7 @@ public class MultiLineOperator extends BaseOperator
      *        When set to <code>false</code>, no changes are performed (only checking)
      * @return <code>true</code> when succeeded
      */
-    private boolean verticalJoin(AreaImpl parent, AreaImpl n1, AreaImpl n2, boolean affect)
+    private boolean verticalJoin(Area parent, Area n1, Area n2, boolean affect)
     {
         //System.out.println("VJoin: " + n1.toString() + " + " + n2.toString());
         //check the maximal distance between the nodes
@@ -266,14 +265,14 @@ public class MultiLineOperator extends BaseOperator
      * @param except an area that shouldn't be considered for conflicts (e.g. an overlaping area)
      * @return <code>true</code> if the area can be expanded
      */
-    private boolean canExpandX(AreaImpl parent, AreaImpl node, int x, AreaImpl except)
+    private boolean canExpandX(Area parent, Area node, int x, Area except)
     {
         AreaTopology t = parent.getTopology();
         int gy = t.getPosition(node).getY1();
         int gh = t.getTopologyHeight();
         for (int y = gy; y < gy + gh; y++)
         {
-            AreaImpl cand = (AreaImpl) t.findAreaAt(x, y);
+            Area cand = t.findAreaAt(x, y);
             if (cand != null && cand != except)
                 return false; //something found - cannot expand
         }

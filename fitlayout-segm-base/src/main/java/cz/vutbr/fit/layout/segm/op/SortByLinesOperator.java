@@ -13,7 +13,6 @@ import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTopology;
 import cz.vutbr.fit.layout.model.AreaTree;
-import cz.vutbr.fit.layout.segm.AreaImpl;
 import cz.vutbr.fit.layout.segm.AreaUtils;
 
 /**
@@ -64,7 +63,7 @@ public class SortByLinesOperator extends SortByPositionOperator
     public void apply(AreaTree atree, Area root)
     {
         recursivelySortChildAreas(root, false);
-        recursiveSortLines((AreaImpl) root);
+        recursiveSortLines(root);
     }
     
     //==============================================================================
@@ -72,18 +71,18 @@ public class SortByLinesOperator extends SortByPositionOperator
     /**
      * Goes through all the areas in the tree and sorts their sub-areas.
      */
-    protected void recursiveSortLines(AreaImpl root)
+    protected void recursiveSortLines(Area root)
     {
         sortChildLines(root);
         for (int i = 0; i < root.getChildCount(); i++)
-            recursiveSortLines((AreaImpl) root.getChildAt(i));
+            recursiveSortLines(root.getChildAt(i));
     }
     
     /**
      * Goes through the grid of areas and sorts the adjacent visual areas that are not
      * separated by anything
      */
-    protected void sortChildLines(AreaImpl root)
+    protected void sortChildLines(Area root)
     {
         if (root.getChildCount() > 1)
         {
@@ -91,7 +90,7 @@ public class SortByLinesOperator extends SortByPositionOperator
             List<Area> dest = new Vector<Area>(src.size());
             while (!src.isEmpty())
             {
-                final AreaImpl seed = (AreaImpl) src.get(0);
+                final Area seed = src.get(0);
                 List<Area> line = findAreasOnLine(root, seed, src);
                 dest.addAll(line);
                 src.removeAll(line);
@@ -102,7 +101,7 @@ public class SortByLinesOperator extends SortByPositionOperator
         }
     }
 
-    private List<Area> findAreasOnLine(AreaImpl parent, AreaImpl area, List<Area> candidates)
+    private List<Area> findAreasOnLine(Area parent, Area area, List<Area> candidates)
     {
         Vector<Area> ret = new Vector<Area>();
         ret.add(area);
@@ -120,7 +119,7 @@ public class SortByLinesOperator extends SortByPositionOperator
             //try to find some node at the right in the given distance
             for (int y = ny1; y <= ny2; y++)
             {
-                AreaImpl neigh = (AreaImpl) t.findAreaAt(nx2 + dist, y);
+                Area neigh = t.findAreaAt(nx2 + dist, y);
                 if (neigh != null && candidates.contains(neigh)) //something found
                 {
                     //the maximal Y difference to consider other areas to be on the same line
@@ -143,7 +142,7 @@ public class SortByLinesOperator extends SortByPositionOperator
             //try to find some node at the right in the given distance
             for (int y = ny1; y <= ny2; y++)
             {
-                AreaImpl neigh = (AreaImpl) t.findAreaAt(nx1 - dist, y);
+                Area neigh = t.findAreaAt(nx1 - dist, y);
                 if (neigh != null && candidates.contains(neigh)) //something found
                 {
                     //the maximal Y difference to consider other areas to be on the same line

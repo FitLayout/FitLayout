@@ -14,7 +14,6 @@ import cz.vutbr.fit.layout.impl.BaseOperator;
 import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
-import cz.vutbr.fit.layout.segm.AreaImpl;
 import cz.vutbr.fit.layout.segm.Config;
 import cz.vutbr.fit.layout.segm.Separators;
 
@@ -92,13 +91,13 @@ public class SuperAreaOperator extends BaseOperator
     @Override
     public void apply(AreaTree atree)
     {
-        recursiveFindSuperAreas((AreaImpl) atree.getRoot());
+        recursiveFindSuperAreas(atree.getRoot());
     }
 
     @Override
     public void apply(AreaTree atree, Area root)
     {
-        recursiveFindSuperAreas((AreaImpl) root);
+        recursiveFindSuperAreas(root);
     }
 
     //==============================================================================
@@ -114,10 +113,10 @@ public class SuperAreaOperator extends BaseOperator
      * Goes through all the areas in the tree and tries to join their sub-areas into single
      * areas.
      */
-    private void recursiveFindSuperAreas(AreaImpl root)
+    private void recursiveFindSuperAreas(Area root)
     {
         for (int i = 0; i < root.getChildCount(); i++)
-            recursiveFindSuperAreas((AreaImpl) root.getChildAt(i));
+            recursiveFindSuperAreas(root.getChildAt(i));
         findSuperAreas(root, depthLimit);
     }
     

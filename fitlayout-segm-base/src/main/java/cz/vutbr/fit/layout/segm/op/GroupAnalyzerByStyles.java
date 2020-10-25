@@ -12,7 +12,6 @@ import java.util.List;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTopology;
 import cz.vutbr.fit.layout.model.Rectangular;
-import cz.vutbr.fit.layout.segm.AreaImpl;
 import cz.vutbr.fit.layout.segm.AreaStyle;
 import cz.vutbr.fit.layout.segm.Separators;
 
@@ -256,7 +255,7 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
         int x = gp.getX1();
         while (x <= gp.getX2()) //scan everything at the target position
         {
-            Area cand = (AreaImpl) getTopology().findAreaAt(x, targety);
+            Area cand = getTopology().findAreaAt(x, targety);
             //ignore candidates that intersect with our area (could leat to an infinite loop)
             if (cand == null || cand.getGridPosition().intersects(gp))
                 x++;

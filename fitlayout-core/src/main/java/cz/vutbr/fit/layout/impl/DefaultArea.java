@@ -86,16 +86,16 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
         level = 0;
     }
     
-    public DefaultArea(DefaultArea src)
+    public DefaultArea(Area src)
     {
         super(Area.class, src);
-        name = (src.name == null) ? null : new String(src.name);
+        name = (src.getName() == null) ? null : new String(src.getName());
         boxes = new ArrayList<>(src.getBoxes());
         tags = new HashMap<>();
-        contentBounds = (src.contentBounds == null) ? null : new Rectangular(src.contentBounds);
-        vsep = src.vsep;
-        hsep = src.hsep;
-        level = src.level;
+        contentBounds = (src.getBounds() == null) ? null : new Rectangular(src.getBounds());
+        vsep = src.isVerticalSeparator();
+        hsep = src.isHorizontalSeparator();
+        level = src.getLevel();
     }
     
     public DefaultArea(int x1, int y1, int x2, int y2)

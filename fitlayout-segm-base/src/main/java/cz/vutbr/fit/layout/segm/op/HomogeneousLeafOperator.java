@@ -7,7 +7,6 @@ package cz.vutbr.fit.layout.segm.op;
 
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
-import cz.vutbr.fit.layout.segm.AreaImpl;
 
 /**
  * This operator joins the homogeneous-style leaf nodes to larger artificial areas. 
@@ -43,13 +42,13 @@ public class HomogeneousLeafOperator extends SuperAreaOperator
     @Override
     public void apply(AreaTree atree)
     {
-        findHomogeneousLeaves((AreaImpl) atree.getRoot());
+        findHomogeneousLeaves(atree.getRoot());
     }
 
     @Override
     public void apply(AreaTree atree, Area root)
     {
-        findHomogeneousLeaves((AreaImpl) root);
+        findHomogeneousLeaves(root);
     }
 
     //==============================================================================
@@ -65,12 +64,12 @@ public class HomogeneousLeafOperator extends SuperAreaOperator
     /**
      * Takes the leaf areas and tries to join the homogeneous paragraphs.
      */
-    private void findHomogeneousLeaves(AreaImpl root)
+    private void findHomogeneousLeaves(Area root)
     {
         if (root.getChildCount() > 1)
             findSuperAreas(root, 1);
         for (int i = 0; i < root.getChildCount(); i++)
-            findHomogeneousLeaves((AreaImpl) root.getChildAt(i));
+            findHomogeneousLeaves(root.getChildAt(i));
     }
     
 

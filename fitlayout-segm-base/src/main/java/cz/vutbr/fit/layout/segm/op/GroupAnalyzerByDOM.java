@@ -10,7 +10,6 @@ import java.util.List;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Rectangular;
-import cz.vutbr.fit.layout.segm.AreaImpl;
 
 /**
  * A group analyzer that groups together the areas that are created by the same DOM element.
@@ -35,7 +34,7 @@ public class GroupAnalyzerByDOM extends GroupAnalyzer
             Rectangular mingp = null;
             for (int i = 0; i < parent.getChildCount(); i++)
             {
-                AreaImpl chld = (AreaImpl) parent.getChildAt(i);
+                Area chld = parent.getChildAt(i);
                 Integer cid = getId(chld);
                 if (cid != null && cid.equals(srcId))
                 {
@@ -50,13 +49,12 @@ public class GroupAnalyzerByDOM extends GroupAnalyzer
             //create the new area
             Rectangular abspos = getTopology().toPixelPosition(mingp);
             abspos.move(parent.getX1(), parent.getY1());
-            AreaImpl area = new AreaImpl(abspos);
-            area.setPageIri(sub.getPageIri());
+            Area area = sub.getAreaTree().createArea(abspos);
             //area.setBorders(true, true, true, true);
             area.setLevel(1);
             //if (!mingp.equals(sub.getGridPosition()))
             //    System.out.println("Found area: " + area + " : " + mingp);
-            AreaImpl ret = new AreaImpl(area);
+            Area ret = sub.getAreaTree().createArea(area);
             ret.setGridPosition(mingp);
             return ret;
         }
@@ -64,7 +62,7 @@ public class GroupAnalyzerByDOM extends GroupAnalyzer
         {
             selected.clear();
             selected.add(sub);
-            return new AreaImpl(0, 0, 0, 0);
+            return sub.getAreaTree().createArea(new Rectangular(0, 0, 0, 0));
         }
     }
     

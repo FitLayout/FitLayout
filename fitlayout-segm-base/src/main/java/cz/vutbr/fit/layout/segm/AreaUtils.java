@@ -119,11 +119,11 @@ public class AreaUtils
         //System.out.println("first=" + first + " last=" + last);
         if (last > first)
         {
-            AreaImpl ret = new AreaImpl(bounds);
+            Area ret = root.getAreaTree().createArea(bounds);
             root.insertChild(ret, first);
             for (Area a : selected)
                 ret.appendChild(a);
-            ((AreaImpl) root).updateTopologies();
+            root.updateTopologies();
             ret.updateTopologies();
             return ret;
         }

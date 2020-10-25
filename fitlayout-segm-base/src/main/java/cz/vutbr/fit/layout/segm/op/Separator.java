@@ -4,8 +4,8 @@
 
 package cz.vutbr.fit.layout.segm.op;
 
+import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Rectangular;
-import cz.vutbr.fit.layout.segm.AreaImpl;
 
 /**
  * @author radek
@@ -24,10 +24,10 @@ public class Separator extends Rectangular implements Comparable<Separator>
     protected short type;
     
     /** Left (top) separated area node (if any) */
-    protected AreaImpl area1;
+    protected Area area1;
     
     /** Bottom (right) separated area node (if any) */
-    protected AreaImpl area2;
+    protected Area area2;
     
     //======================================================================================
     
@@ -70,22 +70,22 @@ public class Separator extends Rectangular implements Comparable<Separator>
         return type == BOXH || type == BOXV;
     }
 
-    public AreaImpl getArea1()
+    public Area getArea1()
     {
         return area1;
     }
 
-    public void setArea1(AreaImpl area1)
+    public void setArea1(Area area1)
     {
         this.area1 = area1;
     }
 
-    public AreaImpl getArea2()
+    public Area getArea2()
     {
         return area2;
     }
 
-    public void setArea2(AreaImpl area2)
+    public void setArea2(Area area2)
     {
         this.area2 = area2;
     }

@@ -51,6 +51,13 @@ public interface AreaTree extends Artifact, SearchableAreaContainer
     public Area createArea(Box box);
     
     /**
+     * Creates a new area in the tree by copying another area.
+     * @param other the other area to copy
+     * @return the new area containing the box.
+     */
+    public Area createArea(Area other);
+    
+    /**
      * Creates a new area in the tree from a list of boxes.
      * @param boxes a list of boxes
      * @return the new area containing all the boxes.

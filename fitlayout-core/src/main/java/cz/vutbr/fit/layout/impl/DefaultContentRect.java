@@ -53,19 +53,20 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
         rightBorder = new Border();
     }
     
-    public DefaultContentRect(Class<T> myType, DefaultContentRect<T> src)
+    public DefaultContentRect(Class<T> myType, ContentRect src)
     {
         super(myType);
         id = nextid++;
-        pageIri = src.pageIri;
-        bounds = new Rectangular(src.bounds);
-        backgroundColor = (src.backgroundColor == null) ? null : new Color(src.backgroundColor.getRed(), src.backgroundColor.getGreen(), src.backgroundColor.getBlue());
-        textStyle = new TextStyle(src.textStyle);
-        topBorder = src.topBorder;
-        bottomBorder = src.bottomBorder;
-        leftBorder = src.leftBorder;
-        rightBorder = src.rightBorder;
-        backgroundSeparated = src.backgroundSeparated;
+        pageIri = src.getPageIri();
+        bounds = new Rectangular(src.getBounds());
+        backgroundColor = (src.getBackgroundColor() == null) ? null : 
+            new Color(src.getBackgroundColor().getRed(), src.getBackgroundColor().getGreen(), src.getBackgroundColor().getBlue());
+        textStyle = new TextStyle(src.getTextStyle());
+        topBorder = src.getBorderStyle(Side.TOP);
+        bottomBorder = src.getBorderStyle(Side.BOTTOM);
+        leftBorder = src.getBorderStyle(Side.LEFT);
+        rightBorder = src.getBorderStyle(Side.RIGHT);
+        backgroundSeparated = src.isBackgroundSeparated();
     }
     
     @Override

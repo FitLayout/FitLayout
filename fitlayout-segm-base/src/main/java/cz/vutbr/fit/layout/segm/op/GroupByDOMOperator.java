@@ -7,7 +7,6 @@ package cz.vutbr.fit.layout.segm.op;
 
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
-import cz.vutbr.fit.layout.segm.AreaImpl;
 
 /**
  * Creates groups of areas that share the same source DOM node.
@@ -43,13 +42,13 @@ public class GroupByDOMOperator extends SuperAreaOperator
     @Override
     public void apply(AreaTree atree)
     {
-        groupByDOM((AreaImpl) atree.getRoot());
+        groupByDOM(atree.getRoot());
     }
 
     @Override
     public void apply(AreaTree atree, Area root)
     {
-        groupByDOM((AreaImpl) root);
+        groupByDOM(root);
     }
 
     //==============================================================================
@@ -65,11 +64,11 @@ public class GroupByDOMOperator extends SuperAreaOperator
     /**
      * Takes the leaf areas and tries to join the homogeneous paragraphs.
      */
-    private void groupByDOM(AreaImpl root)
+    private void groupByDOM(Area root)
     {
         if (root.getChildCount() > 1)
             findSuperAreas(root, 1);
         for (int i = 0; i < root.getChildCount(); i++)
-            groupByDOM((AreaImpl) root.getChildAt(i));
+            groupByDOM(root.getChildAt(i));
     }
 }

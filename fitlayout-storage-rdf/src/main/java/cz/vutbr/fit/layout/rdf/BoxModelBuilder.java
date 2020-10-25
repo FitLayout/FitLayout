@@ -156,11 +156,11 @@ public class BoxModelBuilder implements ModelBuilder
 		}
 		// font attributes
 		graph.add(individual, BOX.fontFamily, vf.createLiteral(box.getFontFamily()));
-		graph.add(individual, BOX.fontSize, vf.createLiteral(box.getFontSize()));
-		graph.add(individual, BOX.fontWeight, vf.createLiteral(box.getFontWeight()));
-		graph.add(individual, BOX.fontStyle, vf.createLiteral(box.getFontStyle()));
-        graph.add(individual, BOX.underline, vf.createLiteral(box.getUnderline()));
-        graph.add(individual, BOX.lineThrough, vf.createLiteral(box.getLineThrough()));
+		graph.add(individual, BOX.fontSize, vf.createLiteral(box.getTextStyle().getFontSize()));
+		graph.add(individual, BOX.fontWeight, vf.createLiteral(box.getTextStyle().getFontWeight()));
+		graph.add(individual, BOX.fontStyle, vf.createLiteral(box.getTextStyle().getFontStyle()));
+        graph.add(individual, BOX.underline, vf.createLiteral(box.getTextStyle().getUnderline()));
+        graph.add(individual, BOX.lineThrough, vf.createLiteral(box.getTextStyle().getLineThrough()));
         graph.add(individual, BOX.color, vf.createLiteral(Serialization.colorString(box.getColor())));
         
         if (box.getBorderStyle(Side.TOP) != null && box.hasTopBorder())

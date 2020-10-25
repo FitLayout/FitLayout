@@ -126,6 +126,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
         RDFArea area = new RDFArea(new Rectangular(), uri);
         int x = 0, y = 0, width = 0, height = 0;
         Map<IRI, Float> tagSupport = new HashMap<IRI, Float>(); //tagUri->support
+        RDFTextStyle style = new RDFTextStyle(); //content length TODO not retrieved yet
         
         RDFPage sourcePage = null;
         
@@ -152,27 +153,27 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             else if (BOX.underline.equals(pred)) 
             {
                 if (value instanceof Literal)
-                    area.setUnderline(((Literal) value).floatValue());
+                    style.underline = ((Literal) value).floatValue();
             }
             else if (BOX.lineThrough.equals(pred)) 
             {
                 if (value instanceof Literal)
-                    area.setLineThrough(((Literal) value).floatValue());
+                    style.lineThrough = ((Literal) value).floatValue();
             }
             else if (BOX.fontSize.equals(pred)) 
             {
                 if (value instanceof Literal)
-                    area.setFontSize(((Literal) value).floatValue());
+                    style.fontSize = ((Literal) value).floatValue();
             }
             else if (BOX.fontStyle.equals(pred)) 
             {
                 if (value instanceof Literal)
-                    area.setFontStyle(((Literal) value).floatValue());
+                    style.fontStyle = ((Literal) value).floatValue();
             }
             else if (BOX.fontWeight.equals(pred)) 
             {
                 if (value instanceof Literal)
-                    area.setFontWeight(((Literal) value).floatValue());
+                    style.fontWeight = ((Literal) value).floatValue();
             }
             else if (BOX.hasBottomBorder.equals(pred)) 
             {
@@ -279,6 +280,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                 }
             }
         }
+        area.setTextStyle(style.toTextStyle());
         area.setBounds(new Rectangular(x, y, x + width - 1, y + height - 1));
         area.sortBoxes();
         

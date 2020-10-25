@@ -128,11 +128,12 @@ public class AreaModelBuilder implements ModelBuilder
         }
 
         // font attributes
-        graph.add(individual, BOX.fontSize, vf.createLiteral(area.getFontSize()));
-        graph.add(individual, BOX.fontWeight, vf.createLiteral(area.getFontWeight()));
-        graph.add(individual, BOX.fontStyle, vf.createLiteral(area.getFontStyle()));
-        graph.add(individual, BOX.underline, vf.createLiteral(area.getUnderline()));
-        graph.add(individual, BOX.lineThrough, vf.createLiteral(area.getLineThrough()));
+        graph.add(individual, BOX.fontSize, vf.createLiteral(area.getTextStyle().getFontSize()));
+        graph.add(individual, BOX.fontWeight, vf.createLiteral(area.getTextStyle().getFontWeight()));
+        graph.add(individual, BOX.fontStyle, vf.createLiteral(area.getTextStyle().getFontStyle()));
+        graph.add(individual, BOX.underline, vf.createLiteral(area.getTextStyle().getUnderline()));
+        graph.add(individual, BOX.lineThrough, vf.createLiteral(area.getTextStyle().getLineThrough()));
+        //TODO store content length - getFontWeightCnt?
         
         //dump boxes
         for (Box box : area.getBoxes())

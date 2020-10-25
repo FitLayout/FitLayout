@@ -55,7 +55,7 @@ public class GroupByDOMOperator extends SuperAreaOperator
     //==============================================================================
 
     @Override
-    protected GroupAnalyzer createGroupAnalyzer(AreaImpl root)
+    protected GroupAnalyzer createGroupAnalyzer(Area root)
     {
         return new GroupAnalyzerByDOM(root);
     }

@@ -21,7 +21,7 @@ public class SeparatorSetHVS extends SeparatorSet
     /**
      * Creates a new separator set with one horizontal and one vertical separator.
      */
-    public SeparatorSetHVS(AreaImpl root)
+    public SeparatorSetHVS(Area root)
     {
         super(root);
     }
@@ -29,7 +29,7 @@ public class SeparatorSetHVS extends SeparatorSet
     /**
      * Creates a new separator set with one horizontal and one vertical separator.
      */
-    public SeparatorSetHVS(AreaImpl root, Area filter)
+    public SeparatorSetHVS(Area root, Area filter)
     {
         super(root, filter);
     }
@@ -42,7 +42,8 @@ public class SeparatorSetHVS extends SeparatorSet
      * @param filter if not null, only the sub areas enclosed in the filter area
      *  are considered
      */
-    protected void findSeparators(AreaImpl area, Area filter)
+    @Override
+    protected void findSeparators(Area area, Area filter)
     {
         hsep = new Vector<Separator>();
         vsep = new Vector<Separator>();
@@ -184,7 +185,7 @@ public class SeparatorSetHVS extends SeparatorSet
      * @param filter if not null, only the sub areas enclosed in the filter area are considered
      * @return the number of processed subareas
      */
-    private int considerSubareas(AreaImpl area, Area filter)
+    private int considerSubareas(Area area, Area filter)
     {
         int ret = 0;
         for (int i = 0; i < area.getChildCount(); i++)

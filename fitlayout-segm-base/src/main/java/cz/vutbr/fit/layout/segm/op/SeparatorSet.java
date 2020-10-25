@@ -5,9 +5,11 @@ package cz.vutbr.fit.layout.segm.op;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 import cz.vutbr.fit.layout.model.Area;
+import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.segm.AreaImpl;
 
 /**
@@ -29,7 +31,7 @@ public abstract class SeparatorSet
     protected static final int ART_SEP_WIDTH = 1;
     
 	/** The root of the area tree that will be processed */
-	protected AreaImpl root;
+	protected Area root;
 	
 	/** List of horizontal separators */
 	protected Vector<Separator> hsep;
@@ -43,7 +45,7 @@ public abstract class SeparatorSet
 	/**
 	 * Creates a new separator set with one horizontal and one vertical separator.
 	 */
-	public SeparatorSet(AreaImpl root)
+	public SeparatorSet(Area root)
 	{
         this.root = root;
         init(null);
@@ -52,7 +54,7 @@ public abstract class SeparatorSet
     /**
      * Creates a new separator set with one horizontal and one vertical separator.
      */
-    public SeparatorSet(AreaImpl root, Area filter)
+    public SeparatorSet(Area root, Area filter)
     {
         this.root = root;
         init(filter);
@@ -107,7 +109,7 @@ public abstract class SeparatorSet
      */
     public int getMinHSepHeight()
     {
-        return (int) (root.getFontSize() * HSEP_MIN_HEIGHT);
+        return (int) (root.getTextStyle().getFontSize() * HSEP_MIN_HEIGHT);
     }
     
     /**
@@ -117,7 +119,7 @@ public abstract class SeparatorSet
      */
     public int getMinVSepWidth()
     {
-        return (int) (root.getFontSize() * VSEP_MIN_WIDTH);
+        return (int) (root.getTextStyle().getFontSize() * VSEP_MIN_WIDTH);
     }
     
     //=====================================================================================
@@ -155,7 +157,7 @@ public abstract class SeparatorSet
      * @param filter if not null, only the sub areas enclosed in the filter area
      * 	are considered
      */
-    protected abstract void findSeparators(AreaImpl area, Area filter);
+    protected abstract void findSeparators(Area area, Area filter);
     
     /**
      * Applies various filters on the current separator sets in order to remove irrelevant separators or adjust the sizes.
@@ -216,11 +218,11 @@ public abstract class SeparatorSet
         {
             Separator sep = it.next();
             //Adaptive height threshold: use the font size of the box above the separator for determining the em size for the threshold  
-            AreaImpl above = root.findContentAbove(sep);
+            Area above = findContentAbove(root, sep);
             if (above != null)
-                hthreshold = (int) (above.getFontSize() * HSEP_MIN_HEIGHT);
+                hthreshold = (int) (above.getTextStyle().getFontSize() * HSEP_MIN_HEIGHT);
             else
-                hthreshold = (int) (root.getFontSize() * HSEP_MIN_HEIGHT);
+                hthreshold = (int) (root.getTextStyle().getFontSize() * HSEP_MIN_HEIGHT);
             //System.out.println("For: " + sep + " limit " + hthreshold + " area " + above);
             
             if (sep.getWeight() < hthreshold)
@@ -315,7 +317,7 @@ public abstract class SeparatorSet
     /**
      * Creates a list of separators that are implemented as visual area borders.
      */
-    private void findAreaSeparators(AreaImpl root)
+    private void findAreaSeparators(Area root)
     {
         bsep = new Vector<Separator>();
         for (int i = 0; i < root.getChildCount(); i++)
@@ -333,19 +335,74 @@ public abstract class SeparatorSet
     private void analyzeAreaSeparators(AreaImpl area)
     {
         boolean isep = area.isExplicitlySeparated() || area.isBackgroundSeparated();
-        if (isep || area.separatedUp())
+        if (isep || area.hasTopBorder())
             bsep.add(new Separator(Separator.BOXH,
                                    area.getX1(), area.getY1(), area.getX2(), area.getY1() + ART_SEP_WIDTH - 1));
-        if (isep || area.separatedDown())
+        if (isep || area.hasBottomBorder())
             bsep.add(new Separator(Separator.BOXH,
                                    area.getX1(), area.getY2() - ART_SEP_WIDTH + 1, area.getX2(), area.getY2()));
-        if (isep || area.separatedLeft())
+        if (isep || area.hasLeftBorder())
             bsep.add(new Separator(Separator.BOXV,
                                    area.getX1(), area.getY1(), area.getX1() + ART_SEP_WIDTH - 1, area.getY2()));
-        if (isep || area.separatedRight())
+        if (isep || area.hasRightBorder())
             bsep.add(new Separator(Separator.BOXV,
                                    area.getX2() - ART_SEP_WIDTH + 1, area.getY1(), area.getX2(), area.getY2()));
     }
+    
+    /**
+     * Looks for the nearest text box area placed above the separator. If there are more
+     * such areas in the same distance, the leftmost one is returned.
+     * @param sep the separator 
+     * @return the leaf area containing the box or <code>null</code> if there is nothing above the separator
+     */
+    private Area findContentAbove(Area root, Separator sep)
+    {
+        return recursiveFindAreaAbove(root, sep.getX1(), sep.getX2(), 0, sep.getY1());
+    }
+    
+    private Area recursiveFindAreaAbove(Area root, int x1, int x2, int y1, int y2)
+    {
+        Area ret = null;
+        int maxx = x2;
+        int miny = y1;
+        List <Box> boxes = root.getBoxes();
+        for (Box box : boxes)
+        {
+            int bx = box.getBounds().getX1();
+            int by = box.getBounds().getY2();
+            if ((bx >= x1 && bx <= x2 && by < y2) &&  //is placed above
+                    (by > miny ||
+                     (by == miny && bx < maxx)))
+            {
+                ret = root; //found in our boxes
+                if (bx < maxx) maxx = bx;
+                if (by > miny) miny = by;
+            }
+        }
+
+        for (int i = 0; i < root.getChildCount(); i++)
+        {
+            Area child = root.getChildAt(i);
+            Area area = recursiveFindAreaAbove(child, x1, x2, miny, y2);
+            if (area != null)
+            {   
+                int bx = area.getX1(); 
+                int by = area.getY2();
+                int len = area.getText().length();
+                if ((len > 0) && //we require some text in the area
+                        (by > miny ||
+                         (by == miny && bx < maxx)))
+                {
+                    ret = area;
+                    if (bx < maxx) maxx = bx;
+                    if (by > miny) miny = by;
+                }
+            }
+        }
+        
+        return ret;
+    }
+    
     
     //================================================================
     

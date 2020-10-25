@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.impl.BaseOperator;
@@ -242,7 +241,7 @@ public class HTMLOutputOperator extends BaseOperator
     
     private void dumpAreaBoxes(Area a, java.io.PrintWriter p, int level)
     {
-        Vector<Box> boxes = a.getBoxes();
+        List<Box> boxes = a.getBoxes();
         for (Box box : boxes)
         {
             //Dump only the text boxes. The style of the element boxes should be
@@ -364,13 +363,13 @@ public class HTMLOutputOperator extends BaseOperator
         if (!bgcol.isEmpty())
             style.put("background", bgcol);
         style.put("font-family", box.getFontFamily());
-        style.put("font-size", box.getFontSize(), UNIT);
-        style.put("font-weight", ((box.getFontWeight() < 0.5f)?"normal":"bold"));
-        style.put("font-style", ((box.getFontStyle() < 0.5f)?"normal":"italic"));
+        style.put("font-size", box.getTextStyle().getFontSize(), UNIT);
+        style.put("font-weight", ((box.getTextStyle().getFontWeight() < 0.5f)?"normal":"bold"));
+        style.put("font-style", ((box.getTextStyle().getFontStyle() < 0.5f)?"normal":"italic"));
         String deco = "";
-        if (box.getUnderline() >= 0.5f)
+        if (box.getTextStyle().getUnderline() >= 0.5f)
             deco += "underline";
-        if (box.getLineThrough() >= 0.5f)
+        if (box.getTextStyle().getLineThrough() >= 0.5f)
             deco += " line-through";
         if (deco.isEmpty())
             deco = "none";

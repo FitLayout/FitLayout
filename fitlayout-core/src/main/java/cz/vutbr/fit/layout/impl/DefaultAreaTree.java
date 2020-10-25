@@ -168,19 +168,25 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
     @Override
     public Area createArea(Rectangular r)
     {
-        return new DefaultArea(r);
+        DefaultArea ret = new DefaultArea(r);
+        ret.setPageIri(pageIri);
+        return ret;
     }
 
     @Override
     public Area createArea(Box box)
     {
-        return new DefaultArea(box);
+        DefaultArea ret = new DefaultArea(box);
+        ret.setPageIri(pageIri);
+        return ret;
     }
 
     @Override
     public Area createArea(List<Box> boxes)
     {
-        return new DefaultArea(boxes);
+        DefaultArea ret = new DefaultArea(boxes);
+        ret.setPageIri(pageIri);
+        return ret;
     }
     
 }

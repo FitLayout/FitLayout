@@ -55,7 +55,7 @@ public class HomogeneousLeafOperator extends SuperAreaOperator
     //==============================================================================
 
     @Override
-    protected GroupAnalyzer createGroupAnalyzer(AreaImpl root)
+    protected GroupAnalyzer createGroupAnalyzer(Area root)
     {
         return new GroupAnalyzerByStyles(root, 1, true);
     }

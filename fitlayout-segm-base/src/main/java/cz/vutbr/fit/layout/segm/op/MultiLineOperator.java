@@ -20,6 +20,8 @@ import cz.vutbr.fit.layout.model.AreaTopology;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.segm.AreaImpl;
+import cz.vutbr.fit.layout.segm.AreaStyle;
+import cz.vutbr.fit.layout.segm.TreeOp;
 
 /**
  * Detects sequences of aligned lines and joins them to a single area.
@@ -161,7 +163,7 @@ public class MultiLineOperator extends BaseOperator
                         neigh = (AreaImpl) t.findAreaAt(x, ny2 + dist);
                         if (neigh != null) //something found
                         {
-                            if ((!useConsistentStyle || node.hasSameStyle(neigh))
+                            if ((!useConsistentStyle || AreaStyle.hasSameStyle(node, neigh))
                                     && neigh.getGridPosition().getX1() == nx1)
                             {
                                 if (verticalJoin(a, node, neigh, true)) //try to join
@@ -193,12 +195,12 @@ public class MultiLineOperator extends BaseOperator
         //System.out.println("VJoin: " + n1.toString() + " + " + n2.toString());
         //check the maximal distance between the nodes
         int dist = Math.min(Math.abs(n2.getY1() - n1.getY2()), Math.abs(n1.getY1() - n2.getY2()));
-        if (dist > n1.getFontSize() * maxLineEmSpace)
+        if (dist > n1.getTextStyle().getFontSize() * maxLineEmSpace)
             return false;
         //check if there is no separating border or background
         if (n1.hasBottomBorder() || 
             n2.hasTopBorder() ||
-            !n1.hasSameBackground(n2))
+            !AreaStyle.hasEqualBackground(n1, n2))
             return false; //separated, give up
         //align the start
         int sx1 = n1.getGridPosition().getX1();
@@ -248,7 +250,7 @@ public class MultiLineOperator extends BaseOperator
             log.debug("VJoin: {} + {}", n1, n2);
             Rectangular newpos = new Rectangular(sx1, n1.getGridPosition().getY1(),
                                                  ex1, n2.getGridPosition().getY2());
-            n1.joinArea(n2, newpos, true);
+            TreeOp.joinArea(n1, n2, newpos, true);
             parent.removeChild(n2);
         }
         return true;

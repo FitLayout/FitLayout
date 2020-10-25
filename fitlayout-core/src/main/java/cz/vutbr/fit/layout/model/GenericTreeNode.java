@@ -61,17 +61,19 @@ public interface GenericTreeNode<T extends GenericTreeNode<T>>
     
     /**
      * Sets a user-defined attribute for the tree node. This allows to assign multiple
-     * attributes with different classes. One object of each class is allowed.
-     * @param attribute an object representing the user attributes (application-specific)
+     * attributes identified by their names.
+     * @param name the attribute name
+     * @param value the attribute value
      */
-    public void addUserAttribute(Object attribute);
+    public void addUserAttribute(String name, Object value);
     
     /**
-     * Obtains the user-defined attributes of the node.
+     * Obtains the user-defined attribute value assigned to the node.
+     * @param name the attribute name
      * @param clazz the class of the required attribute
-     * @return an object of the given class representing the user attributes (application-specific)
+     * @return an object of the given class representing the value of the attribute (application-specific)
      * or {@code null} when no such attribute is present.
      */
-    public <P> P getUserAttribute(Class<P> clazz);
+    public <P> P getUserAttribute(String name, Class<P> clazz);
 
 }

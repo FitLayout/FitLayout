@@ -32,6 +32,7 @@ import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.ContentObject;
 import cz.vutbr.fit.layout.model.Rectangular;
+import cz.vutbr.fit.layout.model.TextStyle;
 import cz.vutbr.fit.layout.model.Border.Side;
 import cz.vutbr.fit.layout.model.Border.Style;
 import cz.vutbr.web.css.CSSProperty;
@@ -86,6 +87,9 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
     
     /** Potential nearest parent node in the box tree */
     private BoxNode nearestParent = null;
+    
+    /** Computed text style statistics */
+    private TextStyle textStyle;
     
     /** Computed background color */
     private Color bgColor;
@@ -1002,33 +1006,46 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
     }
 
     @Override
-    public float getUnderline()
+    public TextStyle getTextStyle()
     {
-        return getBox().getVisualContext().getTextDecoration().contains(CSSProperty.TextDecoration.UNDERLINE) ? 1.0f : 0.0f;
+        if (textStyle == null)
+        {
+            int len = getText().trim().length();
+            
+            textStyle = new TextStyle();
+            textStyle.setFontSizeSum(getIntrinsicFontSize() * len);
+            textStyle.setFontWeightSum(getIntrinsicFontWeight() * len);
+            textStyle.setFontStyleSum(getIntrinsicFontStyle() * len);
+            textStyle.setUnderlineSum(getIntrinsicUnderline() * len);
+            textStyle.setLineThroughSum(getIntrinsicLineThrough() * len);
+            textStyle.setContentLength(len);
+        }
+        return textStyle;
     }
-
-    @Override
-    public float getLineThrough()
-    {
-        return getBox().getVisualContext().getTextDecoration().contains(CSSProperty.TextDecoration.LINE_THROUGH) ? 1.0f : 0.0f;
-    }
-
-    @Override
-    public float getFontSize()
+    
+    public float getIntrinsicFontSize()
     {
         return getBox().getVisualContext().getFontSize();
     }
 
-    @Override
-    public float getFontStyle()
+    public float getIntrinsicFontStyle()
     {
         return getBox().getVisualContext().getFontInfo().isItalic() ? 1.0f : 0.0f;
     }
 
-    @Override
-    public float getFontWeight()
+    public float getIntrinsicFontWeight()
     {
         return getBox().getVisualContext().getFontInfo().isBold() ? 1.0f : 0.0f;
+    }
+
+    public float getIntrinsicUnderline()
+    {
+        return getBox().getVisualContext().getTextDecoration().contains(CSSProperty.TextDecoration.UNDERLINE) ? 1.0f : 0.0f;
+    }
+
+    public float getIntrinsicLineThrough()
+    {
+        return getBox().getVisualContext().getTextDecoration().contains(CSSProperty.TextDecoration.LINE_THROUGH) ? 1.0f : 0.0f;
     }
 
     @Override

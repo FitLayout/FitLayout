@@ -10,7 +10,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.impl.BaseOperator;
@@ -152,9 +151,9 @@ public class XMLOutputOperator extends BaseOperator
                         + " x2=\"" + a.getX2() + "\"" 
                         + " y2=\"" + a.getY2() + "\"" 
                         + " background=\"" + colorString(a.getBackgroundColor()) + "\"" 
-                        + " fontsize=\"" + a.getFontSize() + "\"" 
-                        + " fontweight=\"" + a.getFontWeight() + "\"" 
-                        + " fontstyle=\"" + a.getFontStyle() + "\""
+                        + " fontsize=\"" + a.getTextStyle().getFontSize() + "\"" 
+                        + " fontweight=\"" + a.getTextStyle().getFontWeight() + "\"" 
+                        + " fontstyle=\"" + a.getTextStyle().getFontStyle() + "\""
                         + " tags=\"" + tagString(a.getTags().keySet()) + "\""
                         + ">";
 
@@ -184,7 +183,7 @@ public class XMLOutputOperator extends BaseOperator
     
     private void dumpBoxes(Area a, java.io.PrintWriter p, int level)
     {
-        Vector<Box> boxes = a.getBoxes();
+        List<Box> boxes = a.getBoxes();
         for (Box box : boxes)
         {
             Rectangular pos = box.getVisualBounds();
@@ -196,11 +195,11 @@ public class XMLOutputOperator extends BaseOperator
                             + " y2=\"" + pos.getY2() + "\""
                             + " color=\"" + colorString(box.getColor()) + "\""
                             + " fontfamily=\"" + box.getFontFamily() + "\""
-                            + " fontsize=\"" + box.getFontSize() + "\""
-                            + " fontweight=\"" + (box.getFontWeight()) + "\""
-                            + " fontstyle=\"" + (box.getFontStyle()) + "\""
-                            + " underline=\"" + box.getUnderline() + "\""
-                            + " linethrough=\"" + box.getLineThrough() + "\""
+                            + " fontsize=\"" + box.getTextStyle().getFontSize() + "\""
+                            + " fontweight=\"" + (box.getTextStyle().getFontWeight()) + "\""
+                            + " fontstyle=\"" + (box.getTextStyle().getFontStyle()) + "\""
+                            + " underline=\"" + box.getTextStyle().getUnderline() + "\""
+                            + " linethrough=\"" + box.getTextStyle().getLineThrough() + "\""
                             + " replaced=\"" + ((box.getType() == Type.REPLACED_CONTENT)?"true":"false") + "\""
                             + ">";
             p.print(stag);

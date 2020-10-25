@@ -78,11 +78,11 @@ public class OutputDisplayImpl implements OutputDisplay
             //setup the font
             Font font = new Font("Serif", Font.PLAIN, 12);
             String fmlspec = box.getFontFamily();
-            float fontsize = (box.getFontSize() * 96.0f) / 72.0f; //AWT font assumes 72dpi
+            float fontsize = (box.getTextStyle().getFontSize() * 96.0f) / 72.0f; //AWT font assumes 72dpi
             int fs = Font.PLAIN;
-            if (box.getFontWeight() > 0.5f)
+            if (box.getTextStyle().getFontWeight() > 0.5f)
                 fs = Font.BOLD;
-            if (box.getFontStyle() > 0.5f)
+            if (box.getTextStyle().getFontStyle() > 0.5f)
                 fs = fs | Font.ITALIC;
             
             //TODO underline and overline

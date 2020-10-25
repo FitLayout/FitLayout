@@ -16,6 +16,7 @@ import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.segm.AreaImpl;
 import cz.vutbr.fit.layout.segm.Config;
+import cz.vutbr.fit.layout.segm.Separators;
 
 /**
  * Detects the larger visual areas and creates the artificial area nodes.
@@ -102,7 +103,7 @@ public class SuperAreaOperator extends BaseOperator
 
     //==============================================================================
 
-    protected GroupAnalyzer createGroupAnalyzer(AreaImpl root)
+    protected GroupAnalyzer createGroupAnalyzer(Area root)
     {
         return Config.createGroupAnalyzer(root);
     }
@@ -125,13 +126,13 @@ public class SuperAreaOperator extends BaseOperator
      * @param the root area to be processed
      * @param passlimit the maximal number of passes while some changes occur 
      */ 
-    public void findSuperAreas(AreaImpl root, int passlimit)
+    public void findSuperAreas(Area root, int passlimit)
     {
         if (root.getChildCount() > 0)
         {
             boolean changed = true;
             int pass = 0;
-            root.createSeparators();
+            Separators.createSeparatorsForArea(root);
             while (changed && pass < passlimit)
             {
                 changed = false;
@@ -143,11 +144,11 @@ public class SuperAreaOperator extends BaseOperator
                 while (chld.size() > 1) //we're not going to group a single element
                 {
                     //get the super area
-                    Vector<AreaImpl> selected = new Vector<AreaImpl>();
+                    List<Area> selected = new ArrayList<>();
                     int index = root.getIndex(chld.firstElement());
-                    AreaImpl grp = null;
+                    Area grp = null;
                     if (chld.firstElement().isLeaf())
-                        grp = groups.findSuperArea((AreaImpl) chld.firstElement(), selected);
+                        grp = groups.findSuperArea(chld.firstElement(), selected);
                     if (selected.size() == root.getChildCount())
                     {
                         //everything grouped into one group - it makes no sense to create a new one
@@ -161,7 +162,7 @@ public class SuperAreaOperator extends BaseOperator
                         {
                             root.insertChild(grp, index);
                             //add(grp); //add the new group to the end of children (so that it is processed again later)
-                            for (AreaImpl a : selected)
+                            for (Area a : selected)
                                 grp.appendChild(a);
                             chld.removeAll(selected);
                             grp.updateTopologies();;
@@ -176,7 +177,7 @@ public class SuperAreaOperator extends BaseOperator
                     }
                 }
                 root.updateTopologies();
-                root.removeSimpleSeparators();
+                Separators.removeSimpleSeparators(root);
                 //System.out.println("Pass: " + pass + " changed: " + changed);
                 pass++;
             }

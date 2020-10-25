@@ -5,6 +5,7 @@
  */
 package cz.vutbr.fit.layout.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,7 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTopology;
@@ -45,7 +45,7 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
     private ContentLine line;
 
     /** The visual boxes that form this area. */
-    private Vector<Box> boxes;
+    private List<Box> boxes;
     
     /** Assigned tags */
     private Map<Tag, Float> tags;
@@ -53,6 +53,10 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
     /** Effective bounds of the area content. */
     private Rectangular contentBounds;
 
+    /** Area level. 0 corresponds to the areas formed by boxes, greater numbers represent
+     * greater level of grouping (artificial areas) */
+    private int level = 0;
+    
     /** Previous area on the same line */
     private Area previousOnLine = null;
     
@@ -64,28 +68,34 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
 
     /** Is the area a vertical separator? */
     private boolean vsep;
+    
+    /** Is the area explicitly separated? */
+    private boolean explicitlySeparated;
+    
 
     public DefaultArea(Rectangular r)
     {
         super(Area.class);
         name = null;
-        boxes = new Vector<Box>();
-        tags = new HashMap<Tag, Float>();
+        boxes = new ArrayList<>();
+        tags = new HashMap<>();
         setBounds(new Rectangular(r));
         setBackgroundColor(null);
         hsep = false;
         vsep = false;
+        level = 0;
     }
     
     public DefaultArea(DefaultArea src)
     {
         super(Area.class, src);
         name = (src.name == null) ? null : new String(src.name);
-        boxes = new Vector<Box>(src.getBoxes());
-        tags = new HashMap<Tag, Float>();
+        boxes = new ArrayList<>(src.getBoxes());
+        tags = new HashMap<>();
         contentBounds = (src.contentBounds == null) ? null : new Rectangular(src.contentBounds);
         vsep = src.vsep;
         hsep = src.hsep;
+        level = src.level;
     }
     
     public DefaultArea(int x1, int y1, int x2, int y2)
@@ -155,6 +165,18 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
         super.move(xofs, yofs);
     }
     
+    @Override
+    public int getLevel()
+    {
+        return level;
+    }
+
+    @Override
+    public void setLevel(int level)
+    {
+        this.level = level;
+    }
+
     @Override
     public ContentLine getLine()
     {
@@ -323,14 +345,11 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
     // boxes
     //====================================================================================
     
-    /**
-     * Adds a new box to the area.
-     * @param box
-     */
+    @Override
     public void addBox(Box box)
     {
         boxes.add(box);
-        
+        updateTextStyleForBox(box);
         Rectangular sb = box.getVisualBounds();
         if (contentBounds == null)
             contentBounds = new Rectangular(sb);
@@ -342,7 +361,8 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
      * Returns a vector of boxes that are inside of this area
      * @return A vector containing the {@link cz.vutbr.fit.layout.model.Box Box} objects
      */
-    public Vector<Box> getBoxes()
+    @Override
+    public List<Box> getBoxes()
     {
         return boxes;
     }
@@ -352,14 +372,14 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
      * @return The list of boxes
      */
     @Override
-    public Vector<Box> getAllBoxes()
+    public List<Box> getAllBoxes()
     {
-        Vector<Box> ret = new Vector<Box>();
+        List<Box> ret = new ArrayList<Box>();
         recursiveFindBoxes(this, ret);
         return ret;
     }
     
-    private void recursiveFindBoxes(Area root, Vector<Box> result)
+    private void recursiveFindBoxes(Area root, List<Box> result)
     {
         result.addAll(root.getBoxes());
         for (int i = 0; i < root.getChildCount(); i++)
@@ -401,14 +421,25 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
         boxes.removeAll(box);
     }
     
-    
     /**
      * Returns the child area at the specified grid position or null, if there is no
-     * child area at this position.
+     * child area at this position. TODO?
      */
     public DefaultArea getChildAtGridPos(int x, int y)
     {
         return (DefaultArea) getTopology().findAreaAt(x, y);
+    }
+
+    /**
+     * Updates the average text style of the area with the values of the new box being added.
+     * @param box the box being added
+     */
+    private void updateTextStyleForBox(Box box)
+    {
+        if (box.getType() == Box.Type.TEXT_CONTENT)
+        {
+            getTextStyle().updateAverages(box.getTextStyle());
+        }        
     }
     
     //====================================================================================
@@ -522,7 +553,7 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
         return tags;
     }
     
-    public void SetHorizontalSeparator(boolean hsep)
+    public void setHorizontalSeparator(boolean hsep)
     {
         this.hsep = hsep;
     }
@@ -533,7 +564,7 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
         return hsep;
     }
 
-    public void SetVerticalSeparator(boolean vsep)
+    public void setVerticalSeparator(boolean vsep)
     {
         this.hsep = vsep;
     }
@@ -548,6 +579,16 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
     public boolean isSeparator()
     {
         return isHorizontalSeparator() || isVerticalSeparator();
+    }
+
+    public boolean isExplicitlySeparated()
+    {
+        return explicitlySeparated;
+    }
+
+    public void setExplicitlySeparated(boolean explicitlySeparated)
+    {
+        this.explicitlySeparated = explicitlySeparated;
     }
 
     @Override
@@ -615,6 +656,7 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
      * Sets the grid position of this area within the parent topology.
      * @param gp the new grid position
      */
+    @Override
     public void setGridPosition(Rectangular gp)
     {
         if (getParent() != null)
@@ -625,6 +667,7 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
      * Gets the grid position of this area within the parent topology.
      * @return the grid position or a unit rectangle when there is no parent
      */
+    @Override
     public Rectangular getGridPosition()
     {
         if (getParent() != null)

@@ -5,6 +5,8 @@
  */
 package cz.vutbr.fit.layout.segm;
 
+import cz.vutbr.fit.layout.model.Area;
+import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
 
 /**
@@ -31,12 +33,12 @@ public class AreaStyle
         this.backgroundColor = backgroundColor;
     }
     
-    public AreaStyle(AreaImpl source)
+    public AreaStyle(Area source)
     {
-        this.averageFontSize = source.getFontSize();
-        this.averageFontWeight = source.getFontWeight();
-        this.averageFontStyle = source.getFontStyle();
-        this.averageColorLuminosity = source.getColorLuminosity();
+        this.averageFontSize = source.getTextStyle().getFontSize();
+        this.averageFontWeight = source.getTextStyle().getFontWeight();
+        this.averageFontStyle = source.getTextStyle().getFontStyle();
+        this.averageColorLuminosity = computeColorLuminosity(source);
         this.backgroundColor = source.getBackgroundColor();
     }
 
@@ -112,5 +114,71 @@ public class AreaStyle
                 && ((bg1 == null && bg2 == null) || (bg1 != null && bg2 != null && bg1.equals(bg2)));
     }
     
+    //====================================================================================
+    
+    /**
+     * Compares two visual areas and checks whether they have the same visual style.
+     * @param a1 the first area to compare
+     * @param a2 the second area to compare
+     * @return {@code true} when a2 has the same visual style as a1
+     */
+    public static boolean hasSameStyle(Area a1, Area a2)
+    {
+        final AreaStyle s1 = new AreaStyle(a1);
+        final AreaStyle s2 = new AreaStyle(a2);
+        return s1.isSameStyle(s2);
+    }
+    
+    /**
+     * Checks if two areas have the same background color
+     * @param a1 the first area to compare
+     * @param a1 the second area to compare
+     * @return {@code true} if the areas are both transparent or they have the same
+     * background color declared
+     */
+    public static boolean hasEqualBackground(Area a1, Area a2)
+    {
+        return (a1.getBackgroundColor() == null && a2.getBackgroundColor() == null) || 
+               (a1.getBackgroundColor() != null && a2.getBackgroundColor() != null 
+                   && a1.getBackgroundColor().equals(a2.getBackgroundColor()));
+    }
+
+    
+    //====================================================================================
+    
+    public float computeColorLuminosity(Area area)
+    {
+        if (area.getBoxes().isEmpty())
+            return 0;
+        else
+        {
+            float sum = 0;
+            int len = 0;
+            for (Box box : area.getBoxes())
+            {
+                int l = box.getText().length(); 
+                sum += colorLuminosity(box.getColor()) * l;
+                len += l;
+            }
+            return sum / len;
+        }
+    }
+
+    private float colorLuminosity(Color c)
+    {
+        float lr, lg, lb;
+        if (c == null)
+        {
+            lr = lg = lb = 255;
+        }
+        else
+        {
+            lr = (float) Math.pow(c.getRed() / 255.0f, 2.2f);
+            lg = (float) Math.pow(c.getGreen() / 255.0f, 2.2f);
+            lb = (float) Math.pow(c.getBlue() / 255.0f, 2.2f);
+        }
+        return lr * 0.2126f +  lg * 0.7152f + lb * 0.0722f;
+    }
+
     
 }

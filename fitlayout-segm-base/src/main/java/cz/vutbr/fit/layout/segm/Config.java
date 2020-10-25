@@ -5,6 +5,7 @@
  */
 package cz.vutbr.fit.layout.segm;
 
+import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.segm.op.GroupAnalyzer;
 import cz.vutbr.fit.layout.segm.op.SeparatorSet;
 import cz.vutbr.fit.layout.segm.op.SeparatorSetHVS;
@@ -48,7 +49,7 @@ public class Config
      * @param root the root area for separator detection
      * @return the created group analyzer
      */
-    public static GroupAnalyzer createGroupAnalyzer(AreaImpl root)
+    public static GroupAnalyzer createGroupAnalyzer(Area root)
     {
         //return new org.fit.segm.grouping.op.GroupAnalyzerByGrouping(root);
         //return new org.fit.segm.grouping.op.GroupAnalyzerBySeparators(root);
@@ -62,7 +63,7 @@ public class Config
      * @param root the root area
      * @return the created separator set
      */
-    public static SeparatorSet createSeparators(AreaImpl root)
+    public static SeparatorSet createSeparators(Area root)
     {
         SeparatorSet sset;
         //sset = new SeparatorSetHV(root);

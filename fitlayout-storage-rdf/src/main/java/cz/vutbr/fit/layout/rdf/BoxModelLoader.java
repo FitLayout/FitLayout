@@ -147,6 +147,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
         box.setDisplayType(Box.DisplayType.BLOCK);
         int x = 0, y = 0, width = 0, height = 0;
         int vx = 0, vy = 0, vwidth = 0, vheight = 0;
+        RDFTextStyle style = new RDFTextStyle();
         
         for (Statement st : boxTreeModel.filter(boxIri, null, null))
         {
@@ -177,12 +178,12 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             else if (BOX.underline.equals(pred)) 
             {
                 if (value instanceof Literal)
-                    box.setUnderline(((Literal) value).floatValue());
+                    style.underline = ((Literal) value).floatValue();
             }
             else if (BOX.lineThrough.equals(pred)) 
             {
                 if (value instanceof Literal)
-                    box.setLineThrough(((Literal) value).floatValue());
+                    style.lineThrough = ((Literal) value).floatValue();
             }
             else if (BOX.fontFamily.equals(pred)) 
             {
@@ -192,17 +193,17 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             else if (BOX.fontSize.equals(pred)) 
             {
                 if (value instanceof Literal)
-                    box.setFontSize(((Literal) value).floatValue());
+                    style.fontSize = ((Literal) value).floatValue();
             }
             else if (BOX.fontStyle.equals(pred)) 
             {
                 if (value instanceof Literal)
-                    box.setFontStyle(((Literal) value).floatValue());
+                    style.fontStyle = ((Literal) value).floatValue();
             }
             else if (BOX.fontWeight.equals(pred)) 
             {
                 if (value instanceof Literal)
-                    box.setFontWeight(((Literal) value).floatValue());
+                    style.fontWeight = ((Literal) value).floatValue();
             }
             else if (BOX.hasBottomBorder.equals(pred)) 
             {
@@ -323,6 +324,8 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                 }
             }
         }
+        style.contentLength = box.getText().length();
+        box.setTextStyle(style.toTextStyle());
         box.setBounds(new Rectangular(x, y, x + width - 1, y + height - 1));
         box.setContentBounds(new Rectangular(x, y, x + width - 1, y + height - 1));
         box.setVisualBounds(new Rectangular(vx, vy, vx + vwidth - 1, vy + vheight - 1));

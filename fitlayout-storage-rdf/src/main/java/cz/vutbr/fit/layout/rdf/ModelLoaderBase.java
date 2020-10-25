@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.model.Border;
+import cz.vutbr.fit.layout.model.TextStyle;
 import cz.vutbr.fit.layout.ontology.BOX;
 
 /**
@@ -84,6 +85,31 @@ public abstract class ModelLoaderBase
             return new AbstractMap.SimpleEntry<String, String>(name, avalue);
         else
             return null;
+    }
+    
+    protected static class RDFTextStyle
+    {
+        // average values loaded from RDF
+        public float fontSize = 0;
+        public float fontWeight = 0;
+        public float fontStyle = 0;
+        public float underline = 0;
+        public float lineThrough = 0;
+        // content length loaded from RDF
+        public int contentLength;
+        
+        public TextStyle toTextStyle()
+        {
+            TextStyle ret = new TextStyle();
+            ret.setFontSizeSum(fontSize * contentLength);
+            ret.setFontWeightSum(fontWeight * contentLength);
+            ret.setFontStyleSum(fontStyle * contentLength);
+            ret.setUnderlineSum(underline * contentLength);
+            ret.setLineThroughSum(lineThrough * contentLength);
+            ret.setContentLength(contentLength);
+            return ret;
+        }
+        
     }
     
 }

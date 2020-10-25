@@ -22,7 +22,7 @@ public class DefaultTreeNode<T extends GenericTreeNode<T>> implements GenericTre
     private T root;
     private T parent;
     private List<T> children;
-    private HashMap<Class<?>, Object> attributes;
+    private HashMap<String, Object> attributes;
 
     public DefaultTreeNode(Class<T> myType)
     {
@@ -30,7 +30,7 @@ public class DefaultTreeNode<T extends GenericTreeNode<T>> implements GenericTre
         parent = null;
         myself = myType.cast(this);
         root = myself;
-        attributes = new HashMap<Class<?>, Object>();
+        attributes = new HashMap<>(1); //we do not expect many attributes
     }
 
     @Override
@@ -64,15 +64,15 @@ public class DefaultTreeNode<T extends GenericTreeNode<T>> implements GenericTre
     }
     
     @Override
-    public <P> P getUserAttribute(Class<P> clazz)
+    public <P> P getUserAttribute(String name, Class<P> clazz)
     {
-        return clazz.cast(attributes.get(clazz));
+        return clazz.cast(attributes.get(name));
     }
 
     @Override
-    public void addUserAttribute(Object attribute)
+    public void addUserAttribute(String name, Object value)
     {
-        attributes.put(attribute.getClass(), attribute);
+        attributes.put(name, value);
     }
 
     @Override

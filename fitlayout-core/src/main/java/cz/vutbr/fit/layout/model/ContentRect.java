@@ -40,34 +40,10 @@ public interface ContentRect extends Rect
     public Color getBackgroundColor();
 
     /**
-     * Obtains the amount of underlined text. 0 means no underlined text, 1 means all the text is underlined.
-     * @return a value in the range 0..1
+     * Gets the text style statistics of the content.
+     * @return the text style statistics
      */
-    public float getUnderline();
-    
-    /**
-     * Obtains the amount of line-through text. 0 means no underlined text, 1 means all the text is underlined.
-     * @return a value in the range 0..1
-     */
-    public float getLineThrough();
-    
-    /**
-     * Obtains an average font size in the are in pixels.
-     * @return the average font pixel size
-     */
-    public float getFontSize();
-    
-    /**
-     * Obtains the average font style. 0 means no text in italics, 1 means all the text in italics.
-     * @return a value in the range 0..1
-     */
-    public float getFontStyle();
-    
-    /**
-     * Obtains the average font style. 0 means no text is bold, 1 means all the text is bold
-     * @return a value in the range 0..1
-     */
-    public float getFontWeight();
+    public TextStyle getTextStyle();
     
     //=================================================================================================
     // Borders
@@ -133,6 +109,7 @@ public interface ContentRect extends Rect
      * @return the corresponding border properties.
      */
     public Border getBorderStyle(Border.Side side);
+    
     
     //=================================================================================================
     // Background

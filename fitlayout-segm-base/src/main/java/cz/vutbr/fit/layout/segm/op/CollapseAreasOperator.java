@@ -9,6 +9,7 @@ import cz.vutbr.fit.layout.impl.BaseOperator;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.segm.AreaImpl;
+import cz.vutbr.fit.layout.segm.TreeOp;
 
 /**
  * This operator collapses the areas having only one (leaf) child.
@@ -88,7 +89,7 @@ public class CollapseAreasOperator extends BaseOperator
         {
             AreaImpl child = (AreaImpl) src.getChildAt(i);
             recursiveCollapseSubtree(child, dest);
-            dest.joinChild(child);
+            TreeOp.joinChild(dest, child);
         }
     }
 

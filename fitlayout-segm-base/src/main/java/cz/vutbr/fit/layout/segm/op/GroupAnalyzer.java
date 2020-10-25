@@ -5,9 +5,11 @@
  */
 package cz.vutbr.fit.layout.segm.op;
 
-import java.util.Vector;
+import java.util.List;
 
+import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTopology;
+import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.segm.AreaImpl;
 
 /**
@@ -17,14 +19,14 @@ import cz.vutbr.fit.layout.segm.AreaImpl;
  */
 public class GroupAnalyzer
 {
-    protected AreaImpl parent;
+    protected Area parent;
     
-    public GroupAnalyzer(AreaImpl parent)
+    public GroupAnalyzer(Area parent)
     {
         this.parent = parent;
     }
     
-    public AreaImpl getParent()
+    public Area getParent()
     {
         return parent;
     }
@@ -44,14 +46,13 @@ public class GroupAnalyzer
      * that should be contained in the new area
      * @return the new empty area
      */
-    public AreaImpl findSuperArea(AreaImpl sub, Vector<AreaImpl> selected)
+    public Area findSuperArea(Area sub, List<Area> selected)
     {
     	/* This is a simple testing SuperArea implementation. It groups each 
-    	 * subarea with its first sibling area.*/ 
-        AreaImpl ret = new AreaImpl(0, 0, 0, 0);
-        ret.setPageIri(sub.getPageIri());
+    	 * subarea with its first sibling area.*/
+        Area ret = sub.getAreaTree().createArea(new Rectangular(0, 0, 0, 0));
         AreaImpl sibl = (AreaImpl) sub.getNextSibling();
-        selected.removeAllElements();
+        selected.clear();
         selected.add(sub);
         if (sibl != null)
         {

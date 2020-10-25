@@ -12,6 +12,7 @@ import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.GenericTreeNode;
 import cz.vutbr.fit.layout.model.Rectangular;
+import cz.vutbr.fit.layout.model.TextStyle;
 import cz.vutbr.fit.layout.model.Border.Side;
 import cz.vutbr.fit.layout.model.Border.Style;
 
@@ -30,12 +31,9 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
     private IRI pageIri;
     private Rectangular bounds;
     private Color backgroundColor;
-    private float underline;
-    private float lineThrough;
-    private float fontSize;
-    private float fontStyle;
-    private float fontWeight;
     private boolean backgroundSeparated;
+
+    private TextStyle textStyle;
     
     private Border topBorder;
     private Border bottomBorder;
@@ -48,6 +46,7 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
         super(myType);
         id = nextid++;
         bounds = new Rectangular();
+        textStyle = new TextStyle();
         topBorder = new Border();
         bottomBorder = new Border();
         leftBorder = new Border();
@@ -61,10 +60,7 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
         pageIri = src.pageIri;
         bounds = new Rectangular(src.bounds);
         backgroundColor = (src.backgroundColor == null) ? null : new Color(src.backgroundColor.getRed(), src.backgroundColor.getGreen(), src.backgroundColor.getBlue());
-        underline = src.underline;
-        lineThrough = src.lineThrough;
-        fontSize = src.fontSize;
-        fontWeight= src.fontWeight;
+        textStyle = new TextStyle(src.textStyle);
         topBorder = src.topBorder;
         bottomBorder = src.bottomBorder;
         leftBorder = src.leftBorder;
@@ -115,73 +111,22 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
     {
         this.backgroundSeparated = backgroundSeparated;
     }
-    
+
     @Override
-    public float getUnderline()
+    public TextStyle getTextStyle()
     {
-        return underline;
+        return textStyle;
     }
-    
-    public void setUnderline(float underline)
+
+    public void setTextStyle(TextStyle textStyle)
     {
-        this.underline = underline;
+        this.textStyle = textStyle;
     }
-    
-    @Override
-    public float getLineThrough()
-    {
-        return lineThrough;
-    }
-    
-    public void setLineThrough(float lineThrough)
-    {
-        this.lineThrough = lineThrough;
-    }
-    
-    @Override
-    public float getFontSize()
-    {
-        return fontSize;
-    }
-    
-    public void setFontSize(float fontSize)
-    {
-        this.fontSize = fontSize;
-    }
-    
-    @Override
-    public float getFontStyle()
-    {
-        return fontStyle;
-    }
-    
-    public void setFontStyle(float fontStyle)
-    {
-        this.fontStyle = fontStyle;
-    }
-    
-    @Override
-    public float getFontWeight()
-    {
-        return fontWeight;
-    }
-    
-    public void setFontWeight(float fontWeight)
-    {
-        this.fontWeight = fontWeight;
-    }
-    
+
     @Override
     public int getTopBorder()
     {
         return topBorder.getWidth();
-    }
-
-    public void setTopBorder(int width)
-    {
-        topBorder.setWidth(width);
-        if (topBorder.getStyle() == Style.NONE)
-            topBorder.setStyle(Style.SOLID);
     }
 
     @Override
@@ -190,37 +135,16 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
         return bottomBorder.getWidth();
     }
 
-    public void setBottomBorder(int width)
-    {
-        bottomBorder.setWidth(width);
-        if (bottomBorder.getStyle() == Style.NONE)
-            bottomBorder.setStyle(Style.SOLID);
-    }
-
     @Override
     public int getLeftBorder()
     {
         return leftBorder.getWidth();
     }
 
-    public void setLeftBorder(int width)
-    {
-        leftBorder.setWidth(width);
-        if (leftBorder.getStyle() == Style.NONE)
-            leftBorder.setStyle(Style.SOLID);
-    }
-
     @Override
     public int getRightBorder()
     {
         return rightBorder.getWidth();
-    }
-
-    public void setRightBorder(int width)
-    {
-        rightBorder.setWidth(width);
-        if (rightBorder.getStyle() == Style.NONE)
-            rightBorder.setStyle(Style.SOLID);
     }
 
     @Override
@@ -247,21 +171,6 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
         return rightBorder.getStyle() != Style.NONE;
     }
 
-    /**
-     * Sets all the border values.
-     * @param top
-     * @param right
-     * @param bottom
-     * @param left
-     */
-    public void setBorders(int top, int right, int bottom, int left)
-    {
-        setTopBorder(top);
-        setRightBorder(right);
-        setBottomBorder(bottom);
-        setLeftBorder(left);
-    }
-    
     @Override
     public Border getBorderStyle(Side side)
     {

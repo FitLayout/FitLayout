@@ -5,7 +5,7 @@
  */
 package cz.vutbr.fit.layout.segm.op;
 
-import java.util.Vector;
+import java.util.List;
 
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Box;
@@ -20,18 +20,18 @@ import cz.vutbr.fit.layout.segm.AreaImpl;
 public class GroupAnalyzerByDOM extends GroupAnalyzer
 {
 
-    public GroupAnalyzerByDOM(AreaImpl parent)
+    public GroupAnalyzerByDOM(Area parent)
     {
         super(parent);
     }
 
     @Override
-    public AreaImpl findSuperArea(AreaImpl sub, Vector<AreaImpl> selected)
+    public Area findSuperArea(Area sub, List<Area> selected)
     {
         Integer srcId = getId(sub);
         if (srcId != null)
         {
-            selected.removeAllElements();
+            selected.clear();
             Rectangular mingp = null;
             for (int i = 0; i < parent.getChildCount(); i++)
             {
@@ -62,7 +62,7 @@ public class GroupAnalyzerByDOM extends GroupAnalyzer
         }
         else
         {
-            selected.removeAllElements();
+            selected.clear();
             selected.add(sub);
             return new AreaImpl(0, 0, 0, 0);
         }
@@ -70,7 +70,7 @@ public class GroupAnalyzerByDOM extends GroupAnalyzer
     
     private Integer getId(Area area)
     {
-        Vector<Box> boxes = area.getBoxes();
+        List<Box> boxes = area.getBoxes();
         if (!boxes.isEmpty())
             return boxes.get(0).getSourceNodeId();
         else

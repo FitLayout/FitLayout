@@ -6,7 +6,8 @@
 package cz.vutbr.fit.layout.model;
 
 import java.util.List;
-import java.util.Vector;
+
+import cz.vutbr.fit.layout.model.Border.Side;
 
 /**
  * An area containing several visual boxes.
@@ -37,16 +38,22 @@ public interface Area extends ContentRect, GenericTreeNode<Area>, Taggable
     public void setAreaTree(AreaTree tree);
     
     /**
+     * Adds a new box to the area.
+     * @param box the box to add
+     */
+    public void addBox(Box box);
+    
+    /**
      * Returns the list of boxes that belong directly to this area.
      * @return the list of boxes (possibly empty)
      */
-    public Vector<Box> getBoxes();
+    public List<Box> getBoxes();
     
     /** 
      * Obtains all the boxes from this area and all the child areas.
      * @return The list of boxes
      */
-    public Vector<Box> getAllBoxes();
+    public List<Box> getAllBoxes();
     
     /**
      * Returns the complete text contained in this area and its sub area.
@@ -69,10 +76,43 @@ public interface Area extends ContentRect, GenericTreeNode<Area>, Taggable
     public boolean isReplaced();
     
     /**
+     * Area grouping level. Area level 0 corresponds to the areas formed by boxes, greater numbers represent
+     * greater level of grouping (artificial areas).
+     * @return the area level
+     */
+    public int getLevel();
+
+    /**
+     * Sets the area level. Area level 0 corresponds to the areas formed by boxes, greater numbers represent
+     * greater level of grouping (artificial areas).
+     * @param level the new level to set.
+     */
+    public void setLevel(int level);
+
+    /**
+     * Sets the style of the box border at the given side.
+     * @param side the border side.
+     * @param style the new border style
+     */
+    public void setBorderStyle(Side side, Border style);
+    
+    /**
      * Returns the topology of this area. 
      * @return The area topology.
      */
     public AreaTopology getTopology();
+
+    /**
+     * Sets the grid position of this area within the parent topology.
+     * @param gp the new grid position
+     */
+    public void setGridPosition(Rectangular gp);
+    
+    /**
+     * Gets the grid position of this area within the parent topology.
+     * @return the grid position or a unit rectangle when there is no parent
+     */
+    public Rectangular getGridPosition();
     
     /**
      * Returns the content line the area belongs to.
@@ -115,6 +155,22 @@ public interface Area extends ContentRect, GenericTreeNode<Area>, Taggable
      * @return {@code true} when this area is a separator
      */
     public boolean isSeparator();
+    
+    /**
+     * When set to true, the area is considered to be separated from other
+     * areas explicitly, i.e. independently on its real borders or background.
+     * This is usually used for some new superareas.
+     * @return <code>true</code>, if the area is explicitly separated
+     */
+    public boolean isExplicitlySeparated();
+
+    /**
+     * When set to true, the area is considered to be separated from other
+     * areas explicitly, i.e. independently on its real borders or background.
+     * This is usually used for some new superareas.
+     * @param separated <code>true</code>, if the area should be explicitly separated
+     */
+    public void setExplicitlySeparated(boolean explicitlySeparated);
     
     /**
      * Creates a new subarea from a specified region of the area and moves the selected child

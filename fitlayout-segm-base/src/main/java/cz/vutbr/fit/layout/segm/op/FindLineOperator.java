@@ -20,6 +20,8 @@ import cz.vutbr.fit.layout.model.AreaTopology;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.segm.AreaImpl;
+import cz.vutbr.fit.layout.segm.AreaStyle;
+import cz.vutbr.fit.layout.segm.TreeOp;
 
 /**
  * Detects the basic lines in the area tree and joins the appropriate areas so that a line
@@ -162,7 +164,7 @@ public class FindLineOperator extends BaseOperator
                         neigh = (AreaImpl) t.findAreaAt(nx2 + dist, y);
                         if (neigh != null) //something found
                         {
-                            if (!useConsistentStyle || node.hasSameStyle(neigh))
+                            if (!useConsistentStyle || AreaStyle.hasSameStyle(node, neigh))
                             {
                                 if (horizontalJoin(a, node, neigh, true)) //try to join
                                 {
@@ -201,12 +203,12 @@ public class FindLineOperator extends BaseOperator
         //System.out.println("HJoin: " + n1.toString() + " + " + n2.toString());
         //check the maximal distance between the nodes
         int dist = Math.min(Math.abs(n2.getX1() - n1.getX2()), Math.abs(n1.getX1() - n2.getX2()));
-        if (dist > n1.getFontSize() * maxLineEmSpace)
+        if (dist > n1.getTextStyle().getFontSize() * maxLineEmSpace)
             return false;
         //check if there is no separating border or background
         if (n1.hasRightBorder() || 
             n2.hasLeftBorder() ||
-            !n1.hasSameBackground(n2))
+            !AreaStyle.hasEqualBackground(n1, n2))
             return false; //separated, give up
         //align the start
         int sy1 = n1.getGridPosition().getY1();
@@ -256,7 +258,7 @@ public class FindLineOperator extends BaseOperator
             log.debug("Join: {} + {}", n1, n2);
             Rectangular newpos = new Rectangular(n1.getGridPosition().getX1(), sy1,
                                                  n2.getGridPosition().getX2(), ey1);
-            n1.joinArea(n2, newpos, true);
+            TreeOp.joinArea(n1, n2, newpos, true);
             parent.removeChild(n2);
         }
         return true;

@@ -57,12 +57,6 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
      * greater level of grouping (artificial areas) */
     private int level = 0;
     
-    /** Previous area on the same line */
-    private Area previousOnLine = null;
-    
-    /** Next area on the same line */
-    private Area nextOnLine = null;
-
     /** Is the area a horizontal separator? */
     private boolean hsep;
 
@@ -283,26 +277,6 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
         recomputeTextStyle();
     }
 
-    public Area getPreviousOnLine()
-    {
-        return previousOnLine;
-    }
-
-    public void setPreviousOnLine(Area previousOnLine)
-    {
-        this.previousOnLine = previousOnLine;
-    }
-
-    public Area getNextOnLine()
-    {
-        return nextOnLine;
-    }
-
-    public void setNextOnLine(Area nextOnLine)
-    {
-        this.nextOnLine = nextOnLine;
-    }
-    
     @Override
     public String getText()
     {
@@ -426,15 +400,6 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
         boxes.removeAll(box);
     }
     
-    /**
-     * Returns the child area at the specified grid position or null, if there is no
-     * child area at this position. TODO?
-     */
-    public DefaultArea getChildAtGridPos(int x, int y)
-    {
-        return (DefaultArea) getTopology().findAreaAt(x, y);
-    }
-
     /**
      * Updates the average text style of the area with the values of the new box being added.
      * @param box the box being added

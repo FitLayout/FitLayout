@@ -22,14 +22,9 @@ public class TextStyle
 
     public TextStyle()
     {
-        fontSizeSum = 0;
-        fontWeightSum = 0;
-        fontStyleSum = 0;
-        underlineSum = 0;
-        lineThroughSum = 0;
-        contentLength = 0;
+        reset();
     }
-    
+
     public TextStyle(TextStyle src)
     {
         fontSizeSum = src.fontSizeSum;
@@ -196,6 +191,19 @@ public class TextStyle
         underlineSum += other.getUnderlineSum();
         lineThroughSum += other.getLineThroughSum();
         contentLength += other.getContentLength();
+    }
+    
+    /**
+     * Resets the average values to zeroes.
+     */
+    public void reset()
+    {
+        fontSizeSum = 0;
+        fontWeightSum = 0;
+        fontStyleSum = 0;
+        underlineSum = 0;
+        lineThroughSum = 0;
+        contentLength = 0;
     }
     
 }

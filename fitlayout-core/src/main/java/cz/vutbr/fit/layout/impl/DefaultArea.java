@@ -247,6 +247,7 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
         child.setAreaTree(areaTree);
         super.appendChild(child);
         getBounds().expandToEnclose(child.getBounds());
+        recomputeTextStyle();
     }
     
     @Override
@@ -255,6 +256,7 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
     {
         invalidateTopology();
         super.insertChild(child, index);
+        recomputeTextStyle();
     }
 
     @Override
@@ -262,6 +264,7 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
     {
         invalidateTopology();
         super.removeAllChildren();
+        recomputeTextStyle();
     }
 
     @Override
@@ -269,6 +272,7 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
     {
         invalidateTopology();
         super.removeChild(index);
+        recomputeTextStyle();
     }
 
     @Override
@@ -276,6 +280,7 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
     {
         invalidateTopology();
         super.removeChild(child);
+        recomputeTextStyle();
     }
 
     public Area getPreviousOnLine()
@@ -698,6 +703,22 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
                 ret.append(" class=").append(cls);
             ret.append(">");
             return ret.toString();
+        }
+    }
+    
+    /**
+     * Recomputes the average text style after some boxes or child areas have been added or removed.
+     */
+    protected void recomputeTextStyle()
+    {
+        getTextStyle().reset();
+        for (Box box : getBoxes())
+        {
+            updateTextStyleForBox(box);
+        }
+        for (Area area : getChildren())
+        {
+            getTextStyle().updateAverages(area.getTextStyle());
         }
     }
 

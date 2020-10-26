@@ -126,7 +126,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
         RDFArea area = new RDFArea(new Rectangular(), uri);
         int x = 0, y = 0, width = 0, height = 0;
         Map<IRI, Float> tagSupport = new HashMap<IRI, Float>(); //tagUri->support
-        RDFTextStyle style = new RDFTextStyle(); //content length TODO not retrieved yet
+        RDFTextStyle style = new RDFTextStyle();
         
         RDFPage sourcePage = null;
         
@@ -174,6 +174,11 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof Literal)
                     style.fontWeight = ((Literal) value).floatValue();
+            }
+            else if (SEGM.hasContentLength.equals(pred)) 
+            {
+                if (value instanceof Literal)
+                    style.contentLength = ((Literal) value).intValue();
             }
             else if (BOX.hasBottomBorder.equals(pred)) 
             {

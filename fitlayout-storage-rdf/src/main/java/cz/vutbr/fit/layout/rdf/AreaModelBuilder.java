@@ -133,7 +133,7 @@ public class AreaModelBuilder implements ModelBuilder
         graph.add(individual, BOX.fontStyle, vf.createLiteral(area.getTextStyle().getFontStyle()));
         graph.add(individual, BOX.underline, vf.createLiteral(area.getTextStyle().getUnderline()));
         graph.add(individual, BOX.lineThrough, vf.createLiteral(area.getTextStyle().getLineThrough()));
-        //TODO store content length - getFontWeightCnt?
+        graph.add(individual, SEGM.hasContentLength, vf.createLiteral(area.getTextStyle().getContentLength()));
         
         //dump boxes
         for (Box box : area.getBoxes())

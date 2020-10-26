@@ -62,6 +62,16 @@ public class SEGM {
 	public static final IRI hasAreaTree;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasContentLength}.
+	 * <p>
+	 * The number of content elements used to compute the style statistics
+	 * such as average font weight.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasContentLength">hasContentLength</a>
+	 */
+	public static final IRI hasContentLength;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasName}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasName">hasName</a>
@@ -162,6 +172,7 @@ public class SEGM {
 		containsArea = factory.createIRI(SEGM.NAMESPACE, "containsArea");
 		containsBox = factory.createIRI(SEGM.NAMESPACE, "containsBox");
 		hasAreaTree = factory.createIRI(SEGM.NAMESPACE, "hasAreaTree");
+		hasContentLength = factory.createIRI(SEGM.NAMESPACE, "hasContentLength");
 		hasName = factory.createIRI(SEGM.NAMESPACE, "hasName");
 		hasSourcePage = factory.createIRI(SEGM.NAMESPACE, "hasSourcePage");
 		hasTag = factory.createIRI(SEGM.NAMESPACE, "hasTag");

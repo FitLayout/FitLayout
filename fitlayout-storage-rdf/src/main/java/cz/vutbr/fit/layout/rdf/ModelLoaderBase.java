@@ -96,7 +96,7 @@ public abstract class ModelLoaderBase
         public float underline = 0;
         public float lineThrough = 0;
         // content length loaded from RDF
-        public int contentLength;
+        public int contentLength = 1; // assume 1 element when nothing else is specified
         
         public TextStyle toTextStyle()
         {

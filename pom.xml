@@ -159,6 +159,13 @@
 				<artifactId>rdf4j-onejar</artifactId>
 				<version>${rdf4j.version}</version>
 			</dependency>
+			
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>4.5.10</version>
+			</dependency>
+			
 		</dependencies>
 	</dependencyManagement>
 

@@ -48,6 +48,25 @@ public abstract class BaseProcessor
     }
     
     /**
+     * Gets the currently used artifact repository.
+     * @return the artifact repository used
+     */
+    public ArtifactRepository getRepository()
+    {
+        return serviceManager.getArtifactRepository();
+    }
+
+    
+    /**
+     * Sets the artifact repository to be used.
+     * @param repository
+     */
+    public void setRepository(ArtifactRepository repository)
+    {
+        serviceManager.setArtifactRepository(repository);
+    }
+
+    /**
      * Gets the used instance of service manager for accessing the artifact services.
      * @return a service manager instance
      */

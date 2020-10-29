@@ -49,6 +49,15 @@ public class FL {
 	public static final IRI hasName;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#hasParentArtifact}.
+	 * <p>
+	 * Assigns a parent artifact to another artifact.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#hasParentArtifact">hasParentArtifact</a>
+	 */
+	public static final IRI hasParentArtifact;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#PageSet}.
 	 * <p>
 	 * A set of pages processed together.
@@ -64,6 +73,7 @@ public class FL {
 		containsPage = factory.createIRI(FL.NAMESPACE, "containsPage");
 		createdOn = factory.createIRI(FL.NAMESPACE, "createdOn");
 		hasName = factory.createIRI(FL.NAMESPACE, "hasName");
+		hasParentArtifact = factory.createIRI(FL.NAMESPACE, "hasParentArtifact");
 		PageSet = factory.createIRI(FL.NAMESPACE, "PageSet");
 	}
 

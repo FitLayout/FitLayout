@@ -22,9 +22,9 @@ public class RDFAreaTree extends DefaultAreaTree implements RDFResource
     protected Map<IRI, RDFLogicalArea> logicalAreaIris;
 
 
-    public RDFAreaTree(IRI pageIri)
+    public RDFAreaTree(IRI parentIri, IRI pageIri)
     {
-        super(pageIri);
+        super(parentIri, pageIri);
     }
     
     public RDFAreaTree(AreaTree src, IRI targetIri)

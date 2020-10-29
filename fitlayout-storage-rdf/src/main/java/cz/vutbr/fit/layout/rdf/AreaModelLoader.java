@@ -31,6 +31,7 @@ import cz.vutbr.fit.layout.model.Border.Side;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.ontology.BOX;
+import cz.vutbr.fit.layout.ontology.FL;
 import cz.vutbr.fit.layout.ontology.SEGM;
 import cz.vutbr.fit.layout.rdf.model.RDFArea;
 import cz.vutbr.fit.layout.rdf.model.RDFAreaTree;
@@ -65,7 +66,8 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
         if (artifactModel.size() > 0)
         {
             IRI pageIri = getSourcePageIri(artifactModel, areaTreeIri);
-            RDFAreaTree atree = new RDFAreaTree(pageIri);
+            IRI parentIri = getPredicateIriValue(artifactModel, areaTreeIri, FL.hasParentArtifact);
+            RDFAreaTree atree = new RDFAreaTree(parentIri, pageIri);
             atree.setIri(areaTreeIri);
             //load the models
             Model areaModel = getAreaModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
@@ -394,13 +396,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
      */
     private IRI getSourcePageIri(Model model, IRI areaTreeIri)
     {
-        Iterable<Statement> typeStatements = model.getStatements(areaTreeIri, SEGM.hasSourcePage, null);
-        for (Statement st : typeStatements)
-        {
-            if (st.getObject() instanceof IRI)
-                return (IRI) st.getObject();
-        }
-        return null;
+        return getPredicateIriValue(model, areaTreeIri, SEGM.hasSourcePage);
     }
     
     /**

@@ -22,6 +22,7 @@ import cz.vutbr.fit.layout.model.ContentObject;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.ontology.BOX;
+import cz.vutbr.fit.layout.ontology.FL;
 
 /**
  * Implements an RDF graph construction from a page box model. 
@@ -57,6 +58,8 @@ public class BoxModelBuilder implements ModelBuilder
 		graph.add(pageNode, RDF.TYPE, BOX.Page);
 		graph.add(pageNode,	BOX.launchDatetime,	vf.createLiteral(new java.util.Date()));
 		graph.add(pageNode, BOX.sourceUrl, vf.createLiteral(baseUrl));
+        if (page.getParentIri() != null)
+            graph.add(pageNode, FL.hasParentArtifact, page.getParentIri());
 		if (page.getTitle() != null)
 		    graph.add(pageNode, BOX.hasTitle, vf.createLiteral(page.getTitle()));
 

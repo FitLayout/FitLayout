@@ -30,6 +30,17 @@ public abstract class ModelLoaderBase
 {
     private static Logger log = LoggerFactory.getLogger(ModelLoaderBase.class);
     
+    protected IRI getPredicateIriValue(Model model, IRI subject, IRI predicate)
+    {
+        Iterable<Statement> typeStatements = model.getStatements(subject, predicate, null);
+        for (Statement st : typeStatements)
+        {
+            if (st.getObject() instanceof IRI)
+                return (IRI) st.getObject();
+        }
+        return null;
+    }
+    
     protected Border createBorder(Model model, IRI uri)
     {
         Border ret = new Border();

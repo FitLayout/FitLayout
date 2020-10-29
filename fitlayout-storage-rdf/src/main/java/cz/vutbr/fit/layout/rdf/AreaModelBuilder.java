@@ -21,6 +21,7 @@ import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.ontology.BOX;
+import cz.vutbr.fit.layout.ontology.FL;
 import cz.vutbr.fit.layout.ontology.SEGM;
 
 /**
@@ -56,6 +57,8 @@ public class AreaModelBuilder implements ModelBuilder
 	    
 		graph.add(areaTreeNode, RDF.TYPE, SEGM.AreaTree);
 		graph.add(areaTreeNode, SEGM.hasSourcePage, pageNode);
+		if (areaTree.getParentIri() != null)
+		    graph.add(areaTreeNode, FL.hasParentArtifact, areaTree.getParentIri());
 		next_order = 0;
 		
 		addArea(areaTree.getRoot(), areaTreeNode, pageNode, usedTags, graph);

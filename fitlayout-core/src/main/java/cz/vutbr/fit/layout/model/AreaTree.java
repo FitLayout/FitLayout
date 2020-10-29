@@ -18,7 +18,7 @@ public interface AreaTree extends Artifact, SearchableAreaContainer
 {
 
     /**
-     * Gets the IRI of tha page the area tree was build from. This may be equal
+     * Gets the IRI of the page the area tree was build from. This may be equal
      * to the parent IRI when the tree was built from the page directly.
      * @return the source page IRI
      */

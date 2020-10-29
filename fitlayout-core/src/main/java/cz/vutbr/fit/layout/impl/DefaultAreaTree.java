@@ -54,6 +54,7 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
     public DefaultAreaTree(AreaTree src)
     {
         super(src.getParentIri());
+        setPageIri(src.getPageIri());
         root = src.getRoot();
     }
     

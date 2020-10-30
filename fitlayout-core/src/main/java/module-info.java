@@ -8,9 +8,13 @@ module cz.vutbr.fit.layout.core
     exports cz.vutbr.fit.layout.impl;
     exports cz.vutbr.fit.layout.model;
     exports cz.vutbr.fit.layout.ontology;
+    exports cz.vutbr.fit.layout.provider;
     
     uses cz.vutbr.fit.layout.api.ArtifactService;
     uses cz.vutbr.fit.layout.api.AreaTreeOperator;
     uses cz.vutbr.fit.layout.api.PageStorage;
     uses cz.vutbr.fit.layout.api.ScriptObject;
+    
+    provides cz.vutbr.fit.layout.api.ArtifactService
+        with cz.vutbr.fit.layout.provider.OperatorApplicationProvider;
 }

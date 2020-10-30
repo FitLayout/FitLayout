@@ -21,7 +21,6 @@ import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.ontology.BOX;
-import cz.vutbr.fit.layout.ontology.FL;
 import cz.vutbr.fit.layout.ontology.SEGM;
 
 /**
@@ -30,7 +29,7 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  * @author milicka
  * @author burgetr 
  */
-public class AreaModelBuilder implements ModelBuilder
+public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
 {
 	private ValueFactory vf;
 	
@@ -55,11 +54,8 @@ public class AreaModelBuilder implements ModelBuilder
         IRI pageNode = areaTree.getPageIri();
         Set<Tag> usedTags = new HashSet<Tag>();
 	    
-		graph.add(areaTreeNode, RDF.TYPE, SEGM.AreaTree);
-		graph.add(areaTreeNode, FL.createdOn, vf.createLiteral(new java.util.Date()));
+        addArtifactData(graph, areaTree);
 		graph.add(areaTreeNode, SEGM.hasSourcePage, pageNode);
-		if (areaTree.getParentIri() != null)
-		    graph.add(areaTreeNode, FL.hasParentArtifact, areaTree.getParentIri());
 		next_order = 0;
 		
 		addArea(areaTree.getRoot(), areaTreeNode, pageNode, usedTags, graph);

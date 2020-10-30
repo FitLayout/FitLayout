@@ -22,7 +22,6 @@ import cz.vutbr.fit.layout.model.ContentObject;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.ontology.BOX;
-import cz.vutbr.fit.layout.ontology.FL;
 
 /**
  * Implements an RDF graph construction from a page box model. 
@@ -30,7 +29,7 @@ import cz.vutbr.fit.layout.ontology.FL;
  * @author milicka
  * @author burgetr 
  */
-public class BoxModelBuilder implements ModelBuilder
+public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 {
 	private ValueFactory vf;
 	
@@ -54,12 +53,9 @@ public class BoxModelBuilder implements ModelBuilder
 	    Model graph = new LinkedHashModel(); // it holds whole model
 		next_order = 0;
 		
-		// inicialization with launch node
-		graph.add(pageNode, RDF.TYPE, BOX.Page);
-		graph.add(pageNode,	FL.createdOn, vf.createLiteral(new java.util.Date()));
+		// store basic page data
+		addArtifactData(graph, page);
 		graph.add(pageNode, BOX.sourceUrl, vf.createLiteral(baseUrl));
-        if (page.getParentIri() != null)
-            graph.add(pageNode, FL.hasParentArtifact, page.getParentIri());
 		if (page.getTitle() != null)
 		    graph.add(pageNode, BOX.hasTitle, vf.createLiteral(page.getTitle()));
 

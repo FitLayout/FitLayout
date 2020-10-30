@@ -6,7 +6,6 @@
 package cz.vutbr.fit.layout.rdf.model;
 
 import java.net.URL;
-import java.util.Date;
 import java.util.Map;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -20,7 +19,6 @@ import cz.vutbr.fit.layout.model.Page;
  */
 public class RDFPage extends DefaultPage implements RDFResource
 {
-    protected Date createdOn;
     protected Map<IRI, RDFBox> boxIris;
     
 
@@ -29,26 +27,10 @@ public class RDFPage extends DefaultPage implements RDFResource
         super(url);
     }
 
-    public RDFPage(URL url, Date createdOn)
-    {
-        super(url);
-        this.createdOn = createdOn;
-    }
-    
     public RDFPage(Page src, IRI pageIri)
     {
         super(src);
         setIri(pageIri);
-    }
-
-    public Date getCreatedOn()
-    {
-        return createdOn;
-    }
-
-    public void setCreatedOn(Date createdOn)
-    {
-        this.createdOn = createdOn;
     }
 
     public Map<IRI, RDFBox> getBoxIris()

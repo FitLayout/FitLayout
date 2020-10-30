@@ -5,12 +5,14 @@
  */
 package cz.vutbr.fit.layout.impl;
 
+import java.util.Date;
+
 import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.model.Artifact;
 
 /**
- * A common base class for all artifact implementations.
+ * A common base class for artifact implementations.
  * 
  * @author burgetr
  */
@@ -18,11 +20,15 @@ public abstract class BaseArtifact implements Artifact
 {
     private IRI iri;
     private IRI parentIri;
+    private Date createdOn;
+    private String creator;
+    private String creatorParams;
     
 
     public BaseArtifact(IRI parentIri)
     {
         this.parentIri = parentIri;
+        createdOn = new Date();
     }
 
     @Override
@@ -46,6 +52,36 @@ public abstract class BaseArtifact implements Artifact
     public void setParentIri(IRI parentIri)
     {
         this.parentIri = parentIri;
+    }
+
+    public Date getCreatedOn()
+    {
+        return createdOn;
+    }
+
+    public void setCreatedOn(Date createdOn)
+    {
+        this.createdOn = createdOn;
+    }
+
+    public String getCreator()
+    {
+        return creator;
+    }
+
+    public void setCreator(String creator)
+    {
+        this.creator = creator;
+    }
+
+    public String getCreatorParams()
+    {
+        return creatorParams;
+    }
+
+    public void setCreatorParams(String creatorParams)
+    {
+        this.creatorParams = creatorParams;
     }
 
     @Override

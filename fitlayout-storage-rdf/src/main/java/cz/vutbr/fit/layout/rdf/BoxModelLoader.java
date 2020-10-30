@@ -29,7 +29,6 @@ import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Box.Type;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.ontology.BOX;
-import cz.vutbr.fit.layout.ontology.FL;
 import cz.vutbr.fit.layout.rdf.model.RDFBox;
 import cz.vutbr.fit.layout.rdf.model.RDFContentImage;
 import cz.vutbr.fit.layout.rdf.model.RDFContentObject;
@@ -72,11 +71,8 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                     srcURL = null;
                 }
             }
-            RDFPage page = new RDFPage(srcURL, info.getDate());
-            page.setIri(info.getId());
-            page.setParentIri(getPredicateIriValue(pageModel, pageIri, FL.hasParentArtifact));
-            if (info.getTitle() != null)
-                page.setTitle(info.getTitle());
+            RDFPage page = new RDFPage(srcURL);
+            info.applyToPage(page);
             
             //load the models
             Model boxTreeModel = getBoxModelForPage(storage, pageIri);

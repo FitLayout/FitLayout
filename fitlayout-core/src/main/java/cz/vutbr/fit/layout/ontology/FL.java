@@ -36,17 +36,30 @@ public class FL {
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#createdOn}.
+	 * <p>
+	 * Creation date/time for an artifact or page set
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#createdOn">createdOn</a>
 	 */
 	public static final IRI createdOn;
 
 	/**
-	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#hasName}.
+	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#creator}.
+	 * <p>
+	 * An identification of the service that created an artifact.
 	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#hasName">hasName</a>
+	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#creator">creator</a>
 	 */
-	public static final IRI hasName;
+	public static final IRI creator;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#creatorParams}.
+	 * <p>
+	 * Parametres of the service used for creating an artifact.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#creatorParams">creatorParams</a>
+	 */
+	public static final IRI creatorParams;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#hasParentArtifact}.
@@ -72,7 +85,8 @@ public class FL {
 		Artifact = factory.createIRI(FL.NAMESPACE, "Artifact");
 		containsPage = factory.createIRI(FL.NAMESPACE, "containsPage");
 		createdOn = factory.createIRI(FL.NAMESPACE, "createdOn");
-		hasName = factory.createIRI(FL.NAMESPACE, "hasName");
+		creator = factory.createIRI(FL.NAMESPACE, "creator");
+		creatorParams = factory.createIRI(FL.NAMESPACE, "creatorParams");
 		hasParentArtifact = factory.createIRI(FL.NAMESPACE, "hasParentArtifact");
 		PageSet = factory.createIRI(FL.NAMESPACE, "PageSet");
 	}

@@ -252,20 +252,6 @@ public class BOX {
 	public static final IRI isChildOf;
 
 	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#Launch}.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#Launch">Launch</a>
-	 */
-	public static final IRI Launch;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#launchDatetime}.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#launchDatetime">launchDatetime</a>
-	 */
-	public static final IRI launchDatetime;
-
-	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#lineThrough}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#lineThrough">lineThrough</a>
@@ -392,8 +378,6 @@ public class BOX {
 		Image = factory.createIRI(BOX.NAMESPACE, "Image");
 		imageUrl = factory.createIRI(BOX.NAMESPACE, "imageUrl");
 		isChildOf = factory.createIRI(BOX.NAMESPACE, "isChildOf");
-		Launch = factory.createIRI(BOX.NAMESPACE, "Launch");
-		launchDatetime = factory.createIRI(BOX.NAMESPACE, "launchDatetime");
 		lineThrough = factory.createIRI(BOX.NAMESPACE, "lineThrough");
 		objectInformation = factory.createIRI(BOX.NAMESPACE, "objectInformation");
 		Page = factory.createIRI(BOX.NAMESPACE, "Page");

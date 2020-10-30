@@ -20,6 +20,7 @@ import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.query.Binding;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
@@ -56,7 +57,7 @@ public class RDFPageSetRepository
         ValueFactory vf = SimpleValueFactory.getInstance();
         IRI uri = RESOURCE.createPageSetURI(name);
         graph.add(uri, RDF.TYPE, FL.PageSet);
-        graph.add(uri, FL.hasName, vf.createLiteral(name));
+        graph.add(uri, RDFS.LABEL, vf.createLiteral(name));
         graph.add(uri, FL.createdOn, vf.createLiteral(new java.util.Date()));
         storage.insertGraph(graph);
     }
@@ -80,7 +81,7 @@ public class RDFPageSetRepository
         while (result.hasNext()) 
         {
             Statement st = result.next();
-            if (FL.hasName.equals(st.getPredicate()))
+            if (RDFS.LABEL.equals(st.getPredicate()))
                 ret.setName(st.getObject().stringValue());
             else if (FL.createdOn.equals(st.getPredicate()))
             {
@@ -209,7 +210,7 @@ public class RDFPageSetRepository
                 + " SELECT ?page ?tree ?date ?url ?title " 
                 + "WHERE {"
                 +     "?tree segm:sourcePage ?page . " 
-                +     "?page box:launchDatetime ?date . "
+                +     "?page box:createdOn ?date . "
                 +     "?page box:hasTitle ?title . "
                 +     "?page box:sourceUrl ?url" + contClause
                 + "} ORDER BY ?date ?page ?tree";

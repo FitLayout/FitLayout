@@ -56,7 +56,7 @@ public class BoxModelBuilder implements ModelBuilder
 		
 		// inicialization with launch node
 		graph.add(pageNode, RDF.TYPE, BOX.Page);
-		graph.add(pageNode,	BOX.launchDatetime,	vf.createLiteral(new java.util.Date()));
+		graph.add(pageNode,	FL.createdOn, vf.createLiteral(new java.util.Date()));
 		graph.add(pageNode, BOX.sourceUrl, vf.createLiteral(baseUrl));
         if (page.getParentIri() != null)
             graph.add(pageNode, FL.hasParentArtifact, page.getParentIri());

@@ -65,10 +65,11 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
         Model artifactModel = artifactRepo.getStorage().getSubjectModel(areaTreeIri);
         if (artifactModel.size() > 0)
         {
+            AreaTreeInfo atreeInfo = new AreaTreeInfo(artifactModel);
             IRI pageIri = getSourcePageIri(artifactModel, areaTreeIri);
             IRI parentIri = getPredicateIriValue(artifactModel, areaTreeIri, FL.hasParentArtifact);
             RDFAreaTree atree = new RDFAreaTree(parentIri, pageIri);
-            atree.setIri(areaTreeIri);
+            atreeInfo.applyToAreaTree(atree);
             //load the models
             Model areaModel = getAreaModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
             Model borderModel = getBorderModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);

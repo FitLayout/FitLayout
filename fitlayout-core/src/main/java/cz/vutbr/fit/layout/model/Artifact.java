@@ -5,6 +5,8 @@
  */
 package cz.vutbr.fit.layout.model;
 
+import java.util.Date;
+
 import org.eclipse.rdf4j.model.IRI;
 
 /**
@@ -38,5 +40,23 @@ public interface Artifact
      * @return the parent artifact IRI or {@code null} when this is an initial artifact.
      */
     public IRI getParentIri();
+    
+    /**
+     * The artifact creation date.
+     * @return the date/time of the artifact creation.
+     */
+    public Date getCreatedOn();
+
+    /**
+     * An identification of the service that created the artifact.
+     * @return a service ID string
+     */
+    public String getCreator();
+    
+    /**
+     * The parametres of the service used for creating the artifact.
+     * @return a service parameter string
+     */
+    public String getCreatorParams();
     
 }

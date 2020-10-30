@@ -56,6 +56,7 @@ public class AreaModelBuilder implements ModelBuilder
         Set<Tag> usedTags = new HashSet<Tag>();
 	    
 		graph.add(areaTreeNode, RDF.TYPE, SEGM.AreaTree);
+		graph.add(areaTreeNode, FL.createdOn, vf.createLiteral(new java.util.Date()));
 		graph.add(areaTreeNode, SEGM.hasSourcePage, pageNode);
 		if (areaTree.getParentIri() != null)
 		    graph.add(areaTreeNode, FL.hasParentArtifact, areaTree.getParentIri());

@@ -170,6 +170,7 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
     public Area createArea(Rectangular r)
     {
         DefaultArea ret = new DefaultArea(r);
+        ret.setAreaTree(this);
         ret.setPageIri(pageIri);
         return ret;
     }
@@ -178,6 +179,7 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
     public Area createArea(Box box)
     {
         DefaultArea ret = new DefaultArea(box);
+        ret.setAreaTree(this);
         ret.setPageIri(pageIri);
         return ret;
     }
@@ -186,6 +188,7 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
     public Area createArea(Area other)
     {
         DefaultArea ret = new DefaultArea(other);
+        ret.setAreaTree(this);
         ret.setPageIri(pageIri);
         return ret;
     }
@@ -194,6 +197,7 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
     public Area createArea(List<Box> boxes)
     {
         DefaultArea ret = new DefaultArea(boxes);
+        ret.setAreaTree(this);
         ret.setPageIri(pageIri);
         return ret;
     }

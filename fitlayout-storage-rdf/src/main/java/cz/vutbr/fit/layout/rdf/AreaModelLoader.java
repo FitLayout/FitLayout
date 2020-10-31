@@ -77,7 +77,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             Model tagSupportModel = getTagSupportModelForAreaTree(artifactRepo.getStorage(), areaTreeIri);
             //construct the tree
             Map<IRI, RDFArea> areaUris = new LinkedHashMap<IRI, RDFArea>();
-            RDFArea root = constructVisualAreaTree(artifactRepo, areaModel, borderModel, tagModel, tagSupportModel, areaTreeIri, areaUris);
+            RDFArea root = constructVisualAreaTree(artifactRepo, atree, areaModel, borderModel, tagModel, tagSupportModel, areaTreeIri, areaUris);
             recursiveUpdateTopologies(root);
             atree.setRoot(root);
             atree.setAreaIris(areaUris);
@@ -87,7 +87,8 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             return null;
     }
     
-    private RDFArea constructVisualAreaTree(RDFArtifactRepository artifactRepo, Model areaModel, Model borderModel, Model tagModel, Model tagSupportModel,
+    private RDFArea constructVisualAreaTree(RDFArtifactRepository artifactRepo, RDFAreaTree atree,
+            Model areaModel, Model borderModel, Model tagModel, Model tagSupportModel,
             IRI areaTreeIri, Map<IRI, RDFArea> areas) throws RepositoryException
     {
         //find all areas
@@ -96,6 +97,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             if (res instanceof IRI)
             {
                 RDFArea area = createAreaFromModel(artifactRepo, areaModel, borderModel, tagModel, tagSupportModel, areaTreeIri, (IRI) res);
+                area.setAreaTree(atree);
                 areas.put((IRI) res, area);
             }
         }

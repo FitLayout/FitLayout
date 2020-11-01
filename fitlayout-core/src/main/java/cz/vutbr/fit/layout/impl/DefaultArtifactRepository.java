@@ -14,6 +14,7 @@ import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 import cz.vutbr.fit.layout.api.ArtifactRepository;
+import cz.vutbr.fit.layout.api.IRIDecoder;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.LogicalAreaTree;
@@ -29,12 +30,14 @@ public class DefaultArtifactRepository implements ArtifactRepository
     private static ValueFactory vf = SimpleValueFactory.getInstance();
 
     private int idCounter;
+    private IRIDecoder iriDecoder;
     private Map<IRI, Artifact> repo;
     
 
     public DefaultArtifactRepository()
     {
         idCounter = 1;
+        iriDecoder = new DefaultIRIDecoder();
         repo = new HashMap<>();
     }
 
@@ -84,6 +87,12 @@ public class DefaultArtifactRepository implements ArtifactRepository
     public void clear()
     {
         repo.clear();
+    }
+
+    @Override
+    public IRIDecoder getIriDecoder()
+    {
+        return iriDecoder;
     }
 
 }

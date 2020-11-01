@@ -51,12 +51,12 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
     public Artifact loadArtifact(IRI artifactIri, RDFArtifactRepository artifactRepo)
             throws RepositoryException
     {
-        return constructPage(artifactRepo.getStorage(), artifactIri);
+        return constructPage(artifactRepo, artifactIri);
     }
 
-    private RDFPage constructPage(RDFStorage storage, IRI pageIri) throws RepositoryException
+    private RDFPage constructPage(RDFArtifactRepository artifactRepo, IRI pageIri) throws RepositoryException
     {
-        Model pageModel = storage.getSubjectModel(pageIri);
+        Model pageModel = artifactRepo.getStorage().getSubjectModel(pageIri);
         if (pageModel.size() > 0)
         {
             //create the page
@@ -75,12 +75,12 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             info.applyToPage(page);
             
             //load the models
-            Model boxTreeModel = getBoxModelForPage(storage, pageIri);
-            Model borderModel = getBorderModelForPage(storage, pageIri);
-            Model attributeModel = getAttributeModelForPage(storage, pageIri);
+            Model boxTreeModel = getBoxModelForPage(artifactRepo, pageIri);
+            Model borderModel = getBorderModelForPage(artifactRepo, pageIri);
+            Model attributeModel = getAttributeModelForPage(artifactRepo, pageIri);
             //create the box tree
             Map<IRI, RDFBox> boxes = new LinkedHashMap<IRI, RDFBox>();
-            RDFBox root = constructBoxTree(storage, boxTreeModel, borderModel, attributeModel, pageIri, boxes); 
+            RDFBox root = constructBoxTree(artifactRepo.getStorage(), boxTreeModel, borderModel, attributeModel, pageIri, boxes); 
             page.setRoot(root);
             page.setBoxIris(boxes);
             page.setWidth(root.getWidth());
@@ -338,15 +338,15 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
      * @return
      * @throws RepositoryException 
      */
-    private Model getBoxModelForPage(RDFStorage storage, IRI pageIri) throws RepositoryException
+    private Model getBoxModelForPage(RDFArtifactRepository artifactRepo, IRI pageIri) throws RepositoryException
     {
-        final String query = storage.declarePrefixes()
+        final String query = artifactRepo.getIriDecoder().declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
                 + "?s rdf:type box:Box . "
                 + "?s box:documentOrder ?ord . "
                 + "?s box:belongsTo <" + pageIri.toString() + ">}"
                 + " ORDER BY ?ord";
-        return storage.executeSafeQuery(query);
+        return artifactRepo.getStorage().executeSafeQuery(query);
     }
     
     /**
@@ -356,14 +356,14 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
      * @return
      * @throws RepositoryException 
      */
-    private Model getBorderModelForPage(RDFStorage storage, IRI pageIri) throws RepositoryException
+    private Model getBorderModelForPage(RDFArtifactRepository artifactRepo, IRI pageIri) throws RepositoryException
     {
-        final String query = storage.declarePrefixes()
+        final String query = artifactRepo.getIriDecoder().declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o . "
                 + "?b rdf:type box:Box . " 
                 + "?b box:belongsTo <" + pageIri.toString() + "> . "
                 + "{?b box:hasTopBorder ?s} UNION {?b box:hasRightBorder ?s} UNION {?b box:hasBottomBorder ?s} UNION {?b box:hasLeftBorder ?s}}";
-        return storage.executeSafeQuery(query);
+        return artifactRepo.getStorage().executeSafeQuery(query);
     }
     
     /**
@@ -373,13 +373,13 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
      * @return
      * @throws RepositoryException 
      */
-    private Model getAttributeModelForPage(RDFStorage storage, IRI pageIri) throws RepositoryException
+    private Model getAttributeModelForPage(RDFArtifactRepository artifactRepo, IRI pageIri) throws RepositoryException
     {
-        final String query = storage.declarePrefixes()
+        final String query = artifactRepo.getIriDecoder().declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o . "
                 + "?b rdf:type box:Box . " 
                 + "?b box:belongsTo <" + pageIri.toString() + "> . "
                 + "?b box:hasAttribute ?s}";
-        return storage.executeSafeQuery(query);
+        return artifactRepo.getStorage().executeSafeQuery(query);
     }
 }

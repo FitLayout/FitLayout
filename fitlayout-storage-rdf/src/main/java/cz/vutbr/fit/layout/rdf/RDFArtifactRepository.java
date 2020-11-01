@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.api.ArtifactRepository;
+import cz.vutbr.fit.layout.api.IRIDecoder;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.SEGM;
@@ -38,6 +39,7 @@ public class RDFArtifactRepository implements ArtifactRepository
     private static Logger log = LoggerFactory.getLogger(RDFArtifactRepository.class);
     
     private RDFStorage storage;
+    private RDFIRIDecoder iriDecoder;
     private Map<IRI, ModelBuilder> modelBuilders;
     private Map<IRI, ModelLoader> modelLoaders;
 
@@ -45,6 +47,7 @@ public class RDFArtifactRepository implements ArtifactRepository
     public RDFArtifactRepository(RDFStorage storage)
     {
         this.storage = storage;
+        iriDecoder = new RDFIRIDecoder();
         modelBuilders = new HashMap<>();
         modelLoaders = new HashMap<>();
         initDefaultModelBuilders();
@@ -55,12 +58,18 @@ public class RDFArtifactRepository implements ArtifactRepository
         return storage;
     }
 
+    @Override
+    public IRIDecoder getIriDecoder()
+    {
+        return iriDecoder;
+    }
+
     //Artifact functions =============================================================
     
     @Override
     public Collection<IRI> getArtifactIRIs() throws RepositoryException
     {
-        final String query = storage.declarePrefixes()
+        final String query = iriDecoder.declarePrefixes()
                 + "SELECT ?pg "
                 + "WHERE {"
                 + "  ?pg rdf:type ?type . "

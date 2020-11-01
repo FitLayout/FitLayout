@@ -57,4 +57,10 @@ public interface ArtifactRepository
      */
     public void clear();
     
+    /**
+     * Gets an IRI encoder / decoder usable with this repository.
+     * @return
+     */
+    public IRIDecoder getIriDecoder();
+
 }

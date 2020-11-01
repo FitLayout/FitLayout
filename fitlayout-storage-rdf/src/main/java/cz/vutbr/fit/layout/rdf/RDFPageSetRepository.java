@@ -103,7 +103,7 @@ public class RDFPageSetRepository
     
     public List<IRI> getPagesForPageSet(IRI pageSetUri) throws RepositoryException
     {
-        final String query = storage.declarePrefixes()
+        final String query = artRepo.getIriDecoder().declarePrefixes()
                 + "SELECT ?uri "
                 + "WHERE {"
                 + "  <" + pageSetUri.toString() + "> layout:containsPage ?uri . "
@@ -165,7 +165,7 @@ public class RDFPageSetRepository
      */
     public Set<IRI> getOrphanedPages() throws RepositoryException
     {
-        final String query = storage.declarePrefixes()
+        final String query = artRepo.getIriDecoder().declarePrefixes()
                 + "SELECT ?pg "
                 + "WHERE {"
                 + "  ?pg rdf:type box:Page "
@@ -206,7 +206,7 @@ public class RDFPageSetRepository
             IRI pageSetUri = RESOURCE.createPageSetURI(psetName);
             contClause = " . <" + pageSetUri.toString() + "> layout:containsPage ?page";
         }
-        final String query = storage.declarePrefixes()
+        final String query = artRepo.getIriDecoder().declarePrefixes()
                 + " SELECT ?page ?tree ?date ?url ?title " 
                 + "WHERE {"
                 +     "?tree segm:sourcePage ?page . " 

@@ -3,9 +3,7 @@ package cz.vutbr.fit.layout.rdf;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -35,9 +33,6 @@ import org.eclipse.rdf4j.rio.RDFParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.vutbr.fit.layout.ontology.BOX;
-import cz.vutbr.fit.layout.ontology.FL;
-import cz.vutbr.fit.layout.ontology.SEGM;
 import cz.vutbr.fit.layout.rdf.io.RDFConnector;
 import cz.vutbr.fit.layout.rdf.io.RDFConnectorHTTP;
 import cz.vutbr.fit.layout.rdf.io.RDFConnectorMemory;
@@ -55,8 +50,6 @@ public class RDFStorage implements Closeable
     private static Logger log = LoggerFactory.getLogger(RDFStorage.class);
     
 	private RDFConnector db;
-    private Map<String, String> prefixUris; // prefix -> URI
-    private Map<String, String> uriPrefixes; // URI -> prefix
 
 	/**
 	 * Use the create functions for creating the instances.
@@ -65,9 +58,6 @@ public class RDFStorage implements Closeable
 	protected RDFStorage(RDFConnector connector) throws RepositoryException
 	{
 	    db = connector;
-	    prefixUris = new HashMap<>();
-	    uriPrefixes = new HashMap<>();
-	    initPrefixes();
 	}
 	
 	public static RDFStorage createMemory(String dataDir)
@@ -112,10 +102,9 @@ public class RDFStorage implements Closeable
 	    db.closeConnection();
 	}
 
-	
     //= Low-level repository functions ==============================================================================
 	
-	/**
+    /**
 	 * Obtains all statements for the specific subject.
 	 * (gets all triples for specific node)
 	 * 
@@ -406,99 +395,4 @@ public class RDFStorage implements Closeable
         return val;
     }
     
-    //= Prefixes =======================================================================
-    
-    protected void initPrefixes()
-    {
-        addPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        addPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-        addPrefix("box", BOX.NAMESPACE);
-        addPrefix("segm", SEGM.NAMESPACE);
-        addPrefix("layout", FL.NAMESPACE);
-        addPrefix("r", RESOURCE.NAMESPACE);
-    }
-    
-    /**
-     * Adds a new prefix to be used.
-     * @param prefix the prefix string
-     * @param uri the corresponding IRI prefix
-     */
-    public void addPrefix(String prefix, String uri)
-    {
-        prefixUris.put(prefix, uri);
-        uriPrefixes.put(uri, prefix);
-    }
-    
-    /**
-     * Gets a map that assigns uris to prefix names.
-     * @return the map
-     */
-    public Map<String, String> getPrefixUris()
-    {
-        return prefixUris;
-    }
-    
-    /**
-     * Gets a map that assigns prefix names to uris.
-     * @return the map
-     */
-    public Map<String, String> getUriPrefixes()
-    {
-        return uriPrefixes;
-    }
-    
-    /**
-     * Gets the prefix declaration string (e.g. for SPARQL) containing the currenly defined prefixes.
-     * @return the prefix declaration string
-     */
-    public String declarePrefixes()
-    {
-        StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, String> entry : prefixUris.entrySet())
-        {
-            sb.append("PREFIX ")
-                .append(entry.getKey()).append(": <")
-                .append(entry.getValue()).append("> ");
-        }
-        return sb.toString();
-    }
-    
-    /**
-     * Converts an IRI to a prefixed string.
-     * @param iri
-     * @return
-     */
-    public String encodeIri(IRI iri)
-    {
-        String ret = iri.toString();
-        for (Map.Entry<String, String> entry : uriPrefixes.entrySet())
-        {
-            if (ret.startsWith(entry.getKey()))
-            {
-                ret = ret.replace(entry.getKey(), entry.getValue() + ":");
-                break;
-            }
-        }
-        return ret;
-    }
-    
-    /**
-     * Converts a prefixed string to an IRI
-     * @param shortIri
-     * @return
-     */
-    public IRI decodeIri(String shortIri) throws IllegalArgumentException
-    {
-        String ret = shortIri;
-        for (Map.Entry<String, String> entry : prefixUris.entrySet())
-        {
-            if (ret.startsWith(entry.getKey() + ":"))
-            {
-                ret = ret.replace(entry.getKey() + ":", entry.getValue());
-                break;
-            }
-        }
-        ValueFactory vf = SimpleValueFactory.getInstance();
-        return vf.createIRI(ret);
-    }
 }

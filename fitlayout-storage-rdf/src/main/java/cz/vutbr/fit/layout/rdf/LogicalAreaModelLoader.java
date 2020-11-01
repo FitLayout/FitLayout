@@ -49,7 +49,7 @@ public class LogicalAreaModelLoader implements ModelLoader
     
     private LogicalAreaTree constructLogicalAreaTree(RDFArtifactRepository artifactRepo, IRI logicalTreeIri) throws RepositoryException
     {
-        Model model = getLogicalAreaModelForAreaTree(artifactRepo.getStorage(), logicalTreeIri);
+        Model model = getLogicalAreaModelForAreaTree(artifactRepo, logicalTreeIri);
         if (model.size() > 0)
         {
             IRI areaTreeIri = getSourceAreaTreeIri(model, logicalTreeIri);
@@ -120,7 +120,7 @@ public class LogicalAreaModelLoader implements ModelLoader
                 if (value instanceof IRI)
                 {
                     if (tagInfoModel == null)
-                        tagInfoModel = getTagModelForAreaTree(artifactRepo.getStorage(), treeIri);
+                        tagInfoModel = getTagModelForAreaTree(artifactRepo, treeIri);
                     Tag tag = createTag(tagInfoModel, (IRI) value);
                     if (tag != null)
                         area.setMainTag(tag);
@@ -175,15 +175,15 @@ public class LogicalAreaModelLoader implements ModelLoader
      * @return A Model containing the triplets for all the visual areas contained in the given area tree.
      * @throws RepositoryException 
      */
-    private Model getLogicalAreaModelForAreaTree(RDFStorage storage, IRI logicalTreeIri) throws RepositoryException
+    private Model getLogicalAreaModelForAreaTree(RDFArtifactRepository artifactRepo, IRI logicalTreeIri) throws RepositoryException
     {
-        final String query = storage.declarePrefixes()
+        final String query = artifactRepo.getIriDecoder().declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
                 + "?s rdf:type segm:LogicalArea . "
                 + "?s box:documentOrder ?ord . "
                 + "?s segm:belongsTo <" + logicalTreeIri.stringValue() + "> }" //TODO is belongsTo correct?
                 + " ORDER BY ?ord";
-        return storage.executeSafeQuery(query);
+        return artifactRepo.getStorage().executeSafeQuery(query);
     }
     
     /**
@@ -192,14 +192,14 @@ public class LogicalAreaModelLoader implements ModelLoader
      * @return A Model containing the triplets for all tags of the visual areas contained in the given area tree.
      * @throws RepositoryException 
      */
-    private Model getTagModelForAreaTree(RDFStorage storage, IRI areaTreeIri) throws RepositoryException
+    private Model getTagModelForAreaTree(RDFArtifactRepository artifactRepo, IRI areaTreeIri) throws RepositoryException
     {
-        final String query = storage.declarePrefixes()
+        final String query = artifactRepo.getIriDecoder().declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
                 + "?a rdf:type segm:LogicalArea . "
                 + "?a segm:hasTag ?s . "
                 + "?a segm:belongsTo <" + areaTreeIri.stringValue() + "> }";
-        return storage.executeSafeQuery(query);
+        return artifactRepo.getStorage().executeSafeQuery(query);
     }
 
     /**

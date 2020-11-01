@@ -5,11 +5,11 @@
  */
 package cz.vutbr.fit.layout.rdf;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
@@ -70,15 +70,16 @@ public class RDFArtifactRepository implements ArtifactRepository
     public Collection<IRI> getArtifactIRIs() throws RepositoryException
     {
         final String query = iriDecoder.declarePrefixes()
-                + "SELECT ?pg "
+                + "SELECT DISTINCT ?pg "
                 + "WHERE {"
                 + "  ?pg rdf:type ?type . "
-                + "  ?type rdfs:subClassOf layout:Artifact "
-                + "}";
+                + "  ?type rdfs:subClassOf layout:Artifact . "
+                + "  OPTIONAL { ?pg layout:createdOn ?time } "
+                + "} ORDER BY ?time";
         
         log.debug("QUERY: {}", query);
         TupleQueryResult data = storage.executeSafeTupleQuery(query);
-        Set<IRI> ret = new HashSet<IRI>();
+        List<IRI> ret = new ArrayList<IRI>();
         try
         {
             while (data.hasNext())

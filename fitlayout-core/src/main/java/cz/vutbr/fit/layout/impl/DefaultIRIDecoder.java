@@ -44,7 +44,7 @@ public class DefaultIRIDecoder implements IRIDecoder
         addPrefix("rdfs", RDFS.NAMESPACE);
         addPrefix("box", BOX.NAMESPACE);
         addPrefix("segm", SEGM.NAMESPACE);
-        addPrefix("layout", FL.NAMESPACE);
+        addPrefix("fl", FL.NAMESPACE);
     }
     
     /**

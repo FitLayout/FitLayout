@@ -73,8 +73,8 @@ public class RDFArtifactRepository implements ArtifactRepository
                 + "SELECT DISTINCT ?pg "
                 + "WHERE {"
                 + "  ?pg rdf:type ?type . "
-                + "  ?type rdfs:subClassOf layout:Artifact . "
-                + "  OPTIONAL { ?pg layout:createdOn ?time } "
+                + "  ?type rdfs:subClassOf fl:Artifact . "
+                + "  OPTIONAL { ?pg fl:createdOn ?time } "
                 + "} ORDER BY ?time";
         
         log.debug("QUERY: {}", query);

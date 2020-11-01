@@ -106,7 +106,7 @@ public class RDFPageSetRepository
         final String query = artRepo.getIriDecoder().declarePrefixes()
                 + "SELECT ?uri "
                 + "WHERE {"
-                + "  <" + pageSetUri.toString() + "> layout:containsPage ?uri . "
+                + "  <" + pageSetUri.toString() + "> fl:containsPage ?uri . "
                 + "  ?uri rdf:type box:Page "
                 + "}";
         System.out.println("QUERY: " + query);
@@ -169,7 +169,7 @@ public class RDFPageSetRepository
                 + "SELECT ?pg "
                 + "WHERE {"
                 + "  ?pg rdf:type box:Page "
-                + "  OPTIONAL { ?set layout:containsPage ?pg } "
+                + "  OPTIONAL { ?set fl:containsPage ?pg } "
                 + "  FILTER ( !BOUND(?set) ) "
                 + "}";
         
@@ -204,7 +204,7 @@ public class RDFPageSetRepository
         if (psetName != null)
         {
             IRI pageSetUri = RESOURCE.createPageSetURI(psetName);
-            contClause = " . <" + pageSetUri.toString() + "> layout:containsPage ?page";
+            contClause = " . <" + pageSetUri.toString() + "> fl:containsPage ?page";
         }
         final String query = artRepo.getIriDecoder().declarePrefixes()
                 + " SELECT ?page ?tree ?date ?url ?title " 

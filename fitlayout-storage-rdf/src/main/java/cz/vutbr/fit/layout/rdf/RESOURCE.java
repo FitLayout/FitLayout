@@ -22,7 +22,7 @@ import cz.vutbr.fit.layout.model.Tag;
 public class RESOURCE
 {
     public static final String NAMESPACE = "http://fitlayout.github.io/resource/";
-    public static final String PREFIX = "flr";
+    public static final String PREFIX = "r";
 
     private static final ValueFactory factory = SimpleValueFactory.getInstance();
     

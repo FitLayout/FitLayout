@@ -125,6 +125,8 @@ public class OperatorApplicationProvider extends  BaseArtifactService
         Area root = new DefaultArea(input.getRoot());
         recursiveCopyChildren(root, input.getRoot());
         ret.setParentIri(input.getIri()); //the new tree is the child artifact of the original tree
+        ret.setCreator(getId());
+        ret.setCreatorParams(getOperatorDescription());
         
         // apply operators
         for (AreaTreeOperator op : getOperators())
@@ -143,6 +145,19 @@ public class OperatorApplicationProvider extends  BaseArtifactService
             destArea.appendChild(dest);
             recursiveCopyChildren(dest, src);
         }
+    }
+    
+    private String getOperatorDescription()
+    {
+        StringBuilder ret = new StringBuilder();
+        for (AreaTreeOperator op : getOperators())
+        {
+            if (ret.length() != 0)
+                ret.append(" + ");
+            ret.append(op.getId());
+            ret.append('(').append(op.getParamString()).append(')');
+        }
+        return ret.toString();
     }
     
 }

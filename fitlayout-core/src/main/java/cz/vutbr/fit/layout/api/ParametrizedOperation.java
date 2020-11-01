@@ -36,4 +36,10 @@ public interface ParametrizedOperation
      */
     public Object getParam(String name);
     
+    /**
+     * Creates a string of parameters and their values.
+     * @return A string of the form: name1=value1 name2=value2 ...
+     */
+    public String getParamString();
+    
 }

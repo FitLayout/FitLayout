@@ -17,6 +17,7 @@ import org.xml.sax.SAXException;
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.cssbox.impl.CSSBoxTreeBuilder;
+import cz.vutbr.fit.layout.cssbox.impl.PageImpl;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.impl.ParameterBoolean;
 import cz.vutbr.fit.layout.impl.ParameterFloat;
@@ -84,7 +85,7 @@ public class CSSBoxTreeProvider extends BaseArtifactService
     @Override
     public List<Parameter> defineParams()
     {
-        List<Parameter> ret = new ArrayList<>(5);
+        List<Parameter> ret = new ArrayList<>(6);
         ret.add(new ParameterString("url", 0, 64));
         ret.add(new ParameterInt("width", 10, 9999));
         ret.add(new ParameterInt("height", 10, 9999));
@@ -191,7 +192,9 @@ public class CSSBoxTreeProvider extends BaseArtifactService
         builder = new CSSBoxTreeBuilder(new Dimension(width, height), useVisualBounds, preserveAux, replaceImagesWithAlt);
         builder.setZoom(zoom);
         builder.parse(urlstring);
-        Page page = builder.getPage();
+        PageImpl page = (PageImpl) builder.getPage();
+        page.setCreator(getId());
+        page.setCreatorParams(getParamString());
         IRI pageIri = getServiceManager().getArtifactRepository().createArtifactIri(page);
         page.setIri(pageIri);
         return page;

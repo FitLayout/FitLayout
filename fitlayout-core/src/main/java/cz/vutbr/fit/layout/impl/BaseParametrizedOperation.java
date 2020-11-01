@@ -134,5 +134,24 @@ public abstract class BaseParametrizedOperation extends BaseService implements P
             return null;
         }
     }
+    
+    /**
+     * Creates a string of parameters and their values.
+     * @return A string of the form: name1=value1 name2=value2 ...
+     */
+    @Override
+    public String getParamString()
+    {
+        StringBuilder ret = new StringBuilder();
+        for (Parameter param : getParams())
+        {
+            if (ret.length() != 0)
+                ret.append(' ');
+            Object val = getParam(param.getName());
+            if (val != null)
+                ret.append(param.getName()).append('=').append(val.toString());
+        }
+        return ret.toString();
+    }
 
 }

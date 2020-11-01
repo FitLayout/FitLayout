@@ -85,6 +85,8 @@ public class Provider extends BaseArtifactService
         atree.setParentIri(page.getIri());
         IRI atreeIri = getServiceManager().getArtifactRepository().createArtifactIri(page);
         atree.setIri(atreeIri);
+        atree.setCreator(getId());
+        atree.setCreatorParams(getParamString());
         return atree; 
     }
 

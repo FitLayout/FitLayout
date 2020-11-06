@@ -93,8 +93,7 @@ public class DefaultTreeNode<T extends GenericTreeNode<T>> implements GenericTre
         return (getChildCount() == 0);
     }
 
-    @Override
-    public void appendChild(T child)
+    private void addChild(T child)
     {
         if (child.getParent() != null)
             child.getParent().removeChild(child);
@@ -102,12 +101,20 @@ public class DefaultTreeNode<T extends GenericTreeNode<T>> implements GenericTre
         child.setRoot(getRoot());
         children.add(child);
     }
+    
+    @Override
+    public void appendChild(T child)
+    {
+        addChild(child);
+        childrenChanged();
+    }
 
     @Override
     public void appendChildren(List<T> list)
     {
         for (T child : list)
-            appendChild(child);
+            addChild(child);
+        childrenChanged();
     }
     
     @Override
@@ -118,6 +125,7 @@ public class DefaultTreeNode<T extends GenericTreeNode<T>> implements GenericTre
             child.getParent().removeChild(child);
         child.setParent(myself);
         children.add(index, child);
+        childrenChanged();
     }
 
     @Override
@@ -129,6 +137,7 @@ public class DefaultTreeNode<T extends GenericTreeNode<T>> implements GenericTre
             child.setRoot(child);
         }
         children.clear();
+        childrenChanged();
     }
 
     @Override
@@ -138,6 +147,7 @@ public class DefaultTreeNode<T extends GenericTreeNode<T>> implements GenericTre
         child.setParent(null);
         child.setRoot(child);
         children.remove(index);
+        childrenChanged();
     }
 
     @Override
@@ -147,6 +157,7 @@ public class DefaultTreeNode<T extends GenericTreeNode<T>> implements GenericTre
         {
             child.setParent(null);
             child.setRoot(child);
+            childrenChanged();
         }
         else
             throw new IllegalArgumentException("Given node is not a child of this node");
@@ -240,5 +251,13 @@ public class DefaultTreeNode<T extends GenericTreeNode<T>> implements GenericTre
         }
     }
     
+    /**
+     * This method is called after some child nodes have been added or removed.
+     * Subclasses may override this method in order to update their own internal structures.
+     */
+    protected void childrenChanged()
+    {
+        //do nothing by default
+    }
     
 }

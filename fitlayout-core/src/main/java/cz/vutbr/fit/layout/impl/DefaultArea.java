@@ -119,7 +119,16 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
             addBox(box); //expands the content bounds appropriately
         setBounds(new Rectangular(contentBounds));
     }
-    
+
+    @Override
+    protected void childrenChanged()
+    {
+        super.childrenChanged();
+        //update the topologies and style statistics when some child areas are added or removed
+        invalidateTopology();
+        recomputeTextStyle();
+    }
+
     /**
      * Sets the name of the area. The name is used when the area information is displayed
      * using <code>toString()</code>
@@ -237,44 +246,16 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
     @Override
     public void appendChild(Area child)
     {
-        invalidateTopology();
         child.setAreaTree(areaTree);
         super.appendChild(child);
         getBounds().expandToEnclose(child.getBounds());
-        recomputeTextStyle();
     }
     
     @Override
     public void insertChild(Area child, int index)
             throws IndexOutOfBoundsException
     {
-        invalidateTopology();
         super.insertChild(child, index);
-        recomputeTextStyle();
-    }
-
-    @Override
-    public void removeAllChildren()
-    {
-        invalidateTopology();
-        super.removeAllChildren();
-        recomputeTextStyle();
-    }
-
-    @Override
-    public void removeChild(int index) throws IndexOutOfBoundsException
-    {
-        invalidateTopology();
-        super.removeChild(index);
-        recomputeTextStyle();
-    }
-
-    @Override
-    public void removeChild(Area child) throws IllegalArgumentException
-    {
-        invalidateTopology();
-        super.removeChild(child);
-        recomputeTextStyle();
     }
 
     @Override

@@ -243,6 +243,13 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
         this.efficientBackground = bgcolor;
     }
     
+    @Override
+    protected void childrenChanged()
+    {
+        super.childrenChanged();
+        recomputeTextStyle();
+    }
+
     //===================================================================================
 
 
@@ -1009,10 +1016,20 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
     public TextStyle getTextStyle()
     {
         if (textStyle == null)
+            recomputeTextStyle();
+        return textStyle;
+    }
+
+    protected void recomputeTextStyle()
+    {
+        if (textStyle == null)
+            textStyle = new TextStyle();
+        else
+            textStyle.reset();
+        
+        if (isLeaf())
         {
             int len = getText().trim().length();
-            
-            textStyle = new TextStyle();
             textStyle.setFontSizeSum(getIntrinsicFontSize() * len);
             textStyle.setFontWeightSum(getIntrinsicFontWeight() * len);
             textStyle.setFontStyleSum(getIntrinsicFontStyle() * len);
@@ -1020,7 +1037,13 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
             textStyle.setLineThroughSum(getIntrinsicLineThrough() * len);
             textStyle.setContentLength(len);
         }
-        return textStyle;
+        else
+        {
+            for (cz.vutbr.fit.layout.model.Box box : getChildren())
+            {
+                textStyle.updateAverages(box.getTextStyle());
+            }
+        }
     }
     
     public float getIntrinsicFontSize()

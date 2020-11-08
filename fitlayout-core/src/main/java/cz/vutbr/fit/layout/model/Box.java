@@ -7,7 +7,6 @@ package cz.vutbr.fit.layout.model;
 
 import java.util.Map;
 
-import cz.vutbr.fit.layout.impl.DefaultBoxTreeBuilder;
 
 /**
  * This class represents a box in the rendered page tree. It may contain a text or a content
@@ -72,7 +71,7 @@ public interface Box extends ContentRect, GenericTreeNode<Box>
     /**
      * Returns the bounds of the box as obtained from the renderer. This should correspond to the
      * border bounds of the box in the CSS terminology. This value is used when a box tree is
-     * being constructed from individual boxes obtained from the renderer (e.g. using {@link DefaultBoxTreeBuilder}).
+     * being constructed from individual boxes obtained from the renderer (e.g. using {@link BaseBoxTreeBuilder}).
      * The renturned value may be {@code null} when the box was not obtained by rendering
      * (e.g. a box tree loaded from the storage).
      * @return the intrinsic bounds of the box or {@code null} when not available

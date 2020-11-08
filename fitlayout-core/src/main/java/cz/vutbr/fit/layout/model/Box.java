@@ -7,6 +7,8 @@ package cz.vutbr.fit.layout.model;
 
 import java.util.Map;
 
+import cz.vutbr.fit.layout.impl.DefaultBoxTreeBuilder;
+
 /**
  * This class represents a box in the rendered page tree. It may contain a text or a content
  * object (e.g. an image).
@@ -16,6 +18,13 @@ import java.util.Map;
 public interface Box extends ContentRect, GenericTreeNode<Box>
 {
 
+    /**
+     * Gets the order of precedence of the box in the page. A box that precedes another box in the
+     * page must have a lower order number.
+     * @return the document order for the box
+     */
+    public int getOrder();
+    
     /**
      * Obtains the box text color.
      * @return the text color
@@ -52,10 +61,28 @@ public interface Box extends ContentRect, GenericTreeNode<Box>
     // BOUNDS
     //=============================================================================================
     
+    /**
+     * Gets the parent box of this box as obtained from the renderer. 
+     * The renturned value may be {@code null} when the box was not obtained by rendering
+     * (e.g. a box tree loaded from the storage).
+     * @return the intrinsic parent box or {@code null}
+     */
+    public Box getIntrinsicParent();
+    
+    /**
+     * Returns the bounds of the box as obtained from the renderer. This should correspond to the
+     * border bounds of the box in the CSS terminology. This value is used when a box tree is
+     * being constructed from individual boxes obtained from the renderer (e.g. using {@link DefaultBoxTreeBuilder}).
+     * The renturned value may be {@code null} when the box was not obtained by rendering
+     * (e.g. a box tree loaded from the storage).
+     * @return the intrinsic bounds of the box or {@code null} when not available
+     */
+    public Rectangular getIntrinsicBounds();
+    
     /** 
-     * Returns the logical bounds of the box node. Normally, the bounds are the same
-     * as the content bounds. However, the BoxNode may be extended
-     * in order to enclose all the overlapping boxes
+     * Returns the logical bounds of the box. Normally, the bounds are the same
+     * as the content bounds. However, the Box may be extended
+     * in order to enclose all the overlapping boxes.
      * @return the logical bounds of the box
      */
     public Rectangular getBounds();
@@ -69,11 +96,23 @@ public interface Box extends ContentRect, GenericTreeNode<Box>
     public Rectangular getContentBounds();
 
     /**
+     * Sets the content bounds of the box.
+     * @param visualBounds the new content bounds.
+     */
+    public void setContentBounds(Rectangular contentBounds);
+    
+    /**
      * Returns the bounds of the box as they visually appear to the user.
      * @return the visual bounds
      */
     public Rectangular getVisualBounds();
 
+    /**
+     * Sets the visual bounds of the box.
+     * @param visualBounds the new visual bounds.
+     */
+    public void setVisualBounds(Rectangular visualBounds);
+    
     /**
      * Returns the bounds of a substring of the own text of the box starting at {@code startPos} and ending at {@code endPos}.
      * @param startPos the starting position in the own text of the box (as obtained by )
@@ -87,6 +126,13 @@ public interface Box extends ContentRect, GenericTreeNode<Box>
      * @return {@code true} when the box is visible
      */
     public boolean isVisible();
+    
+    /**
+     * Checks if the box is separated from other contents by some visual means: a visible border
+     * at any side, visible background different from its parent or a visible content.
+     * @return {@code true} if the box is visually separated
+     */
+    public boolean isVisuallySeparated();
 
     //=============================================================================================
     // BOX TYPE

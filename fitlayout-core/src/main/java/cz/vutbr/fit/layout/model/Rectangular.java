@@ -189,7 +189,7 @@ public class Rectangular implements Rect
     {
         if (obj instanceof Rectangular)
         {
-            Rectangular r = (Rectangular) obj;
+            final Rectangular r = (Rectangular) obj;
             return r.x1 == x1 && r.y1 == y1 && r.x2 == x2 && r.y2 == y2;
         }
         else

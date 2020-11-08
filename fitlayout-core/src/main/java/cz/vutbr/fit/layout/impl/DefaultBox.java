@@ -21,15 +21,19 @@ import cz.vutbr.fit.layout.model.Rectangular;
  */
 public class DefaultBox extends DefaultContentRect<Box> implements Box
 {
+    private int order;
+    
     private boolean visible;
     private Color color;
     private String fontFamily;
     private String text;
     private ContentObject contentObject;
     
+    private Rectangular intrinsicBounds;
     private Rectangular contentBounds;
     private Rectangular visualBounds;
     
+    private Box intrinsicParent;
     private int sourceNodeId;
     private String tagName;
     private Map<String, String> attributes;
@@ -63,6 +67,16 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
         displayType = src.displayType;
     }
     
+    public int getOrder()
+    {
+        return order;
+    }
+
+    public void setOrder(int order)
+    {
+        this.order = order;
+    }
+
     @Override
     public boolean isVisible()
     {
@@ -142,11 +156,23 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
     }
     
     @Override
+    public Rectangular getIntrinsicBounds()
+    {
+        return intrinsicBounds;
+    }
+
+    public void setIntrinsicBounds(Rectangular intrinsicBounds)
+    {
+        this.intrinsicBounds = intrinsicBounds;
+    }
+
+    @Override
     public Rectangular getContentBounds()
     {
         return contentBounds;
     }
     
+    @Override
     public void setContentBounds(Rectangular contentBounds)
     {
         this.contentBounds = contentBounds;
@@ -158,6 +184,7 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
         return visualBounds;
     }
     
+    @Override
     public void setVisualBounds(Rectangular visualBounds)
     {
         this.visualBounds = visualBounds;
@@ -179,6 +206,16 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
         }
         else
             return null;
+    }
+
+    public Box getIntrinsicParent()
+    {
+        return intrinsicParent;
+    }
+
+    public void setIntrinsicParent(Box intrinsicParent)
+    {
+        this.intrinsicParent = intrinsicParent;
     }
 
     @Override
@@ -323,5 +360,49 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
         }
         return ret;
     }
+    
+    //===========================================================================================
+    
+    @Override
+    public boolean isVisuallySeparated()
+    {
+        //invisible boxes are not separated
+        if (!isVisible()) 
+            return false;
+        //root box is visually separated
+        else if (getParent() == null)
+            return true;
+        //non-empty text boxes are visually separated
+        else if (getType() == Type.TEXT_CONTENT) 
+        {
+            if (getText().trim().isEmpty())
+                return false;
+            else
+                return true;
+        }
+        //replaced boxes are visually separated
+        else if (getType() == Type.REPLACED_CONTENT)
+        {
+            return true;
+        }
+        //list item boxes with a bullet
+        else if (getDisplayType() == DisplayType.LIST_ITEM)
+        {
+            return true;
+        }
+        //other element boxes
+        else 
+        {
+            //check if separated by border -- at least one border needed
+            if (getBorderCount() >= 1)
+                return true;
+            //check the background
+            else if (isBackgroundSeparated())
+                return true;
+            return false;
+        }
+    }
+    
+
     
 }

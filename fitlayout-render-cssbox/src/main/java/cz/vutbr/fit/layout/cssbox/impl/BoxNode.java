@@ -252,6 +252,28 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
 
     //===================================================================================
 
+    @Override
+    public Rectangular getIntrinsicBounds()
+    {
+        final Box box = getBox();
+        Rectangular ret = null;
+        
+        if (box instanceof Viewport)
+        {
+            ret = new RectangularZ(((Viewport) box).getClippedBounds(), zoom);
+        }
+        else if (box instanceof ElementBox)
+        {
+            final ElementBox elem = (ElementBox) box;
+            ret = new RectangularZ(elem.getAbsoluteBorderBounds().intersection(elem.getClipBlock().getClippedContentBounds()), zoom);
+        }
+        else //not an element
+        {
+            ret = new RectangularZ(box.getAbsoluteBounds().intersection(box.getClipBlock().getClippedContentBounds()), zoom);
+        }
+        
+        return ret;
+    }
 
     /**
      * @return <code>true</code> if the box is visually separated by a border or
@@ -348,7 +370,7 @@ public class BoxNode extends DefaultTreeNode<cz.vutbr.fit.layout.model.Box> impl
         return visual;
     }
     
-    private Rectangular computeVisualBounds()
+    private Rectangular computeVisualBounds() //TODO rewrite to use getIntrinsicBounds()
     {
         Box box = getBox();
         Rectangular ret = null;

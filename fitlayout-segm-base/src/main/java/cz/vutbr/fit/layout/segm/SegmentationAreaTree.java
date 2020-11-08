@@ -119,49 +119,9 @@ public class SegmentationAreaTree extends DefaultAreaTree
             createGrids(root.getChildAt(i));
     }
 
-    public boolean isVisuallySeparated(Box box)
+    protected boolean isVisuallySeparated(Box box)
     {
-        //invisible boxes are not separated
-        if (!box.isVisible()) 
-            return false;
-        //root box is visually separated
-        else if (box.getParent() == null)
-            return true;
-        //non-empty text boxes are visually separated
-        else if (box.getType() == Type.TEXT_CONTENT) 
-        {
-            if (box.getText().trim().isEmpty())
-                return false;
-            else
-                return true;
-        }
-        //replaced boxes are visually separated
-        else if (box.getType() == Type.REPLACED_CONTENT)
-        {
-            return true;
-        }
-        //list item boxes with a bullet
-        else if (box.getDisplayType() == DisplayType.LIST_ITEM)
-        {
-            return true;
-        }
-        //other element boxes
-        else 
-        {
-            if (preserveAuxAreas)
-                return true;
-            else
-            {
-                //check if separated by border -- at least one border needed
-                if (box.getBorderCount() >= 1)
-                    return true;
-                //check the background
-                else if (box.isBackgroundSeparated())
-                    return true;
-                return false;
-            }
-        }
-
+        return preserveAuxAreas || box.isVisuallySeparated();
     }
     
     //=================================================================================

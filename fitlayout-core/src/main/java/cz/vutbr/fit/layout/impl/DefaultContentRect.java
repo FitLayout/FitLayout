@@ -108,6 +108,7 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
         return backgroundSeparated;
     }
     
+    @Override
     public void setBackgroundSeparated(boolean backgroundSeparated)
     {
         this.backgroundSeparated = backgroundSeparated;
@@ -214,6 +215,7 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
         return bounds;
     }
     
+    @Override
     public void setBounds(Rectangular bounds)
     {
         this.bounds = bounds;

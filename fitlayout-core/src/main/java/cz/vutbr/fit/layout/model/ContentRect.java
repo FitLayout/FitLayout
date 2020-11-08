@@ -34,6 +34,12 @@ public interface ContentRect extends Rect
     public Rectangular getBounds();
     
     /**
+     * Sets the pixel position within the page.
+     * @param bounds the new position
+     */
+    public void setBounds(Rectangular bounds);
+    
+    /**
      * Obtains the background color of the area. 
      * @return A color or {@code null} for transparent background
      */
@@ -121,6 +127,13 @@ public interface ContentRect extends Rect
      * @return {@code true} for background-separated boxes
      */
     public boolean isBackgroundSeparated();
+    
+    /**
+     * Sets whether the box is separated by background. This is typically determined and set during the
+     * box tree construction.
+     * @param backgroundSeparated
+     */
+    public void setBackgroundSeparated(boolean backgroundSeparated);
 
     
 }

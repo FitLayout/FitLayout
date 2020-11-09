@@ -14,7 +14,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -39,10 +38,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import cz.vutbr.fit.layout.impl.BaseBoxTreeBuilder;
 import cz.vutbr.fit.layout.impl.DefaultBox;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
+import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Box.DisplayType;
 import cz.vutbr.web.css.MediaSpec;
 
@@ -51,7 +52,7 @@ import cz.vutbr.web.css.MediaSpec;
  * 
  * @author burgetr
  */
-public class CSSBoxTreeBuilder
+public class CSSBoxTreeBuilder extends BaseBoxTreeBuilder
 {
     private static Logger log = LoggerFactory.getLogger(CSSBoxTreeBuilder.class);
 
@@ -67,11 +68,6 @@ public class CSSBoxTreeBuilder
     /** Requested page dimensions */
     protected Dimension pageSize;
     
-    /** Use real visual bounds instead of the element content bounds for building the box hierarchy */
-    protected boolean useVisualBounds;
-    
-    protected boolean preserveAux;
-    
     /** Replace the images with their {@code alt} text */
     protected boolean replaceImagesWithAlt;
     
@@ -80,6 +76,7 @@ public class CSSBoxTreeBuilder
    
     public CSSBoxTreeBuilder(Dimension pageSize, boolean useVisualBounds, boolean preserveAux, boolean replaceImagesWithAlt)
     {
+        super(useVisualBounds, preserveAux);
         this.pageSize = pageSize;
         this.useVisualBounds = useVisualBounds;
         this.preserveAux = preserveAux;
@@ -113,7 +110,7 @@ public class CSSBoxTreeBuilder
         
         //construct the box tree
         Viewport rootbox = engine.getViewport();
-        BoxNode root = buildTree(rootbox);
+        Box root = buildTree(rootbox);
         
         //initialize the page
         pg.setRoot(root);
@@ -137,7 +134,7 @@ public class CSSBoxTreeBuilder
             //render the page using custom renderer
             Engine engine = renderUrl(url, pageSize);
             Viewport rootbox = engine.getViewport();
-            BoxNode root = buildTree(rootbox);
+            Box root = buildTree(rootbox);
             
             //wrap the page with a new block box
             DefaultBox pageBox = new DefaultBox();
@@ -190,6 +187,7 @@ public class CSSBoxTreeBuilder
      * The resulting page model.
      * @return the page
      */
+    @Override
     public Page getPage()
     {
         return page;
@@ -291,45 +289,15 @@ public class CSSBoxTreeBuilder
     
     //===================================================================
     
-    protected BoxNode buildTree(Viewport vp)
+    protected Box buildTree(Viewport vp)
     {
         //create the working list of nodes
         log.trace("LIST");
-        List<BoxNode> boxlist = createBoxList(vp);
-        BoxNode rootNode = boxlist.remove(0);
-        
-        //create the tree
-        if (useVisualBounds)
-        {
-            //two-phase algorithm considering the visual bounds
-            log.trace("A1");
-            BoxNode root = createBoxTree(rootNode, boxlist, true, true, true); //create a nesting tree based on the content bounds
-            log.trace("A2");
-            Color bg = rootNode.getBackgroundColor();
-            if (bg == null) bg = Color.WHITE;
-            computeBackgrounds(root, bg); //compute the efficient background colors
-            log.trace("A2.5");
-            root.recomputeVisualBounds(); //compute the visual bounds for the whole tree
-            log.trace("A3");
-            root = createBoxTree(rootNode, boxlist, true, true, preserveAux); //create the nesting tree based on the visual bounds or content bounds depending on the settings
-            root.recomputeVisualBounds(); //compute the visual bounds for the whole tree
-            root.recomputeBounds(); //compute the real bounds of each node
-            log.trace("A4");
-            //root.applyTransforms(); //TODO test this first; actually the transform should be applied according to the drawing tree, not this tree
-            return root;
-        }
-        else
-        {
-            //simplified algorihm - use the original box nesting
-            BoxNode root = createBoxTree(rootNode, boxlist, false, true, true);
-            Color bg = Units.toColor(vp.getBgcolor());
-            if (bg == null) bg = Color.WHITE;
-            computeBackgrounds(root, bg); //compute the efficient background colors
-            root.recomputeVisualBounds(); //compute the visual bounds for the whole tree
-            root.recomputeBounds(); //compute the real bounds of each node
-            root.applyTransforms();
-            return root;
-        }
+        List<Box> boxlist = createBoxList(vp);
+        Color bg = Units.toColor(vp.getBgcolor());
+        if (bg == null) bg = Color.WHITE;
+        Box root = buildTree(boxlist, bg);
+        return root;
     }
     
     /**
@@ -337,96 +305,12 @@ public class CSSBoxTreeBuilder
      * is always the first element in the resulting list.
      * @param vp the viewport to render
      */
-    private List<BoxNode> createBoxList(Viewport vp)
+    private List<Box> createBoxList(Viewport vp)
     {
         BoxListRenderer renderer = new BoxListRenderer(page.getIri(), zoom);
         renderer.init(vp);
         vp.draw(renderer);
         return renderer.getBoxList();
-    }
-
-    /**
-     * Creates a tree of box nesting based on the content bounds of the boxes.
-     * This tree is only used for determining the backgrounds.
-     * 
-     * @param boxlist the list of boxes to build the tree from
-     * @param useBounds when set to {@code true}, the full or visual bounds are used for constructing the tree
-     * depending on the {@code useVisualBounds} parameter. Otherwise, the original box hierarchy is used.
-     * @param useVisualBounds when set to {@code true} the visual bounds are used for constructing the tree. Otherwise,
-     * the content bounds are used. 
-     * @param preserveAux when set to {@code true}, all boxes are preserved. Otherwise, only the visually
-     * distinguished ones are preserved.
-     */
-    private BoxNode createBoxTree(BoxNode root, List<BoxNode> boxlist, boolean useBounds, boolean useVisualBounds, boolean preserveAux)
-    {
-        //a working copy of the box list
-        List<BoxNode> list = new ArrayList<BoxNode>(boxlist);
-
-        //an artificial root node
-        //BoxNode root = new BoxNode(rootbox, page, zoom);
-        root.setOrder(0);
-        //detach the nodes from any old trees
-        for (BoxNode node : list)
-            node.removeFromTree();
-        
-        //when working with visual bounds, remove the boxes that are not visually separated
-        if (!preserveAux)
-        {
-            for (Iterator<BoxNode> it = list.iterator(); it.hasNext(); )
-            {
-                BoxNode node = it.next();
-                if (!node.isVisuallySeparated() || !node.isVisible())
-                    it.remove();
-            }
-        }
-        
-        //let each node choose it's children - find the roots and parents
-        for (BoxNode node : list)
-        {
-            if (useBounds)
-                node.markNodesInside(list, useVisualBounds);
-            else
-                node.markChildNodes(list);
-        }
-        
-        //choose the roots
-        for (Iterator<BoxNode> it = list.iterator(); it.hasNext();)
-        {
-            BoxNode node = it.next();
-            
-            /*if (!full) //DEBUG
-            {
-               if (node.toString().contains("mediawiki") || node.toString().contains("globalWrapper"))
-                    System.out.println(node + " => " + node.nearestParent);
-            }*/
-            
-            if (node.isRootNode())
-            {
-                root.appendChild(node);
-                it.remove();
-            }
-        }
-        
-        //recursively choose the children
-        for (int i = 0; i < root.getChildCount(); i++)
-            ((BoxNode) root.getChildAt(i)).takeChildren(list);
-        
-        return root;
-    }
-    
-    /**
-     * Computes efficient background color for all the nodes in the tree
-     */
-    private void computeBackgrounds(BoxNode root, Color currentbg)
-    {
-        Color newbg = root.getBackgroundColor();
-        if (newbg == null)
-            newbg = currentbg;
-        root.setEfficientBackground(newbg);
-        root.setBackgroundSeparated(!newbg.equals(currentbg));
-        
-        for (int i = 0; i < root.getChildCount(); i++)
-            computeBackgrounds((BoxNode) root.getChildAt(i), newbg);
     }
     
     //===================================================================

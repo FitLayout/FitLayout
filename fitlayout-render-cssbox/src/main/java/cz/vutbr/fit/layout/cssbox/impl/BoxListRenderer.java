@@ -21,6 +21,7 @@ import org.fit.cssbox.layout.ReplacedBox;
 import org.fit.cssbox.layout.TextBox;
 import org.fit.cssbox.render.StructuredRenderer;
 
+import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
 
 /**
@@ -34,7 +35,7 @@ public class BoxListRenderer extends StructuredRenderer
     private float zoom;
     
     /** the resulting list */
-    private List<BoxNode> boxList;
+    private List<Box> boxList;
     
     /** current transformation to be applied (or null) */
     private AffineTransform currentTransform;
@@ -54,12 +55,12 @@ public class BoxListRenderer extends StructuredRenderer
         orderCounter = 0;
     }
 
-    public List<BoxNode> getBoxList()
+    public List<Box> getBoxList()
     {
         return boxList;
     }
 
-    public void setBoxList(List<BoxNode> boxList)
+    public void setBoxList(List<Box> boxList)
     {
         this.boxList = boxList;
     }
@@ -87,6 +88,7 @@ public class BoxListRenderer extends StructuredRenderer
     @Override
     public void renderElementBackground(ElementBox elem)
     {
+        // TODO set intrinsic parents
         // TODO apply transforms
         // background color is computed by the renderer in order to treat special Viewport behavior
         BackgroundDecoder bg = findBackgroundSource(elem);
@@ -95,6 +97,7 @@ public class BoxListRenderer extends StructuredRenderer
         if (newnode.isVisible())
         {
             newnode.setOrder(orderCounter++);
+            newnode.setId(newnode.getOrder());
             boxList.add(newnode);
         }
     }
@@ -112,6 +115,7 @@ public class BoxListRenderer extends StructuredRenderer
         if (newnode.isVisible())
         {
             newnode.setOrder(orderCounter++);
+            newnode.setId(newnode.getOrder());
             boxList.add(newnode);
         }
     }

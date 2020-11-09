@@ -14,8 +14,6 @@ import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
-import cz.vutbr.fit.layout.model.Box.DisplayType;
-import cz.vutbr.fit.layout.model.Box.Type;
 
 
 /**
@@ -121,7 +119,7 @@ public class SegmentationAreaTree extends DefaultAreaTree
 
     protected boolean isVisuallySeparated(Box box)
     {
-        return preserveAuxAreas || box.isVisuallySeparated();
+        return preserveAuxAreas || box.isRoot() || box.isVisuallySeparated();
     }
     
     //=================================================================================

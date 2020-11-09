@@ -38,17 +38,14 @@ public abstract class BaseBoxTreeBuilder
     /** Use real visual bounds instead of the element content bounds for building the box hierarchy */
     protected boolean useVisualBounds;
     
+    /** Preserve auxiliary boxes that have no actual visual result */
     protected boolean preserveAux;
     
-    /** Replace the images with their {@code alt} text */
-    protected boolean replaceImagesWithAlt; //TODO use this?
-    
    
-    public BaseBoxTreeBuilder(boolean useVisualBounds, boolean preserveAux, boolean replaceImagesWithAlt)
+    public BaseBoxTreeBuilder(boolean useVisualBounds, boolean preserveAux)
     {
         this.useVisualBounds = useVisualBounds;
         this.preserveAux = preserveAux;
-        this.replaceImagesWithAlt = replaceImagesWithAlt;
     }
     
     /**
@@ -61,15 +58,16 @@ public abstract class BaseBoxTreeBuilder
     
     protected Box buildTree(List<Box> boxlist, Color bgColor)
     {
-        //create the working list of nodes
-        log.trace("LIST");
+        //the first box should be the root
         Box rootNode = boxlist.remove(0);
+        System.out.println("preserve: " + preserveAux);
         
         //create the tree
         if (useVisualBounds)
         {
             //two-phase algorithm considering the visual bounds
             log.trace("A1");
+            recomputeVisualBounds(boxlist);
             Box root = createBoxTree(rootNode, boxlist, true, true, true); //create a nesting tree based on the content bounds
             log.trace("A2");
             Color bg = rootNode.getBackgroundColor();
@@ -115,6 +113,7 @@ public abstract class BaseBoxTreeBuilder
         List<Box> list = new ArrayList<Box>(boxlist);
 
         //detach the nodes from any old trees
+        root.removeAllChildren();
         for (Box node : list)
         {
             node.removeAllChildren();
@@ -292,7 +291,19 @@ public abstract class BaseBoxTreeBuilder
     }
     
     /**
-     * Re-computes the visual bounds of the whole subtree.
+     * Recomputes the visual bounds for a list of boxes.
+     * @param boxes
+     */
+    protected void recomputeVisualBounds(List<Box> boxes)
+    {
+        for (Box box : boxes)
+        {
+            box.setVisualBounds(computeVisualBounds(box));
+        }
+    }
+    
+    /**
+     * Recomputes the visual bounds of the whole subtree.
      * @param root the root node of the subtree
      */
     protected void recomputeVisualBounds(Box root)
@@ -306,7 +317,7 @@ public abstract class BaseBoxTreeBuilder
     {
         Rectangular ret = null;
         
-        if (box.getType() == Type.ELEMENT)
+        if (box.getType() == Type.ELEMENT) //TODO viewport?
         {
             //one border only -- the box represents the border only
             if (box.getBorderCount() == 1 && !box.isBackgroundSeparated())

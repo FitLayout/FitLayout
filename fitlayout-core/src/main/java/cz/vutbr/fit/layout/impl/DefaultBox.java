@@ -115,7 +115,7 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
     {
         if (isLeaf())
         {
-            return text;
+            return getOwnText();
         }
         else
         {
@@ -139,7 +139,7 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
             return null;
     }
 
-    public void setText(String text)
+    public void setOwnText(String text)
     {
         this.text = text;
     }
@@ -338,6 +338,12 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
     }
 
     @Override
+    protected void childrenChanged()
+    {
+        recomputeTextStyle();
+    }
+    
+    @Override
     public String toString()
     {
         String ret = null;
@@ -370,8 +376,8 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
         if (!isVisible()) 
             return false;
         //root box is visually separated
-        else if (getParent() == null)
-            return true;
+        /*else if (getParent() == null)
+            return true;*/
         //non-empty text boxes are visually separated
         else if (getType() == Type.TEXT_CONTENT) 
         {
@@ -403,6 +409,15 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
         }
     }
     
-
+    private void recomputeTextStyle()
+    {
+        if (!isLeaf())
+        {
+            for (Box box : getChildren())
+            {
+                getTextStyle().updateAverages(box.getTextStyle());
+            }
+        }
+    }
     
 }

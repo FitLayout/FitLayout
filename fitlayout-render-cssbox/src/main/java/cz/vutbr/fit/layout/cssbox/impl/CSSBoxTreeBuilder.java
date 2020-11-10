@@ -14,7 +14,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.eclipse.rdf4j.model.IRI;
@@ -310,10 +312,36 @@ public class CSSBoxTreeBuilder extends BaseBoxTreeBuilder
         BoxListRenderer renderer = new BoxListRenderer(page.getIri(), zoom);
         renderer.init(vp);
         vp.draw(renderer);
-        return renderer.getBoxList();
+        List<Box> ret = renderer.getBoxList();
+        findIntrinsicParents(ret);
+        return ret;
     }
     
     //===================================================================
+    
+    /**
+     * Sets the intrinsicParent properties of all boxes in the list based on the same relationship
+     * between their source CSSBox boxes.
+     * @param boxes the list of boxes to process
+     */
+    private void findIntrinsicParents(List<Box> boxes)
+    {
+        Map<org.fit.cssbox.layout.Box, Box> srcBoxes = new HashMap<>();
+        //index the boxes by their source CSSBox box
+        for (Box box : boxes)
+            srcBoxes.put(((BoxNode) box).getBox(), box);
+        //map the parents
+        for (Box box : boxes)
+        {
+            final BoxNode node = (BoxNode) box;
+            if (node.getBox() != null && node.getBox().getParent() != null)
+            {
+                final Box parent = srcBoxes.get(node.getBox().getParent());
+                if (parent != null)
+                    node.setIntrinsicParent(parent);
+            }
+        }
+    }
     
     private List<URL> loadList(String filename)
     {

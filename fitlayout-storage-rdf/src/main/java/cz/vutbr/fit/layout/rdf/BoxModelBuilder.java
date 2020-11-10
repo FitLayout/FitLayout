@@ -33,8 +33,6 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 {
 	private ValueFactory vf;
 	
-	private int next_order; //order counter
-
 	public BoxModelBuilder() 
 	{
         vf = SimpleValueFactory.getInstance();
@@ -51,7 +49,6 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
         String baseUrl = page.getSourceURL().toString();
 	    
 	    Model graph = new LinkedHashModel(); // it holds whole model
-		next_order = 0;
 		
 		// store basic page data
 		addArtifactData(graph, page);
@@ -90,7 +87,7 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		// add BOX individual into graph
 		final IRI individual = RESOURCE.createBoxURI(pageNode, box);
 		graph.add(individual, RDF.TYPE, BOX.Box);
-		graph.add(individual, BOX.documentOrder, vf.createLiteral(next_order++));
+		graph.add(individual, BOX.documentOrder, vf.createLiteral(box.getOrder()));
 
 		// pin to page node
 		graph.add(individual, BOX.belongsTo, pageNode);

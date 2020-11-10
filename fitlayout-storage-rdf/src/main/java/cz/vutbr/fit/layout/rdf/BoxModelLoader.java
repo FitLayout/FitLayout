@@ -155,7 +155,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             if (BOX.documentOrder.equals(pred))
             {
                 if (value instanceof Literal)
-                    box.setDocumentOrder(((Literal) value).intValue());
+                    box.setOrder(((Literal) value).intValue());
             }
             else if (BOX.backgroundColor.equals(pred)) 
             {

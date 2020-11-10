@@ -37,16 +37,6 @@ public class RDFBox extends DefaultBox implements RDFResource
         setId(Integer.parseInt(uri.getLocalName()));
     }
 
-    public int getDocumentOrder()
-    {
-        return documentOrder;
-    }
-
-    public void setDocumentOrder(int documentOrder)
-    {
-        this.documentOrder = documentOrder;
-    }
-
     @Override
     public String toString()
     {

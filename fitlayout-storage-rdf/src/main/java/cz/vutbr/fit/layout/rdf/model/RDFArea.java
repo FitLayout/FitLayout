@@ -61,7 +61,7 @@ public class RDFArea extends DefaultArea implements RDFResource
             public int compare(Box box1, Box box2)
             {
                 if (box1 instanceof RDFBox && box2 instanceof RDFBox)
-                    return ((RDFBox) box1).getDocumentOrder() - ((RDFBox) box2).getDocumentOrder();
+                    return ((RDFBox) box1).getOrder() - ((RDFBox) box2).getOrder();
                 else
                     return 0;
             }

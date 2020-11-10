@@ -107,7 +107,8 @@ public class BoxNode extends DefaultBox
             ret += " [" + elem.getElement().getAttribute("id") + "]";
             ret += " [" + elem.getElement().getAttribute("class") + "]";
             ret += " B" + getBounds().toString();
-            ret += " V" + getVisualBounds().toString();
+            if (getVisualBounds() != null)
+                ret += " V" + getVisualBounds().toString();
         }
         else if (box instanceof TextBox)
         {
@@ -183,50 +184,6 @@ public class BoxNode extends DefaultBox
         else //not an element
         {
             ret = new RectangularZ(box.getAbsoluteBounds().intersection(box.getClipBlock().getClippedContentBounds()), zoom);
-        }
-        
-        return ret;
-    }
-
-    
-    /**
-     * Computes node the content bounds. They correspond to the background bounds
-     * however, when a border is present, it is included in the contents. Moreover,
-     * the box is clipped by its clipping box.
-     */
-    private Rectangular computeContentBounds()
-    {
-        Box box = getBox();
-        Rectangular ret = null;
-        
-        if (box instanceof Viewport)
-        {
-            ret = new RectangularZ(((Viewport) box).getClippedBounds(), zoom);
-        }
-        else if (box instanceof ElementBox)
-        {
-            ElementBox elem = (ElementBox) box;
-            //at least one border - take the border bounds
-            //TODO: when only one border is present, we shouldn't take the whole border box? 
-            if (elem.getBorder().top > 0 || elem.getBorder().left > 0 ||
-                elem.getBorder().bottom > 0 || elem.getBorder().right > 0)
-            {
-                ret = new RectangularZ(elem.getAbsoluteBorderBounds(), zoom);
-            }
-            //no border
-            else
-            {
-                ret = new RectangularZ(elem.getAbsolutePaddingBounds(), zoom);
-            }
-        }
-        else //not an element - return the whole box
-            ret = new RectangularZ(box.getAbsoluteBounds(), zoom);
-
-        //clip with the clipping bounds
-        if (box.getClipBlock() != null)
-        {
-            Rectangular clip = new RectangularZ(box.getClipBlock().getClippedContentBounds(), zoom);
-            ret = ret.intersection(clip);
         }
         
         return ret;

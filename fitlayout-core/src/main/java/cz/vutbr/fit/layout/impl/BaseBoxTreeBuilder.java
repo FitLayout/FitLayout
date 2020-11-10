@@ -317,7 +317,11 @@ public abstract class BaseBoxTreeBuilder
     {
         Rectangular ret = null;
         
-        if (box.getType() == Type.ELEMENT) //TODO viewport?
+        if (box.getIntrinsicParent() == null) //the root box is always visually separated
+        {
+            ret = box.getIntrinsicBounds();
+        }
+        else if (box.getType() == Type.ELEMENT)
         {
             //one border only -- the box represents the border only
             if (box.getBorderCount() == 1 && !box.isBackgroundSeparated())

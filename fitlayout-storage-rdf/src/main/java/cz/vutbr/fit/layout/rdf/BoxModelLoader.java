@@ -239,7 +239,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (box.getType() != Type.REPLACED_CONTENT) //once it is a replaced box, do not change it back to text box
                     box.setType(Type.TEXT_CONTENT);
-                box.setText(value.stringValue());
+                box.setOwnText(value.stringValue());
             }
             else if (BOX.containsImage.equals(pred))
             {

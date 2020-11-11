@@ -11,15 +11,15 @@ package cz.vutbr.fit.layout.puppeteer.parser;
  */
 public class BoxInfo
 {
-    private int id;
-    private Integer parent;
-    private String tagName;
-    private float x;
-    private float y;
-    private float width;
-    private float height;
-    private String css;
-    private String text;
+    public int id;
+    public Integer parent;
+    public String tagName;
+    public float x;
+    public float y;
+    public float width;
+    public float height;
+    public String css;
+    public String text;
     
     
     public int getId()

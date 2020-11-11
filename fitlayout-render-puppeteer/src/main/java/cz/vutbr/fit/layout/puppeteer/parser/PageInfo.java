@@ -11,9 +11,9 @@ package cz.vutbr.fit.layout.puppeteer.parser;
  */
 public class PageInfo
 {
-    private float width;
-    private float height;
-    private String title;
+    public float width;
+    public float height;
+    public String title;
 
     public float getWidth()
     {

@@ -11,9 +11,9 @@ package cz.vutbr.fit.layout.puppeteer.parser;
  */
 public class InputFile
 {
-    private PageInfo page;
-    private String[] fonts;
-    private BoxInfo[] boxes;
+    public PageInfo page;
+    public String[] fonts;
+    public BoxInfo[] boxes;
     
 
     public PageInfo getPage()

@@ -29,6 +29,8 @@ import cz.vutbr.fit.layout.puppeteer.parser.InputFile;
 import cz.vutbr.fit.layout.puppeteer.parser.PageInfo;
 import cz.vutbr.web.css.CSSException;
 import cz.vutbr.web.css.CSSFactory;
+import cz.vutbr.web.css.CSSProperty;
+import cz.vutbr.web.css.CSSProperty.BackgroundColor;
 import cz.vutbr.web.css.CSSProperty.FontFamily;
 import cz.vutbr.web.css.CSSProperty.FontSize;
 import cz.vutbr.web.css.CSSProperty.FontStyle;
@@ -38,6 +40,7 @@ import cz.vutbr.web.css.NodeData;
 import cz.vutbr.web.css.RuleSet;
 import cz.vutbr.web.css.StyleSheet;
 import cz.vutbr.web.css.Term;
+import cz.vutbr.web.css.TermColor;
 import cz.vutbr.web.css.TermLength;
 import cz.vutbr.web.css.TermList;
 
@@ -127,7 +130,10 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
             {
                 final int pindex = boxInfo.getParent();
                 if (pindex < elems.size())
+                {
                     elem.setIntrinsicParent(elems.get(pindex));
+                    elem.computeAbsoluteBounds();
+                }
             }
             ret.add(elem);
             //create a text box if there is a contained text
@@ -144,13 +150,17 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
     private BoxImpl createElementBox(BoxInfo src, NodeData style, int order)
     {
         BoxImpl ret = new BoxImpl();
+        setupCommonProperties(ret, src, style, order);
         ret.setType(Box.Type.ELEMENT);
-        ret.setOrder(order);
-        ret.setId(order);
-        ret.setFontFamily(getUsedFont(style, DEFAULT_FONT_FAMILY));
-        ret.setIntrinsicBounds(new Rectangular(Math.round(src.getX()), Math.round(src.getY()),
-                Math.round(src.getX() + src.getWidth() - 1), Math.round(src.getY() + src.getHeight() - 1)));
+        ret.setTagName(src.getTagName());
         
+        BackgroundColor color = style.getProperty("background-color");
+        if (color == BackgroundColor.color)
+        {
+            TermColor colorVal = style.getValue(TermColor.class, "background-color", false);
+            if (colorVal != null)
+                ret.setBackgroundColor(Units.toColor(colorVal.getValue()));
+        }
         
         return ret;
     }
@@ -158,10 +168,9 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
     private BoxImpl createTextBox(BoxInfo src, NodeData style, int order)
     {
         BoxImpl ret = new BoxImpl();
+        setupCommonProperties(ret, src, style, order);
         ret.setType(Box.Type.TEXT_CONTENT);
-        ret.setOrder(order);
-        ret.setId(order);
-        ret.setFontFamily(getUsedFont(style, DEFAULT_FONT_FAMILY));
+        
         if (src.getText() != null)
         {
             TextStyle tstyle = createTextStyle(style, src.getText().length());
@@ -170,6 +179,24 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
             ret.setOwnText(src.getText());
         }
         return ret;
+    }
+    
+    private void setupCommonProperties(BoxImpl ret, BoxInfo src, NodeData style, int order)
+    {
+        ret.setOrder(order);
+        ret.setId(order);
+        ret.setIntrinsicBounds(new Rectangular(Math.round(src.getX()), Math.round(src.getY()),
+                Math.round(src.getX() + src.getWidth() - 1), Math.round(src.getY() + src.getHeight() - 1)));
+        
+        ret.setFontFamily(getUsedFont(style, DEFAULT_FONT_FAMILY));
+        
+        CSSProperty.Color color = style.getProperty("color");
+        if (color == CSSProperty.Color.color)
+        {
+            TermColor colorVal = style.getValue(TermColor.class, "color", false);
+            if (colorVal != null)
+                ret.setColor(Units.toColor(colorVal.getValue()));
+        }
     }
     
     /**

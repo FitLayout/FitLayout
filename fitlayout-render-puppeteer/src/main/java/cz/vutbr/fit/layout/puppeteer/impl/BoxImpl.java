@@ -6,6 +6,7 @@
 package cz.vutbr.fit.layout.puppeteer.impl;
 
 import cz.vutbr.fit.layout.impl.DefaultBox;
+import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.TextStyle;
 
 /**
@@ -30,6 +31,15 @@ public class BoxImpl extends DefaultBox
     public void setIntrinsicTextStyle(TextStyle intrinsicTextStyle)
     {
         this.intrinsicTextStyle = intrinsicTextStyle;
+    }
+    
+    /**
+     * Recomputes the intrinsic bounds based on the parent bounds.
+     */
+    public void computeAbsoluteBounds()
+    {
+        final Rectangular parentBounds = getIntrinsicParent().getIntrinsicBounds();
+        getIntrinsicBounds().move(parentBounds.getX1(), parentBounds.getY1());
     }
     
 }

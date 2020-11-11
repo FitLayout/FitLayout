@@ -65,9 +65,23 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
     private PageImpl page;
     
 
-    public BoxTreeBuilder(boolean useVisualBounds, boolean preserveAux)
+    public BoxTreeBuilder(int width, int height, boolean useVisualBounds, boolean preserveAux)
     {
         super(useVisualBounds, preserveAux);
+    }
+    
+    public void parse(String urlstring) throws MalformedURLException, IOException
+    {
+        urlstring = urlstring.trim();
+        if (urlstring.startsWith("http:") ||
+            urlstring.startsWith("https:") ||
+            urlstring.startsWith("ftp:") ||
+            urlstring.startsWith("file:"))
+        {
+            parse(new URL(urlstring));
+        }
+        else
+            throw new MalformedURLException("Unsupported protocol in " + urlstring);
     }
     
     public void parse(URL url) throws IOException

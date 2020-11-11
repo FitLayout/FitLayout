@@ -37,7 +37,7 @@ public class ParserTest
      */
     public static void main(String[] args) throws IOException, CSSException
     {
-        FileReader fin = new FileReader("/tmp/aaa.json");
+        FileReader fin = new FileReader(System.getProperty("user.home") + "/tmp/fitlayout/boxes.json");
 
         Gson gson = new Gson();
         InputFile file = gson.fromJson(fin, InputFile.class);

@@ -6,6 +6,7 @@
 package cz.vutbr.fit.layout.puppeteer.impl;
 
 import cz.vutbr.fit.layout.impl.DefaultBox;
+import cz.vutbr.fit.layout.model.TextStyle;
 
 /**
  * 
@@ -13,10 +14,22 @@ import cz.vutbr.fit.layout.impl.DefaultBox;
  */
 public class BoxImpl extends DefaultBox
 {
+    private TextStyle intrinsicTextStyle;
 
     public BoxImpl()
     {
         super();
+        intrinsicTextStyle = new TextStyle();
+    }
+
+    public TextStyle getIntrinsicTextStyle()
+    {
+        return intrinsicTextStyle;
+    }
+
+    public void setIntrinsicTextStyle(TextStyle intrinsicTextStyle)
+    {
+        this.intrinsicTextStyle = intrinsicTextStyle;
     }
     
 }

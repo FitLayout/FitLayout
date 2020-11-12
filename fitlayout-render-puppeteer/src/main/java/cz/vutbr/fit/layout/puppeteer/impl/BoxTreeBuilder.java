@@ -43,6 +43,7 @@ import cz.vutbr.web.css.Term;
 import cz.vutbr.web.css.TermColor;
 import cz.vutbr.web.css.TermLength;
 import cz.vutbr.web.css.TermList;
+import cz.vutbr.web.css.TermString;
 
 /**
  * 
@@ -256,9 +257,12 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
             TermList values = (TermList) style.getValue("font-family", false);
             for (Term<?> value : values)
             {
-                final String name = value.toString();
-                if (availFonts.contains(name) || defaultFonts.contains(name))
-                    return name;
+                if (value instanceof TermString)
+                {
+                    final String name = ((TermString) value).getValue();
+                    if (availFonts.contains(name) || defaultFonts.contains(name))
+                        return name;
+                }
             }
             return fallback;
         }

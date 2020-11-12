@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 
 import cz.vutbr.fit.layout.impl.BaseBoxTreeBuilder;
+import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.Page;
@@ -198,6 +199,13 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
                 if (clr.getAlpha() > 0)
                     ret.setBackgroundColor(clr); //represent transparent background as null background
             }
+        }
+        
+        for (Border.Side side : Border.Side.values())
+        {
+            Border brd = new CSSBorder(style, side.toString());
+            if (brd.getStyle() != Border.Style.NONE)
+                ret.setBorderStyle(side, brd);
         }
         
         return ret;

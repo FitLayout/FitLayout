@@ -60,7 +60,6 @@ public abstract class BaseBoxTreeBuilder
     {
         //the first box should be the root
         Box rootNode = boxlist.remove(0);
-        System.out.println("preserve: " + preserveAux);
         
         //create the tree
         if (useVisualBounds)

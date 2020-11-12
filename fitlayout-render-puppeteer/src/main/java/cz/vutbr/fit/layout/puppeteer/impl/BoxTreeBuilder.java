@@ -117,31 +117,68 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
     private List<Box> createBoxList(InputFile input)
     {
         List<Box> ret = new ArrayList<>(); //the returned list that includes text boxes
-        List<Box> elems = new ArrayList<>(input.getBoxes().length); //list of elements for assigning the parents
         //create the element and text boxes
         int nextOrder = 0;
         for (BoxInfo boxInfo : input.getBoxes())
         {
             final NodeData style = parseCss(boxInfo.getCss());
-            final BoxImpl elem = createElementBox(boxInfo, style, nextOrder++);
-            elems.add(elem);
-            //map the parent if any
-            if (boxInfo.getParent() != null)
+            final BoxImpl newbox;
+            if (boxInfo.getText() == null)
             {
-                final int pindex = boxInfo.getParent();
-                if (pindex < elems.size())
+                //standard element box
+                newbox = createElementBox(boxInfo, style, nextOrder++);
+                //map the offset parent if any, the coordinates are computed from the parent
+                if (boxInfo.getParent() != null)
                 {
-                    elem.setIntrinsicParent(elems.get(pindex));
-                    elem.computeAbsoluteBounds();
+                    final int pindex = boxInfo.getParent();
+                    if (pindex < ret.size())
+                    {
+                        final Box parent = ret.get(pindex);
+                        newbox.setIntrinsicParent(parent);
+                        final Rectangular parentBounds = parent.getIntrinsicBounds();
+                        newbox.getIntrinsicBounds().move(parentBounds.getX1(), parentBounds.getY1());
+                        newbox.applyIntrinsicBounds();
+                    }
+                    else
+                    {
+                        log.error("Backend error: the parent element is not yet available.");
+                    }
                 }
             }
-            ret.add(elem);
-            //create a text box if there is a contained text
-            if (boxInfo.getText() != null)
+            else
             {
-                final BoxImpl tbox = createTextBox(boxInfo, style, nextOrder++);
-                tbox.setIntrinsicParent(elem);
-                ret.add(tbox);
+                //text boxes
+                newbox = createTextBox(boxInfo, style, nextOrder++);
+                //use the DOM parent element. The intrinsic bounds are however relative to the offset parent.
+                if (boxInfo.getParent() != null && boxInfo.getDomParent() != null)
+                {
+                    final int pindex = boxInfo.getParent();
+                    final int dpindex = boxInfo.getDomParent();
+                    if (pindex < ret.size() && dpindex < ret.size())
+                    {
+                        final Box parent = ret.get(pindex);
+                        final Box domParent = ret.get(dpindex);
+                        newbox.setIntrinsicParent(domParent);
+                        final Rectangular parentBounds = parent.getIntrinsicBounds();
+                        newbox.getIntrinsicBounds().move(parentBounds.getX1(), parentBounds.getY1());
+                        newbox.applyIntrinsicBounds();
+                    }
+                    else
+                    {
+                        log.error("Backend error: the parent element is not yet available.");
+                    }
+                }
+                else
+                {
+                    log.error("Backend error: a text node is missing a parent reference");
+                }
+            }
+            ret.add(newbox);
+            //The first box is the root box. Ensure it has a background set.
+            if (ret.size() == 1)
+            {
+                if (newbox.getBackgroundColor() == null)
+                    newbox.setBackgroundColor(Color.WHITE);
             }
         }
         return ret;
@@ -159,7 +196,11 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
         {
             TermColor colorVal = style.getValue(TermColor.class, "background-color", false);
             if (colorVal != null)
-                ret.setBackgroundColor(Units.toColor(colorVal.getValue()));
+            {
+                Color clr = Units.toColor(colorVal.getValue());
+                if (clr.getAlpha() > 0)
+                    ret.setBackgroundColor(clr); //represent transparent background as null background
+            }
         }
         
         return ret;
@@ -170,6 +211,7 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
         BoxImpl ret = new BoxImpl();
         setupCommonProperties(ret, src, style, order);
         ret.setType(Box.Type.TEXT_CONTENT);
+        ret.setTagName("text");
         
         if (src.getText() != null)
         {
@@ -187,6 +229,7 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
         ret.setId(order);
         ret.setIntrinsicBounds(new Rectangular(Math.round(src.getX()), Math.round(src.getY()),
                 Math.round(src.getX() + src.getWidth() - 1), Math.round(src.getY() + src.getHeight() - 1)));
+        ret.applyIntrinsicBounds();
         
         ret.setFontFamily(getUsedFont(style, DEFAULT_FONT_FAMILY));
         
@@ -233,7 +276,7 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
         if (fsize == FontSize.length)
         {
             TermLength fsizeVal = style.getValue(TermLength.class, "font-size", false);
-            ret.setFontSizeSum(fsizeVal.getValue());
+            ret.setFontSizeSum(fsizeVal.getValue() * textLen);
         }
         else
             ret.setFontSizeSum(DEFAULT_FONT_SIZE);
@@ -247,7 +290,7 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
             case numeric_700:
             case numeric_800:
             case numeric_900:
-                ret.setFontWeightSum(1);
+                ret.setFontWeightSum(1 * textLen);
                 break;
             default:
                 break;
@@ -255,7 +298,7 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
         
         FontStyle fstyle = style.getProperty("font-style");
         if (fstyle == FontStyle.ITALIC || fstyle == FontStyle.OBLIQUE)
-            ret.setFontStyleSum(1);
+            ret.setFontStyleSum(1  * textLen);
         
         //TODO text decoration
         

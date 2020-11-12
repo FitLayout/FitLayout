@@ -12,7 +12,8 @@ package cz.vutbr.fit.layout.puppeteer.parser;
 public class BoxInfo
 {
     public int id;
-    public Integer parent;
+    public Integer parent; //offsetParent ID reference
+    public Integer domParent; //DOM parentElement ID refrence
     public String tagName;
     public float x;
     public float y;
@@ -45,6 +46,16 @@ public class BoxInfo
     public String getTagName()
     {
         return tagName;
+    }
+
+    public Integer getDomParent()
+    {
+        return domParent;
+    }
+
+    public void setDomParent(Integer domParent)
+    {
+        this.domParent = domParent;
     }
 
     public void setTagName(String tagName)

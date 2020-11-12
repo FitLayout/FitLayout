@@ -34,12 +34,12 @@ public class BoxImpl extends DefaultBox
     }
     
     /**
-     * Recomputes the intrinsic bounds based on the parent bounds.
+     * Applies the intrinsic bounds as the initial content bounds.
      */
-    public void computeAbsoluteBounds()
+    public void applyIntrinsicBounds()
     {
-        final Rectangular parentBounds = getIntrinsicParent().getIntrinsicBounds();
-        getIntrinsicBounds().move(parentBounds.getX1(), parentBounds.getY1());
+        setBounds(new Rectangular(getIntrinsicBounds()));
+        setContentBounds(new Rectangular(getIntrinsicBounds()));
     }
     
 }

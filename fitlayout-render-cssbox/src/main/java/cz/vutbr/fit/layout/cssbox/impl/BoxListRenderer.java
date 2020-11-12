@@ -19,6 +19,7 @@ import org.fit.cssbox.layout.ElementBox;
 import org.fit.cssbox.layout.ListItemBox;
 import org.fit.cssbox.layout.ReplacedBox;
 import org.fit.cssbox.layout.TextBox;
+import org.fit.cssbox.layout.Viewport;
 import org.fit.cssbox.render.StructuredRenderer;
 
 import cz.vutbr.fit.layout.model.Box;
@@ -88,11 +89,12 @@ public class BoxListRenderer extends StructuredRenderer
     @Override
     public void renderElementBackground(ElementBox elem)
     {
-        // TODO set intrinsic parents
         // TODO apply transforms
         // background color is computed by the renderer in order to treat special Viewport behavior
         BackgroundDecoder bg = findBackgroundSource(elem);
         Color bgColor = (bg == null) ? null : Units.toColor(bg.getBgcolor());
+        if (bgColor == null && elem instanceof Viewport)
+            bgColor = Color.WHITE; //viewport should always have a background
         BoxNode newnode = new BoxNode(elem, pageIri, bgColor, zoom);
         if (newnode.isVisible())
         {

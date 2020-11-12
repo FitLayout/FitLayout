@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.rdf4j.model.IRI;
+import org.fit.cssbox.css.CSSUnits;
 import org.fit.cssbox.layout.Box;
 import org.fit.cssbox.layout.ElementBox;
 import org.fit.cssbox.layout.ReplacedBox;
@@ -352,7 +353,7 @@ public class BoxNode extends DefaultBox
     
     public float getIntrinsicFontSize()
     {
-        return getBox().getVisualContext().getFontSize();
+        return CSSUnits.pixels(getBox().getVisualContext().getFontSize());
     }
 
     public float getIntrinsicFontStyle()

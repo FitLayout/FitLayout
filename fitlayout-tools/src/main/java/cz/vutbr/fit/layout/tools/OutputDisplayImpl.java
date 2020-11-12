@@ -78,7 +78,7 @@ public class OutputDisplayImpl implements OutputDisplay
             //setup the font
             Font font = new Font("Serif", Font.PLAIN, 12);
             String fmlspec = box.getFontFamily();
-            float fontsize = (box.getTextStyle().getFontSize() * 96.0f) / 72.0f; //AWT font assumes 72dpi
+            float fontsize = box.getTextStyle().getFontSize(); //AWT font assumes 72dpi, i.e. the required point size is our pixel size
             int fs = Font.PLAIN;
             if (box.getTextStyle().getFontWeight() > 0.5f)
                 fs = Font.BOLD;

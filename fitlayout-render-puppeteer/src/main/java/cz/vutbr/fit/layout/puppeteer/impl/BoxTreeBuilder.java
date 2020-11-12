@@ -32,16 +32,12 @@ import cz.vutbr.web.css.CSSFactory;
 import cz.vutbr.web.css.CSSProperty;
 import cz.vutbr.web.css.CSSProperty.BackgroundColor;
 import cz.vutbr.web.css.CSSProperty.FontFamily;
-import cz.vutbr.web.css.CSSProperty.FontSize;
-import cz.vutbr.web.css.CSSProperty.FontStyle;
-import cz.vutbr.web.css.CSSProperty.FontWeight;
 import cz.vutbr.web.css.Declaration;
 import cz.vutbr.web.css.NodeData;
 import cz.vutbr.web.css.RuleSet;
 import cz.vutbr.web.css.StyleSheet;
 import cz.vutbr.web.css.Term;
 import cz.vutbr.web.css.TermColor;
-import cz.vutbr.web.css.TermLength;
 import cz.vutbr.web.css.TermList;
 import cz.vutbr.web.css.TermString;
 
@@ -53,8 +49,8 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
 {
     private static Logger log = LoggerFactory.getLogger(BoxTreeBuilder.class);
     
-    private static final String DEFAULT_FONT_FAMILY = "sans-serif";
-    private static final float DEFAULT_FONT_SIZE = 12;
+    public static final String DEFAULT_FONT_FAMILY = "sans-serif";
+    public static final float DEFAULT_FONT_SIZE = 12;
     
     /** Input JSON representation */
     private InputFile inputFile;
@@ -216,7 +212,7 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
         
         if (src.getText() != null)
         {
-            TextStyle tstyle = createTextStyle(style, src.getText().length());
+            TextStyle tstyle = new CSSTextStyle(src, style, src.getText().length());
             ((BoxImpl) ret).setIntrinsicTextStyle(tstyle);
             ret.setTextStyle(tstyle);
             ret.setOwnText(src.getText());
@@ -270,49 +266,12 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
             return ff.toString();
     }
 
-    private TextStyle createTextStyle(NodeData style, int textLen)
-    {
-        TextStyle ret = new TextStyle();
-        
-        ret.setContentLength(textLen);
-        
-        FontSize fsize = style.getProperty("font-size");
-        if (fsize == FontSize.length)
-        {
-            TermLength fsizeVal = style.getValue(TermLength.class, "font-size", false);
-            ret.setFontSizeSum(fsizeVal.getValue() * textLen);
-        }
-        else
-            ret.setFontSizeSum(DEFAULT_FONT_SIZE);
-        
-        FontWeight fweight = style.getProperty("font-weight");
-        switch (fweight)
-        {
-            case BOLD:
-            case BOLDER:
-            case numeric_600:
-            case numeric_700:
-            case numeric_800:
-            case numeric_900:
-                ret.setFontWeightSum(1 * textLen);
-                break;
-            default:
-                break;
-        }
-        
-        FontStyle fstyle = style.getProperty("font-style");
-        if (fstyle == FontStyle.ITALIC || fstyle == FontStyle.OBLIQUE)
-            ret.setFontStyleSum(1  * textLen);
-        
-        //TODO text decoration
-        
-        
-        return ret;
-    }
-    
     private NodeData parseCss(String css) 
     {
-        final String ssheet = "* { " + css + "}";
+        String ssheet = "* { " + css + "}";
+        ssheet = ssheet.replace("text-decoration-line", "text-decoration");
+        if (ssheet.contains("underline"))
+            System.out.println(ssheet);
         NodeData style = CSSFactory.createNodeData();
         try {
             StyleSheet sheet = CSSFactory.parseString(ssheet, new URL("http://base.url"));

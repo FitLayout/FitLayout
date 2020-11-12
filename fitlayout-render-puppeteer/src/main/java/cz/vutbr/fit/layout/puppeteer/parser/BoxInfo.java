@@ -20,6 +20,7 @@ public class BoxInfo
     public float width;
     public float height;
     public String css;
+    public String decoration;
     public String text;
     
     
@@ -111,6 +112,16 @@ public class BoxInfo
     public void setCss(String css)
     {
         this.css = css;
+    }
+
+    public String getDecoration()
+    {
+        return decoration;
+    }
+
+    public void setDecoration(String decoration)
+    {
+        this.decoration = decoration;
     }
 
     public String getText()

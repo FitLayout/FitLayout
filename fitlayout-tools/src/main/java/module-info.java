@@ -2,6 +2,7 @@ module cz.vutbr.fit.layout.tools
 {
     requires java.xml;
     requires java.scripting;
+    requires java.desktop;
     requires org.slf4j;
     
     requires transitive cz.vutbr.fit.layout.core;

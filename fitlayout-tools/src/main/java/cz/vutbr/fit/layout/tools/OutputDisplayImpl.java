@@ -11,9 +11,13 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.font.TextAttribute;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.text.AttributedString;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import cz.vutbr.fit.layout.api.OutputDisplay;
@@ -76,7 +80,6 @@ public class OutputDisplayImpl implements OutputDisplay
             g.setColor(toAWTColor(box.getColor()));
             
             //setup the font
-            Font font = new Font("Serif", Font.PLAIN, 12);
             String fmlspec = box.getFontFamily();
             float fontsize = box.getTextStyle().getFontSize(); //AWT font assumes 72dpi, i.e. the required point size is our pixel size
             int fs = Font.PLAIN;
@@ -85,14 +88,27 @@ public class OutputDisplayImpl implements OutputDisplay
             if (box.getTextStyle().getFontStyle() > 0.5f)
                 fs = fs | Font.ITALIC;
             
-            //TODO underline and overline
-            font = new Font(fmlspec, fs, (int) fontsize);
+            //Create base font
+            Font font = new Font(fmlspec, fs, (int) fontsize);
+            //Use kerning
+            Map<TextAttribute, Object> attributes = new HashMap<>();
+                attributes.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
+            font = font.deriveFont(attributes);
             g.setFont(font);
             
             String text = box.getText();
+            AttributedString as = new AttributedString(text);
+            as.addAttribute(TextAttribute.FONT, font);
+            if (box.getTextStyle().getUnderline() > 0.5f)
+                as.addAttribute(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+            if (box.getTextStyle().getLineThrough() > 0.5f)
+                as.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
+            
             FontMetrics fm = g.getFontMetrics();
             Rectangle2D rect = fm.getStringBounds(text, g);
-            g.drawString(text, box.getX1() + (int) rect.getX(), box.getY1() - (int) rect.getY());
+            int x = box.getX1() + (int) rect.getX();
+            int y = box.getY1() - (int) rect.getY();
+            g.drawString(as.getIterator(), x, y);
         }
         else if (type == Box.Type.REPLACED_CONTENT)
         {

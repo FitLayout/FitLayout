@@ -97,18 +97,21 @@ public class OutputDisplayImpl implements OutputDisplay
             g.setFont(font);
             
             String text = box.getText();
-            AttributedString as = new AttributedString(text);
-            as.addAttribute(TextAttribute.FONT, font);
-            if (box.getTextStyle().getUnderline() > 0.5f)
-                as.addAttribute(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-            if (box.getTextStyle().getLineThrough() > 0.5f)
-                as.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
-            
-            FontMetrics fm = g.getFontMetrics();
-            Rectangle2D rect = fm.getStringBounds(text, g);
-            int x = box.getX1() + (int) rect.getX();
-            int y = box.getY1() - (int) rect.getY();
-            g.drawString(as.getIterator(), x, y);
+            if (text.length() > 0)
+            {
+                AttributedString as = new AttributedString(text);
+                as.addAttribute(TextAttribute.FONT, font);
+                if (box.getTextStyle().getUnderline() > 0.5f)
+                    as.addAttribute(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+                if (box.getTextStyle().getLineThrough() > 0.5f)
+                    as.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
+                
+                FontMetrics fm = g.getFontMetrics();
+                Rectangle2D rect = fm.getStringBounds(text, g);
+                int x = box.getX1() + (int) rect.getX();
+                int y = box.getY1() - (int) rect.getY();
+                g.drawString(as.getIterator(), x, y);
+            }
         }
         else if (type == Box.Type.REPLACED_CONTENT)
         {

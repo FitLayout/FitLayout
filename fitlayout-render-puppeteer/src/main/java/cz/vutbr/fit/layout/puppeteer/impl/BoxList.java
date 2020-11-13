@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +74,17 @@ public class BoxList
         return boxes;
     }
     
+    /**
+     * Gets a list of all visible boxes.
+     * @return
+     */
+    public List<Box> getVisibleBoxes()
+    {
+        return boxes.stream()
+                .filter(box -> box.isVisible())
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+    
     //=======================================================================================
     
     private List<Box> createBoxList(InputFile input)
@@ -101,6 +113,16 @@ public class BoxList
                 newbox.getIntrinsicBounds().move(parentBounds.getX1(), parentBounds.getY1());
                 newbox.applyIntrinsicBounds();
             }
+            //apply clipping when applicable
+            if (newbox.getClipBox() != null)
+            {
+                final Rectangular clipBounds = newbox.getClipBox().getIntrinsicBounds();
+                final Rectangular clipped = newbox.getIntrinsicBounds().intersection(clipBounds);
+                newbox.setIntrinsicBounds(clipped);
+                newbox.applyIntrinsicBounds();
+                if (clipped.isEmpty())
+                    newbox.setVisible(false);
+            }
             //add the box
             boxes.add(newbox);
             //The first box is the root box. Ensure it has a background set.
@@ -127,6 +149,11 @@ public class BoxList
         setupParents(ret, src);
         ret.setType(Box.Type.ELEMENT);
         ret.setTagName(src.getTagName());
+        
+        CSSProperty.Overflow overflowx = style.getProperty("overflow-x");
+        CSSProperty.Overflow overflowy = style.getProperty("overflow-y");
+        ret.setClipping((overflowx != null && overflowx != CSSProperty.Overflow.VISIBLE)
+                || (overflowy != null && overflowy != CSSProperty.Overflow.VISIBLE));
         
         CSSProperty.BackgroundColor color = style.getProperty("background-color");
         if (color == CSSProperty.BackgroundColor.color)
@@ -296,8 +323,6 @@ public class BoxList
     {
         String ssheet = "* { " + css + "}";
         ssheet = ssheet.replace("text-decoration-line", "text-decoration");
-        if (ssheet.contains("underline"))
-            System.out.println(ssheet);
         NodeData style = CSSFactory.createNodeData();
         try {
             StyleSheet sheet = CSSFactory.parseString(ssheet, new URL("http://base.url"));

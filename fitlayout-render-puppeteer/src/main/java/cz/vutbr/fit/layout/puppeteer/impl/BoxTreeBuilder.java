@@ -73,7 +73,7 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
         
         //create the box tree
         BoxList boxlist = new BoxList(inputFile);
-        Box root = buildTree(boxlist.getBoxes(), Color.WHITE);
+        Box root = buildTree(boxlist.getVisibleBoxes(), Color.WHITE);
         page.setRoot(root);
     }
     

@@ -21,8 +21,8 @@ public class BoxImpl extends DefaultBox
     private BoxImpl domParent;
     
     private TextStyle intrinsicTextStyle;
-    private boolean absolute;
-    private boolean fixed;
+    private boolean absolute; //position: absolute
+    private boolean fixed; //position: fixed
     private boolean clipping; //does it clip the contents
     
 
@@ -106,6 +106,23 @@ public class BoxImpl extends DefaultBox
     {
         setBounds(new Rectangular(getIntrinsicBounds()));
         setContentBounds(new Rectangular(getIntrinsicBounds()));
+    }
+    
+    /**
+     * Finds the nearest ancestor that may clip the contents of this box (it has the 'overflow'
+     * value different from 'visible');
+     * @return an ancestor box used for clipping or {@code null} when there is no such box
+     */
+    public BoxImpl getClipBox()
+    {
+        BoxImpl parent = (BoxImpl) getIntrinsicParent();
+        while (parent != null)
+        {
+            if (parent.isClipping())
+                return parent;
+            parent = (BoxImpl) parent.getIntrinsicParent();
+        }
+        return null;
     }
     
 }

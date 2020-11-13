@@ -33,8 +33,6 @@ import cz.vutbr.web.css.Term;
 import cz.vutbr.web.css.TermColor;
 import cz.vutbr.web.css.TermList;
 import cz.vutbr.web.css.TermString;
-import cz.vutbr.web.css.CSSProperty.BackgroundColor;
-import cz.vutbr.web.css.CSSProperty.FontFamily;
 
 /**
  * A list of FitLayout boxes created from the backend output.
@@ -88,54 +86,22 @@ public class BoxList
             final BoxImpl newbox;
             if (boxInfo.getText() == null)
             {
-                //standard element box
+                //a standard element box
                 newbox = createElementBox(boxInfo, style, nextOrder++);
-                //map the offset parent if any, the coordinates are computed from the parent
-                if (boxInfo.getParent() != null)
-                {
-                    final int pindex = boxInfo.getParent();
-                    if (pindex < boxes.size())
-                    {
-                        final Box parent = boxes.get(pindex);
-                        newbox.setIntrinsicParent(parent);
-                        final Rectangular parentBounds = parent.getIntrinsicBounds();
-                        newbox.getIntrinsicBounds().move(parentBounds.getX1(), parentBounds.getY1());
-                        newbox.applyIntrinsicBounds();
-                    }
-                    else
-                    {
-                        log.error("Backend error: the parent element is not yet available.");
-                    }
-                }
             }
             else
             {
                 //text boxes
                 newbox = createTextBox(boxInfo, style, nextOrder++);
-                //use the DOM parent element. The intrinsic bounds are however relative to the offset parent.
-                if (boxInfo.getParent() != null && boxInfo.getDomParent() != null)
-                {
-                    final int pindex = boxInfo.getParent();
-                    final int dpindex = boxInfo.getDomParent();
-                    if (pindex < boxes.size() && dpindex < boxes.size())
-                    {
-                        final Box parent = boxes.get(pindex);
-                        final Box domParent = boxes.get(dpindex);
-                        newbox.setIntrinsicParent(domParent);
-                        final Rectangular parentBounds = parent.getIntrinsicBounds();
-                        newbox.getIntrinsicBounds().move(parentBounds.getX1(), parentBounds.getY1());
-                        newbox.applyIntrinsicBounds();
-                    }
-                    else
-                    {
-                        log.error("Backend error: the parent element is not yet available.");
-                    }
-                }
-                else
-                {
-                    log.error("Backend error: a text node is missing a parent reference");
-                }
             }
+            //map the offset parent if any, the coordinates are computed from the parent
+            if (newbox.getOffsetParent() != null)
+            {
+                final Rectangular parentBounds = newbox.getOffsetParent().getIntrinsicBounds();
+                newbox.getIntrinsicBounds().move(parentBounds.getX1(), parentBounds.getY1());
+                newbox.applyIntrinsicBounds();
+            }
+            //add the box
             boxes.add(newbox);
             //The first box is the root box. Ensure it has a background set.
             if (boxes.size() == 1)
@@ -147,15 +113,23 @@ public class BoxList
         return boxes;
     }
     
+    /**
+     * Creates an element box.
+     * @param src the source box info 
+     * @param style the parsed box style
+     * @param order  index of the box in the list
+     * @return the new box
+     */
     private BoxImpl createElementBox(BoxInfo src, NodeData style, int order)
     {
-        BoxImpl ret = new BoxImpl();
+        BoxImpl ret = new BoxImpl(this);
         setupCommonProperties(ret, src, style, order);
+        setupParents(ret, src);
         ret.setType(Box.Type.ELEMENT);
         ret.setTagName(src.getTagName());
         
-        BackgroundColor color = style.getProperty("background-color");
-        if (color == BackgroundColor.color)
+        CSSProperty.BackgroundColor color = style.getProperty("background-color");
+        if (color == CSSProperty.BackgroundColor.color)
         {
             TermColor colorVal = style.getValue(TermColor.class, "background-color", false);
             if (colorVal != null)
@@ -176,12 +150,19 @@ public class BoxList
         return ret;
     }
 
+    /**
+     * Creates a text box.
+     * @param src the source box info (its getText() value must not be null) 
+     * @param style the parsed box style
+     * @param order  index of the box in the list
+     * @return the new box
+     */
     private BoxImpl createTextBox(BoxInfo src, NodeData style, int order)
     {
-        BoxImpl ret = new BoxImpl();
+        BoxImpl ret = new BoxImpl(this);
         setupCommonProperties(ret, src, style, order);
+        setupParents(ret, src);
         ret.setType(Box.Type.TEXT_CONTENT);
-        ret.setTagName("text");
         
         if (src.getText() != null)
         {
@@ -193,22 +174,94 @@ public class BoxList
         return ret;
     }
     
-    private void setupCommonProperties(BoxImpl ret, BoxInfo src, NodeData style, int order)
+    /**
+     * Sets the common properties of the box based on the style.
+     * @param box the destination box
+     * @param boxInfo source box info
+     * @param style the parsed box style
+     * @param order index of the box in the list
+     */
+    private void setupCommonProperties(BoxImpl box, BoxInfo boxInfo, NodeData style, int order)
     {
-        ret.setOrder(order);
-        ret.setId(order);
-        ret.setIntrinsicBounds(new Rectangular(Math.round(src.getX()), Math.round(src.getY()),
-                Math.round(src.getX() + src.getWidth() - 1), Math.round(src.getY() + src.getHeight() - 1)));
-        ret.applyIntrinsicBounds();
+        box.setOrder(order);
+        box.setId(order);
+        box.setIntrinsicBounds(new Rectangular(Math.round(boxInfo.getX()), Math.round(boxInfo.getY()),
+                Math.round(boxInfo.getX() + boxInfo.getWidth() - 1), Math.round(boxInfo.getY() + boxInfo.getHeight() - 1)));
+        box.applyIntrinsicBounds();
         
-        ret.setFontFamily(getUsedFont(style, BoxTreeBuilder.DEFAULT_FONT_FAMILY));
+        CSSProperty.Position pos = style.getProperty("position");
+        if (pos == CSSProperty.Position.ABSOLUTE)
+            box.setAbsolute(true);
+        else if (pos == CSSProperty.Position.FIXED)
+            box.setFixed(true);
+        
+        box.setFontFamily(getUsedFont(style, BoxTreeBuilder.DEFAULT_FONT_FAMILY));
         
         CSSProperty.Color color = style.getProperty("color");
         if (color == CSSProperty.Color.color)
         {
             TermColor colorVal = style.getValue(TermColor.class, "color", false);
             if (colorVal != null)
-                ret.setColor(Units.toColor(colorVal.getValue()));
+                box.setColor(Units.toColor(colorVal.getValue()));
+        }
+    }
+    
+    /**
+     * Finds and sets the DOM and offset parent for the box. Moreover, the intrinsic parent is set
+     * accordinggly: for absolute positoned boxes, the offsetParent is used. For fixed elements,
+     * the root box is used. Otherwise, the DOM parent is used.
+     * @param box the destination box to which the parents should be assigned
+     * @param boxInfo the source box info
+     */
+    private void setupParents(BoxImpl box, BoxInfo boxInfo)
+    {
+        if (boxInfo.getParent() != null)
+        {
+            final int pindex = boxInfo.getParent();
+            if (pindex < boxes.size())
+            {
+                final BoxImpl parent = (BoxImpl) boxes.get(pindex);
+                box.setOffsetParent(parent);
+            }
+            else
+            {
+                log.error("Backend data error: the offset parent element <{}> is not available for <{}>.", pindex, boxInfo.getId());
+            }
+        }
+        if (boxInfo.getDomParent() != null)
+        {
+            final int pindex = boxInfo.getDomParent();
+            if (pindex < boxes.size())
+            {
+                final BoxImpl parent = (BoxImpl) boxes.get(pindex);
+                box.setDomParent(parent);
+            }
+            else
+            {
+                log.error("Backend data error: the DOM parent element <{}> is not available for <{}>.", pindex, boxInfo.getId());
+            }
+        }
+        //compute the intrinsic parent
+        if (box.isAbsolute())
+        {
+            if (box.getOffsetParent() != null)
+                box.setIntrinsicParent(box.getOffsetParent());
+            else
+                log.error("Backend data error: absolutely positioned box <{}> has no offset parent", box.getOrder());
+        }
+        else if (box.isFixed())
+        {
+            if (boxes.size() > 0)
+                box.setIntrinsicParent(boxes.get(0)); //use the root box
+            else
+                log.warn("Backend data warning: root box <{}> has a fixed position", box.getOrder());
+        }
+        else
+        {
+            if (box.getDomParent() != null)
+                box.setIntrinsicParent(box.getDomParent());
+            else if (boxes.size() > 0)
+                log.error("Backend data error: absolutely positioned box <{}> has no DOM parent", box.getOrder());
         }
     }
     
@@ -220,8 +273,8 @@ public class BoxList
      */
     private String getUsedFont(NodeData style, String fallback)
     {
-        FontFamily ff = style.getProperty("font-family");
-        if (ff == FontFamily.list_values)
+        CSSProperty.FontFamily ff = style.getProperty("font-family");
+        if (ff == CSSProperty.FontFamily.list_values)
         {
             TermList values = (TermList) style.getValue("font-family", false);
             for (Term<?> value : values)

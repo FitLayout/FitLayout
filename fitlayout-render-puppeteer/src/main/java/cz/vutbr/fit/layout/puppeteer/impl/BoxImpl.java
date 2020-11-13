@@ -10,17 +10,83 @@ import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.TextStyle;
 
 /**
- * 
+ * A standard box implementation extended by additional properties necessary for building
+ * the resulting tree correctly.
  * @author burgetr
  */
 public class BoxImpl extends DefaultBox
 {
+    private BoxList parentList;
+    private BoxImpl offsetParent;
+    private BoxImpl domParent;
+    
     private TextStyle intrinsicTextStyle;
+    private boolean absolute;
+    private boolean fixed;
+    private boolean clipping; //does it clip the contents
+    
 
-    public BoxImpl()
+    public BoxImpl(BoxList parentList)
     {
         super();
+        this.parentList = parentList; 
+        absolute = false;
         intrinsicTextStyle = new TextStyle();
+    }
+
+    public BoxList getParentList()
+    {
+        return parentList;
+    }
+
+    public BoxImpl getOffsetParent()
+    {
+        return offsetParent;
+    }
+
+    public void setOffsetParent(BoxImpl offsetParent)
+    {
+        this.offsetParent = offsetParent;
+    }
+
+    public BoxImpl getDomParent()
+    {
+        return domParent;
+    }
+
+    public void setDomParent(BoxImpl domParent)
+    {
+        this.domParent = domParent;
+    }
+
+    public boolean isAbsolute()
+    {
+        return absolute;
+    }
+
+    public void setAbsolute(boolean absolute)
+    {
+        this.absolute = absolute;
+    }
+
+    public boolean isFixed()
+    {
+        return fixed;
+    }
+
+    public void setFixed(boolean fixed)
+    {
+        this.fixed = fixed;
+    }
+
+    public boolean isClipping()
+    {
+        return clipping;
+    }
+
+    public void setClipping(boolean clipping)
+    {
+        this.clipping = clipping;
     }
 
     public TextStyle getIntrinsicTextStyle()

@@ -168,7 +168,7 @@ public abstract class BaseBoxTreeBuilder
         for (int i = 0; i < list.size(); i++)
         {
             Box child = list.get(i);
-            if (child != parent && child.getIntrinsicParent().equals(parent))
+            if (child != parent && child.getIntrinsicParent() != null && child.getIntrinsicParent().equals(parent))
                 parents.set(i, parent);
         }        
     }

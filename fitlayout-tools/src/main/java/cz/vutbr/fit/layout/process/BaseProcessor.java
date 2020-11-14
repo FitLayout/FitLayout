@@ -13,6 +13,7 @@ import cz.vutbr.fit.layout.api.AreaTreeOperator;
 import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.api.ArtifactService;
 import cz.vutbr.fit.layout.api.ParametrizedOperation;
+import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.api.ServiceManager;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
@@ -124,6 +125,7 @@ public abstract class BaseProcessor
      * @return the new artifact obtained from the provider
      */
     public Artifact processArtifact(Artifact input, ArtifactService provider, Map<String, Object> params)
+        throws ServiceException
     {
         if (provider instanceof ParametrizedOperation)
             getServiceManager().setServiceParams((ParametrizedOperation) provider, params);

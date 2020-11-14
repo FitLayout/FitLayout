@@ -183,7 +183,7 @@ public class CSSBoxTreeProvider extends BaseArtifactService
         try {
             return getPage();
         } catch (IOException | SAXException e) {
-            throw new ServiceException("Page rendering failed", e);
+            throw new ServiceException(e);
         }
     }
 

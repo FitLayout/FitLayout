@@ -180,11 +180,13 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         try {
             return getPage();
         } catch (IOException e) {
-            throw new ServiceException("Page rendering failed", e);
+            throw new ServiceException(e);
+        } catch (InterruptedException e) {
+            throw new ServiceException(e);
         }
     }
 
-    public Page getPage() throws IOException
+    public Page getPage() throws IOException, InterruptedException
     {
         builder = new BoxTreeBuilder(width, height, useVisualBounds, preserveAux);
         builder.parse(urlstring);

@@ -16,6 +16,7 @@ public class BoxInfo
     public Integer domParent; //DOM parentElement ID refrence
     public String tagName;
     public Attribute[] attrs;
+    public Boolean replaced;
     public float x;
     public float y;
     public float width;
@@ -73,6 +74,16 @@ public class BoxInfo
     public void setAttrs(Attribute[] attrs)
     {
         this.attrs = attrs;
+    }
+
+    public Boolean getReplaced()
+    {
+        return replaced;
+    }
+
+    public void setReplaced(Boolean replaced)
+    {
+        this.replaced = replaced;
     }
 
     public float getX()

@@ -148,7 +148,10 @@ public class BoxList
         BoxImpl ret = new BoxImpl(this);
         setupCommonProperties(ret, src, style, order);
         setupParents(ret, src);
-        ret.setType(Box.Type.ELEMENT);
+        if (src.getReplaced() != null && src.getReplaced())
+            ret.setType(Box.Type.REPLACED_CONTENT);
+        else
+            ret.setType(Box.Type.ELEMENT);
         ret.setTagName(src.getTagName());
         
         if (src.attrs != null)
@@ -334,7 +337,6 @@ public class BoxList
     private NodeData parseCss(String css) 
     {
         String ssheet = "* { " + css + "}";
-        ssheet = ssheet.replace("text-decoration-line", "text-decoration");
         NodeData style = CSSFactory.createNodeData();
         try {
             StyleSheet sheet = CSSFactory.parseString(ssheet, new URL("http://base.url"));
@@ -350,6 +352,5 @@ public class BoxList
         }
         return style;
     }
-    
     
 }

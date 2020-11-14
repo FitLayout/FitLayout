@@ -346,25 +346,25 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
     @Override
     public String toString()
     {
-        String ret = null;
+        StringBuilder ret = new StringBuilder();
         switch (type)
         {
             case ELEMENT:
-                ret = "<" + getTagName();
-                if (getAttribute("id") != null)
-                    ret += " id=" + getAttribute("id");
-                if (getAttribute("class") != null)
-                    ret += " class=" + getAttribute("class");
-                ret += ">";
-                break;
             case REPLACED_CONTENT:
-                ret = "[replaced content]";
+                ret.append("<").append(getTagName());
+                if (getAttribute("id") != null)
+                    ret.append(" id=").append(getAttribute("id"));
+                if (getAttribute("class") != null)
+                    ret.append(" class=").append(getAttribute("class"));
+                ret.append(">");
+                if (type == Type.REPLACED_CONTENT)
+                    ret.append(" [replaced]");
                 break;
             case TEXT_CONTENT:
-                ret = "Text: " + getText();
+                ret.append("Text: ").append(getText());
                 break;
         }
-        return ret;
+        return ret.toString();
     }
     
     //===========================================================================================

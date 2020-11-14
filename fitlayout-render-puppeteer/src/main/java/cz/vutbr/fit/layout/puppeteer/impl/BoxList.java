@@ -316,7 +316,12 @@ public class BoxList
             return fallback;
         }
         else
-            return ff.toString();
+        {
+            if (ff != null)
+                return ff.toString();
+            else
+                return fallback;
+        }
     }
 
     private NodeData parseCss(String css) 

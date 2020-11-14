@@ -21,6 +21,7 @@ import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.TextStyle;
+import cz.vutbr.fit.layout.puppeteer.parser.Attribute;
 import cz.vutbr.fit.layout.puppeteer.parser.BoxInfo;
 import cz.vutbr.fit.layout.puppeteer.parser.InputFile;
 import cz.vutbr.web.css.CSSException;
@@ -149,6 +150,12 @@ public class BoxList
         setupParents(ret, src);
         ret.setType(Box.Type.ELEMENT);
         ret.setTagName(src.getTagName());
+        
+        if (src.attrs != null)
+        {
+            for (Attribute attr : src.attrs)
+                ret.setAttribute(attr.getName(), attr.getValue());
+        }
         
         CSSProperty.Overflow overflowx = style.getProperty("overflow-x");
         CSSProperty.Overflow overflowy = style.getProperty("overflow-y");

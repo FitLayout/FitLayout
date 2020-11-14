@@ -15,6 +15,7 @@ public class BoxInfo
     public Integer parent; //offsetParent ID reference
     public Integer domParent; //DOM parentElement ID refrence
     public String tagName;
+    public Attribute[] attrs;
     public float x;
     public float y;
     public float width;
@@ -62,6 +63,16 @@ public class BoxInfo
     public void setTagName(String tagName)
     {
         this.tagName = tagName;
+    }
+
+    public Attribute[] getAttrs()
+    {
+        return attrs;
+    }
+
+    public void setAttrs(Attribute[] attrs)
+    {
+        this.attrs = attrs;
     }
 
     public float getX()

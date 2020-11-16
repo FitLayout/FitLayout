@@ -62,5 +62,10 @@ public interface ArtifactRepository
      * @return
      */
     public IRIDecoder getIriDecoder();
+    
+    /**
+     * Disconnects the repository.
+     */
+    public void disconnect();
 
 }

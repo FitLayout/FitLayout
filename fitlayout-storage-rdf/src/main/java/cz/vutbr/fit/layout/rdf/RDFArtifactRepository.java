@@ -53,6 +53,12 @@ public class RDFArtifactRepository implements ArtifactRepository
         initDefaultModelBuilders();
     }
 
+    @Override
+    public void disconnect()
+    {
+        storage.close();
+    }
+
     public RDFStorage getStorage()
     {
         return storage;

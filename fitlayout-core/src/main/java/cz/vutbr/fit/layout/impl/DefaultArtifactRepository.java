@@ -95,4 +95,9 @@ public class DefaultArtifactRepository implements ArtifactRepository
         return iriDecoder;
     }
 
+    @Override
+    public void disconnect()
+    {
+    }
+
 }

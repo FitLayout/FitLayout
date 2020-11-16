@@ -35,7 +35,7 @@ public abstract class BaseProcessor
      */
     public BaseProcessor()
     {
-        serviceManager = ServiceManager.createAndDiscover();
+        serviceManager = createServiceManager();
     }
     
     /**
@@ -44,8 +44,17 @@ public abstract class BaseProcessor
      */
     public BaseProcessor(ArtifactRepository repository)
     {
-        serviceManager = ServiceManager.createAndDiscover();
+        serviceManager = createServiceManager();
         serviceManager.setArtifactRepository(repository);
+    }
+    
+    /**
+     * Creates the default instance of service manager.
+     * @return
+     */
+    protected ServiceManager createServiceManager()
+    {
+        return ServiceManager.createAndDiscover();
     }
     
     /**

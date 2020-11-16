@@ -247,6 +247,15 @@ public class ServiceManager
     }
 
     /**
+     * Gets a map of all available parametrized operations.
+     * @return a map from service ID to the service instance
+     */
+    public Map<String, ParametrizedOperation> getParametrizedServices()
+    {
+        return parametrizedServices;
+    }
+    
+    /**
      * Finds a parametrized service based on its ID.
      * @param id the service ID.
      * @return the parametrized operation object or {@code null} when the service does not exist.

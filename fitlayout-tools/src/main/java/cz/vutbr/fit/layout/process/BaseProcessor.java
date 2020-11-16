@@ -137,7 +137,7 @@ public abstract class BaseProcessor
         throws ServiceException
     {
         if (provider instanceof ParametrizedOperation)
-            getServiceManager().setServiceParams((ParametrizedOperation) provider, params);
+            ServiceManager.setServiceParams((ParametrizedOperation) provider, params);
         return provider.process(input);
     }
     
@@ -149,7 +149,7 @@ public abstract class BaseProcessor
      */
     public void apply(AreaTree atree, AreaTreeOperator op, Map<String, Object> params)
     {
-        getServiceManager().setServiceParams(op, params);
+        ServiceManager.setServiceParams(op, params);
         op.apply(atree);
     }
 

@@ -220,7 +220,7 @@ public class ServiceManager
      * @param op The operation whose parametres should be set
      * @param params A map that assigns values to parameter names
      */
-    public void setServiceParams(ParametrizedOperation op, Map<String, Object> params)
+    public static void setServiceParams(ParametrizedOperation op, Map<String, Object> params)
     {
         if (params != null)
         {
@@ -236,7 +236,7 @@ public class ServiceManager
      * @param op The operation whose parametres should be set
      * @return A map that assigns values to parameter names
      */
-    public Map<String, Object> getServiceParams(ParametrizedOperation op)
+    public static Map<String, Object> getServiceParams(ParametrizedOperation op)
     {
         Map<String, Object> ret = new HashMap<String, Object>();
         for (Parameter param : op.getParams())

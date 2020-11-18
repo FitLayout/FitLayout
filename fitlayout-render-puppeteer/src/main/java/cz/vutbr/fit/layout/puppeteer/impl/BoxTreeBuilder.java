@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -109,6 +110,15 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
         page.setTitle(pInfo.getTitle());
         page.setWidth(Math.round(pInfo.getWidth()));
         page.setHeight(Math.round(pInfo.getHeight()));
+        if (input.getScreenshot() != null)
+        {
+            try {
+                byte[] image = Base64.getDecoder().decode(input.getScreenshot());
+                page.setPngImage(image);
+            } catch (IllegalArgumentException e) {
+                log.error("Couldn't decode a base64 screenshot: {}", e.getMessage());
+            }
+        }
         
         //create the box tree
         BoxList boxlist = new BoxList(inputFile);
@@ -143,6 +153,7 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
         cmds.add("index.js");
         cmds.add("-W" + String.valueOf(width));
         cmds.add("-H" + String.valueOf(height));
+        cmds.add("-s"); //include screenshot
         cmds.add(url.toString());
         
         ProcessBuilder pb = new ProcessBuilder(cmds);
@@ -159,7 +170,6 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
                 BufferedReader outReader = new BufferedReader(
                         new InputStreamReader(backend.getInputStream()));
                 InputFile file = gson.fromJson(outReader, InputFile.class);
-                System.err.println("Consumed ok");
                 return file;
             }
         };
@@ -179,7 +189,6 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
                     while ((line = errReader.readLine()) != null)
                         builder.append(line).append(System.getProperty("line.separator"));
                 } catch (IOException e) {
-                    System.err.println("Err " + e);
                 }
                 return builder.toString();                
             }

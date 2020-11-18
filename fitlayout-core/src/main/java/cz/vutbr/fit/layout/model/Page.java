@@ -47,6 +47,12 @@ public interface Page extends Artifact
     public Box getRoot();
     
     /**
+     * Gets the PNG image of the rendered page if provided by the renderer.
+     * @return PNG image data array or {@code null} when the page image was not provided by the renderer.
+     */
+    public byte[] getPngImage();
+    
+    /**
      * Finds the deepest node in the tree that contains the given point.
      * @param x The point X coordinate
      * @param y The point Y coordinate

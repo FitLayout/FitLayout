@@ -28,6 +28,7 @@ public class DefaultPage extends BaseArtifact implements Page
     protected Box root;
     protected int width;
     protected int height;
+    protected byte[] pngImage;
     
 
     public DefaultPage(URL url)
@@ -100,6 +101,17 @@ public class DefaultPage extends BaseArtifact implements Page
     public void setHeight(int height)
     {
         this.height = height;
+    }
+
+    @Override
+    public byte[] getPngImage()
+    {
+        return pngImage;
+    }
+
+    public void setPngImage(byte[] pngImage)
+    {
+        this.pngImage = pngImage;
     }
 
     @Override

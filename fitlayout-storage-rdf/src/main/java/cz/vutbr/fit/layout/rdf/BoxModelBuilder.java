@@ -1,5 +1,6 @@
 package cz.vutbr.fit.layout.rdf;
 
+import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
 
@@ -55,6 +56,8 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		graph.add(pageNode, BOX.sourceUrl, vf.createLiteral(baseUrl));
 		if (page.getTitle() != null)
 		    graph.add(pageNode, BOX.hasTitle, vf.createLiteral(page.getTitle()));
+		if (page.getPngImage() != null)
+		    graph.add(pageNode, BOX.pngImage, vf.createLiteral(Base64.getEncoder().encodeToString(page.getPngImage())));
 
         // recursively add the boxes
 		Box root = page.getRoot();

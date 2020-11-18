@@ -1,5 +1,7 @@
 package cz.vutbr.fit.layout.rdf;
 
+import java.util.Base64;
+
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Statement;
 
@@ -16,6 +18,7 @@ public class PageInfo extends ArtifactInfo
 {
 	private String title;
     private String url;
+	private byte[] pngImage;
 	
 	
     public PageInfo(Model model) 
@@ -35,20 +38,38 @@ public class PageInfo extends ArtifactInfo
         {
             url = st.getObject().stringValue();
         }
+        else if (st.getPredicate().equals(BOX.pngImage))
+        {
+            String dataStr = st.getObject().stringValue();
+            try {
+                pngImage = Base64.getDecoder().decode(dataStr);
+            } catch (IllegalArgumentException e) {
+                pngImage = null;
+            }
+        }
     }
     
-	public String getTitle() {
+	public String getTitle() 
+	{
 	    return title;
 	}
 	
-    public String getUrl() {
+    public String getUrl() 
+    {
         return url;
+    }
+
+    public byte[] getPngImage()
+    {
+        return pngImage;
     }
 
     public void applyToPage(RDFPage page)
     {
         applyToArtifact(page);
         page.setTitle(getTitle());
+        if (getPngImage() != null)
+            page.setPngImage(getPngImage());
     }
     
 }

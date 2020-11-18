@@ -273,6 +273,15 @@ public class BOX {
 	public static final IRI Page;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#pngImage}.
+	 * <p>
+	 * PNG image data representing the whole page (screen shot)
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#pngImage">pngImage</a>
+	 */
+	public static final IRI pngImage;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#positionX}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#positionX">positionX</a>
@@ -381,6 +390,7 @@ public class BOX {
 		lineThrough = factory.createIRI(BOX.NAMESPACE, "lineThrough");
 		objectInformation = factory.createIRI(BOX.NAMESPACE, "objectInformation");
 		Page = factory.createIRI(BOX.NAMESPACE, "Page");
+		pngImage = factory.createIRI(BOX.NAMESPACE, "pngImage");
 		positionX = factory.createIRI(BOX.NAMESPACE, "positionX");
 		positionY = factory.createIRI(BOX.NAMESPACE, "positionY");
 		Rectangle = factory.createIRI(BOX.NAMESPACE, "Rectangle");

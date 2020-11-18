@@ -6,7 +6,7 @@
 package cz.vutbr.fit.layout.model;
 
 import java.net.URL;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * This class represents the whole rendered (and segmented) page.
@@ -60,7 +60,6 @@ public interface Page extends Artifact
      * @param r The region to be tested
      * @return A vector of subtree root boxes (possibly empty)
      */
-    public Vector<Box> getBoxesInRegion(Rectangular r);
+    public List<Box> getBoxesInRegion(Rectangular r);
     
-    //TODO some factory functions (create area, etc?)
 }

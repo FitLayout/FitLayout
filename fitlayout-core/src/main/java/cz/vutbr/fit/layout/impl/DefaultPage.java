@@ -6,7 +6,8 @@
 package cz.vutbr.fit.layout.impl;
 
 import java.net.URL;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.rdf4j.model.IRI;
 
@@ -124,14 +125,14 @@ public class DefaultPage extends BaseArtifact implements Page
     }
 
     @Override
-    public Vector<Box> getBoxesInRegion(Rectangular r)
+    public List<Box> getBoxesInRegion(Rectangular r)
     {
-        Vector<Box> ret = new Vector<Box>();
+        List<Box> ret = new ArrayList<>();
         recursiveGetBoxesInRegion(root, r, ret);
         return ret;
     }
     
-    private void recursiveGetBoxesInRegion(Box root, Rectangular r, Vector<Box> result)
+    private void recursiveGetBoxesInRegion(Box root, Rectangular r, List<Box> result)
     {
         if (r.encloses(root.getVisualBounds()))
         {

@@ -141,9 +141,9 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
         List<String> cmds = new ArrayList<>();
         cmds.add("node");
         cmds.add("index.js");
+        cmds.add("-W" + String.valueOf(width));
+        cmds.add("-H" + String.valueOf(height));
         cmds.add(url.toString());
-        cmds.add(String.valueOf(width));
-        cmds.add(String.valueOf(height));
         
         ProcessBuilder pb = new ProcessBuilder(cmds);
         pb.directory(new File(rendererPath));

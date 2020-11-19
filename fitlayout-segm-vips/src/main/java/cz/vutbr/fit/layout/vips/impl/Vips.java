@@ -6,21 +6,9 @@
 
 package cz.vutbr.fit.layout.vips.impl;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-
-import javax.imageio.ImageIO;
-
-import org.w3c.dom.Document;
 
 import cz.vutbr.fit.layout.model.Page;
 
@@ -31,6 +19,7 @@ import cz.vutbr.fit.layout.model.Page;
  */
 public class Vips {
 	private Page page = null;
+	private VisualStructure visualStructure;
 
 	private boolean _graphicsOutput = false;
 	private boolean _outputToFolder = false;
@@ -40,7 +29,6 @@ public class Vips {
 	private	int sizeTresholdWidth = 350;
 	private	int sizeTresholdHeight = 400;
 
-	private PrintStream originalOut = null;
 	long startTime = 0;
 	long endTime = 0;
 
@@ -104,6 +92,16 @@ public class Vips {
 	    this.page = page;
 	}
 
+	public VisualStructure getVisualStructure()
+	{
+	    return visualStructure; 
+	}
+	
+	public VipsTreeBuilder getTreeBuilder()
+	{
+	    return new VipsTreeBuilder(_pDoC);
+	}
+	
 	/**
 	 * Exports rendered page to image.
 	 */
@@ -239,10 +237,12 @@ public class Vips {
 		//		constructor.normalizeSeparatorsSoftMax();
 		constructor.normalizeSeparatorsMinMax();
 
+		visualStructure = constructor.getVisualStructure();
+		
 		VipsOutput vipsOutput = new VipsOutput(_pDoC);
 		vipsOutput.setEscapeOutput(_outputEscaping);
 		vipsOutput.setOutputFileName(_filename);
-		vipsOutput.writeXML(constructor.getVisualStructure(), page);
+		vipsOutput.writeXML(visualStructure, page);
 
 		endTime = System.nanoTime();
 

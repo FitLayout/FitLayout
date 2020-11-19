@@ -10,12 +10,14 @@ import org.eclipse.rdf4j.model.IRI;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.impl.DefaultAreaTree;
+import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.SEGM;
 import cz.vutbr.fit.layout.vips.impl.Vips;
+import cz.vutbr.fit.layout.vips.impl.VipsTreeBuilder;
 
 /**
  * 
@@ -68,6 +70,13 @@ public class VipsProvider extends BaseArtifactService
     
     private AreaTree createAreaTree(Page page)
     {
+        DefaultAreaTree atree = new DefaultAreaTree(page.getIri());
+        atree.setParentIri(page.getIri());
+        IRI atreeIri = getServiceManager().getArtifactRepository().createArtifactIri(page);
+        atree.setIri(atreeIri);
+        atree.setCreator(getId());
+        atree.setCreatorParams(getParamString());
+        
         Vips vips = new Vips();
         // disable graphics output
         vips.enableGraphicsOutput(true);
@@ -77,9 +86,12 @@ public class VipsProvider extends BaseArtifactService
         vips.setPredefinedDoC(8);
         // start segmentation on page
         vips.startSegmentation(page);
+        // build the tree
+        VipsTreeBuilder builder = vips.getTreeBuilder();
+        Area root = builder.buildAreaTree(vips.getVisualStructure());
+        atree.setRoot(root);
 
-        AreaTree atree = new DefaultAreaTree(page.getIri());
-        return atree;
+        return atree; 
     }
     
 }

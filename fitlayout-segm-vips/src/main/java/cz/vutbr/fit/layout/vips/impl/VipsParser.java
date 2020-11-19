@@ -245,9 +245,9 @@ public class VipsParser {
 				if (!child.isVisible())
 					continue;
 
-				if (childNodeName.equals("img"))
+				if (childNodeName.equalsIgnoreCase("img"))
 					return true;
-				if (childNodeName.equals("input"))
+				if (childNodeName.equalsIgnoreCase("input"))
 					return true;
 			}
 

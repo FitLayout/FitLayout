@@ -114,8 +114,8 @@ public class VipsSeparatorNonGraphicsDetector implements VipsSeparatorDetector {
 		for (VipsBlock vipsBlock : _visualBlocks)
 		{
 			// block vertical coordinates
-			int blockStart = vipsBlock.getBox().getContentBounds().getX1();
-			int blockEnd = blockStart + vipsBlock.getBox().getContentBounds().getWidth();
+			final int blockStart = vipsBlock.getBox().getContentBounds().getX1();
+			final int blockEnd = blockStart + vipsBlock.getBox().getContentBounds().getWidth();
 
 			// for each separator that we have in pool
 			for (Separator separator : _verticalSeparators)
@@ -244,8 +244,8 @@ public class VipsSeparatorNonGraphicsDetector implements VipsSeparatorDetector {
 		for (VipsBlock vipsBlock : _visualBlocks)
 		{
 			// block vertical coordinates
-			int blockStart = vipsBlock.getBox().getContentBounds().getY1();
-			int blockEnd = blockStart + vipsBlock.getBox().getContentBounds().getHeight();
+			final int blockStart = vipsBlock.getBox().getContentBounds().getY1();
+			final int blockEnd = blockStart + vipsBlock.getBox().getContentBounds().getHeight();
 
 			// for each separator that we have in pool
 			for (Separator separator : _horizontalSeparators)
@@ -587,8 +587,8 @@ public class VipsSeparatorNonGraphicsDetector implements VipsSeparatorDetector {
 	{
 		for (VipsBlock vipsBlock : _visualBlocks)
 		{
-			int leftEdge = vipsBlock.getBox().getContentBounds().getX1();
-			int rightEdge = leftEdge + vipsBlock.getBox().getContentBounds().getWidth();
+			final int leftEdge = vipsBlock.getBox().getContentBounds().getX1();
+			final int rightEdge = leftEdge + vipsBlock.getBox().getContentBounds().getWidth();
 
 			// two left edges of element are overlapped with separator
 			if (leftEdge > separator.startPoint && leftEdge < separator.endPoint && rightEdge > separator.endPoint)
@@ -686,8 +686,8 @@ public class VipsSeparatorNonGraphicsDetector implements VipsSeparatorDetector {
 	{
 		for (VipsBlock vipsBlock : _visualBlocks)
 		{
-			int leftEdge = vipsBlock.getBox().getContentBounds().getX1() + 1;
-			int rightEdge = leftEdge + vipsBlock.getBox().getContentBounds().getWidth();
+			final int leftEdge = vipsBlock.getBox().getContentBounds().getX1() + 1;
+			final int rightEdge = leftEdge + vipsBlock.getBox().getContentBounds().getWidth();
 
 			// if box is adjancent to separator from right
 			if (leftEdge == separator.endPoint + 1 && rightEdge > separator.endPoint + 1)

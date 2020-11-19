@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import cz.vutbr.fit.layout.model.Rectangular;
+
 /**
  * Class that constructs final visual structure of page.
  * @author Tomas Popela
@@ -705,13 +707,14 @@ public class VisualStructureConstructor {
 			visualStructure.clearNestedBlocks();
 			for (VipsBlock visualBlock : _visualBlocks)
 			{
-				if (visualBlock.getBox().getContentBounds().getX1() >= visualStructure.getX() &&
-						visualBlock.getBox().getContentBounds().getX1() <= (visualStructure.getX() + visualStructure.getWidth()))
+				final Rectangular bb = visualBlock.getBox().getContentBounds();
+                if (bb.getX1() >= visualStructure.getX() &&
+						bb.getX1() <= (visualStructure.getX() + visualStructure.getWidth()))
 				{
-					if (visualBlock.getBox().getContentBounds().getY1() >= visualStructure.getY() &&
-							visualBlock.getBox().getContentBounds().getY1() <= (visualStructure.getY() + visualStructure.getHeight()))
+					if (bb.getY1() >= visualStructure.getY() &&
+							bb.getY1() <= (visualStructure.getY() + visualStructure.getHeight()))
 					{
-						if (visualBlock.getBox().getContentBounds().getHeight() != 0 && visualBlock.getBox().getContentBounds().getWidth() != 0)
+						if (bb.getHeight() != 0 && bb.getWidth() != 0)
 							visualStructure.addNestedBlock(visualBlock);
 					}
 				}
@@ -831,8 +834,9 @@ public class VisualStructureConstructor {
 
 			for (VipsBlock block : visualStructure.getNestedBlocks())
 			{
-				int top = block.getBox().getContentBounds().getY1();
-				int bottom = block.getBox().getContentBounds().getY1() + block.getBox().getContentBounds().getHeight();
+				final Rectangular bb = block.getBox().getContentBounds();
+                final int top = bb.getY1();
+				final int bottom = bb.getY1() + bb.getHeight();
 
 				if (bottom <= separator.startPoint && bottom > aboveBottom)
 				{
@@ -906,8 +910,9 @@ public class VisualStructureConstructor {
 
 			for (VipsBlock block : visualStructure.getNestedBlocks())
 			{
-				int top = block.getBox().getContentBounds().getY1();
-				int bottom = block.getBox().getContentBounds().getY1() + block.getBox().getContentBounds().getHeight();
+				final Rectangular bb = block.getBox().getContentBounds();
+                final int top = bb.getY1();
+				final int bottom = bb.getY1() + bb.getHeight();
 
 				// block is inside the separator
 				if (top > separator.startPoint && bottom < separator.endPoint)

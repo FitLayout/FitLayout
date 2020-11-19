@@ -209,7 +209,7 @@ public class VipsParser {
 
 	private boolean verifyValidity(Box node)
 	{
-	    final Rectangular bounds = node.getBounds();
+	    final Rectangular bounds = node.getContentBounds();
 	    
 		if (bounds.getX1() < 0 || bounds.getY1() < 0)
 			return false;

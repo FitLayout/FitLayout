@@ -122,6 +122,16 @@ public class BOX {
 	public static final IRI ContentObject;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#displayType}.
+	 * <p>
+	 * The display type of a box that corresponds to the CSS 'display'
+	 * property ('inline', 'block', etc.)
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#displayType">displayType</a>
+	 */
+	public static final IRI displayType;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#documentOrder}.
 	 * <p>
 	 * The order of a rectangle within its page
@@ -369,6 +379,7 @@ public class BOX {
 		containsObject = factory.createIRI(BOX.NAMESPACE, "containsObject");
 		ContentBox = factory.createIRI(BOX.NAMESPACE, "ContentBox");
 		ContentObject = factory.createIRI(BOX.NAMESPACE, "ContentObject");
+		displayType = factory.createIRI(BOX.NAMESPACE, "displayType");
 		documentOrder = factory.createIRI(BOX.NAMESPACE, "documentOrder");
 		fontFamily = factory.createIRI(BOX.NAMESPACE, "fontFamily");
 		fontSize = factory.createIRI(BOX.NAMESPACE, "fontSize");

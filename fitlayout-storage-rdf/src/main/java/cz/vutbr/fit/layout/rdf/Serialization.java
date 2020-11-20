@@ -17,6 +17,7 @@ import org.eclipse.rdf4j.rio.helpers.BasicWriterSettings;
 import org.eclipse.rdf4j.rio.helpers.JSONLDMode;
 import org.eclipse.rdf4j.rio.helpers.JSONLDSettings;
 
+import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
 
 /**
@@ -37,6 +38,20 @@ public class Serialization
                 Integer.valueOf( colorStr.substring( 1, 3 ), 16 ),
                 Integer.valueOf( colorStr.substring( 3, 5 ), 16 ),
                 Integer.valueOf( colorStr.substring( 5, 7 ), 16 ) );
+    }
+    
+    public static String displayTypeString(Box.DisplayType type)
+    {
+        return type.name().toLowerCase().replace('_', '-');
+    }
+    
+    public static Box.DisplayType decodeDisplayType(String typeStr)
+    {
+        try {
+            return Box.DisplayType.valueOf(typeStr.trim().toUpperCase().replace('-', '_'));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
     
     public static RDFWriter createRioWriter(OutputStream os) throws RDFHandlerException

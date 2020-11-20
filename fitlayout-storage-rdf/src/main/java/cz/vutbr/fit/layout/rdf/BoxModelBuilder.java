@@ -103,6 +103,10 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		if (box.getTagName() != null)
 		    graph.add(individual, BOX.htmlTagName, vf.createLiteral(box.getTagName()));
 		
+		//display type
+		if (box.getDisplayType() != null)
+		    graph.add(individual, BOX.displayType, vf.createLiteral(Serialization.displayTypeString(box.getDisplayType())));
+		
 		//attributes
 		Map<String, String> attrs = box.getAttributes();
 		for (Map.Entry<String, String> attr : attrs.entrySet())

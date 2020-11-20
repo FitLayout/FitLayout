@@ -239,6 +239,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (box.getType() != Type.REPLACED_CONTENT) //once it is a replaced box, do not change it back to text box
                     box.setType(Type.TEXT_CONTENT);
+                box.setDisplayType(null); //text boxes have no display type
                 box.setOwnText(value.stringValue());
             }
             else if (BOX.containsImage.equals(pred))
@@ -311,6 +312,12 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             else if (BOX.htmlTagName.equals(pred)) 
             {
                 box.setTagName(value.stringValue());
+            }
+            else if (BOX.displayType.equals(pred))
+            {
+                final Box.DisplayType type = Serialization.decodeDisplayType(value.stringValue());
+                if (type != null)
+                    box.setDisplayType(type);
             }
             else if (BOX.hasAttribute.equals(pred))
             {

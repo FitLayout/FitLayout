@@ -5,7 +5,9 @@
  */
 package cz.vutbr.fit.layout.puppeteer.impl;
 
+import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
+import cz.vutbr.web.css.CSSProperty;
 
 /**
  * 
@@ -22,4 +24,14 @@ public class Units
             return new Color(clr.getRGB());
     }
 
+    public static Box.DisplayType toDisplayType(CSSProperty.Display display)
+    {
+        final String name = display.name();
+        try {
+            return Box.DisplayType.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+    
 }

@@ -160,6 +160,14 @@ public class BoxList
                 ret.setAttribute(attr.getName(), attr.getValue());
         }
         
+        CSSProperty.Display display = style.getProperty("display");
+        if (display != null)
+        {
+            final Box.DisplayType displayType = Units.toDisplayType(display);
+            if (displayType != null)
+                ret.setDisplayType(displayType);
+        }
+        
         CSSProperty.Overflow overflowx = style.getProperty("overflow-x");
         CSSProperty.Overflow overflowy = style.getProperty("overflow-y");
         ret.setClipping((overflowx != null && overflowx != CSSProperty.Overflow.VISIBLE)

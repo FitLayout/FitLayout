@@ -71,6 +71,8 @@ public class VipsBlock {
 	public void setIsVisualBlock(boolean isVisualBlock)
 	{
 		_isVisualBlock = isVisualBlock;
+		if (this.toString().contains("STRONG"))
+		    System.out.println("jo!");
 		checkProperties();
 	}
 
@@ -431,5 +433,15 @@ public class VipsBlock {
 	{
 		return _order;
 	}
+
+    @Override
+    public String toString()
+    {
+        String ret = isVisualBlock() ? "[":"![";
+        if (getBox() != null)
+            ret += getBox().toString();
+        ret += "]";
+        return ret;
+    }
 
 }

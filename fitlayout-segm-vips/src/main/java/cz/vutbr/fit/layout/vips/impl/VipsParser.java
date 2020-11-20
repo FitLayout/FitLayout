@@ -123,7 +123,6 @@ public class VipsParser {
 	private void constructVipsBlockTree(Box element, VipsBlock node)
 	{
 		node.setBox(element);
-
 		if (element.getType() != Box.Type.TEXT_CONTENT)
 		{
 			for (Box box : element.getChildren())
@@ -141,10 +140,9 @@ public class VipsParser {
 	private void divideVipsBlockTree(VipsBlock vipsBlock)
 	{
 		_currentVipsBlock = vipsBlock;
-		Box elementBox = vipsBlock.getBox();
-
+		
 		// With VIPS rules it tries to determine if element is dividable
-		if (applyVipsRules(elementBox) && vipsBlock.isDividable() && !vipsBlock.isVisualBlock())
+		if (applyVipsRules(vipsBlock.getBox()) && vipsBlock.isDividable() && !vipsBlock.isVisualBlock())
 		{
 			// if element is dividable, let's divide it
 			_currentVipsBlock.setAlreadyDivided(true);
@@ -163,7 +161,7 @@ public class VipsParser {
 				vipsBlock.setDoC(11);
 			}
 
-			if (!verifyValidity(elementBox))
+			if (!verifyValidity(vipsBlock.getBox()))
 			{
 				_currentVipsBlock.setIsVisualBlock(false);
 			}
@@ -197,13 +195,12 @@ public class VipsParser {
 	private void getAllChildren(Box node, List<Box> children)
 	{
 		children.add(node);
-
-		if (node.getType() == Box.Type.TEXT_CONTENT)
-			return;
-
-		for (Box child : node.getChildren())
+		if (node.getType() != Box.Type.TEXT_CONTENT)
 		{
-			getAllChildren(child, children);
+    		for (Box child : node.getChildren())
+    		{
+    			getAllChildren(child, children);
+    		}
 		}
 	}
 
@@ -302,16 +299,19 @@ public class VipsParser {
 	private boolean isVirtualTextNode1(Box node)
 	{
 		if (node.getDisplayType() == DisplayType.BLOCK)
-			return false;
-
-		for (Box childNode : node.getChildren())
 		{
-			if (childNode.getType() != Type.TEXT_CONTENT)
-			{
-				return false;
-			}
+			return false;
 		}
-
+		else
+		{
+    		for (Box childNode : node.getChildren())
+    		{
+    			if (childNode.getType() != Type.TEXT_CONTENT)
+    			{
+    				return false;
+    			}
+    		}
+		}
 		return true;
 	}
 
@@ -329,15 +329,18 @@ public class VipsParser {
 	private boolean isVirtualTextNode2(Box node)
 	{
 		if (node.getDisplayType() == DisplayType.BLOCK)
-			return false;
-
-		for (Box childNode : node.getChildren())
 		{
-			if (!isTextNode(childNode) || !isVirtualTextNode1(childNode))
-				return false;
+			return false;
 		}
-
-		return true;
+		else
+		{
+    		for (Box childNode : node.getChildren())
+    		{
+    			if (!isTextNode(childNode) || !isVirtualTextNode1(childNode))
+    				return false;
+    		}
+    		return true;
+		}
 	}
 
 	/**
@@ -350,12 +353,7 @@ public class VipsParser {
 	 */
 	private boolean isVirtualTextNode(Box node)
 	{
-		if (isVirtualTextNode1(node))
-			return true;
-		if (isVirtualTextNode2(node))
-			return true;
-
-		return false;
+		return isVirtualTextNode1(node) || isVirtualTextNode2(node);
 	}
 
 	int _cnt = 0;
@@ -1002,12 +1000,13 @@ public class VipsParser {
 		if (node.getType() == Type.TEXT_CONTENT)
 		{
 			results.add(node);
-			return;
 		}
-
-		for (Box childNode : node.getChildren())
+		else
 		{
-			findTextChildrenNodes(childNode, results);
+    		for (Box childNode : node.getChildren())
+    		{
+    			findTextChildrenNodes(childNode, results);
+    		}
 		}
 	}
 

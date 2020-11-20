@@ -23,7 +23,6 @@ import cz.vutbr.fit.layout.model.Rectangular;
 public class VipsParser {
 
 	private VipsBlock _vipsBlocks = null;
-	private VipsBlock _currentVipsBlock = null;
 	private VipsBlock _tempVipsBlock = null;
 
 	private int _sizeTresholdWidth = 0;
@@ -139,37 +138,30 @@ public class VipsParser {
 	 */
 	private void divideVipsBlockTree(VipsBlock vipsBlock)
 	{
-		_currentVipsBlock = vipsBlock;
-		
 		// With VIPS rules it tries to determine if element is dividable
-		if (applyVipsRules(vipsBlock.getBox()) && vipsBlock.isDividable() && !vipsBlock.isVisualBlock())
+		if (applyVipsRules(vipsBlock) && vipsBlock.isDividable() && !vipsBlock.isVisualBlock())
 		{
 			// if element is dividable, let's divide it
-			_currentVipsBlock.setAlreadyDivided(true);
+			vipsBlock.setAlreadyDivided(true);
 			for (VipsBlock vipsBlockChild : vipsBlock.getChildren())
 			{
 				if (vipsBlockChild.getBox().getType() != Box.Type.TEXT_CONTENT)
 					divideVipsBlockTree(vipsBlockChild);
+				//TODO process text nodes somewhere
 			}
 		}
 		else
 		{
 			if (vipsBlock.isDividable())
 			{
-				//System.err.println("Element " + elementBox.getNode().getNodeName() + " is visual block");
 				vipsBlock.setIsVisualBlock(true);
 				vipsBlock.setDoC(11);
 			}
 
 			if (!verifyValidity(vipsBlock.getBox()))
 			{
-				_currentVipsBlock.setIsVisualBlock(false);
+				vipsBlock.setIsVisualBlock(false);
 			}
-			/*
-			if (vipsBlock.isVisualBlock())
-				//System.err.println("Element " + elementBox.getNode().getNodeName() + " is visual block");
-			else
-				System.err.println("Element " + elementBox.getNode().getNodeName() + " is not visual block");*/
 		}
 	}
 
@@ -267,10 +259,12 @@ public class VipsParser {
 	 */
 	private boolean isValidNode(Box node)
 	{
-		if (node.getHeight() > 0 && node.getWidth() > 0)
+	    if (node.getType() == Type.TEXT_CONTENT)
+	        return true;
+	    else if (node.getHeight() > 0 && node.getWidth() > 0)
 			return true;
-
-		return false;
+	    else
+	        return false;
 	}
 
 	/**
@@ -356,36 +350,24 @@ public class VipsParser {
 		return isVirtualTextNode1(node) || isVirtualTextNode2(node);
 	}
 
-	int _cnt = 0;
-
-	private void checkValidChildrenNodes(Box node)
+	private int countValidChildNodes(Box node)
 	{
-		if (node.getType() == Type.TEXT_CONTENT)
-		{
-			if (!node.getOwnText().equals(" "))
-			{
-				_cnt++;
-			}
-			return;
-		}
-		else
-		{
-			if (isValidNode(node))
-				_cnt++;
-		}
-
+	    int ret = 0;
+		if (isValidNode(node))
+			ret++;
 		for (Box childNode : node.getChildren())
 		{
-			checkValidChildrenNodes(childNode);
+			ret += countValidChildNodes(childNode);
 		}
+		return ret;
 	}
-
+	
 	/*
 	 * Checks if node has valid children nodes
 	 */
 	private boolean hasValidChildrenNodes(Box node)
 	{
-		if ("img".equalsIgnoreCase(node.getTagName()) || "input".equalsIgnoreCase(node.getTagName()))
+		/*if ("img".equalsIgnoreCase(node.getTagName()) || "input".equalsIgnoreCase(node.getTagName()))
 		{
 			if (node.getContentBounds().getWidth() > 0 && node.getContentBounds().getHeight() > 0)
 			{
@@ -395,37 +377,14 @@ public class VipsParser {
 			}
 			else
 				return false;
-		}
+		}*/ //TODO treat this elsewhere
 
-		if (node.getChildren().isEmpty())
-			return false;
-
-		_cnt = 0;
-
+		int cnt = 0;
 		for (Box child : node.getChildren())
 		{
-			checkValidChildrenNodes(child);
+			cnt += countValidChildNodes(child);
 		}
-
-		return (_cnt > 0) ? true : false;
-	}
-
-	/*
-	 * Returns the number of node's valid children
-	 */
-	private int numberOfValidChildNodes(Box node)
-	{
-		_cnt = 0;
-
-		if (node.getChildren().isEmpty())
-			return _cnt;
-
-		for (Box child : node.getChildren())
-		{
-			checkValidChildrenNodes(child);
-		}
-
-		return _cnt;
+		return (cnt > 0);
 	}
 
 	/**
@@ -433,35 +392,36 @@ public class VipsParser {
 	 * @param node DOM node
 	 * @return Returns true if element is dividable, otherwise false.
 	 */
-	private boolean applyVipsRules(Box node)
+	private boolean applyVipsRules(VipsBlock block)
 	{
+	    final Box node = block.getBox();
 		boolean retVal = false;
 
 		//System.err.println("Applying VIPS rules on " + node.getNode().getNodeName() + " node");
 
 		if (node.getDisplayType() == DisplayType.INLINE)
 		{
-			retVal = applyInlineTextNodeVipsRules(node);
+			retVal = applyInlineTextNodeVipsRules(block);
 		}
 		else if ("table".equalsIgnoreCase(node.getTagName()))
 		{
-			retVal = applyTableNodeVipsRules(node);
+			retVal = applyTableNodeVipsRules(block);
 		}
 		else if ("tr".equalsIgnoreCase(node.getTagName()))
 		{
-			retVal = applyTrNodeVipsRules(node);
+			retVal = applyTrNodeVipsRules(block);
 		}
 		else if ("td".equalsIgnoreCase(node.getTagName()))
 		{
-			retVal = applyTdNodeVipsRules(node);
+			retVal = applyTdNodeVipsRules(block);
 		}
 		else if ("p".equalsIgnoreCase(node.getTagName()))
 		{
-			retVal = applyPNodeVipsRules(node);
+			retVal = applyPNodeVipsRules(block);
 		}
 		else
 		{
-			retVal = applyOtherNodeVipsRules(node);
+			retVal = applyOtherNodeVipsRules(block);
 		}
 
 		return retVal;
@@ -470,35 +430,35 @@ public class VipsParser {
 	/**
 	 * Applies VIPS rules on block nodes other than &lt;P&gt; &lt;TD&gt;
 	 * &lt;TR&gt; &lt;TABLE&gt;.
-	 * @param node Node
+	 * @param block Node
 	 * @return Returns true if one of rules success and node is dividable.
 	 */
-	private boolean applyOtherNodeVipsRules(Box node)
+	private boolean applyOtherNodeVipsRules(VipsBlock block)
 	{
 		// 1 2 3 4 6 8 9 11
 
-		if (ruleOne(node))
+		if (ruleOne(block))
 			return true;
 
-		if (ruleTwo(node))
+		if (ruleTwo(block))
 			return true;
 
-		if (ruleThree(node))
+		if (ruleThree(block))
 			return true;
 
-		if (ruleFour(node))
+		if (ruleFour(block))
 			return true;
 
-		if (ruleSix(node))
+		if (ruleSix(block))
 			return true;
 
-		if (ruleEight(node))
+		if (ruleEight(block))
 			return true;
 
-		if (ruleNine(node))
+		if (ruleNine(block))
 			return true;
 
-		if (ruleEleven(node))
+		if (ruleEleven(block))
 			return true;
 
 		return false;
@@ -506,47 +466,47 @@ public class VipsParser {
 
 	/**
 	 * Applies VIPS rules on &lt;P&gt; node.
-	 * @param node Node
+	 * @param block Node
 	 * @return Returns true if one of rules success and node is dividable.
 	 */
-	private boolean applyPNodeVipsRules(Box node)
+	private boolean applyPNodeVipsRules(VipsBlock block)
 	{
 		// 1 2 3 4 5 6 8 9 11
 
-		if (ruleOne(node))
+		if (ruleOne(block))
 			return true;
 
-		if (ruleTwo(node))
+		if (ruleTwo(block))
 			return true;
 
-		if (ruleThree(node))
+		if (ruleThree(block))
 			return true;
 
-		if (ruleFour(node))
+		if (ruleFour(block))
 			return true;
 
-		if (ruleFive(node))
+		if (ruleFive(block))
 			return true;
 
-		if (ruleSix(node))
+		if (ruleSix(block))
 			return true;
 
-		if (ruleSeven(node))
+		if (ruleSeven(block))
 			return true;
 
-		if (ruleEight(node))
+		if (ruleEight(block))
 			return true;
 
-		if (ruleNine(node))
+		if (ruleNine(block))
 			return true;
 
-		if (ruleTen(node))
+		if (ruleTen(block))
 			return true;
 
-		if (ruleEleven(node))
+		if (ruleEleven(block))
 			return true;
 
-		if (ruleTwelve(node))
+		if (ruleTwelve(block))
 			return true;
 
 		return false;
@@ -554,35 +514,35 @@ public class VipsParser {
 
 	/**
 	 * Applies VIPS rules on &lt;TD&gt; node.
-	 * @param node Node
+	 * @param block Node
 	 * @return Returns true if one of rules success and node is dividable.
 	 */
-	private boolean applyTdNodeVipsRules(Box node)
+	private boolean applyTdNodeVipsRules(VipsBlock block)
 	{
 		// 1 2 3 4 8 9 10 12
 
-		if (ruleOne(node))
+		if (ruleOne(block))
 			return true;
 
-		if (ruleTwo(node))
+		if (ruleTwo(block))
 			return true;
 
-		if (ruleThree(node))
+		if (ruleThree(block))
 			return true;
 
-		if (ruleFour(node))
+		if (ruleFour(block))
 			return true;
 
-		if (ruleEight(node))
+		if (ruleEight(block))
 			return true;
 
-		if (ruleNine(node))
+		if (ruleNine(block))
 			return true;
 
-		if (ruleTen(node))
+		if (ruleTen(block))
 			return true;
 
-		if (ruleTwelve(node))
+		if (ruleTwelve(block))
 			return true;
 
 		return false;
@@ -590,29 +550,29 @@ public class VipsParser {
 
 	/**
 	 * Applies VIPS rules on &TR;&gt; node.
-	 * @param node Node
+	 * @param block Node
 	 * @return Returns true if one of rules success and node is dividable.
 	 */
-	private boolean applyTrNodeVipsRules(Box node)
+	private boolean applyTrNodeVipsRules(VipsBlock block)
 	{
 		// 1 2 3 7 9 12
 
-		if (ruleOne(node))
+		if (ruleOne(block))
 			return true;
 
-		if (ruleTwo(node))
+		if (ruleTwo(block))
 			return true;
 
-		if (ruleThree(node))
+		if (ruleThree(block))
 			return true;
 
-		if (ruleSeven(node))
+		if (ruleSeven(block))
 			return true;
 
-		if (ruleNine(node))
+		if (ruleNine(block))
 			return true;
 
-		if (ruleTwelve(node))
+		if (ruleTwelve(block))
 			return true;
 
 		return false;
@@ -620,29 +580,29 @@ public class VipsParser {
 
 	/**
 	 * Applies VIPS rules on &lt;TABLE&gt; node.
-	 * @param node Node
+	 * @param block Node
 	 * @return Returns true if one of rules success and node is dividable.
 	 */
-	private boolean applyTableNodeVipsRules(Box node)
+	private boolean applyTableNodeVipsRules(VipsBlock block)
 	{
 		// 1 2 3 7 9 12
 
-		if (ruleOne(node))
+		if (ruleOne(block))
 			return true;
 
-		if (ruleTwo(node))
+		if (ruleTwo(block))
 			return true;
 
-		if (ruleThree(node))
+		if (ruleThree(block))
 			return true;
 
-		if (ruleSeven(node))
+		if (ruleSeven(block))
 			return true;
 
-		if (ruleNine(node))
+		if (ruleNine(block))
 			return true;
 
-		if (ruleTwelve(node))
+		if (ruleTwelve(block))
 			return true;
 
 		return false;
@@ -650,38 +610,38 @@ public class VipsParser {
 
 	/**
 	 * Applies VIPS rules on inline nodes.
-	 * @param node Node
+	 * @param block Node
 	 * @return Returns true if one of rules success and node is dividable.
 	 */
-	private boolean applyInlineTextNodeVipsRules(Box node)
+	private boolean applyInlineTextNodeVipsRules(VipsBlock block)
 	{
 		// 1 2 3 4 5 6 8 9 11
 
-		if (ruleOne(node))
+		if (ruleOne(block))
 			return true;
 
-		if (ruleTwo(node))
+		if (ruleTwo(block))
 			return true;
 
-		if (ruleThree(node))
+		if (ruleThree(block))
 			return true;
 
-		if (ruleFour(node))
+		if (ruleFour(block))
 			return true;
 
-		if (ruleFive(node))
+		if (ruleFive(block))
 			return true;
 
-		if (ruleSix(node))
+		if (ruleSix(block))
 			return true;
 
-		if (ruleEight(node))
+		if (ruleEight(block))
 			return true;
 
-		if (ruleNine(node))
+		if (ruleNine(block))
 			return true;
 
-		if (ruleTwelve(node))
+		if (ruleTwelve(block))
 			return true;
 
 		return false;
@@ -698,15 +658,14 @@ public class VipsParser {
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleOne(Box node)
+	private boolean ruleOne(VipsBlock block)
 	{
-		//System.err.println("Applying rule One on " + node.getNode().getNodeName() + " node");
-
+	    final Box node = block.getBox();
 		if (!isTextNode(node))
 		{
 			if (!hasValidChildrenNodes(node))
 			{
-				_currentVipsBlock.setIsDividable(false);
+				block.setIsDividable(false);
 				return true;
 			}
 		}
@@ -725,16 +684,12 @@ public class VipsParser {
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleTwo(Box node)
+	private boolean ruleTwo(VipsBlock block)
 	{
-		//System.err.println("Applying rule Two on " + node.getNode().getNodeName() + " node");
-
-		if (numberOfValidChildNodes(node) == 1)
+	    final Box node = block.getBox();
+		if (countValidChildNodes(node) == 1)
 		{
-			if (node.getChildAt(0).getType() == Type.TEXT_CONTENT)
-				return false;
-			if (!isTextNode(node.getChildAt(0)))
-				return true;
+			return !isTextNode(node.getChildAt(0)); //TODO is this the valid child?!
 		}
 
 		return false;
@@ -752,29 +707,31 @@ public class VipsParser {
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleThree(Box node)
+	private boolean ruleThree(VipsBlock block)
 	{
-		//System.err.println("Applying rule Three on " + node.getNode().getNodeName() + " node");
+        final Box node = block.getBox();
 
-		if (!node.isRoot())
-			return false;
-
-		boolean result = true;
-		int cnt = 0;
-
-		for (VipsBlock vipsBlock : _vipsBlocks.getChildren())
+		if (node.isRoot())
 		{
-			if (vipsBlock.getBox().getTagName().equalsIgnoreCase(node.getTagName()))
-			{
-				result = true;
-				isOnlyOneDomSubTree(node, vipsBlock.getBox(), result);
-
-				if (result)
-					cnt++;
-			}
+    		boolean result = true;
+    		int cnt = 0;
+    
+    		for (VipsBlock vipsBlock : _vipsBlocks.getChildren())
+    		{
+    			if (vipsBlock.getBox().getTagName().equalsIgnoreCase(node.getTagName()))
+    			{
+    				result = true;
+    				isOnlyOneDomSubTree(node, vipsBlock.getBox(), result);
+    
+    				if (result)
+    					cnt++;
+    			}
+    		}
+    
+    		return (cnt == 1) ? true : false;
 		}
-
-		return (cnt == 1) ? true : false;
+		else
+		    return false;
 	}
 
 	/**
@@ -814,9 +771,9 @@ public class VipsParser {
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleFour(Box node)
+	private boolean ruleFour(VipsBlock block)
 	{
-		//System.err.println("Applying rule Four on " + node.getNode().getNodeName() + " node");
+        final Box node = block.getBox();
 
 		if (node.getChildren().isEmpty())
 			return false;
@@ -829,8 +786,8 @@ public class VipsParser {
 				return false;
 		}
 
-		_currentVipsBlock.setIsVisualBlock(true);
-		_currentVipsBlock.setIsDividable(false);
+		block.setIsVisualBlock(true);
+		block.setIsDividable(false);
 
 		if (node.getChildren().size() == 1)
 		{
@@ -845,9 +802,9 @@ public class VipsParser {
 			}
 			 */
 			if ("em".equals(node.getChildAt(0).getTagName()))
-				_currentVipsBlock.setDoC(11);
+				block.setDoC(11); //TODO what's this?
 			else
-				_currentVipsBlock.setDoC(10);
+				block.setDoC(10);
 			return true;
 		}
 
@@ -864,11 +821,11 @@ public class VipsParser {
 				{
 					if (fontSize != childFontSize)
 					{
-						_currentVipsBlock.setDoC(9);
+						block.setDoC(9);
 						break;
 					}
 					else
-						_currentVipsBlock.setDoC(10);
+						block.setDoC(10);
 				}
 				else
 					fontSize = childFontSize;
@@ -879,11 +836,11 @@ public class VipsParser {
 			{
 				if (Utils.fontWeight(childNode).equals(fontWeight) && childFontSize == fontSize)
 				{
-					_currentVipsBlock.setDoC(10);
+					block.setDoC(10);
 				}
 				else
 				{
-					_currentVipsBlock.setDoC(9);
+					block.setDoC(9);
 					break;
 				}
 			}
@@ -908,12 +865,9 @@ public class VipsParser {
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleFive(Box node)
+	private boolean ruleFive(VipsBlock block)
 	{
-		//System.err.println("Applying rule Five on " + node.getNode().getNodeName() + " node");
-
-		if (node.getChildren().isEmpty())
-			return false;
+        final Box node = block.getBox();
 
 		for (Box childNode : node.getChildren())
 		{
@@ -935,9 +889,10 @@ public class VipsParser {
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleSix(Box node)
+	private boolean ruleSix(VipsBlock block)
 	{
-		//System.err.println("Applying rule Six on " + node.getNode().getNodeName() + " node");
+        final Box node = block.getBox();
+        
 		if (node.getChildren().isEmpty())
 			return false;
 
@@ -967,9 +922,10 @@ public class VipsParser {
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleSeven(Box node)
+	private boolean ruleSeven(VipsBlock block)
 	{
-		//System.err.println("Applying rule Seven on " + node.getNode().getNodeName() + " node");
+        final Box node = block.getBox();
+        
 		if (node.getChildren().isEmpty())
 			return false;
 
@@ -977,9 +933,9 @@ public class VipsParser {
 			return false;
 
 		//String nodeBgColor = node.getStylePropertyValue("background-color");
-		String nodeBgColor = _currentVipsBlock.getBgColor();
+		String nodeBgColor = block.getBgColor();
 
-		for (VipsBlock vipsStructureChild : _currentVipsBlock.getChildren())
+		for (VipsBlock vipsStructureChild : block.getChildren())
 		{
 			if (!(vipsStructureChild.getBgColor().equals(nodeBgColor)))
 			{
@@ -1022,9 +978,10 @@ public class VipsParser {
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleEight(Box node)
+	private boolean ruleEight(VipsBlock block)
 	{
-		//System.err.println("Applying rule Eight on " + node.getNode().getNodeName() + " node");
+        final Box node = block.getBox();
+        
 		if (node.getChildren().isEmpty())
 			return false;
 
@@ -1059,17 +1016,17 @@ public class VipsParser {
 			return true;
 		}
 
-		_currentVipsBlock.setIsVisualBlock(true);
-		_currentVipsBlock.setIsDividable(false);
+		block.setIsVisualBlock(true);
+		block.setIsDividable(false);
 
 		if ("Xdiv".equalsIgnoreCase(node.getTagName()))
-			_currentVipsBlock.setDoC(7);
+			block.setDoC(7);
 		else if ("code".equalsIgnoreCase(node.getTagName()))
-			_currentVipsBlock.setDoC(7);
+			block.setDoC(7);
 		else if ("div".equalsIgnoreCase(node.getTagName()))
-			_currentVipsBlock.setDoC(5);
+			block.setDoC(5);
 		else
-			_currentVipsBlock.setDoC(8);
+			block.setDoC(8);
 		return true;
 	}
 
@@ -1084,9 +1041,10 @@ public class VipsParser {
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleNine(Box node)
+	private boolean ruleNine(VipsBlock block)
 	{
-		//System.err.println("Applying rule Nine on " + node.getNode().getNodeName() + " node");
+        final Box node = block.getBox();
+        
 		if (node.getChildren().isEmpty())
 			return false;
 
@@ -1106,15 +1064,15 @@ public class VipsParser {
 			return true;
 
 		//TODO set DOC
-		_currentVipsBlock.setIsVisualBlock(true);
-		_currentVipsBlock.setIsDividable(false);
+		block.setIsVisualBlock(true);
+		block.setIsDividable(false);
 
 		if ("XDiv".equalsIgnoreCase(node.getTagName()))
-			_currentVipsBlock.setDoC(7);
+			block.setDoC(7);
 		if ("a".equalsIgnoreCase(node.getTagName()))
-			_currentVipsBlock.setDoC(11);
+			block.setDoC(11);
 		else
-			_currentVipsBlock.setDoC(8);
+			block.setDoC(8);
 
 		return true;
 	}
@@ -1128,9 +1086,9 @@ public class VipsParser {
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleTen(Box node)
+	private boolean ruleTen(VipsBlock block)
 	{
-		//System.err.println("Applying rule Ten on " + node.getNode().getNodeName() + " node");
+        final Box node = block.getBox();
 
 		//VipsBlock previousSiblingVipsBlock = null;
 		//findPreviousSiblingNodeVipsBlock(node.getNode().getPreviousSibling(), _vipsBlocks, previousSiblingVipsBlock);
@@ -1156,11 +1114,11 @@ public class VipsParser {
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleEleven(Box node)
+	private boolean ruleEleven(VipsBlock block)
 	{
 		//System.err.println("Applying rule Eleven on " + node.getNode().getNodeName() + " node");
 
-		return (isTextNode(node)) ? false : true;
+		return !isTextNode(block.getBox());
 	}
 
 	/**
@@ -1173,25 +1131,25 @@ public class VipsParser {
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleTwelve(Box node)
+	private boolean ruleTwelve(VipsBlock block)
 	{
-		//System.err.println("Applying rule Twelve on " + node.getNode().getNodeName() + " node");
+        final Box node = block.getBox();
 
-		_currentVipsBlock.setIsDividable(false);
-		_currentVipsBlock.setIsVisualBlock(true);
+		block.setIsDividable(false);
+		block.setIsVisualBlock(true);
 
 		if ("XDiv".equalsIgnoreCase(node.getTagName()))
-			_currentVipsBlock.setDoC(7);
+			block.setDoC(7);
 		else if ("li".equalsIgnoreCase(node.getTagName()))
-			_currentVipsBlock.setDoC(8);
+			block.setDoC(8);
 		else if ("span".equalsIgnoreCase(node.getTagName()))
-			_currentVipsBlock.setDoC(8);
+			block.setDoC(8);
 		else if ("sup".equalsIgnoreCase(node.getTagName()))
-			_currentVipsBlock.setDoC(8);
+			block.setDoC(8);
 		else if ("img".equalsIgnoreCase(node.getTagName()))
-			_currentVipsBlock.setDoC(8);
+			block.setDoC(8);
 		else
-			_currentVipsBlock.setDoC(333);
+			block.setDoC(333);
 		//TODO DoC Part
 		return true;
 	}

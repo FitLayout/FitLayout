@@ -41,6 +41,7 @@ public class VipsBlock {
 	private boolean _alreadyDivided = false;
 	//if node can be divided
 	private boolean _isDividable = true;
+	private boolean preventDivision = false;
 
 	private String _bgColor = null;
 
@@ -71,8 +72,6 @@ public class VipsBlock {
 	public void setIsVisualBlock(boolean isVisualBlock)
 	{
 		_isVisualBlock = isVisualBlock;
-		if (this.toString().contains("STRONG"))
-		    System.out.println("jo!");
 		checkProperties();
 	}
 
@@ -85,7 +84,17 @@ public class VipsBlock {
 		return _isVisualBlock;
 	}
 
-	/**
+	public boolean isPreventDivision()
+    {
+        return preventDivision;
+    }
+
+    public void setPreventDivision(boolean preventDivision)
+    {
+        this.preventDivision = preventDivision;
+    }
+
+    /**
 	 * Checks the properties of visual block
 	 */
 	private void checkProperties()
@@ -348,27 +357,23 @@ public class VipsBlock {
 	 * Finds background color of element
 	 * @param element Element
 	 */
-	private void findBgColor(Box element)
+	private String findBgColor(Box element)
 	{
 		String backgroundColor = Utils.colorString(element.getBackgroundColor());
-
 		if (backgroundColor.isEmpty())
 		{
-			if (element.getParent() != null &&
-			    !element.getTagName().equals("body"))
+			if (element.getParent() != null && !element.getTagName().equals("body"))
 			{
-				findBgColor(element.getParent());
+				return findBgColor(element.getParent());
 			}
 			else
 			{
-				_bgColor = "#ffffff";
-				return;
+				return "#ffffff";
 			}
 		}
 		else
 		{
-			_bgColor = backgroundColor;
-			return;
+			return backgroundColor;
 		}
 	}
 
@@ -378,14 +383,8 @@ public class VipsBlock {
 	 */
 	public String getBgColor()
 	{
-		if (_bgColor != null)
-			return _bgColor;
-
-		_bgColor = Utils.colorString(_box.getBackgroundColor());
-		
-		if (_bgColor.isEmpty())
-			findBgColor(this.getBox());
-
+		if (_bgColor == null)
+    		_bgColor = findBgColor(getBox());
 		return _bgColor;
 	}
 

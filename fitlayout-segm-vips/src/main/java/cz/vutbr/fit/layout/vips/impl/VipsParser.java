@@ -109,65 +109,42 @@ public class VipsParser
 
 	/**
 	 * Tries to divide DOM elements and finds visual blocks.
-	 * @param vipsBlock Visual structure
+	 * @param block Visual structure
 	 */
-	private void divideVipsBlockTree(VipsBlock vipsBlock)
+	private void divideVipsBlockTree(VipsBlock block)
 	{
 		// With VIPS rules it tries to determine if element is dividable
-		if (applyVipsRules(vipsBlock) && vipsBlock.isDividable() && !vipsBlock.isVisualBlock())
+		if (applyVipsRules(block) && block.isDividable() && !block.isVisualBlock())
 		{
 			// if element is dividable, let's divide it
-			vipsBlock.setAlreadyDivided(true);
-			for (VipsBlock vipsBlockChild : vipsBlock.getChildren())
+			block.setAlreadyDivided(true);
+			for (VipsBlock child : block.getChildren())
 			{
-				if (vipsBlockChild.getBox().getType() != Box.Type.TEXT_CONTENT)
-					divideVipsBlockTree(vipsBlockChild);
-				//TODO process text nodes somewhere
+				if (child.getBox().getType() == Box.Type.TEXT_CONTENT)
+				{
+				  //TODO process text nodes somewhere
+				}
+				else
+				{
+				    if (!child.isPreventDivision())
+				        divideVipsBlockTree(child);
+				    //TODO re-enable division for further rounds?
+				}
+				
 			}
 		}
 		else
 		{
-			if (vipsBlock.isDividable())
+			if (block.isDividable())
 			{
-				vipsBlock.setIsVisualBlock(true);
-				vipsBlock.setDoC(11);
+				block.setIsVisualBlock(true);
+				block.setDoC(11);
 			}
 
-			if (!verifyValidity(vipsBlock.getBox()))
+			if (!verifyValidity(block.getBox()))
 			{
-				vipsBlock.setIsVisualBlock(false);
+				block.setIsVisualBlock(false);
 			}
-		}
-	}
-
-	private int getAllTextLength(Box node)
-	{
-		List<Box> childrenTextNodes = new ArrayList<Box>();
-
-		findTextChildrenNodes(node, childrenTextNodes);
-
-		int textLength = 0;
-
-		for (Box child : childrenTextNodes)
-		{
-			String childText = child.getOwnText();
-
-			if (!childText.equals("") && !childText.equals(" ") && !childText.equals("\n"))
-				textLength += childText.length();
-		}
-
-		return textLength;
-	}
-
-	private void getAllChildren(Box node, List<Box> children)
-	{
-		children.add(node);
-		if (node.getType() != Box.Type.TEXT_CONTENT)
-		{
-    		for (Box child : node.getChildren())
-    		{
-    			getAllChildren(child, children);
-    		}
 		}
 	}
 
@@ -195,28 +172,6 @@ public class VipsParser
 
 		if (!node.isVisible())
 			return false;
-
-		if (getAllTextLength(node) == 0)
-		{
-			List<Box> children = new ArrayList<Box>();
-
-			getAllChildren(node, children);
-
-			for (Box child : children)
-			{
-				String childNodeName = child.getTagName();
-
-				if (!child.isVisible())
-					continue;
-
-				if (childNodeName.equalsIgnoreCase("img"))
-					return true;
-				if (childNodeName.equalsIgnoreCase("input"))
-					return true;
-			}
-
-			return false;
-		}
 
 		return true;
 	}
@@ -252,7 +207,7 @@ public class VipsParser
 	 */
 	private boolean isTextNode(Box box)
 	{
-		return (box.getType() == Type.TEXT_CONTENT);
+		return (box.getType() == Type.TEXT_CONTENT || box.getType() == Type.REPLACED_CONTENT);
 	}
 
 	/**
@@ -328,11 +283,10 @@ public class VipsParser
 	private int countValidChildNodes(Box node)
 	{
 	    int ret = 0;
-		if (isValidNode(node))
-			ret++;
 		for (Box childNode : node.getChildren())
 		{
-			ret += countValidChildNodes(childNode);
+			if (isValidNode(childNode))
+			    ret++;
 		}
 		return ret;
 	}
@@ -340,7 +294,7 @@ public class VipsParser
 	/*
 	 * Checks if node has valid children nodes
 	 */
-	private boolean hasValidChildrenNodes(Box node)
+	private Box getFirstValidChildNode(Box node)
 	{
 		/*if ("img".equalsIgnoreCase(node.getTagName()) || "input".equalsIgnoreCase(node.getTagName()))
 		{
@@ -354,14 +308,19 @@ public class VipsParser
 				return false;
 		}*/ //TODO treat this elsewhere
 
-		int cnt = 0;
-		for (Box child : node.getChildren())
-		{
-			cnt += countValidChildNodes(child);
-		}
-		return (cnt > 0);
+        for (Box childNode : node.getChildren())
+        {
+            if (isValidNode(childNode))
+                return childNode;
+        }
+        return null;
 	}
 
+	private boolean hasValidChildNodes(Box node)
+	{
+	    return getFirstValidChildNode(node) != null;
+	}
+	
 	/**
 	 * On different DOM nodes it applies different sets of VIPS rules.
 	 * @param node DOM node
@@ -410,6 +369,8 @@ public class VipsParser
 	 */
 	private boolean applyOtherNodeVipsRules(VipsBlock block)
 	{
+        if (block.toString().contains("screenshots"))
+            System.out.println("jo!");
 		// 1 2 3 4 6 8 9 11
 
 		if (ruleOne(block))
@@ -636,16 +597,13 @@ public class VipsParser
 	private boolean ruleOne(VipsBlock block)
 	{
 	    final Box node = block.getBox();
-		if (!isTextNode(node))
+		if (!isTextNode(node) && !hasValidChildNodes(node))
 		{
-			if (!hasValidChildrenNodes(node))
-			{
-				block.setIsDividable(false);
-				return true;
-			}
+			block.setIsDividable(false);
+			return true;
 		}
-
-		return false;
+		else
+		    return false;
 	}
 
 	/**
@@ -664,9 +622,9 @@ public class VipsParser
 	    final Box node = block.getBox();
 		if (countValidChildNodes(node) == 1)
 		{
-			return !isTextNode(node.getChildAt(0)); //TODO is this the valid child?!
+		    final Box child = getFirstValidChildNode(node);
+			return !isTextNode(child);
 		}
-
 		return false;
 	}
 
@@ -684,52 +642,12 @@ public class VipsParser
 	 */
 	private boolean ruleThree(VipsBlock block)
 	{
-        final Box node = block.getBox();
-
-		if (node.isRoot())
-		{
-    		boolean result = true;
-    		int cnt = 0;
-    
-    		for (VipsBlock vipsBlock : rootBlock.getChildren())
-    		{
-    			if (vipsBlock.getBox().getTagName().equalsIgnoreCase(node.getTagName()))
-    			{
-    				result = true;
-    				isOnlyOneDomSubTree(node, vipsBlock.getBox(), result);
-    
-    				if (result)
-    					cnt++;
-    			}
-    		}
-    
-    		return (cnt == 1) ? true : false;
-		}
-		else
-		    return false;
-	}
-
-	/**
-	 * Checks if node's subtree is unique in DOM tree.
-	 * @param pattern Node for comparing
-	 * @param node Node from DOM tree
-	 * @param result True if element is unique otherwise false
-	 */
-	private void isOnlyOneDomSubTree(Box pattern, Box node, boolean result) //TODO result?!
-	{
-		if (!pattern.getTagName().equalsIgnoreCase(node.getTagName()))
-			result = false;
-
-		if (pattern.getChildren().size() != node.getChildren().size())
-			result = false;
-
-		if (!result)
-			return;
-
-		for (int i = 0; i < pattern.getChildren().size(); i++)
-		{
-			isOnlyOneDomSubTree(pattern.getChildren().get(i), node.getChildren().get(i), result);
-		}
+	    //TODO this is not very clear
+	    if (block.getBox().isRoot())
+	    {
+	        return true;
+	    }
+	    return false;
 	}
 
 	/**
@@ -750,83 +668,34 @@ public class VipsParser
 	{
         final Box node = block.getBox();
 
-		if (node.getChildren().isEmpty())
-			return false;
-
-		for (Box box : node.getChildren())
+		if (node.getChildCount() > 0)
 		{
-			if (box.getType() == Type.TEXT_CONTENT)
-				continue;
-			if (!isTextNode(box) ||	!isVirtualTextNode(box))
-				return false;
+		    //all children must be text nodes or virtual text nodes
+    		for (Box box : node.getChildren())
+    		{
+    			if (!isTextNode(box) && !isVirtualTextNode(box))
+    				return false;
+    		}
+
+    		block.setIsVisualBlock(true);
+    		block.setIsDividable(false);
+
+    		//determine the DoC
+    		final float fw = node.getChildAt(0).getTextStyle().getFontWeight();
+    		final float fs = node.getChildAt(0).getTextStyle().getFontSize();
+    		boolean allEqual = true;
+    		for (int i = 1; i < node.getChildCount() && allEqual; i++)
+    		{
+                float nfw = node.getChildAt(i).getTextStyle().getFontWeight();
+                float nfs = node.getChildAt(i).getTextStyle().getFontSize();
+    		    if (Math.abs(fw - nfw) > 0.01 && Math.abs(fs - nfs) > 0.01)
+    		        allEqual = false;
+    		}
+    		block.setDoC(allEqual ? 10 : 9);
+    		return true;
 		}
-
-		block.setIsVisualBlock(true);
-		block.setIsDividable(false);
-
-		if (node.getChildren().size() == 1)
-		{
-			/*
-			if (node.getSubBox(0) instanceof TextBox)
-			{
-				_currentVipsBlock.setIsVisualBlock(false);
-				_currentVipsBlock.setIsDividable(true);
-				_currentVipsBlock.getChildren().get(0).setIsVisualBlock(true);
-				_currentVipsBlock.getChildren().get(0).setIsDividable(false);
-				_currentVipsBlock.getChildren().get(0).setDoC(11);
-			}
-			 */
-			if ("em".equals(node.getChildAt(0).getTagName()))
-				block.setDoC(11); //TODO what's this?
-			else
-				block.setDoC(10);
-			return true;
-		}
-
-		String fontWeight = "";
-		int fontSize = 0;
-
-		for (Box childNode : node.getChildren())
-		{
-			int childFontSize = Math.round(childNode.getTextStyle().getFontSize());
-
-			if (childNode.getType() == Type.TEXT_CONTENT)
-			{
-				if (fontSize > 0)
-				{
-					if (fontSize != childFontSize)
-					{
-						block.setDoC(9);
-						break;
-					}
-					else
-						block.setDoC(10);
-				}
-				else
-					fontSize = childFontSize;
-				continue;
-			}
-
-			if (fontSize > 0)
-			{
-				if (Utils.fontWeight(childNode).equals(fontWeight) && childFontSize == fontSize)
-				{
-					block.setDoC(10);
-				}
-				else
-				{
-					block.setDoC(9);
-					break;
-				}
-			}
-			else
-			{
-				fontWeight = Utils.fontWeight(childNode);
-				fontSize = childFontSize;
-			}
-		}
-
-		return true;
+		else
+		    return false; //no children
 	}
 
 	/**
@@ -867,19 +736,11 @@ public class VipsParser
 	private boolean ruleSix(VipsBlock block)
 	{
         final Box node = block.getBox();
-        
-		if (node.getChildren().isEmpty())
-			return false;
-
-		List<Box> children = new ArrayList<Box>();
-		getAllChildren(node, children);
-
-		for (Box child : children)
+		for (Box child : node.getChildren())
 		{
 			if ("hr".equalsIgnoreCase(child.getTagName()))
 				return true;
 		}
-
 		return false;
 	}
 
@@ -907,17 +768,16 @@ public class VipsParser
 		if (isTextNode(node))
 			return false;
 
-		//String nodeBgColor = node.getStylePropertyValue("background-color");
 		String nodeBgColor = block.getBgColor();
-
-		for (VipsBlock vipsStructureChild : block.getChildren())
+		for (VipsBlock child : block.getChildren())
 		{
-			if (!(vipsStructureChild.getBgColor().equals(nodeBgColor)))
+			if (!(child.getBgColor().equals(nodeBgColor)))
 			{
-				vipsStructureChild.setIsDividable(false);
-				vipsStructureChild.setIsVisualBlock(true);
+				child.setIsDividable(false);
+				child.setIsVisualBlock(true);
+                child.setPreventDivision(true);
 				// TODO DoC values
-				vipsStructureChild.setDoC(7);
+				child.setDoC(7);
 				return true;
 			}
 		}
@@ -925,21 +785,6 @@ public class VipsParser
 		return false;
 	}
 
-
-	private void findTextChildrenNodes(Box node, List<Box> results)
-	{
-		if (node.getType() == Type.TEXT_CONTENT)
-		{
-			results.add(node);
-		}
-		else
-		{
-    		for (Box childNode : node.getChildren())
-    		{
-    			findTextChildrenNodes(childNode, results);
-    		}
-		}
-	}
 
 	/**
 	 * VIPS Rule Eight
@@ -957,52 +802,42 @@ public class VipsParser
 	{
         final Box node = block.getBox();
         
-		if (node.getChildren().isEmpty())
-			return false;
-
-
-		List<Box> children = new ArrayList<Box>();
-
-		findTextChildrenNodes(node, children);
-
-		int cnt = children.size();
-
-		if (cnt == 0)
-			return false;
-
-		if (node.getWidth() == 0 || node.getHeight() == 0)
+		if (node.getChildCount() > 0)
 		{
-			children.clear();
-
-			getAllChildren(node, children);
-
-			for (Box child : children)
-			{
-				if (child.getWidth() != 0 && child.getHeight() != 0)
-					return true;
-			}
+    		if (node.getWidth() * node.getHeight() < sizeTresholdHeight * sizeTresholdWidth)
+    		{
+    		    boolean hasTextChild = false;
+    		    for (Box child : node.getChildren())
+    		    {
+    		        if (isTextNode(child) || isVirtualTextNode(child))
+    		        {
+    		            hasTextChild = true;
+    		            break;
+    		        }
+    		    }
+    		    if (hasTextChild)
+    		    {
+            		block.setIsVisualBlock(true);
+            		block.setIsDividable(false);
+            
+            		if ("Xdiv".equalsIgnoreCase(node.getTagName()))
+            			block.setDoC(7);
+            		else if ("code".equalsIgnoreCase(node.getTagName()))
+            			block.setDoC(7);
+            		else if ("div".equalsIgnoreCase(node.getTagName()))
+            			block.setDoC(5);
+            		else
+            			block.setDoC(8);
+            		return true;
+    		    }
+    		    else
+    		        return false; //no text child
+    		}
+    		else
+    		    return false; //not smaller than a treshold
 		}
-
-		if (node.getWidth() * node.getHeight() > sizeTresholdHeight * sizeTresholdWidth)
-			return false;
-
-		if ("ul".equalsIgnoreCase(node.getTagName()))
-		{
-			return true;
-		}
-
-		block.setIsVisualBlock(true);
-		block.setIsDividable(false);
-
-		if ("Xdiv".equalsIgnoreCase(node.getTagName()))
-			block.setDoC(7);
-		else if ("code".equalsIgnoreCase(node.getTagName()))
-			block.setDoC(7);
-		else if ("div".equalsIgnoreCase(node.getTagName()))
-			block.setDoC(5);
 		else
-			block.setDoC(8);
-		return true;
+		    return false; //no children
 	}
 
 	/**
@@ -1020,36 +855,35 @@ public class VipsParser
 	{
         final Box node = block.getBox();
         
-		if (node.getChildren().isEmpty())
-			return false;
-
-		int maxSize = 0;
-
-		for (Box childNode : node.getChildren())
+		if (node.getChildCount() > 0)
 		{
-			int childSize = childNode.getWidth() * childNode.getHeight();
-
-			if (maxSize < childSize)
-			{
-				maxSize = childSize;
-			}
+    		int maxSize = 0;
+    		for (Box childNode : node.getChildren())
+    		{
+    			int childSize = childNode.getWidth() * childNode.getHeight();
+    			if (maxSize < childSize)
+    				maxSize = childSize;
+    		}
+    		if (maxSize < sizeTresholdWidth * sizeTresholdHeight)
+    		{
+        		//TODO set DOC
+        		block.setIsVisualBlock(true);
+        		block.setIsDividable(false);
+        
+        		if ("XDiv".equalsIgnoreCase(node.getTagName()))
+        			block.setDoC(7);
+        		if ("a".equalsIgnoreCase(node.getTagName()))
+        			block.setDoC(11);
+        		else
+        			block.setDoC(8);
+        		
+                return true;
+    		}
+    		else
+    		    return false; //not smaller than the threshold
 		}
-
-		if (maxSize > sizeTresholdWidth * sizeTresholdHeight)
-			return true;
-
-		//TODO set DOC
-		block.setIsVisualBlock(true);
-		block.setIsDividable(false);
-
-		if ("XDiv".equalsIgnoreCase(node.getTagName()))
-			block.setDoC(7);
-		if ("a".equalsIgnoreCase(node.getTagName()))
-			block.setDoC(11);
 		else
-			block.setDoC(8);
-
-		return true;
+		    return false;
 	}
 
 	/**
@@ -1065,12 +899,9 @@ public class VipsParser
 	{
         final Box node = block.getBox();
 
-		//VipsBlock previousSiblingVipsBlock = null;
-		//findPreviousSiblingNodeVipsBlock(node.getNode().getPreviousSibling(), _vipsBlocks, previousSiblingVipsBlock);
-
         if (node.getPreviousSibling() != null)
         {
-            VipsBlock siblingBlock = findBlockForBox(node.getPreviousSibling(), rootBlock);
+            final VipsBlock siblingBlock = findBlockForBox(node.getPreviousSibling(), rootBlock);
             if (siblingBlock != null && siblingBlock.isAlreadyDivided())
             {
                 block.setIsDividable(true);
@@ -1094,9 +925,7 @@ public class VipsParser
 	 */
 	private boolean ruleEleven(VipsBlock block)
 	{
-		//System.err.println("Applying rule Eleven on " + node.getNode().getNodeName() + " node");
-
-		return !isTextNode(block.getBox());
+        return true;
 	}
 
 	/**

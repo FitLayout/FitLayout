@@ -18,45 +18,46 @@ import cz.vutbr.fit.layout.model.Rectangular;
 /**
  * Class that parses blocks on page and finds visual blocks.
  * @author Tomas Popela
- *
+ * @author burgetr
  */
-public class VipsParser {
+public class VipsParser 
+{
+    //source page
+    private Page page = null;
 
-	private VipsBlock _vipsBlocks = null;
-	private VipsBlock _tempVipsBlock = null;
+	private VipsBlock rootBlock = null;
 
-	private int _sizeTresholdWidth = 0;
-	private int _sizeTresholdHeight = 0;
-	private Page _page = null;
-	private int _visualBlocksCount = 0;
-	private int _pageWidth = 0;
-	private int _pageHeight = 0;
+	private int sizeTresholdWidth = 0;
+	private int sizeTresholdHeight = 0;
+	private int pageWidth = 0;
+	private int pageHeight = 0;
 
 	/**
 	 * Default constructor
 	 * 
-	 * @param viewport Rendered's page viewport
+	 * @param page Rendered's page viewport
 	 */
-	public VipsParser(Page viewport) {
-		this._page = viewport;
-		this._vipsBlocks = new VipsBlock();
-		this._sizeTresholdHeight = 80;
-		this._sizeTresholdWidth = 80;
-		this._pageWidth = viewport.getWidth();
-		this._pageHeight = viewport.getHeight();
+	public VipsParser(Page page) 
+	{
+		this.page = page;
+		this.rootBlock = new VipsBlock();
+		this.sizeTresholdHeight = 80;
+		this.sizeTresholdWidth = 80;
+		this.pageWidth = page.getWidth();
+		this.pageHeight = page.getHeight();
 	}
 
 	/**
 	 * Constructor, where we can define element's size treshold
-	 * @param viewport	Rendered's page viewport
+	 * @param page	Rendered page
 	 * @param sizeTresholdWidth Element's width treshold
 	 * @param sizeTresholdHeight Element's height treshold
 	 */
-	public VipsParser(Page viewport, int sizeTresholdWidth, int sizeTresholdHeight) {
-		this._page = viewport;
-		this._vipsBlocks = new VipsBlock();
-		this._sizeTresholdHeight = sizeTresholdHeight;
-		this._sizeTresholdWidth = sizeTresholdWidth;
+	public VipsParser(Page page, int sizeTresholdWidth, int sizeTresholdHeight) 
+	{
+	    this(page);
+		this.sizeTresholdHeight = sizeTresholdHeight;
+		this.sizeTresholdWidth = sizeTresholdWidth;
 	}
 
 	/**
@@ -64,35 +65,9 @@ public class VipsParser {
 	 */
 	public void parse()
 	{
-		if (_page != null)
-		{
-			this._vipsBlocks = new VipsBlock();
-			_visualBlocksCount = 0;
-
-			constructVipsBlockTree(_page.getRoot(), _vipsBlocks);
-			divideVipsBlockTree(_vipsBlocks);
-
-			getVisualBlocksCount(_vipsBlocks);
-			//System.err.println(String.valueOf("We have " + _visualBlocksCount + " visual blocks."));
-		}
-		else
-			System.err.print("Page's viewPort is not defined");
-	}
-
-	/**
-	 * Counts number of visual blocks in visual structure
-	 * @param vipsBlock Visual structure
-	 */
-	private void getVisualBlocksCount(VipsBlock vipsBlock)
-	{
-		if (vipsBlock.isVisualBlock())
-			_visualBlocksCount++;
-
-		for (VipsBlock vipsBlockChild : vipsBlock.getChildren())
-		{
-			if (vipsBlockChild.getBox().getType() != Box.Type.TEXT_CONTENT)
-				getVisualBlocksCount(vipsBlockChild);
-		}
+		this.rootBlock = new VipsBlock();
+		constructVipsBlockTree(page.getRoot(), rootBlock);
+		divideVipsBlockTree(rootBlock);
 	}
 
 	private void findVisualBlocks(VipsBlock vipsBlock, List<VipsBlock> list)
@@ -107,7 +82,7 @@ public class VipsParser {
 	public List<VipsBlock> getVisualBlocks()
 	{
 		List<VipsBlock> list = new ArrayList<VipsBlock>();
-		findVisualBlocks(_vipsBlocks, list);
+		findVisualBlocks(rootBlock, list);
 
 		return list;
 	}
@@ -203,13 +178,13 @@ public class VipsParser {
 		if (bounds.getX1() < 0 || bounds.getY1() < 0)
 			return false;
 
-		if (node.getX2() > _pageWidth)
+		if (node.getX2() > pageWidth)
 		{
 			return false;
 			//System.out.println("X " + node.getAbsoluteContentX() + "\t" + (node.getAbsoluteContentX() + node.getContentWidth()) + "\t" + _pageWidth);
 		}
 
-		if (node.getY2() > _pageHeight)
+		if (node.getY2() > pageHeight)
 		{
 			return false;
 			//System.out.println("Y " + node.getAbsoluteContentY() + "\t" + (node.getAbsoluteContentY() + node.getContentHeight()) + "\t" + _pageHeight);
@@ -716,7 +691,7 @@ public class VipsParser {
     		boolean result = true;
     		int cnt = 0;
     
-    		for (VipsBlock vipsBlock : _vipsBlocks.getChildren())
+    		for (VipsBlock vipsBlock : rootBlock.getChildren())
     		{
     			if (vipsBlock.getBox().getTagName().equalsIgnoreCase(node.getTagName()))
     			{
@@ -1008,7 +983,7 @@ public class VipsParser {
 			}
 		}
 
-		if (node.getWidth() * node.getHeight() > _sizeTresholdHeight * _sizeTresholdWidth)
+		if (node.getWidth() * node.getHeight() > sizeTresholdHeight * sizeTresholdWidth)
 			return false;
 
 		if ("ul".equalsIgnoreCase(node.getTagName()))
@@ -1060,7 +1035,7 @@ public class VipsParser {
 			}
 		}
 
-		if (maxSize > _sizeTresholdWidth * _sizeTresholdHeight)
+		if (maxSize > sizeTresholdWidth * sizeTresholdHeight)
 			return true;
 
 		//TODO set DOC
@@ -1093,16 +1068,19 @@ public class VipsParser {
 		//VipsBlock previousSiblingVipsBlock = null;
 		//findPreviousSiblingNodeVipsBlock(node.getNode().getPreviousSibling(), _vipsBlocks, previousSiblingVipsBlock);
 
-		_tempVipsBlock = null;
-		findPreviousSiblingNodeVipsBlock(node.getPreviousSibling(), _vipsBlocks);
-
-		if (_tempVipsBlock == null)
-			return false;
-
-		if (_tempVipsBlock.isAlreadyDivided())
-			return true;
-
-		return false;
+        if (node.getPreviousSibling() != null)
+        {
+            VipsBlock siblingBlock = findBlockForBox(node.getPreviousSibling(), rootBlock);
+            if (siblingBlock != null && siblingBlock.isAlreadyDivided())
+            {
+                block.setIsDividable(true);
+                return true;
+            }
+            else
+                return false;
+        }
+        else
+            return false;
 	}
 
 	/**
@@ -1159,7 +1137,7 @@ public class VipsParser {
 	 */
 	public int getSizeTresholdWidth()
 	{
-		return _sizeTresholdWidth;
+		return sizeTresholdWidth;
 	}
 
 	/**
@@ -1167,7 +1145,7 @@ public class VipsParser {
 	 */
 	public void setSizeTresholdWidth(int sizeTresholdWidth)
 	{
-		this._sizeTresholdWidth = sizeTresholdWidth;
+		this.sizeTresholdWidth = sizeTresholdWidth;
 	}
 
 	/**
@@ -1175,7 +1153,7 @@ public class VipsParser {
 	 */
 	public int getSizeTresholdHeight()
 	{
-		return _sizeTresholdHeight;
+		return sizeTresholdHeight;
 	}
 
 	/**
@@ -1183,29 +1161,35 @@ public class VipsParser {
 	 */
 	public void setSizeTresholdHeight(int sizeTresholdHeight)
 	{
-		this._sizeTresholdHeight = sizeTresholdHeight;
+		this.sizeTresholdHeight = sizeTresholdHeight;
 	}
 
 	public VipsBlock getVipsBlocks()
 	{
-		return _vipsBlocks;
+		return rootBlock;
 	}
 
 	/**
-	 * Finds previous sibling node's VIPS block.
-	 * @param node Node
-	 * @param vipsBlock Actual VIPS block
-	 * @param foundBlock VIPS block for given node
+	 * Finds a vips block in a subtree that contains the given box.
+	 * @param node the box to find
+	 * @param root Subtree root
+	 * @returns VIPS block for the gien block or {@code null}
 	 */
-	private void findPreviousSiblingNodeVipsBlock(Box node, VipsBlock vipsBlock)
+	private VipsBlock findBlockForBox(Box node, VipsBlock root)
 	{
-		if (vipsBlock.getBox().equals(node))
+		if (root.getBox().equals(node))
 		{
-			_tempVipsBlock = vipsBlock;
-			return;
+			return root;
 		}
 		else
-			for (VipsBlock vipsBlockChild : vipsBlock.getChildren())
-				findPreviousSiblingNodeVipsBlock(node, vipsBlockChild);
+		{
+			for (VipsBlock child : root.getChildren())
+			{
+				final VipsBlock found = findBlockForBox(node, child);
+				if (found != null)
+				    return found;
+			}
+			return null;
+		}
 	}
 }

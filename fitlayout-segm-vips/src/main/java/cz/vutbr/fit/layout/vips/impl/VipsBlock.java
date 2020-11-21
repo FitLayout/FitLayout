@@ -12,54 +12,41 @@ import java.util.List;
 import cz.vutbr.fit.layout.model.Box;
 
 /**
- * Class that represents block on page.
+ * A class that represents a block on the page.
  * @author Tomas Popela
- *
+ * @author burgetr
  */
-public class VipsBlock {
-
+public class VipsBlock 
+{
 	//rendered Box, that corresponds to DOM element
-	private Box _box = null;
+	private Box box = null;
 	//children of this node
-	private List<VipsBlock> _children = null;
+	private List<VipsBlock> children = null;
 	//node id
 	private int _id = 0;
 	//node's Degree Of Coherence
 	private int _DoC = 0;
 
-	//number of images in node
-	private int _containImg = 0;
-	//if node is image
-	private boolean _isImg = false;
 	//if node is visual block
-	private boolean _isVisualBlock = false;
-	//if node contains table
-	private boolean _containTable = false;
-	//number of paragraphs in node
-	private int _containP = 0;
+	private boolean visualBlock = false;
 	//if node was already divided
-	private boolean _alreadyDivided = false;
+	private boolean alreadyDivided = false;
 	//if node can be divided
-	private boolean _isDividable = true;
+	private boolean dividable = true;
 
-	private String _bgColor = null;
+	private String bgColor = null;
 
-	private int _frameSourceIndex = 0;
-	private int _sourceIndex = 0;
-	private int _order = 0;
+	private int frameSourceIndex = 0;
 
 
-	//length of text in node
-	private int _textLen = 0;
-	//length of text in links in node
-	private int _linkTextLen = 0;
-
-	public VipsBlock() {
-		this._children = new ArrayList<VipsBlock>();
+	public VipsBlock() 
+	{
+		this.children = new ArrayList<VipsBlock>();
 	}
 
-	public VipsBlock(int id, VipsBlock node) {
-		this._children = new ArrayList<VipsBlock>();
+	public VipsBlock(int id, VipsBlock node) 
+	{
+		this.children = new ArrayList<VipsBlock>();
 		setId(id);
 		addChild(node);
 	}
@@ -70,8 +57,7 @@ public class VipsBlock {
 	 */
 	public void setIsVisualBlock(boolean isVisualBlock)
 	{
-		_isVisualBlock = isVisualBlock;
-		checkProperties();
+		visualBlock = isVisualBlock;
 	}
 
 	/**
@@ -80,104 +66,7 @@ public class VipsBlock {
 	 */
 	public boolean isVisualBlock()
 	{
-		return _isVisualBlock;
-	}
-
-    /**
-	 * Checks the properties of visual block
-	 */
-	private void checkProperties()
-	{
-		checkIsImg();
-		checkContainImg(this);
-		checkContainTable(this);
-		checkContainP(this);
-		_linkTextLen = 0;
-		_textLen = 0;
-		countTextLength(this);
-		countLinkTextLength(this);
-		_sourceIndex = _box.getOrder();
-	}
-
-	/**
-	 * Checks if visual block is an image.
-	 */
-	private void checkIsImg()
-	{
-        if ("img".equalsIgnoreCase(getBox().getTagName()))
-			_isImg = true;
-		else
-			_isImg = false;
-	}
-
-	/**
-	 * Checks if visual block contains image.
-	 * @param vipsBlock Visual block
-	 */
-	private void checkContainImg(VipsBlock vipsBlock)
-	{
-        if ("img".equalsIgnoreCase(vipsBlock.getBox().getTagName()))
-		{
-			vipsBlock._isImg = true;
-			this._containImg++;
-		}
-
-		for (VipsBlock childVipsBlock : vipsBlock.getChildren())
-			checkContainImg(childVipsBlock);
-	}
-
-	/**
-	 * Checks if visual block contains table.
-	 * @param vipsBlock Visual block
-	 */
-	private void checkContainTable(VipsBlock vipsBlock)
-	{
-        if ("table".equalsIgnoreCase(vipsBlock.getBox().getTagName()))
-			this._containTable = true;
-
-		for (VipsBlock childVipsBlock : vipsBlock.getChildren())
-			checkContainTable(childVipsBlock);
-	}
-
-	/**
-	 * Checks if visual block contains paragraph.
-	 * @param vipsBlock Visual block
-	 */
-	private void checkContainP(VipsBlock vipsBlock)
-	{
-		if ("p".equalsIgnoreCase(vipsBlock.getBox().getTagName()))
-			this._containP++;
-
-		for (VipsBlock childVipsBlock : vipsBlock.getChildren())
-			checkContainP(childVipsBlock);
-	}
-
-	/**
-	 * Counts length of text in links in visual block
-	 * @param vipsBlock Visual block
-	 */
-	private void countLinkTextLength(VipsBlock vipsBlock)
-	{
-        if ("a".equalsIgnoreCase(vipsBlock.getBox().getTagName()))
-		{
-            if (vipsBlock.getBox().getOwnText() != null)
-                _linkTextLen += vipsBlock.getBox().getOwnText().length();
-		}
-
-		for (VipsBlock childVipsBlock : vipsBlock.getChildren())
-			countLinkTextLength(childVipsBlock);
-	}
-
-	/**
-	 * Count length of text in visual block
-	 * @param vipsBlock Visual block
-	 */
-	private void countTextLength(VipsBlock vipsBlock)
-	{
-	    if (vipsBlock.getBox().getOwnText() != null)
-	        _textLen = vipsBlock.getBox().getOwnText().replaceAll("\n", "").length();
-	    else
-	        _textLen = 0;
+		return visualBlock;
 	}
 
 	/**
@@ -186,7 +75,7 @@ public class VipsBlock {
 	 */
 	public void addChild(VipsBlock child)
 	{
-		_children.add(child);
+		children.add(child);
 	}
 
 	/**
@@ -195,7 +84,7 @@ public class VipsBlock {
 	 */
 	public List<VipsBlock> getChildren()
 	{
-		return _children;
+		return children;
 	}
 
 	/**
@@ -204,7 +93,7 @@ public class VipsBlock {
 	 */
 	public void setBox(Box box)
 	{
-		this._box = box;
+		this.box = box;
 	}
 
 	/**
@@ -213,7 +102,7 @@ public class VipsBlock {
 	 */
 	public Box getBox()
 	{
-		return _box;
+		return box;
 	}
 
 	/**
@@ -258,7 +147,7 @@ public class VipsBlock {
 	 */
 	public boolean isDividable()
 	{
-		return _isDividable;
+		return dividable;
 	}
 
 	/**
@@ -267,7 +156,7 @@ public class VipsBlock {
 	 */
 	public void setIsDividable(boolean isDividable)
 	{
-		this._isDividable = isDividable;
+		this.dividable = isDividable;
 	}
 
 	/**
@@ -276,7 +165,7 @@ public class VipsBlock {
 	 */
 	public boolean isAlreadyDivided()
 	{
-		return _alreadyDivided;
+		return alreadyDivided;
 	}
 
 	/**
@@ -285,61 +174,7 @@ public class VipsBlock {
 	 */
 	public void setAlreadyDivided(boolean alreadyDivided)
 	{
-		this._alreadyDivided = alreadyDivided;
-	}
-
-	/**
-	 * Checks if block is image
-	 * @return True if block is image, otherwise false
-	 */
-	public boolean isImg()
-	{
-		return _isImg;
-	}
-
-	/**
-	 * Checks if block contain images
-	 * @return Number of images
-	 */
-	public int containImg()
-	{
-		return _containImg;
-	}
-
-	/**
-	 * Checks if block contains table
-	 * @return True if block contains table, otherwise false
-	 */
-	public boolean containTable()
-	{
-		return _containTable;
-	}
-
-	/**
-	 * Gets length of text in block
-	 * @return Length of text
-	 */
-	public int getTextLength()
-	{
-		return _textLen;
-	}
-
-	/**
-	 * Gets length of text in links in block
-	 * @return Length of links text
-	 */
-	public int getLinkTextLength()
-	{
-		return _linkTextLen;
-	}
-
-	/**
-	 * Gets number of paragraphs in block
-	 * @return Number of paragraphs
-	 */
-	public int containP()
-	{
-		return _containP;
+		this.alreadyDivided = alreadyDivided;
 	}
 
 	/**
@@ -372,9 +207,9 @@ public class VipsBlock {
 	 */
 	public String getBgColor()
 	{
-		if (_bgColor == null)
-    		_bgColor = findBgColor(getBox());
-		return _bgColor;
+		if (bgColor == null)
+    		bgColor = findBgColor(getBox());
+		return bgColor;
 	}
 
 	/**
@@ -401,34 +236,17 @@ public class VipsBlock {
 	 */
 	public int getFrameSourceIndex()
 	{
-		return _frameSourceIndex;
-	}
-
-	/**
-	 * Gets source index of block
-	 * @return Block's source index
-	 */
-	public int getSourceIndex()
-	{
-		return _sourceIndex;
-	}
-
-	/**
-	 * Gets order of block
-	 * @return Block's order
-	 */
-	public int getOrder()
-	{
-		return _order;
+		return frameSourceIndex;
 	}
 
     @Override
     public String toString()
     {
-        String ret = isVisualBlock() ? "[":"![";
+        String ret = isVisualBlock() ? "*[":"[";
         if (getBox() != null)
             ret += getBox().toString();
         ret += "]";
+        ret += "(DoC=" + getDoC() + ")";
         return ret;
     }
 

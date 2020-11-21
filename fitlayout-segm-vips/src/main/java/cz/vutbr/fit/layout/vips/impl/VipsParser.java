@@ -22,10 +22,9 @@ import cz.vutbr.fit.layout.model.Rectangular;
  */
 public class VipsParser 
 {
-    //source page
-    private Page page = null;
-
-	private VipsBlock rootBlock = null;
+    private Page page;
+    private Box rootBox;
+    private VipsBlock rootBlock;
 
 	private int sizeTresholdWidth = 0;
 	private int sizeTresholdHeight = 0;
@@ -37,9 +36,10 @@ public class VipsParser
 	 * 
 	 * @param page Rendered's page viewport
 	 */
-	public VipsParser(Page page) 
+	public VipsParser(Page page, Box rootBox) 
 	{
 		this.page = page;
+		this.rootBox = rootBox;
 		this.rootBlock = new VipsBlock();
 		this.sizeTresholdHeight = 80;
 		this.sizeTresholdWidth = 80;
@@ -53,9 +53,9 @@ public class VipsParser
 	 * @param sizeTresholdWidth Element's width treshold
 	 * @param sizeTresholdHeight Element's height treshold
 	 */
-	public VipsParser(Page page, int sizeTresholdWidth, int sizeTresholdHeight) 
+	public VipsParser(Page page, Box rootBox, int sizeTresholdWidth, int sizeTresholdHeight) 
 	{
-	    this(page);
+	    this(page, rootBox);
 		this.sizeTresholdHeight = sizeTresholdHeight;
 		this.sizeTresholdWidth = sizeTresholdWidth;
 	}
@@ -65,8 +65,9 @@ public class VipsParser
 	 */
 	public void parse()
 	{
-		this.rootBlock = new VipsBlock();
+	    //construct the tree of block, one for each source box
 		constructVipsBlockTree(page.getRoot(), rootBlock);
+		//divide the blocks according to the block extraction algorithm
 		divideVipsBlockTree(rootBlock);
 	}
 
@@ -74,35 +75,38 @@ public class VipsParser
 	{
 		if (vipsBlock.isVisualBlock())
 			list.add(vipsBlock);
-
 		for (VipsBlock vipsStructureChild : vipsBlock.getChildren())
 			findVisualBlocks(vipsStructureChild, list);
 	}
 
+	/**
+	 * Selects all the extracted blocks from the tree of blocks.
+	 * @return a list of extracted blocks
+	 */
 	public List<VipsBlock> getVisualBlocks()
 	{
 		List<VipsBlock> list = new ArrayList<VipsBlock>();
 		findVisualBlocks(rootBlock, list);
-
 		return list;
 	}
 
 	/**
-	 * Construct VIPS block tree from viewport.
+	 * Construct VIPS block tree starting at the root box.
 	 * <p>
 	 * Starts from &lt;body&gt; element.
-	 * @param element Box that represents element
-	 * @param node Visual structure tree node
+	 * @param root Box that represents the current box
+	 * @param rootBlock Visual structure tree node
 	 */
-	private void constructVipsBlockTree(Box element, VipsBlock node)
+	private void constructVipsBlockTree(Box root, VipsBlock rootBlock)
 	{
-		node.setBox(element);
-		if (element.getType() != Box.Type.TEXT_CONTENT)
+		rootBlock.setBox(root);
+		if (root.getType() != Box.Type.TEXT_CONTENT)
 		{
-			for (Box box : element.getChildren())
+			for (Box child : root.getChildren())
 			{
-				node.addChild(new VipsBlock());
-				constructVipsBlockTree(box, node.getChildren().get(node.getChildren().size()-1));
+			    final VipsBlock childBlock = new VipsBlock();
+				rootBlock.addChild(childBlock);
+				constructVipsBlockTree(child, childBlock);
 			}
 		}
 	}
@@ -120,24 +124,17 @@ public class VipsParser
 			block.setAlreadyDivided(true);
 			for (VipsBlock child : block.getChildren())
 			{
-				if (child.getBox().getType() == Box.Type.TEXT_CONTENT)
-				{
-				    //TODO process text nodes somewhere?
-				}
-				else
-				{
-			        divideVipsBlockTree(child);
-				}
+		        divideVipsBlockTree(child);
 			}
 		}
 		else
 		{
-			if (block.isDividable())
+			/*if (block.isDividable())
 			{
 				block.setIsVisualBlock(true);
 				block.setDoC(11);
-			}
-
+			}*/ //TODO what was this?
+		    //remove invalid blocks
 			if (!verifyValidity(block.getBox()))
 			{
 				block.setIsVisualBlock(false);
@@ -328,7 +325,6 @@ public class VipsParser
 	    final Box node = block.getBox();
 		boolean retVal = false;
 
-		//System.err.println("Applying VIPS rules on " + node.getNode().getNodeName() + " node");
 
 		if (node.getDisplayType() == DisplayType.INLINE)
 		{
@@ -665,7 +661,15 @@ public class VipsParser
 	{
         final Box node = block.getBox();
 
-		if (node.getChildCount() > 0)
+        if (isTextNode(node)) 
+        {
+            //text node always succeeds - it has a consistent style and is not further dividable
+            block.setIsVisualBlock(true);
+            block.setIsDividable(false);
+            block.setDoC(10);
+            return true;
+        }
+        else if (node.getChildCount() > 0)
 		{
 		    //all children must be text nodes or virtual text nodes
     		for (Box box : node.getChildren())
@@ -989,7 +993,7 @@ public class VipsParser
 		this.sizeTresholdHeight = sizeTresholdHeight;
 	}
 
-	public VipsBlock getVipsBlocks()
+	public VipsBlock getRootBlock()
 	{
 		return rootBlock;
 	}

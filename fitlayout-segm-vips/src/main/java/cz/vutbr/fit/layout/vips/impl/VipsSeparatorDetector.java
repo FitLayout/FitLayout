@@ -19,8 +19,7 @@ import cz.vutbr.fit.layout.model.Box.Type;
  */
 public class VipsSeparatorDetector 
 {
-	VipsBlock _vipsBlocks = null;
-	List<VipsBlock> _visualBlocks = null;
+	private List<VipsBlock> _visualBlocks = null;
 	private List<Separator> _horizontalSeparators = null;
 	private List<Separator> _verticalSeparators = null;
 	
@@ -40,7 +39,6 @@ public class VipsSeparatorDetector
 		this._horizontalSeparators = new ArrayList<Separator>();
 		this._verticalSeparators = new ArrayList<Separator>();
 		this._visualBlocks = new ArrayList<VipsBlock>();
-		createPool();
 	}
 
 	public int getWidth()
@@ -53,44 +51,6 @@ public class VipsSeparatorDetector
         return height;
     }
 
-	public void addVisualBlock(VipsBlock vipsBlock)
-	{
-	    //used only for graphics
-	}
-
-	protected void fillPoolWithBlocks(List<VipsBlock> visualBlocks)
-	{
-		for (VipsBlock block : visualBlocks)
-		{
-			addVisualBlock(block);
-		}
-	}
-
-	private void fillPoolWithBlocks(VipsBlock vipsBlock)
-	{
-		if (vipsBlock.isVisualBlock())
-		{
-			addVisualBlock(vipsBlock);
-			_visualBlocks.add(vipsBlock);
-		}
-
-		for (VipsBlock vipsBlockChild : vipsBlock.getChildren())
-			fillPoolWithBlocks(vipsBlockChild);
-	}
-
-	/**
-	 * Fills pool with all visual blocks from VIPS blocks.
-	 * 
-	 */
-	public void fillPool()
-	{
-		createPool();
-		if (_vipsBlocks != null)
-			fillPoolWithBlocks(_vipsBlocks);
-		else
-			fillPoolWithBlocks(_visualBlocks);
-	}
-
 	/**
 	 * Creates pool
 	 */
@@ -100,33 +60,16 @@ public class VipsSeparatorDetector
 
 	/**
 	 * Sets VIPS block, that will be used for separators computing.
-	 * @param vipsBlock Visual structure
-	 */
-	public void setVipsBlock(VipsBlock vipsBlock)
-	{
-		this._vipsBlocks = vipsBlock;
-		_visualBlocks.clear();
-		fillPoolWithBlocks(vipsBlock);
-		createPool();
-	}
-
-	/**
-	 * Gets VIPS block that is used for separators computing.
-	 * @return Vips blocks
-	 */
-	public VipsBlock getVipsBlock()
-	{
-		return _vipsBlocks;
-	}
-
-	/**
-	 * Sets VIPS block, that will be used for separators computing.
 	 * @param visualBlocks List of visual blocks
 	 */
 	public void setVisualBlocks(List<VipsBlock> visualBlocks)
 	{
 		this._visualBlocks.clear();
-		this._visualBlocks.addAll(visualBlocks);
+		for (VipsBlock block : visualBlocks)
+		{
+		    //addVisualBlock(block); //TODO? does this have effect?
+		    _visualBlocks.add(block);
+		}
 	}
 
 	/**
@@ -877,4 +820,11 @@ public class VipsSeparatorDetector
 
 		return false;
 	}
+
+    public void addVisualBlock(VipsBlock vipsBlock)
+    {
+        //used only for graphics
+    }
+
+
 }

@@ -33,6 +33,7 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
     {
         super(width, height);
         this._image = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
+        createPool();
     }
     
     /**
@@ -64,6 +65,14 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
         _pool.setColor(Color.black);
     }
 
+    public void fillPool()
+    {
+        for (VipsBlock block : getVisualBlocks())
+        {
+            addVisualBlock(block);
+        }
+    }
+    
     /**
      * Saves everything (separators + block) to image.
      */
@@ -82,7 +91,7 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
     public void exportAllToImage(int suffix)
     {
         createPool();
-        fillPoolWithBlocks(_visualBlocks);
+        fillPool();
         drawVerticalSeparators();
         drawHorizontalSeparators();
         saveToImage("iteration" + suffix);

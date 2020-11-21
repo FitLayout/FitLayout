@@ -9,6 +9,7 @@ package cz.vutbr.fit.layout.vips.impl;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 
 import cz.vutbr.fit.layout.model.Page;
 
@@ -23,14 +24,12 @@ public class Vips {
 
 	private boolean _graphicsOutput = false;
 	private boolean _outputToFolder = false;
-	private boolean _outputEscaping = true;
-	private int _pDoC = 11;
-	private String _filename = "";
+	private int pDoC = 11;
 	private	int sizeTresholdWidth = 350;
 	private	int sizeTresholdHeight = 400;
 
-	long startTime = 0;
-	long endTime = 0;
+	private long startTime = 0;
+	private long endTime = 0;
 
 	/**
 	 * Default constructor
@@ -58,15 +57,6 @@ public class Vips {
 	}
 
 	/**
-	 * Enables or disables output XML character escaping.
-	 * @param enable True for enable, otherwise false.
-	 */
-	public void enableOutputEscaping(boolean enable)
-	{
-		_outputEscaping = enable;
-	}
-
-	/**
 	 * Sets permitted degree of coherence (pDoC) value.
 	 * @param value pDoC value.
 	 */
@@ -79,7 +69,7 @@ public class Vips {
 		}
 		else
 		{
-			_pDoC = value;
+			pDoC = value;
 		}
 	}
 
@@ -99,7 +89,7 @@ public class Vips {
 	
 	public VipsTreeBuilder getTreeBuilder()
 	{
-	    return new VipsTreeBuilder(_pDoC);
+	    return new VipsTreeBuilder(pDoC);
 	}
 	
 	/**
@@ -137,14 +127,42 @@ public class Vips {
 		return outputFolder;
 	}
 
+    private void performSegmentation()
+    {
+        final int pageWidth = page.getWidth();
+        final int pageHeight = page.getHeight();
+        
+        //extract the blocks
+        VipsParser vipsParser = new VipsParser(page, page.getRoot());
+        vipsParser.setSizeTresholdHeight(sizeTresholdHeight);
+        vipsParser.setSizeTresholdWidth(sizeTresholdWidth);
+        vipsParser.parse();
+        //VipsBlock vipsBlocks = vipsParser.getVipsBlocks();
+        List<VipsBlock> vipsBlocks = vipsParser.getVisualBlocks();
+        
+        
+        VisualStructureConstructor constructor = new VisualStructureConstructor(pDoC);
+        constructor.setGraphicsOutput(_graphicsOutput);
+
+        // visual structure construction
+        constructor.setVipsBlocks(vipsBlocks);
+        constructor.setPageSize(pageWidth, pageHeight);
+        constructor.constructVisualStructure();
+        constructor.normalizeSeparatorsMinMax();
+        visualStructure = constructor.getVisualStructure();
+
+        
+        
+    }	
+	
 	/**
 	 * Performs page segmentation.
 	 */
-	private void performSegmentation()
+	/*private void xperformSegmentation()
 	{
 
 		startTime = System.nanoTime();
-		int numberOfIterations = 10;
+		int numberOfIterations = 1;
 		int pageWidth = page.getWidth();
 		int pageHeight = page.getHeight();
 
@@ -152,8 +170,8 @@ public class Vips {
 			exportPageToImage();
 
 		VipsSeparatorGraphicsDetector detector;
-		VipsParser vipsParser = new VipsParser(page);
-		VisualStructureConstructor constructor = new VisualStructureConstructor(_pDoC);
+		VipsParser vipsParser = new VipsParser(page, page.getRoot());
+		VisualStructureConstructor constructor = new VisualStructureConstructor(pDoC);
 		constructor.setGraphicsOutput(_graphicsOutput);
 
 		for (int iterationNumber = 1; iterationNumber < numberOfIterations+1; iterationNumber++)
@@ -239,11 +257,6 @@ public class Vips {
 
 		visualStructure = constructor.getVisualStructure();
 		
-		VipsOutput vipsOutput = new VipsOutput(_pDoC);
-		vipsOutput.setEscapeOutput(_outputEscaping);
-		vipsOutput.setOutputFileName(_filename);
-		vipsOutput.writeXML(visualStructure, page);
-
 		endTime = System.nanoTime();
 
 		long diff = endTime - startTime;
@@ -251,7 +264,7 @@ public class Vips {
 		System.out.println("Execution time of VIPS: " + diff + " ns; " +
 				(diff / 1000000.0) + " ms; " +
 				(diff / 1000000000.0) + " sec");
-	}
+	}*/
 
 	/**
 	 * Starts segmentation on given address
@@ -305,15 +318,4 @@ public class Vips {
 		}
 	}
 
-	public void setOutputFileName(String filename)
-	{
-		if (!filename.equals(""))
-		{
-			_filename = filename;
-		}
-		else
-		{
-			System.out.println("Invalid filename!");
-		}
-	}
 }

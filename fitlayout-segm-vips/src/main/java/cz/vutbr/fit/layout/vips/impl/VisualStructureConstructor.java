@@ -18,9 +18,8 @@ import cz.vutbr.fit.layout.model.Rectangular;
  * @author Tomas Popela
  *
  */
-public class VisualStructureConstructor {
-
-	private VipsBlock _vipsBlocks = null;
+public class VisualStructureConstructor 
+{
 	private List<VipsBlock> _visualBlocks = null;
 	private VisualStructure _visualStructure = null;
 	private List<Separator> _horizontalSeparators = null;
@@ -43,23 +42,7 @@ public class VisualStructureConstructor {
 
 	public VisualStructureConstructor(int pDoC)
 	{
-		this._horizontalSeparators = new ArrayList<Separator>();
-		this._verticalSeparators = new ArrayList<Separator>();
-		setPDoC(pDoC);
-	}
-
-	public VisualStructureConstructor(VipsBlock vipsBlocks)
-	{
-		this._horizontalSeparators = new ArrayList<Separator>();
-		this._verticalSeparators = new ArrayList<Separator>();
-		this._vipsBlocks = vipsBlocks;
-	}
-
-	public VisualStructureConstructor(VipsBlock vipsBlocks, int pDoC)
-	{
-		this._horizontalSeparators = new ArrayList<Separator>();
-		this._verticalSeparators = new ArrayList<Separator>();
-		this._vipsBlocks = vipsBlocks;
+	    this();
 		setPDoC(pDoC);
 	}
 
@@ -138,10 +121,9 @@ public class VisualStructureConstructor {
 			if (_graphicsOutput)
 				detector = new VipsSeparatorGraphicsDetector(_pageWidth, _pageHeight);
 			else
-				detector = new VipsSeparatorNonGraphicsDetector(_pageWidth, _pageHeight);
+				detector = new VipsSeparatorDetector(_pageWidth, _pageHeight);
 
 			detector.setCleanUpSeparators(3);
-			detector.setVipsBlock(_vipsBlocks);
 			detector.setVisualBlocks(_visualBlocks);
 			detector.detectHorizontalSeparators();
 			this._horizontalSeparators = detector.getHorizontalSeparators();
@@ -173,11 +155,11 @@ public class VisualStructureConstructor {
 				if (_graphicsOutput)
 					detector = new VipsSeparatorGraphicsDetector(_pageWidth, _pageHeight);
 				else
-					detector = new VipsSeparatorNonGraphicsDetector(_pageWidth, _pageHeight);
+					detector = new VipsSeparatorDetector(_pageWidth, _pageHeight);
 
 				detector.setCleanUpSeparators(4);
 
-				detector.setVipsBlock(_vipsBlocks);
+				//detector.setVipsBlock(_vipsBlocks);
 				detector.setVisualBlocks(childVisualStructure.getNestedBlocks());
 				detector.detectHorizontalSeparators();
 				this._horizontalSeparators = detector.getHorizontalSeparators();
@@ -206,10 +188,10 @@ public class VisualStructureConstructor {
 			if (_graphicsOutput)
 				detector = new VipsSeparatorGraphicsDetector(_pageWidth, _pageHeight);
 			else
-				detector = new VipsSeparatorNonGraphicsDetector(_pageWidth, _pageHeight);
+				detector = new VipsSeparatorDetector(_pageWidth, _pageHeight);
 
 			detector.setCleanUpSeparators(3);
-			detector.setVipsBlock(_vipsBlocks);
+			//detector.setVipsBlock(_vipsBlocks);
 			detector.setVisualBlocks(_visualBlocks);
 			detector.detectVerticalSeparators();
 			this._verticalSeparators = detector.getVerticalSeparators();
@@ -240,11 +222,11 @@ public class VisualStructureConstructor {
 				if (_graphicsOutput)
 					detector = new VipsSeparatorGraphicsDetector(_pageWidth, _pageHeight);
 				else
-					detector = new VipsSeparatorNonGraphicsDetector(_pageWidth, _pageHeight);
+					detector = new VipsSeparatorDetector(_pageWidth, _pageHeight);
 
 				detector.setCleanUpSeparators(4);
 
-				detector.setVipsBlock(_vipsBlocks);
+				//detector.setVipsBlock(_vipsBlocks);
 				detector.setVisualBlocks(childVisualStructure.getNestedBlocks());
 				detector.detectVerticalSeparators();
 				this._verticalSeparators = detector.getVerticalSeparators();
@@ -514,14 +496,6 @@ public class VisualStructureConstructor {
 	}
 
 	/**
-	 * @return Returns VipsBlocks structure with all blocks from page
-	 */
-	public VipsBlock getVipsBlocks()
-	{
-		return _vipsBlocks;
-	}
-
-	/**
 	 * @return Returns final visual structure
 	 */
 	public VisualStructure getVisualStructure()
@@ -530,31 +504,12 @@ public class VisualStructureConstructor {
 	}
 
 	/**
-	 * Finds all visual blocks in VipsBlock structure
-	 * @param vipsBlock Actual VipsBlock
-	 * @param results	Results
-	 */
-	private void findVisualBlocks(VipsBlock vipsBlock, List<VipsBlock> results)
-	{
-		if (vipsBlock.isVisualBlock())
-			results.add(vipsBlock);
-
-		for (VipsBlock child : vipsBlock.getChildren())
-		{
-			findVisualBlocks(child, results);
-		}
-	}
-
-	/**
 	 * Sets VipsBlock structure and also finds and saves all visual blocks from its
 	 * @param vipsBlocks VipsBlock structure
 	 */
-	public void setVipsBlocks(VipsBlock vipsBlocks)
+	public void setVipsBlocks(List<VipsBlock> vipsBlocks)
 	{
-		this._vipsBlocks = vipsBlocks;
-
-		_visualBlocks = new ArrayList<VipsBlock>();
-		findVisualBlocks(vipsBlocks, _visualBlocks);
+		_visualBlocks = vipsBlocks;
 	}
 
 	/**
@@ -694,7 +649,8 @@ public class VisualStructureConstructor {
 	 */
 	public void updateVipsBlocks(VipsBlock vipsBlocks)
 	{
-		setVipsBlocks(vipsBlocks);
+	    //TODO what is this?
+		//setVipsBlocks(vipsBlocks);
 
 		List<VisualStructure> listsVisualStructures = new ArrayList<VisualStructure>();
 		List<VipsBlock> oldNestedBlocks = new ArrayList<VipsBlock>();
@@ -740,7 +696,7 @@ public class VisualStructureConstructor {
 	 */
 	private void setOrder(VisualStructure visualStructure)
 	{
-		visualStructure.setOrder(_srcOrder);
+		//visualStructure.setOrder(_srcOrder);
 		_srcOrder++;
 
 		for (VisualStructure child : visualStructure.getChildrenVisualStructures())
@@ -868,7 +824,7 @@ public class VisualStructureConstructor {
 			if (_graphicsOutput)
 				detector = new VipsSeparatorGraphicsDetector(_pageWidth, _pageHeight);
 			else
-				detector = new VipsSeparatorNonGraphicsDetector(_pageWidth, _pageHeight);
+				detector = new VipsSeparatorDetector(_pageWidth, _pageHeight);
 
 			detector.setCleanUpSeparators(3);
 			if (_iteration > 3)
@@ -934,7 +890,7 @@ public class VisualStructureConstructor {
 			if (_graphicsOutput)
 				detector = new VipsSeparatorGraphicsDetector(_pageWidth, _pageHeight);
 			else
-				detector = new VipsSeparatorNonGraphicsDetector(_pageWidth, _pageHeight);
+				detector = new VipsSeparatorDetector(_pageWidth, _pageHeight);
 
 			detector.setCleanUpSeparators(3);
 			if (_iteration > 3)

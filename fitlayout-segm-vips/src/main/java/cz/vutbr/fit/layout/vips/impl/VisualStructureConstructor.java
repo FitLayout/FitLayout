@@ -555,7 +555,6 @@ public class VisualStructureConstructor {
 
 		_visualBlocks = new ArrayList<VipsBlock>();
 		findVisualBlocks(vipsBlocks, _visualBlocks);
-
 	}
 
 	/**

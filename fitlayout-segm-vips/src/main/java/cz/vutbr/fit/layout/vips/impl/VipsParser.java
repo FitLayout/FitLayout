@@ -122,15 +122,12 @@ public class VipsParser
 			{
 				if (child.getBox().getType() == Box.Type.TEXT_CONTENT)
 				{
-				  //TODO process text nodes somewhere
+				    //TODO process text nodes somewhere?
 				}
 				else
 				{
-				    if (!child.isPreventDivision())
-				        divideVipsBlockTree(child);
-				    //TODO re-enable division for further rounds?
+			        divideVipsBlockTree(child);
 				}
-				
 			}
 		}
 		else
@@ -775,7 +772,6 @@ public class VipsParser
 			{
 				child.setIsDividable(false);
 				child.setIsVisualBlock(true);
-                child.setPreventDivision(true);
 				// TODO DoC values
 				child.setDoC(7);
 				return true;

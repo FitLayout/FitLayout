@@ -41,7 +41,6 @@ public class VipsBlock {
 	private boolean _alreadyDivided = false;
 	//if node can be divided
 	private boolean _isDividable = true;
-	private boolean preventDivision = false;
 
 	private String _bgColor = null;
 
@@ -83,16 +82,6 @@ public class VipsBlock {
 	{
 		return _isVisualBlock;
 	}
-
-	public boolean isPreventDivision()
-    {
-        return preventDivision;
-    }
-
-    public void setPreventDivision(boolean preventDivision)
-    {
-        this.preventDivision = preventDivision;
-    }
 
     /**
 	 * Checks the properties of visual block

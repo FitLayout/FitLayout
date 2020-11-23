@@ -19,9 +19,9 @@ import cz.vutbr.fit.layout.model.Box.Type;
  */
 public class VipsSeparatorDetector 
 {
-	private List<VipsBlock> _visualBlocks = null;
-	private List<Separator> _horizontalSeparators = null;
-	private List<Separator> _verticalSeparators = null;
+	private List<VipsBlock> visualBlocks = null;
+	private List<Separator> horizontalSeparators = null;
+	private List<Separator> verticalSeparators = null;
 	
 	private int width;
 	private int height;
@@ -36,9 +36,9 @@ public class VipsSeparatorDetector
 	public VipsSeparatorDetector(int width, int height) {
 	    this.width = width;
 	    this.height = height;
-		this._horizontalSeparators = new ArrayList<Separator>();
-		this._verticalSeparators = new ArrayList<Separator>();
-		this._visualBlocks = new ArrayList<VipsBlock>();
+		this.horizontalSeparators = new ArrayList<Separator>();
+		this.verticalSeparators = new ArrayList<Separator>();
+		this.visualBlocks = new ArrayList<VipsBlock>();
 	}
 
 	public int getWidth()
@@ -52,23 +52,15 @@ public class VipsSeparatorDetector
     }
 
 	/**
-	 * Creates pool
-	 */
-	protected void createPool()
-	{
-	}
-
-	/**
 	 * Sets VIPS block, that will be used for separators computing.
 	 * @param visualBlocks List of visual blocks
 	 */
 	public void setVisualBlocks(List<VipsBlock> visualBlocks)
 	{
-		this._visualBlocks.clear();
+		this.visualBlocks.clear();
 		for (VipsBlock block : visualBlocks)
 		{
-		    //addVisualBlock(block); //TODO? does this have effect?
-		    _visualBlocks.add(block);
+		    this.visualBlocks.add(block);
 		}
 	}
 
@@ -78,7 +70,7 @@ public class VipsSeparatorDetector
 	 */
 	public List<VipsBlock> getVisualBlocks()
 	{
-		return _visualBlocks;
+		return visualBlocks;
 	}
 
 	/**
@@ -86,17 +78,17 @@ public class VipsSeparatorDetector
 	 */
 	private void findVerticalSeparators()
 	{
-		for (VipsBlock vipsBlock : _visualBlocks)
+		for (VipsBlock vipsBlock : visualBlocks)
 		{
 			// add new visual block to pool
-			addVisualBlock(vipsBlock);
+			showVisualBlock(vipsBlock);
 
 			// block vertical coordinates
 			final int blockStart = vipsBlock.getBox().getContentBounds().getX1();
 			final int blockEnd = blockStart + vipsBlock.getBox().getContentBounds().getWidth();
 
 			// for each separator that we have in pool
-			for (Separator separator : _verticalSeparators)
+			for (Separator separator : verticalSeparators)
 			{
 				// find separator, that intersects with our visual block
 				if (blockStart < separator.endPoint)
@@ -107,17 +99,17 @@ public class VipsSeparatorDetector
 					if (blockStart < separator.startPoint && blockEnd >= separator.endPoint)
 					{
 						List<Separator> tempSeparators = new ArrayList<Separator>();
-						tempSeparators.addAll(_verticalSeparators);
+						tempSeparators.addAll(verticalSeparators);
 
 						//remove all separators, that are included in block
 						for (Separator other : tempSeparators)
 						{
 							if (blockStart < other.startPoint && blockEnd > other.endPoint)
-								_verticalSeparators.remove(other);
+								verticalSeparators.remove(other);
 						}
 
 						//find separator, that is on end of this block (if exists)
-						for (Separator other : _verticalSeparators)
+						for (Separator other : verticalSeparators)
 						{
 							// and if it's necessary change it's start point
 							if (blockEnd > other.startPoint && blockEnd < other.endPoint)
@@ -152,7 +144,7 @@ public class VipsSeparatorDetector
 							break;
 						}
 						// add new separator that starts behind the block
-						_verticalSeparators.add(_verticalSeparators.indexOf(separator) + 1, new Separator(blockEnd + 1, separator.endPoint));
+						verticalSeparators.add(verticalSeparators.indexOf(separator) + 1, new Separator(blockEnd + 1, separator.endPoint));
 						// change end point coordinates of separator, that's before block
 						separator.endPoint = blockStart - 1;
 						break;
@@ -161,12 +153,12 @@ public class VipsSeparatorDetector
 					if (blockStart > separator.startPoint && blockStart < separator.endPoint)
 					{
 						// find the next one
-						int nextSeparatorIndex =_verticalSeparators.indexOf(separator);
+						int nextSeparatorIndex =verticalSeparators.indexOf(separator);
 
 						// if it's not the last separator
-						if (nextSeparatorIndex + 1 < _verticalSeparators.size())
+						if (nextSeparatorIndex + 1 < verticalSeparators.size())
 						{
-							Separator nextSeparator = _verticalSeparators.get(_verticalSeparators.indexOf(separator) + 1);
+							Separator nextSeparator = verticalSeparators.get(verticalSeparators.indexOf(separator) + 1);
 
 							// next separator is really starting before the block ends
 							if (blockEnd > nextSeparator.startPoint && blockEnd < nextSeparator.endPoint)
@@ -179,14 +171,14 @@ public class VipsSeparatorDetector
 							else
 							{
 								List<Separator> tempSeparators = new ArrayList<Separator>();
-								tempSeparators.addAll(_verticalSeparators);
+								tempSeparators.addAll(verticalSeparators);
 
 								//remove all separators, that are included in block
 								for (Separator other : tempSeparators)
 								{
 									if (blockStart < other.startPoint && other.endPoint < blockEnd)
 									{
-										_verticalSeparators.remove(other);
+										verticalSeparators.remove(other);
 										continue;
 									}
 									if (blockEnd > other.startPoint && blockEnd < other.endPoint)
@@ -219,17 +211,17 @@ public class VipsSeparatorDetector
 	 */
 	private void findHorizontalSeparators()
 	{
-		for (VipsBlock vipsBlock : _visualBlocks)
+		for (VipsBlock vipsBlock : visualBlocks)
 		{
 			// add new visual block to pool
-			addVisualBlock(vipsBlock);
+			showVisualBlock(vipsBlock);
 
 			// block vertical coordinates
 			final int blockStart = vipsBlock.getBox().getContentBounds().getY1();
 			final int blockEnd = blockStart + vipsBlock.getBox().getContentBounds().getHeight();
 
 			// for each separator that we have in pool
-			for (Separator separator : _horizontalSeparators)
+			for (Separator separator : horizontalSeparators)
 			{
 				// find separator, that intersects with our visual block
 				if (blockStart < separator.endPoint)
@@ -240,17 +232,17 @@ public class VipsSeparatorDetector
 					if (blockStart < separator.startPoint && blockEnd >= separator.endPoint)
 					{
 						List<Separator> tempSeparators = new ArrayList<Separator>();
-						tempSeparators.addAll(_horizontalSeparators);
+						tempSeparators.addAll(horizontalSeparators);
 
 						//remove all separators, that are included in block
 						for (Separator other : tempSeparators)
 						{
 							if (blockStart < other.startPoint && blockEnd > other.endPoint)
-								_horizontalSeparators.remove(other);
+								horizontalSeparators.remove(other);
 						}
 
 						//find separator, that is on end of this block (if exists)
-						for (Separator other : _horizontalSeparators)
+						for (Separator other : horizontalSeparators)
 						{
 							// and if it's necessary change it's start point
 							if (blockEnd > other.startPoint && blockEnd < other.endPoint)
@@ -285,7 +277,7 @@ public class VipsSeparatorDetector
 							break;
 						}
 						// add new separator that starts behind the block
-						_horizontalSeparators.add(_horizontalSeparators.indexOf(separator) + 1, new Separator(blockEnd + 1, separator.endPoint));
+						horizontalSeparators.add(horizontalSeparators.indexOf(separator) + 1, new Separator(blockEnd + 1, separator.endPoint));
 						// change end point coordinates of separator, that's before block
 						separator.endPoint = blockStart - 1;
 						break;
@@ -294,12 +286,12 @@ public class VipsSeparatorDetector
 					if (blockStart > separator.startPoint && blockStart < separator.endPoint)
 					{
 						// find the next one
-						int nextSeparatorIndex =_horizontalSeparators.indexOf(separator);
+						int nextSeparatorIndex =horizontalSeparators.indexOf(separator);
 
 						// if it's not the last separator
-						if (nextSeparatorIndex + 1 < _horizontalSeparators.size())
+						if (nextSeparatorIndex + 1 < horizontalSeparators.size())
 						{
-							Separator nextSeparator = _horizontalSeparators.get(_horizontalSeparators.indexOf(separator) + 1);
+							Separator nextSeparator = horizontalSeparators.get(horizontalSeparators.indexOf(separator) + 1);
 
 							// next separator is really starting before the block ends
 							if (blockEnd > nextSeparator.startPoint && blockEnd < nextSeparator.endPoint)
@@ -312,14 +304,14 @@ public class VipsSeparatorDetector
 							else
 							{
 								List<Separator> tempSeparators = new ArrayList<Separator>();
-								tempSeparators.addAll(_horizontalSeparators);
+								tempSeparators.addAll(horizontalSeparators);
 
 								//remove all separators, that are included in block
 								for (Separator other : tempSeparators)
 								{
 									if (blockStart < other.startPoint && other.endPoint < blockEnd)
 									{
-										_horizontalSeparators.remove(other);
+										horizontalSeparators.remove(other);
 										continue;
 									}
 									if (blockEnd > other.startPoint && blockEnd < other.endPoint)
@@ -352,35 +344,35 @@ public class VipsSeparatorDetector
 	 */
 	public void detectHorizontalSeparators()
 	{
-		if (_visualBlocks.size() == 0)
+		if (visualBlocks.size() == 0)
 		{
 			System.err.println("I don't have any visual blocks!");
 			return;
 		}
 
-		createPool();
-		_horizontalSeparators.clear();
-		_horizontalSeparators.add(new Separator(0, getHeight()));
+		createDisplayPool();
+		horizontalSeparators.clear();
+		horizontalSeparators.add(new Separator(0, getHeight()));
 
 		findHorizontalSeparators();
 
 		//remove pool borders
 		List<Separator> tempSeparators = new ArrayList<Separator>();
-		tempSeparators.addAll(_horizontalSeparators);
+		tempSeparators.addAll(horizontalSeparators);
 
 		for (Separator separator : tempSeparators)
 		{
 			if (separator.startPoint == 0)
-				_horizontalSeparators.remove(separator);
+				horizontalSeparators.remove(separator);
 			if (separator.endPoint == getHeight())
-				_horizontalSeparators.remove(separator);
+				horizontalSeparators.remove(separator);
 		}
 
 		if (_cleanSeparatorsTreshold != 0)
-			cleanUpSeparators(_horizontalSeparators);
+			cleanUpSeparators(horizontalSeparators);
 
 		computeHorizontalWeights();
-		sortSeparatorsByWeight(_horizontalSeparators);
+		sortSeparatorsByWeight(horizontalSeparators);
 	}
 
 	/**
@@ -388,34 +380,34 @@ public class VipsSeparatorDetector
 	 */
 	public void detectVerticalSeparators()
 	{
-		if (_visualBlocks.size() == 0)
+		if (visualBlocks.size() == 0)
 		{
 			System.err.println("I don't have any visual blocks!");
 			return;
 		}
 
-		createPool();
-		_verticalSeparators.clear();
-		_verticalSeparators.add(new Separator(0, getWidth()));
+		createDisplayPool();
+		verticalSeparators.clear();
+		verticalSeparators.add(new Separator(0, getWidth()));
 
 		findVerticalSeparators();
 
 		//remove pool borders
 		List<Separator> tempSeparators = new ArrayList<Separator>();
-		tempSeparators.addAll(_verticalSeparators);
+		tempSeparators.addAll(verticalSeparators);
 
 		for (Separator separator : tempSeparators)
 		{
 			if (separator.startPoint == 0)
-				_verticalSeparators.remove(separator);
+				verticalSeparators.remove(separator);
 			if (separator.endPoint == getWidth())
-				_verticalSeparators.remove(separator);
+				verticalSeparators.remove(separator);
 		}
 
 		if (_cleanSeparatorsTreshold != 0)
-			cleanUpSeparators(_verticalSeparators);
+			cleanUpSeparators(verticalSeparators);
 		computeVerticalWeights();
-		sortSeparatorsByWeight(_verticalSeparators);
+		sortSeparatorsByWeight(verticalSeparators);
 	}
 
 	private void cleanUpSeparators(List<Separator> separators)
@@ -446,7 +438,7 @@ public class VipsSeparatorDetector
 	 */
 	private void computeVerticalWeights()
 	{
-		for (Separator separator : _verticalSeparators)
+		for (Separator separator : verticalSeparators)
 		{
 			ruleOne(separator);
 			ruleTwo(separator, false);
@@ -459,7 +451,7 @@ public class VipsSeparatorDetector
 	 */
 	private void computeHorizontalWeights()
 	{
-		for (Separator separator : _horizontalSeparators)
+		for (Separator separator : horizontalSeparators)
 		{
 			ruleOne(separator);
 			ruleTwo(separator, true);
@@ -532,7 +524,7 @@ public class VipsSeparatorDetector
 	 */
 	private void findHorizontalOverlappedElements(Separator separator, List<VipsBlock> result)
 	{
-		for (VipsBlock vipsBlock : _visualBlocks)
+		for (VipsBlock vipsBlock : visualBlocks)
 		{
 			int topEdge = vipsBlock.getBox().getContentBounds().getY1();
 			int bottomEdge = topEdge + vipsBlock.getBox().getContentBounds().getHeight();
@@ -566,7 +558,7 @@ public class VipsSeparatorDetector
 	 */
 	private void findVerticalOverlappedElements(Separator separator, List<VipsBlock> result)
 	{
-		for (VipsBlock vipsBlock : _visualBlocks)
+		for (VipsBlock vipsBlock : visualBlocks)
 		{
 			final int leftEdge = vipsBlock.getBox().getContentBounds().getX1();
 			final int rightEdge = leftEdge + vipsBlock.getBox().getContentBounds().getWidth();
@@ -637,7 +629,7 @@ public class VipsSeparatorDetector
 	 */
 	private void findHorizontalAdjacentBlocks(Separator separator, List<VipsBlock> resultTop, List<VipsBlock> resultBottom)
 	{
-		for (VipsBlock vipsBlock : _visualBlocks)
+		for (VipsBlock vipsBlock : visualBlocks)
 		{
 			int topEdge = vipsBlock.getBox().getContentBounds().getY1();
 			int bottomEdge = topEdge + vipsBlock.getBox().getContentBounds().getHeight();
@@ -665,7 +657,7 @@ public class VipsSeparatorDetector
 	 */
 	private void findVerticalAdjacentBlocks(Separator separator, List<VipsBlock> resultLeft, List<VipsBlock> resultRight)
 	{
-		for (VipsBlock vipsBlock : _visualBlocks)
+		for (VipsBlock vipsBlock : visualBlocks)
 		{
 			final int leftEdge = vipsBlock.getBox().getContentBounds().getX1() + 1;
 			final int rightEdge = leftEdge + vipsBlock.getBox().getContentBounds().getWidth();
@@ -785,19 +777,19 @@ public class VipsSeparatorDetector
 	 */
 	public List<Separator> getHorizontalSeparators()
 	{
-		return _horizontalSeparators;
+		return horizontalSeparators;
 	}
 
 	public void setHorizontalSeparators(List<Separator> separators)
 	{
-		_horizontalSeparators.clear();
-		_horizontalSeparators.addAll(separators);
+		horizontalSeparators.clear();
+		horizontalSeparators.addAll(separators);
 	}
 
 	public void setVerticalSeparators(List<Separator> separators)
 	{
-		_verticalSeparators.clear();
-		_verticalSeparators.addAll(separators);
+		verticalSeparators.clear();
+		verticalSeparators.addAll(separators);
 	}
 
 	/**
@@ -805,7 +797,7 @@ public class VipsSeparatorDetector
 	 */
 	public List<Separator> getVerticalSeparators()
 	{
-		return _verticalSeparators;
+		return verticalSeparators;
 	}
 
 	public void setCleanUpSeparators(int treshold)
@@ -821,7 +813,12 @@ public class VipsSeparatorDetector
 		return false;
 	}
 
-    public void addVisualBlock(VipsBlock vipsBlock)
+    protected void createDisplayPool()
+    {
+        //used only for graphics
+    }
+
+    public void showVisualBlock(VipsBlock vipsBlock)
     {
         //used only for graphics
     }

@@ -8,7 +8,9 @@ package cz.vutbr.fit.layout.vips.impl;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -25,15 +27,15 @@ import cz.vutbr.fit.layout.model.Rectangular;
  */
 public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector 
 {
-    Graphics2D _pool = null;
-    BufferedImage _image = null;
+    private Graphics2D displayPool = null;
+    private BufferedImage image = null;
 
 
     public VipsSeparatorGraphicsDetector(int width, int height)
     {
         super(width, height);
-        this._image = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
-        createPool();
+        this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
+        createDisplayPool();
     }
     
     /**
@@ -43,33 +45,32 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
      *            Visual block
      */
     @Override
-    public void addVisualBlock(VipsBlock vipsBlock)
+    public void showVisualBlock(VipsBlock vipsBlock)
     {
         Box elementBox = vipsBlock.getBox();
 
         Rectangular bb = elementBox.getContentBounds();
         Rectangle rect = new Rectangle(bb.getX1(), bb.getY1(), bb.getWidth(), bb.getHeight());
 
-        _pool.draw(rect);
-        _pool.fill(rect);
+        displayPool.draw(rect);
+        displayPool.fill(rect);
     }
     
     @Override
-    protected void createPool()
+    protected void createDisplayPool()
     {
-        // set black as pool background color
-        _pool = _image.createGraphics();
-        _pool.setColor(Color.white);
-        _pool.fillRect(0, 0, _image.getWidth(), _image.getHeight());
-        // set drawing color back to white
-        _pool.setColor(Color.black);
+        displayPool = image.createGraphics();
+        displayPool.setColor(Color.white);
+        displayPool.fillRect(0, 0, image.getWidth(), image.getHeight());
+        displayPool.setColor(Color.black);
+        displayPool.setFont(new Font("Dialog", Font.BOLD, 11));
     }
 
     public void fillPool()
     {
         for (VipsBlock block : getVisualBlocks())
         {
-            addVisualBlock(block);
+            showVisualBlock(block);
         }
     }
     
@@ -78,7 +79,7 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
      */
     public void exportAllToImage()
     {
-        createPool();
+        createDisplayPool();
         fillPool();
         drawVerticalSeparators();
         drawHorizontalSeparators();
@@ -90,7 +91,7 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
      */
     public void exportAllToImage(int suffix)
     {
-        createPool();
+        createDisplayPool();
         fillPool();
         drawVerticalSeparators();
         drawHorizontalSeparators();
@@ -102,19 +103,29 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
      */
     private void drawVerticalSeparators()
     {
-        _pool.setColor(Color.red);
         for (Separator separator : getVerticalSeparators())
         {
             Rectangle rect;
-            if (separator.leftUp != null)
-                rect = new Rectangle(separator.leftUp, new Dimension(
-                        (int) (separator.rightDown.getX() - separator.leftUp.getX()),
-                        (int) (separator.rightDown.getY() - separator.leftUp.getY())));
-            else
-                rect = new Rectangle(separator.startPoint, 0, separator.endPoint - separator.startPoint, _image.getHeight());
+            int tx, ty;
+            if (!separator.isEmpty()) //position is known
+            {
+                rect = new Rectangle(new Point(separator.getX1(), separator.getY1()), 
+                        new Dimension(separator.getWidth(), separator.getHeight()));
+                tx = separator.getX1();
+                ty = separator.getY1();
+            }
+            else //only start/end point is known
+            {
+                rect = new Rectangle(separator.getStartPoint(), 0, separator.getWidth(), image.getHeight());
+                tx = separator.getStartPoint();
+                ty = 0;
+            }
 
-            _pool.draw(rect);
-            _pool.fill(rect);
+            displayPool.setColor(Color.red);
+            displayPool.draw(rect);
+            displayPool.fill(rect);
+            displayPool.setColor(Color.white);
+            displayPool.drawString(String.valueOf(separator.getWeight()), tx + 5, ty + 25);
         }
     }
 
@@ -123,7 +134,7 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
      */
     public void exportVerticalSeparatorsToImage()
     {
-        createPool();
+        createDisplayPool();
         drawVerticalSeparators();
         saveToImage("verticalSeparators");
     }
@@ -133,7 +144,7 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
      */
     public void exportVerticalSeparatorsToImage(int suffix)
     {
-        createPool();
+        createDisplayPool();
         drawVerticalSeparators();
         saveToImage("verticalSeparators" + suffix);
     }
@@ -143,19 +154,29 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
      */
     private void drawHorizontalSeparators()
     {
-        _pool.setColor(Color.blue);
         for (Separator separator : getHorizontalSeparators())
         {
             Rectangle rect;
-            if (separator.leftUp != null)
-                rect = new Rectangle(separator.leftUp, new Dimension(
-                        (int) (separator.rightDown.getX() - separator.leftUp.getX()),
-                        (int) (separator.rightDown.getY() - separator.leftUp.getY())));
-            else
-                rect = new Rectangle(0, separator.startPoint, _image.getWidth(), separator.endPoint - separator.startPoint);
+            int tx, ty;
+            if (!separator.isEmpty()) //position is known
+            {
+                rect = new Rectangle(new Point(separator.getX1(), separator.getY1()), 
+                        new Dimension(separator.getWidth(), separator.getHeight()));
+                tx = separator.getX1();
+                ty = separator.getY1();
+            }
+            else //only start/end point is known
+            {
+                rect = new Rectangle(0, separator.getStartPoint(), image.getWidth(), separator.getHeight());
+                tx = separator.getStartPoint();
+                ty = 0;
+            }
 
-            _pool.draw(rect);
-            _pool.fill(rect);
+            displayPool.setColor(Color.blue);
+            displayPool.draw(rect);
+            displayPool.fill(rect);
+            displayPool.setColor(Color.white);
+            displayPool.drawString(String.valueOf(separator.getWeight()), tx + 5, ty + 15);
         }
     }
 
@@ -164,7 +185,7 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
      */
     public void exportHorizontalSeparatorsToImage()
     {
-        createPool();
+        createDisplayPool();
         drawHorizontalSeparators();
         saveToImage("horizontalSeparators");
     }
@@ -174,7 +195,7 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
      */
     public void exportHorizontalSeparatorsToImage(int suffix)
     {
-        createPool();
+        createDisplayPool();
         drawHorizontalSeparators();
         saveToImage("horizontalSeparators" + suffix);
     }
@@ -187,7 +208,7 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
         filename = System.getProperty("user.dir") + "/" + filename + ".png";
         try
         {
-            ImageIO.write(_image, "png", new File(filename));
+            ImageIO.write(image, "png", new File(filename));
         } catch (Exception e)
         {
             System.err.println("Error: " + e.getMessage());
@@ -207,14 +228,12 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
 
         try
         {
-            ImageIO.write(_image, "png", new File(filename));
+            ImageIO.write(image, "png", new File(filename));
         } catch (Exception e)
         {
             System.err.println("Error: " + e.getMessage());
             e.printStackTrace();
         }
     }
-
-
     
 }

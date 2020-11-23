@@ -6,53 +6,75 @@
 
 package cz.vutbr.fit.layout.vips.impl;
 
-import java.awt.Point;
+import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
- * Class that represents visual separator.
- * @author Tomas Popela
- *
+ * Class that represents a visual separator.
+ * @author burgetr
  */
-public class Separator implements Comparable<Separator> {
+public class Separator extends Rectangular implements Comparable<Separator> 
+{
 	public int startPoint = 0;
 	public int endPoint = 0;
 	public int weight = 3;
 	public int normalizedWeight = 0;
 
-	// for horizontal separators it means
-	public Point leftUp;
-	public Point rightDown;
-
-	public Separator(int start, int end) {
+	public Separator(int start, int end) 
+	{
 		this.startPoint = start;
 		this.endPoint = end;
 	}
 
-	public Separator(int start, int end, int weight) {
+	public Separator(int start, int end, int weight) 
+	{
 		this.startPoint = start;
 		this.endPoint = end;
 		this.weight = weight;
 	}
 
-	public Separator(int leftUpX, int leftUpY, int rightDownX, int rightDownY)
+	public void setTopLeft(int x, int y)
 	{
-		this.leftUp = new Point(leftUpX, leftUpY);
-		this.rightDown = new Point(rightDownX, rightDownY);
-		this.startPoint = leftUpX;
-		this.endPoint = rightDownY;
+		setX1(x);
+		setY1(y);
 	}
 
-	public void setLeftUp(int leftUpX, int leftUpY)
+	public void setBottomRight(int x, int y)
 	{
-		this.leftUp = new Point(leftUpX, leftUpY);
+        setX2(x);
+        setY2(y);
 	}
 
-	public void setRightDown(int rightDownX, int rightDownY)
-	{
-		this.rightDown = new Point(rightDownX, rightDownY);
-	}
+	public int getStartPoint()
+    {
+        return startPoint;
+    }
 
-	@Override
+    public void setStartPoint(int startPoint)
+    {
+        this.startPoint = startPoint;
+    }
+
+    public int getEndPoint()
+    {
+        return endPoint;
+    }
+
+    public void setEndPoint(int endPoint)
+    {
+        this.endPoint = endPoint;
+    }
+
+    public int getWeight()
+    {
+        return weight;
+    }
+
+    public void setWeight(int weight)
+    {
+        this.weight = weight;
+    }
+
+    @Override
 	public int compareTo(Separator otherSeparator)
 	{
 		return this.weight - otherSeparator.weight;

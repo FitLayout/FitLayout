@@ -151,7 +151,7 @@ public class Vips {
         constructor.normalizeSeparatorsMinMax();
         visualStructure = constructor.getVisualStructure();
 
-        
+        System.out.println("done");
         
     }	
 	

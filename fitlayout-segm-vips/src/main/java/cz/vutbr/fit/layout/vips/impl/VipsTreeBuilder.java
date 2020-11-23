@@ -35,16 +35,16 @@ public class VipsTreeBuilder
         if (pDoC >= vs.getDoC())
         {
             // continue segmenting
-            if (vs.getChildrenVisualStructures().size() == 0)
+            if (vs.getChildren().size() == 0)
             {
-                for (VipsBlock block : vs.getNestedBlocks())
+                for (VipsBlock block : vs.getBlockRoots())
                 {
                     Box box = block.getBox();
                     ret.addBox(box);
                 }
             }
 
-            for (VisualStructure child : vs.getChildrenVisualStructures())
+            for (VisualStructure child : vs.getChildren())
             {
                 Area childArea = createSubtree(child);
                 ret.appendChild(childArea);
@@ -53,9 +53,9 @@ public class VipsTreeBuilder
         else
         {
             // "stop" segmentation
-            if (vs.getNestedBlocks().size() > 0)
+            if (vs.getBlockRoots().size() > 0)
             {
-                for (VipsBlock block : vs.getNestedBlocks())
+                for (VipsBlock block : vs.getBlockRoots())
                 {
                     Box box = block.getBox();
                     ret.addBox(box);

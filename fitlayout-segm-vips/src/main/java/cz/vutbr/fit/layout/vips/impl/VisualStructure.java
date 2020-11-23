@@ -16,95 +16,76 @@ import java.util.List;
  */
 public class VisualStructure 
 {
-	private List<VipsBlock> _nestedBlocks = null;
-	private List<VisualStructure> _childrenVisualStructures = null;
-	private List<Separator> _horizontalSeparators = null;
-	private List<Separator> _verticalSeparators = null;
-	private int _width = 0;
-	private int _height = 0;
-	private int _x = 0;
-	private int _y = 0;
-	private int _doC = 12;
+	private List<VipsBlock> blockRoots = null;
+	private List<VisualStructure> childStructures = null;
+	private List<Separator> horizontalSeparators = null;
+	private List<Separator> verticalSeparators = null;
+	private int width = 0;
+	private int height = 0;
+	private int x = 0;
+	private int y = 0;
+	private int doC = 12;
 	private String _id = null;
-	private int _minimalDoC = 0;
 
 	public VisualStructure()
 	{
-		_nestedBlocks = new ArrayList<VipsBlock>();
-		_childrenVisualStructures = new ArrayList<VisualStructure>();
-		_horizontalSeparators = new ArrayList<Separator>();
-		_verticalSeparators = new ArrayList<Separator>();
+		blockRoots = new ArrayList<VipsBlock>();
+		childStructures = new ArrayList<VisualStructure>();
+		horizontalSeparators = new ArrayList<Separator>();
+		verticalSeparators = new ArrayList<Separator>();
 	}
 
 	/**
 	 * @return Nested blocks in structure
 	 */
-	public List<VipsBlock> getNestedBlocks()
+	public List<VipsBlock> getBlockRoots()
 	{
-		return _nestedBlocks;
+		return blockRoots;
 	}
 
 	/**
 	 * Adds block to nested blocks
-	 * @param nestedBlock New block
+	 * @param blockRoot New block
 	 */
-	public void addNestedBlock(VipsBlock nestedBlock)
+	public void addBlock(VipsBlock blockRoot)
 	{
-		this._nestedBlocks.add(nestedBlock);
+		this.blockRoots.add(blockRoot);
 	}
 
 	/**
 	 * Adds blocks to nested blocks
-	 * @param nestedBlocks
+	 * @param blockRoots
 	 */
-	public void addNestedBlocks(List<VipsBlock> nestedBlocks)
+	public void addBlocks(List<VipsBlock> blockRoots)
 	{
-		this._nestedBlocks.addAll(nestedBlocks);
+		this.blockRoots.addAll(blockRoots);
 	}
 
 	/**
 	 * Sets blocks as nested blocks
 	 * @param vipsBlocks
 	 */
-	public void setNestedBlocks(List<VipsBlock> vipsBlocks)
+	public void setBlockRoots(List<VipsBlock> vipsBlocks)
 	{
-		this._nestedBlocks = vipsBlocks;
+		this.blockRoots = vipsBlocks;
 	}
 
 	/**
 	 * Clears nested blocks list
 	 */
-	public void clearNestedBlocks()
+	public void clearBlocks()
 	{
-		this._nestedBlocks.clear();
+		this.blockRoots.clear();
 	}
 
-	/**
-	 * Removes nested block at given index
-	 * @param index Index of block
-	 */
-	public void removeNestedBlockAt(int index)
-	{
-		this._nestedBlocks.remove(index);
-	}
-
-	/**
-	 * Removes given child from structures children
-	 * @param visualStructure Child
-	 */
-	public void removeChild(VisualStructure visualStructure)
-	{
-		this._childrenVisualStructures.remove(visualStructure);
-	}
-
-	/**
-	 * Adds new child to visual structure children
-	 * @param visualStructure New child
-	 */
-	public void addChild(VisualStructure visualStructure)
-	{
-		this._childrenVisualStructures.add(visualStructure);
-	}
+    /**
+     * Adds new child to visual structure children
+     * @param visualStructure New child
+     */
+    public void addChild(VisualStructure visualStructure)
+    {
+        this.childStructures.add(visualStructure);
+    }
 
 	/**
 	 * Adds new child to visual structure at given index
@@ -113,25 +94,34 @@ public class VisualStructure
 	 */
 	public void addChildAt(VisualStructure visualStructure, int index)
 	{
-		this._childrenVisualStructures.add(index, visualStructure);
+		this.childStructures.add(index, visualStructure);
 	}
+
+    /**
+     * Removes given child from structures children
+     * @param visualStructure Child
+     */
+    public void removeChild(VisualStructure visualStructure)
+    {
+        this.childStructures.remove(visualStructure);
+    }
 
 	/**
 	 * Returns all children structures
 	 * @return Children structures
 	 */
-	public List<VisualStructure> getChildrenVisualStructures()
+	public List<VisualStructure> getChildren()
 	{
-		return _childrenVisualStructures;
+		return childStructures;
 	}
 
 	/**
 	 * Sets visual structures as children of visual structure
-	 * @param childrenVisualStructures List of visual structures
+	 * @param childStructures List of visual structures
 	 */
-	public void setChildrenVisualStructures(List<VisualStructure> childrenVisualStructures)
+	public void setChildren(List<VisualStructure> childStructures)
 	{
-		this._childrenVisualStructures = childrenVisualStructures;
+		this.childStructures = childStructures;
 	}
 
 	/**
@@ -140,7 +130,7 @@ public class VisualStructure
 	 */
 	public List<Separator> getHorizontalSeparators()
 	{
-		return _horizontalSeparators;
+		return horizontalSeparators;
 	}
 
 	/**
@@ -149,7 +139,7 @@ public class VisualStructure
 	 */
 	public void setHorizontalSeparators(List<Separator> horizontalSeparators)
 	{
-		this._horizontalSeparators = horizontalSeparators;
+		this.horizontalSeparators = horizontalSeparators;
 	}
 
 	/**
@@ -158,7 +148,7 @@ public class VisualStructure
 	 */
 	public void addHorizontalSeparator(Separator horizontalSeparator)
 	{
-		this._horizontalSeparators.add(horizontalSeparator);
+		this.horizontalSeparators.add(horizontalSeparator);
 
 	}
 
@@ -168,9 +158,45 @@ public class VisualStructure
 	 */
 	public void addHorizontalSeparators(List<Separator> horizontalSeparators)
 	{
-		this._horizontalSeparators.addAll(horizontalSeparators);
+		this.horizontalSeparators.addAll(horizontalSeparators);
 
 	}
+
+    /**
+     * Returns list of all vertical separators in visual structure
+     * @return List of vertical separators
+     */
+    public List<Separator> getVerticalSeparators()
+    {
+        return verticalSeparators;
+    }
+
+    /**
+     * Sets list of separators as vertical separators of structure
+     * @param _verticalSeparators List of separators
+     */
+    public void setVerticalSeparators(List<Separator> _verticalSeparators)
+    {
+        this.verticalSeparators = _verticalSeparators;
+    }
+
+    /**
+     * Adds separator to structure's vertical sepators
+     * @param verticalSeparator
+     */
+    public void addVerticalSeparator(Separator verticalSeparator)
+    {
+        this.verticalSeparators.add(verticalSeparator);
+    }
+    
+    /**
+     * Adds list of separators to visual structure vertical separators list.
+     * @param verticalSeparators
+     */
+    public void addVerticalSeparators(List<Separator> verticalSeparators)
+    {
+        this.verticalSeparators.addAll(verticalSeparators);
+    }
 
 	/**
 	 * Returns X structure's coordinate
@@ -178,7 +204,7 @@ public class VisualStructure
 	 */
 	public int getX()
 	{
-		return this._x;
+		return this.x;
 	}
 
 	/**
@@ -187,7 +213,7 @@ public class VisualStructure
 	 */
 	public int getY()
 	{
-		return this._y;
+		return this.y;
 	}
 
 	/**
@@ -196,7 +222,7 @@ public class VisualStructure
 	 */
 	public void setX(int x)
 	{
-		this._x = x;
+		this.x = x;
 	}
 
 	/**
@@ -205,7 +231,7 @@ public class VisualStructure
 	 */
 	public void setY(int y)
 	{
-		this._y = y;
+		this.y = y;
 	}
 
 	/**
@@ -214,7 +240,7 @@ public class VisualStructure
 	 */
 	public void setWidth(int width)
 	{
-		this._width = width;
+		this.width = width;
 	}
 
 	/**
@@ -223,7 +249,7 @@ public class VisualStructure
 	 */
 	public void setHeight(int height)
 	{
-		this._height = height;
+		this.height = height;
 	}
 
 	/**
@@ -232,7 +258,7 @@ public class VisualStructure
 	 */
 	public int getWidth()
 	{
-		return this._width;
+		return this.width;
 	}
 
 	/**
@@ -241,34 +267,7 @@ public class VisualStructure
 	 */
 	public int getHeight()
 	{
-		return this._height;
-	}
-
-	/**
-	 * Returns list of all vertical separators in visual structure
-	 * @return List of vertical separators
-	 */
-	public List<Separator> getVerticalSeparators()
-	{
-		return _verticalSeparators;
-	}
-
-	/**
-	 * Sets list of separators as vertical separators of structure
-	 * @param _verticalSeparators List of separators
-	 */
-	public void setVerticalSeparators(List<Separator> _verticalSeparators)
-	{
-		this._verticalSeparators = _verticalSeparators;
-	}
-
-	/**
-	 * Adds separator to structure's vertical sepators
-	 * @param verticalSeparator
-	 */
-	public void addVerticalSeparator(Separator verticalSeparator)
-	{
-		this._verticalSeparators.add(verticalSeparator);
+		return this.height;
 	}
 
 	/**
@@ -295,7 +294,7 @@ public class VisualStructure
 	 */
 	public void setDoC(int doC)
 	{
-		this._doC = doC;
+		this.doC = doC;
 	}
 
 	/**
@@ -304,69 +303,13 @@ public class VisualStructure
 	 */
 	public int getDoC()
 	{
-		return _doC;
+		return doC;
 	}
 
-	/**
-	 * Finds minimal DoC in all children visual structures
-	 * @param visualStructure Given visual structure
-	 */
-	private void findMinimalDoC(VisualStructure visualStructure)
-	{
-		if (!visualStructure.getId().equals("1"))
-		{
-			if (visualStructure.getDoC() < _minimalDoC)
-				_minimalDoC = visualStructure.getDoC();
-		}
+    @Override
+    public String toString()
+    {
+        return "[blockRoots=" + blockRoots + ", doC=" + doC + "]";
+    }
 
-		for (VisualStructure child : visualStructure.getChildrenVisualStructures())
-		{
-			findMinimalDoC(child);
-		}
-	}
-
-	/**
-	 * Updates DoC to normalized DoC
-	 */
-	public void updateToNormalizedDoC()
-	{
-		_doC = 12;
-
-		for (Separator separator : _horizontalSeparators)
-		{
-			if (separator.normalizedWeight < _doC)
-				_doC = separator.normalizedWeight;
-		}
-
-		for (Separator separator : _verticalSeparators)
-		{
-			if (separator.normalizedWeight < _doC)
-				_doC = separator.normalizedWeight;
-		}
-
-		if (_doC == 12)
-		{
-			for (VipsBlock nestedBlock : _nestedBlocks)
-			{
-				if (nestedBlock.getDoC() < _doC)
-					_doC = nestedBlock.getDoC();
-			}
-		}
-
-		_minimalDoC = 12;
-
-		findMinimalDoC(this);
-
-		if (_minimalDoC < _doC)
-			_doC = _minimalDoC;
-	}
-
-	/**
-	 * Adds list of separators to visual structure vertical separators list.
-	 * @param verticalSeparators
-	 */
-	public void addVerticalSeparators(List<Separator> verticalSeparators)
-	{
-		this._verticalSeparators.addAll(verticalSeparators);
-	}
 }

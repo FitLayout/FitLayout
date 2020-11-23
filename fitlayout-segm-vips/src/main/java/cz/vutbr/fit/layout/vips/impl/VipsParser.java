@@ -23,7 +23,6 @@ import cz.vutbr.fit.layout.model.Rectangular;
 public class VipsParser 
 {
     private Page page;
-    private Box rootBox;
     private VipsBlock rootBlock;
 
 	private int sizeTresholdWidth = 0;
@@ -39,7 +38,6 @@ public class VipsParser
 	public VipsParser(Page page, Box rootBox) 
 	{
 		this.page = page;
-		this.rootBox = rootBox;
 		this.rootBlock = new VipsBlock();
 		this.sizeTresholdHeight = 80;
 		this.sizeTresholdWidth = 80;
@@ -362,8 +360,6 @@ public class VipsParser
 	 */
 	private boolean applyOtherNodeVipsRules(VipsBlock block)
 	{
-        if (block.toString().contains("screenshots"))
-            System.out.println("jo!");
 		// 1 2 3 4 6 8 9 11
 
 		if (ruleOne(block))

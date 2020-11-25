@@ -7,13 +7,12 @@
 package cz.vutbr.fit.layout.vips.impl;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -21,11 +20,12 @@ import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
- * Separator detector with possibility of generating graphics output.
+ * A graphical output that allows to draws the blocks and separators into an image.
+ * 
  * @author Tomas Popela
  * @author burgetr
  */
-public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector 
+public class GraphicalOutput 
 {
     private static final Color VSEP_COLOR = Color.RED;
     private static final Color HSEP_COLOR = Color.BLUE;
@@ -34,16 +34,51 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
     
     private Graphics2D displayPool;
     private BufferedImage image;
+    private Rectangular bounds;
+
+    private List<VipsBlock> visualBlocks;
+    private List<Separator> horizontalSeparators;
+    private List<Separator> verticalSeparators;
 
 
-    public VipsSeparatorGraphicsDetector(int width, int height)
+    public GraphicalOutput(Rectangular subPageBounds)
     {
-        super(width, height);
-        this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
+        this.bounds = new Rectangular(subPageBounds);
+        this.image = new BufferedImage(bounds.getWidth(), bounds.getHeight(), BufferedImage.TYPE_INT_BGR);
         createDisplayPool();
     }
     
-    protected void createDisplayPool()
+    public List<VipsBlock> getVisualBlocks()
+    {
+        return visualBlocks;
+    }
+
+    public void setVisualBlocks(List<VipsBlock> visualBlocks)
+    {
+        this.visualBlocks = visualBlocks;
+    }
+
+    public List<Separator> getHorizontalSeparators()
+    {
+        return horizontalSeparators;
+    }
+
+    public void setHorizontalSeparators(List<Separator> horizontalSeparators)
+    {
+        this.horizontalSeparators = horizontalSeparators;
+    }
+
+    public List<Separator> getVerticalSeparators()
+    {
+        return verticalSeparators;
+    }
+
+    public void setVerticalSeparators(List<Separator> verticalSeparators)
+    {
+        this.verticalSeparators = verticalSeparators;
+    }
+
+    private void createDisplayPool()
     {
         displayPool = image.createGraphics();
         displayPool.setColor(Color.WHITE);
@@ -84,21 +119,9 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
     {
         for (Separator separator : getHorizontalSeparators())
         {
-            Rectangle rect;
-            int tx, ty;
-            if (!separator.isEmpty()) //position is known
-            {
-                rect = new Rectangle(new Point(separator.getX1(), separator.getY1()), 
-                        new Dimension(separator.getWidth(), separator.getHeight()));
-                tx = separator.getX1();
-                ty = separator.getY1();
-            }
-            else //only start/end point is known
-            {
-                rect = new Rectangle(0, separator.getStartPoint(), image.getWidth(), separator.getHeight());
-                tx = separator.getStartPoint();
-                ty = 0;
-            }
+            int tx = bounds.getX1();
+            int ty = bounds.getY1() + separator.getStartPoint();
+            Rectangle rect = new Rectangle(tx, ty, bounds.getWidth(), separator.getEndPoint() - separator.getStartPoint());
 
             displayPool.setColor(HSEP_COLOR);
             displayPool.draw(rect);
@@ -115,21 +138,9 @@ public class VipsSeparatorGraphicsDetector extends VipsSeparatorDetector
     {
         for (Separator separator : getVerticalSeparators())
         {
-            Rectangle rect;
-            int tx, ty;
-            if (!separator.isEmpty()) //position is known
-            {
-                rect = new Rectangle(new Point(separator.getX1(), separator.getY1()), 
-                        new Dimension(separator.getWidth(), separator.getHeight()));
-                tx = separator.getX1();
-                ty = separator.getY1();
-            }
-            else //only start/end point is known
-            {
-                rect = new Rectangle(separator.getStartPoint(), 0, separator.getWidth(), image.getHeight());
-                tx = separator.getStartPoint();
-                ty = 0;
-            }
+            int tx = bounds.getX1() + separator.getStartPoint();
+            int ty = bounds.getY1();
+            Rectangle rect = new Rectangle(tx, ty, separator.getEndPoint() - separator.getStartPoint(), bounds.getHeight());
 
             displayPool.setColor(VSEP_COLOR);
             displayPool.draw(rect);

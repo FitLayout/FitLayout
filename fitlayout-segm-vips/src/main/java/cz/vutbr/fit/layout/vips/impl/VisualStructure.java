@@ -8,6 +8,9 @@ package cz.vutbr.fit.layout.vips.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
  * A class that represents visual structure.
@@ -16,25 +19,45 @@ import java.util.List;
  */
 public class VisualStructure 
 {
-	private List<VipsBlock> blockRoots = null;
-	private List<VisualStructure> childStructures = null;
-	private List<Separator> horizontalSeparators = null;
-	private List<Separator> verticalSeparators = null;
-	private int width = 0;
-	private int height = 0;
-	private int x = 0;
-	private int y = 0;
+	private List<VipsBlock> blockRoots;
+	private List<VisualStructure> childStructures;
+	private List<Separator> separators;
+	private Separator top;
+    private Separator bottom;
+    private Separator left;
+    private Separator right;
+    private Rectangular bounds;
 	private int doC = 12;
-	private String _id = null;
 
 	public VisualStructure()
 	{
-		blockRoots = new ArrayList<VipsBlock>();
-		childStructures = new ArrayList<VisualStructure>();
-		horizontalSeparators = new ArrayList<Separator>();
-		verticalSeparators = new ArrayList<Separator>();
+		blockRoots = new ArrayList<>();
+		childStructures = new ArrayList<>();
+		separators = new ArrayList<>();
+		bounds = new Rectangular();
 	}
 
+    public VisualStructure(VisualStructure src)
+    {
+        this();
+        top = src.top;
+        bottom = src.bottom;
+        left = src.left;
+        right = src.right;
+        bounds = new Rectangular(src.bounds);
+        doC = src.doC;
+    }
+	
+    /**
+     * Creates a visual structure covering a pair of visual structures.
+     * @param pair
+     */
+    public VisualStructure(SepPair pair)
+    {
+        this(pair.a);
+        joinPair(pair, Set.of(pair.a));
+    }
+	
 	/**
 	 * @return Nested blocks in structure
 	 */
@@ -124,168 +147,99 @@ public class VisualStructure
 		this.childStructures = childStructures;
 	}
 
-	/**
-	 * Returns all horizontal separators form structure
-	 * @return List of horizontal separators
-	 */
-	public List<Separator> getHorizontalSeparators()
-	{
-		return horizontalSeparators;
-	}
-
-	/**
-	 * Sets list of separators as horizontal separators of structure
-	 * @param horizontalSeparators List of separators
-	 */
-	public void setHorizontalSeparators(List<Separator> horizontalSeparators)
-	{
-		this.horizontalSeparators = horizontalSeparators;
-	}
-
-	/**
-	 * Adds separator to horizontal separators of structure
-	 * @param horizontalSeparator
-	 */
-	public void addHorizontalSeparator(Separator horizontalSeparator)
-	{
-		this.horizontalSeparators.add(horizontalSeparator);
-
-	}
-
-	/**
-	 * Adds separators to horizontal separators of structure
-	 * @param horizontalSeparators
-	 */
-	public void addHorizontalSeparators(List<Separator> horizontalSeparators)
-	{
-		this.horizontalSeparators.addAll(horizontalSeparators);
-
-	}
-
-    /**
-     * Returns list of all vertical separators in visual structure
-     * @return List of vertical separators
-     */
-    public List<Separator> getVerticalSeparators()
+	public List<Separator> getSeparators()
     {
-        return verticalSeparators;
+        return separators;
     }
 
-    /**
-     * Sets list of separators as vertical separators of structure
-     * @param _verticalSeparators List of separators
-     */
-    public void setVerticalSeparators(List<Separator> _verticalSeparators)
+    public Separator getTop()
     {
-        this.verticalSeparators = _verticalSeparators;
+        return top;
     }
 
-    /**
-     * Adds separator to structure's vertical sepators
-     * @param verticalSeparator
-     */
-    public void addVerticalSeparator(Separator verticalSeparator)
+    public void setTop(Separator top)
     {
-        this.verticalSeparators.add(verticalSeparator);
+        this.top = top;
+    }
+
+    public Separator getBottom()
+    {
+        return bottom;
+    }
+
+    public void setBottom(Separator bottom)
+    {
+        this.bottom = bottom;
+    }
+
+    public Separator getLeft()
+    {
+        return left;
+    }
+
+    public void setLeft(Separator left)
+    {
+        this.left = left;
+    }
+
+    public Separator getRight()
+    {
+        return right;
+    }
+
+    public void setRight(Separator right)
+    {
+        this.right = right;
+    }
+
+	public void setBounds(Rectangular bounds)
+	{
+	    this.bounds = new Rectangular(bounds);
+	}
+	
+	public void setX1(int x)
+	{
+	    bounds.setX1(x);
+	}
+	
+    public void setX2(int x)
+    {
+        bounds.setX2(x);
     }
     
-    /**
-     * Adds list of separators to visual structure vertical separators list.
-     * @param verticalSeparators
-     */
-    public void addVerticalSeparators(List<Separator> verticalSeparators)
+    public void setY1(int y)
     {
-        this.verticalSeparators.addAll(verticalSeparators);
+        bounds.setY1(y);
     }
-
-	/**
-	 * Returns X structure's coordinate
-	 * @return X coordinate
-	 */
-	public int getX()
+    
+    public void setY2(int y)
+    {
+        bounds.setY2(y);
+    }
+    
+    public int getX1()
+    {
+        return bounds.getX1();
+    }
+    
+    public int getX2()
+    {
+        return bounds.getX2();
+    }
+    
+    public int getY1()
+    {
+        return bounds.getY1();
+    }
+    
+    public int getY2()
+    {
+        return bounds.getY2();
+    }
+    
+	public Rectangular getBounds()
 	{
-		return this.x;
-	}
-
-	/**
-	 * Returns structure's Y coordinate
-	 * @return Y coordinate
-	 */
-	public int getY()
-	{
-		return this.y;
-	}
-
-	/**
-	 * Sets X coordinate
-	 * @param x X coordinate
-	 */
-	public void setX(int x)
-	{
-		this.x = x;
-	}
-
-	/**
-	 * Sets Y coordinate
-	 * @param y Y coordinate
-	 */
-	public void setY(int y)
-	{
-		this.y = y;
-	}
-
-	/**
-	 * Sets width of visual structure
-	 * @param width Width
-	 */
-	public void setWidth(int width)
-	{
-		this.width = width;
-	}
-
-	/**
-	 * Sets height of visual structure
-	 * @param height Height
-	 */
-	public void setHeight(int height)
-	{
-		this.height = height;
-	}
-
-	/**
-	 * Returns width of visual structure
-	 * @return Visual structure's width
-	 */
-	public int getWidth()
-	{
-		return this.width;
-	}
-
-	/**
-	 * Returns height of visual structure
-	 * @return Visual structure's height
-	 */
-	public int getHeight()
-	{
-		return this.height;
-	}
-
-	/**
-	 * Sets if of visual structure
-	 * @param id Id
-	 */
-	public void setId(String id)
-	{
-		this._id = id;
-	}
-
-	/**
-	 * Returns id of visual structure
-	 * @return Visual structure's id
-	 */
-	public String getId()
-	{
-		return this._id;
+	    return bounds;
 	}
 
 	/**
@@ -305,6 +259,50 @@ public class VisualStructure
 	{
 		return doC;
 	}
+	
+	/**
+	 * Concatenates a pair with this structure. Extends the structure and adds the separator.
+	 * @param pair
+	 * @param knownChildren the existing already known children of this structure. The pair must contain some
+	 * of them to be joined
+	 * @return
+	 */
+    public boolean joinPair(SepPair pair, Set<VisualStructure> knownChildren)
+    {
+        if (knownChildren.contains(pair.a))
+        {
+            if (pair.separator.isVertical()) //we're on the left
+            {
+                setX2(pair.b.getX2());
+                setRight(pair.b.getRight());
+            }
+            else //we're above
+            {
+                setY2(pair.b.getY2());
+                setBottom(pair.b.bottom);
+            }
+            separators.add(pair.separator);
+            return true;
+        }
+        else if (knownChildren.contains(pair.b))
+        {
+            if (pair.separator.isVertical()) //we're on the right
+            {
+                setX1(pair.a.getX1());
+                setLeft(pair.a.getLeft());
+            }
+            else //we're below
+            {
+                setY1(pair.a.getY1());
+                setTop(pair.a.getTop());
+            }
+            separators.add(pair.separator);
+            return true;
+        }
+        else
+            return false;
+    }
+    
 
     @Override
     public String toString()

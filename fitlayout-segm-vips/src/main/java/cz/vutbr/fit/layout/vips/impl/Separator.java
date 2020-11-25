@@ -6,45 +6,43 @@
 
 package cz.vutbr.fit.layout.vips.impl;
 
-import cz.vutbr.fit.layout.model.Rectangular;
-
 /**
  * Class that represents a visual separator.
  * @author burgetr
  */
-public class Separator extends Rectangular implements Comparable<Separator> 
+public class Separator implements Comparable<Separator> 
 {
+    public boolean vertical;
 	public int startPoint = 0;
 	public int endPoint = 0;
 	public int weight = 3;
-	public int normalizedWeight = 0;
 
-	public Separator(int start, int end) 
+	public Separator(int start, int end, boolean vertical) 
 	{
+	    this.vertical = vertical;
 		this.startPoint = start;
 		this.endPoint = end;
 	}
 
-	public Separator(int start, int end, int weight) 
+	public Separator(int start, int end, boolean vertical, int weight) 
 	{
+        this.vertical = vertical;
 		this.startPoint = start;
 		this.endPoint = end;
 		this.weight = weight;
 	}
 
-	public void setTopLeft(int x, int y)
-	{
-		setX1(x);
-		setY1(y);
-	}
+	public boolean isVertical()
+    {
+        return vertical;
+    }
 
-	public void setBottomRight(int x, int y)
-	{
-        setX2(x);
-        setY2(y);
-	}
+    public void setVertical(boolean vertical)
+    {
+        this.vertical = vertical;
+    }
 
-	public int getStartPoint()
+    public int getStartPoint()
     {
         return startPoint;
     }
@@ -79,4 +77,12 @@ public class Separator extends Rectangular implements Comparable<Separator>
 	{
 		return this.weight - otherSeparator.weight;
 	}
+
+    @Override
+    public String toString()
+    {
+        return "Separator [vertical=" + vertical + ", startPoint=" + startPoint
+                + ", endPoint=" + endPoint + ", weight=" + weight + "]";
+    }
+    
 }

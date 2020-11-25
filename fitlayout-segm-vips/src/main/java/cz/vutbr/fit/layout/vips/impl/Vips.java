@@ -8,10 +8,13 @@ package cz.vutbr.fit.layout.vips.impl;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 import cz.vutbr.fit.layout.model.Page;
+import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
  * Vision-based Page Segmentation algorithm
@@ -89,7 +92,7 @@ public class Vips {
 	
 	public VipsTreeBuilder getTreeBuilder()
 	{
-	    return new VipsTreeBuilder(pDoC);
+	    return new VipsTreeBuilder();
 	}
 	
 	/**
@@ -131,24 +134,28 @@ public class Vips {
     {
         final int pageWidth = page.getWidth();
         final int pageHeight = page.getHeight();
+        final Rectangular pageBounds = new Rectangular(0, 0, pageWidth - 1, pageHeight - 1);
         
         //extract the blocks
         VipsParser vipsParser = new VipsParser(page, page.getRoot());
         vipsParser.setSizeTresholdHeight(sizeTresholdHeight);
         vipsParser.setSizeTresholdWidth(sizeTresholdWidth);
         vipsParser.parse();
-        //VipsBlock vipsBlocks = vipsParser.getVipsBlocks();
         List<VipsBlock> vipsBlocks = vipsParser.getVisualBlocks();
         
+        //find separators
+        VipsSeparatorDetector detector = new VipsSeparatorDetector(vipsBlocks, pageWidth, pageHeight);
+        List<Separator> hsep = detector.detectHorizontalSeparators();
+        List<Separator> vsep = detector.detectVerticalSeparators();
+        List<Separator> asep = detector.getAllSeparators();
+        if (_graphicsOutput)
+        {
+            exportSeparators(1, pageBounds, vipsBlocks, hsep, vsep);
+        }
         
-        VisualStructureConstructor constructor = new VisualStructureConstructor(pDoC);
-        constructor.setGraphicsOutput(_graphicsOutput);
-
         // visual structure construction
-        constructor.setVipsBlocks(vipsBlocks);
-        constructor.setPageSize(pageWidth, pageHeight);
+        VisualStructureConstructor constructor = new VisualStructureConstructor(pageBounds, vipsBlocks, asep);
         constructor.constructVisualStructure();
-        constructor.normalizeSeparatorsMinMax();
         visualStructure = constructor.getVisualStructure();
 
         System.out.println("done");
@@ -318,4 +325,22 @@ public class Vips {
 		}
 	}
 
+   /**
+     * Exports all separators to output images
+     */
+    private void exportSeparators(int iteration, Rectangular bounds,
+            List<VipsBlock> blocks, List<Separator> hsep, List<Separator> vsep)
+    {
+        GraphicalOutput out = new GraphicalOutput(bounds);
+        out.setHorizontalSeparators(hsep);
+        out.exportHorizontalSeparatorsToImage(iteration);
+
+        out.setVerticalSeparators(vsep);
+        out.exportVerticalSeparatorsToImage(iteration);
+
+        out.setVisualBlocks(blocks);
+        out.exportAllToImage(iteration);
+    }
+
+	
 }

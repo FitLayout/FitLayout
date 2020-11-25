@@ -16,11 +16,8 @@ import cz.vutbr.fit.layout.model.Box;
  */
 public class VipsTreeBuilder
 {
-    private int pDoC;
-
-    public VipsTreeBuilder(int pDoC)
+    public VipsTreeBuilder()
     {
-        this.pDoC = pDoC;
     }
     
     public Area buildAreaTree(VisualStructure vs)
@@ -31,44 +28,29 @@ public class VipsTreeBuilder
     
     private Area createSubtree(VisualStructure vs)
     {
-        Area ret = createArea(vs);
-        if (pDoC >= vs.getDoC())
+        DefaultArea ret = createArea(vs);
+        if (vs.getChildren().size() == 0)
         {
-            // continue segmenting
-            if (vs.getChildren().size() == 0)
+            for (VipsBlock block : vs.getBlockRoots())
             {
-                for (VipsBlock block : vs.getBlockRoots())
-                {
-                    Box box = block.getBox();
-                    ret.addBox(box);
-                }
+                Box box = block.getBox();
+                ret.addBox(box);
             }
-
+        }
+        else
+        {
             for (VisualStructure child : vs.getChildren())
             {
                 Area childArea = createSubtree(child);
                 ret.appendChild(childArea);
             }
         }
-        else
-        {
-            // "stop" segmentation
-            if (vs.getBlockRoots().size() > 0)
-            {
-                for (VipsBlock block : vs.getBlockRoots())
-                {
-                    Box box = block.getBox();
-                    ret.addBox(box);
-                }
-            }
-        }
         return ret;
     }
     
-    private Area createArea(VisualStructure vs)
+    private DefaultArea createArea(VisualStructure vs)
     {
-        DefaultArea ret = new DefaultArea(vs.getX(), vs.getY(), vs.getX() + vs.getWidth() - 1, vs.getY() + vs.getHeight() - 1);
-        
+        DefaultArea ret = new DefaultArea(vs.getBounds());
         return ret;
     }
     

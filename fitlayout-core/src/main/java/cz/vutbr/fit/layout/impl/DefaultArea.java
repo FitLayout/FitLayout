@@ -387,10 +387,7 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
      */
     private void updateTextStyleForBox(Box box)
     {
-        if (box.getType() == Box.Type.TEXT_CONTENT)
-        {
-            getTextStyle().updateAverages(box.getTextStyle());
-        }        
+        getTextStyle().updateAverages(box.getTextStyle());
     }
     
     //====================================================================================

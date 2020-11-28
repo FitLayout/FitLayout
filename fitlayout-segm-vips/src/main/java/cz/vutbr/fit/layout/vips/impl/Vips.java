@@ -125,7 +125,7 @@ public class Vips
         List<VipsBlock> vipsBlocks = vipsParser.getVisualBlocks();
         
         //find separators
-        VipsSeparatorDetector detector = new VipsSeparatorDetector(vipsBlocks, pageWidth, pageHeight);
+        VipsSeparatorDetector detector = new VipsSeparatorDetector(vipsBlocks, pageBounds);
         List<Separator> hsep = detector.detectHorizontalSeparators();
         List<Separator> vsep = detector.detectVerticalSeparators();
         List<Separator> asep = detector.getAllSeparators();

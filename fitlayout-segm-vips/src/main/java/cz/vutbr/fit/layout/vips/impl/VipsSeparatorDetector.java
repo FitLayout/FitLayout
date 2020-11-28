@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import cz.vutbr.fit.layout.model.Box.Type;
+import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
  * A base separator detector implementation.
@@ -24,34 +25,21 @@ public class VipsSeparatorDetector
 	private List<VipsBlock> visualBlocks;
 	private List<Separator> horizontalSeparators;
 	private List<Separator> verticalSeparators;
-	
-	private int width;
-	private int height;
+	private Rectangular pageBounds;
 
 	/**
-	 * Defaults constructor.
+	 * Creates the separator detector from a list of visual blocks.
+	 * 
 	 * @param visualBlocks the visual blocks to consider
-	 * @param width Pools width
-	 * @param height Pools height
+	 * @param pageBounds the sub-page bounds
 	 */
-	public VipsSeparatorDetector(List<VipsBlock> visualBlocks, int width, int height) 
+	public VipsSeparatorDetector(List<VipsBlock> visualBlocks, Rectangular pageBounds) 
 	{
-	    this.width = width;
-	    this.height = height;
+	    this.pageBounds = pageBounds;
         this.visualBlocks = visualBlocks;
 		this.horizontalSeparators = new ArrayList<>();
 		this.verticalSeparators = new ArrayList<>();
 	}
-
-	public int getWidth()
-    {
-        return width;
-    }
-
-    public int getHeight()
-    {
-        return height;
-    }
 
 	/**
 	 * Sets VIPS block, that will be used for separators computing.
@@ -84,9 +72,9 @@ public class VipsSeparatorDetector
         horizontalSeparators.clear();
         if (visualBlocks.size() > 0)
         {
-            horizontalSeparators.add(new Separator(0, getHeight() - 1, false));
+            horizontalSeparators.add(new Separator(pageBounds.getY1(), pageBounds.getY2(), false));
             findHorizontalSeparators();
-            removeBorderSeparators(horizontalSeparators, getHeight() - 1);
+            removeBorderSeparators(horizontalSeparators, pageBounds.getY1(), pageBounds.getY2());
             computeHorizontalWeights();
             sortSeparatorsByWeight(horizontalSeparators);
         }       
@@ -102,9 +90,9 @@ public class VipsSeparatorDetector
         verticalSeparators.clear();
         if (visualBlocks.size() > 0)
         {
-            verticalSeparators.add(new Separator(0, getWidth() - 1, true));
+            verticalSeparators.add(new Separator(pageBounds.getX1(), pageBounds.getX2(), true));
             findVerticalSeparators();
-            removeBorderSeparators(verticalSeparators, getWidth() - 1);
+            removeBorderSeparators(verticalSeparators, pageBounds.getX1(), pageBounds.getX2());
             computeVerticalWeights();
             sortSeparatorsByWeight(verticalSeparators);
         }
@@ -172,14 +160,15 @@ public class VipsSeparatorDetector
     /**
      * Removes the border separators from the list.
      * @param list the list of separators
-     * @param max the maximum coordinate for recognizing the right/bottom border
+     * @param min the minimum coordinate value for recognizing the left/top border
+     * @param max the maximum coordinate value for recognizing the right/bottom border
      */
-    private void removeBorderSeparators(List<Separator> list, int max)
+    private void removeBorderSeparators(List<Separator> list, int min, int max)
     {
         for (Iterator<Separator> it = list.iterator(); it.hasNext(); )
         {
             final Separator separator = it.next();
-            if (separator.startPoint == 0 || separator.endPoint == max)
+            if (separator.startPoint == min || separator.endPoint == max)
                 it.remove();
         }
     }

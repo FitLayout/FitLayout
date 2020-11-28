@@ -32,6 +32,13 @@ public class Separator implements Comparable<Separator>
 		this.weight = weight;
 	}
 
+    public Separator(Separator src) 
+    {
+        this.vertical = src.vertical;
+        this.startPoint = src.startPoint;
+        this.endPoint = src.endPoint;
+    }
+
 	public boolean isVertical()
     {
         return vertical;

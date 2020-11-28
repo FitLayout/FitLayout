@@ -75,308 +75,104 @@ public class VipsSeparatorDetector
 		return visualBlocks;
 	}
 
+    /**
+     * Detects horizontal visual separators from Vips blocks.
+     * @return a list of detected separators
+     */
+    public List<Separator> detectHorizontalSeparators()
+    {
+        horizontalSeparators.clear();
+        if (visualBlocks.size() > 0)
+        {
+            horizontalSeparators.add(new Separator(0, getHeight() - 1, false));
+            findHorizontalSeparators();
+            removeBorderSeparators(horizontalSeparators, getHeight() - 1);
+            computeHorizontalWeights();
+            sortSeparatorsByWeight(horizontalSeparators);
+        }       
+        return horizontalSeparators;
+    }
+
+    /**
+     * Detects vertical visual separators from Vips blocks.
+     * @return 
+     */
+    public List<Separator> detectVerticalSeparators()
+    {
+        verticalSeparators.clear();
+        if (visualBlocks.size() > 0)
+        {
+            verticalSeparators.add(new Separator(0, getWidth() - 1, true));
+            findVerticalSeparators();
+            removeBorderSeparators(verticalSeparators, getWidth() - 1);
+            computeVerticalWeights();
+            sortSeparatorsByWeight(verticalSeparators);
+        }
+        return verticalSeparators;
+    }
+
 	/**
-	 * Computes vertical visual separators
+	 * Computes the vertical visual separators.
 	 */
 	private void findVerticalSeparators()
 	{
 		for (VipsBlock vipsBlock : visualBlocks)
 		{
-			// block vertical coordinates
 			final int blockStart = vipsBlock.getBox().getContentBounds().getX1();
-			final int blockEnd = blockStart + vipsBlock.getBox().getContentBounds().getWidth();
-
-			// for each separator that we have in pool
-			for (Separator separator : verticalSeparators)
-			{
-				// find separator, that intersects with our visual block
-				if (blockStart < separator.endPoint)
-				{
-					// next there are six relations that the separator and visual block can have
-
-					// if separator is inside visual block
-					if (blockStart < separator.startPoint && blockEnd >= separator.endPoint)
-					{
-						List<Separator> tempSeparators = new ArrayList<Separator>();
-						tempSeparators.addAll(verticalSeparators);
-
-						//remove all separators, that are included in block
-						for (Separator other : tempSeparators)
-						{
-							if (blockStart < other.startPoint && blockEnd > other.endPoint)
-								verticalSeparators.remove(other);
-						}
-
-						//find separator, that is on end of this block (if exists)
-						for (Separator other : verticalSeparators)
-						{
-							// and if it's necessary change it's start point
-							if (blockEnd > other.startPoint && blockEnd < other.endPoint)
-							{
-								other.startPoint = blockEnd + 1;
-								break;
-							}
-						}
-						break;
-					}
-					// if block is inside another block -> skip it
-					if (blockEnd < separator.startPoint)
-						break;
-					// if separator starts in the middle of block
-					if (blockStart < separator.startPoint && blockEnd >= separator.startPoint)
-					{
-						// change separator start's point coordinate
-						separator.startPoint = blockEnd+1;
-						break;
-					}
-					// if block is inside the separator
-					if (blockStart >= separator.startPoint && blockEnd <= separator.endPoint)
-					{
-						if (blockStart == separator.startPoint)
-						{
-							separator.startPoint = blockEnd+1;
-							break;
-						}
-						if (blockEnd == separator.endPoint)
-						{
-							separator.endPoint = blockStart - 1;
-							break;
-						}
-						// add new separator that starts behind the block
-						verticalSeparators.add(verticalSeparators.indexOf(separator) + 1,
-						        new Separator(blockEnd + 1, separator.endPoint, true));
-						// change end point coordinates of separator, that's before block
-						separator.endPoint = blockStart - 1;
-						break;
-					}
-					// if in one block is one separator ending and another one starting
-					if (blockStart > separator.startPoint && blockStart < separator.endPoint)
-					{
-						// find the next one
-						int nextSeparatorIndex =verticalSeparators.indexOf(separator);
-
-						// if it's not the last separator
-						if (nextSeparatorIndex + 1 < verticalSeparators.size())
-						{
-							Separator nextSeparator = verticalSeparators.get(verticalSeparators.indexOf(separator) + 1);
-
-							// next separator is really starting before the block ends
-							if (blockEnd > nextSeparator.startPoint && blockEnd < nextSeparator.endPoint)
-							{
-								// change separator start point coordinate
-								separator.endPoint = blockStart - 1;
-								nextSeparator.startPoint = blockEnd + 1;
-								break;
-							}
-							else
-							{
-								List<Separator> tempSeparators = new ArrayList<Separator>();
-								tempSeparators.addAll(verticalSeparators);
-
-								//remove all separators, that are included in block
-								for (Separator other : tempSeparators)
-								{
-									if (blockStart < other.startPoint && other.endPoint < blockEnd)
-									{
-										verticalSeparators.remove(other);
-										continue;
-									}
-									if (blockEnd > other.startPoint && blockEnd < other.endPoint)
-									{
-										// change separator start's point coordinate
-										other.startPoint = blockEnd+1;
-										break;
-									}
-									if (blockStart > other.startPoint && blockStart < other.endPoint)
-									{
-										other.endPoint = blockStart-1;
-										continue;
-									}
-								}
-								break;
-							}
-						}
-					}
-					// if separator ends in the middle of block
-					// change it's end point coordinate
-					separator.endPoint = blockStart-1;
-					break;
-				}
-			}
+			final int blockEnd = vipsBlock.getBox().getContentBounds().getX2();
+			updateSeparatorsForBlock(verticalSeparators, blockStart, blockEnd);
 		}
-	}
-
-	/**
-	 * Computes horizontal visual separators
-	 */
-	private void findHorizontalSeparators()
-	{
-		for (VipsBlock vipsBlock : visualBlocks)
-		{
-			// block vertical coordinates
-			final int blockStart = vipsBlock.getBox().getContentBounds().getY1();
-			final int blockEnd = blockStart + vipsBlock.getBox().getContentBounds().getHeight();
-
-			// for each separator that we have in pool
-			for (Separator separator : horizontalSeparators)
-			{
-				// find separator, that intersects with our visual block
-				if (blockStart < separator.endPoint)
-				{
-					// next there are six relations that the separator and visual block can have
-
-					// if separator is inside visual block
-					if (blockStart < separator.startPoint && blockEnd >= separator.endPoint)
-					{
-						List<Separator> tempSeparators = new ArrayList<Separator>();
-						tempSeparators.addAll(horizontalSeparators);
-
-						//remove all separators, that are included in block
-						for (Separator other : tempSeparators)
-						{
-							if (blockStart < other.startPoint && blockEnd > other.endPoint)
-								horizontalSeparators.remove(other);
-						}
-
-						//find separator, that is on end of this block (if exists)
-						for (Separator other : horizontalSeparators)
-						{
-							// and if it's necessary change it's start point
-							if (blockEnd > other.startPoint && blockEnd < other.endPoint)
-							{
-								other.startPoint = blockEnd + 1;
-								break;
-							}
-						}
-						break;
-					}
-					// if block is inside another block -> skip it
-					if (blockEnd < separator.startPoint)
-						break;
-					// if separator starts in the middle of block
-					if (blockStart <= separator.startPoint && blockEnd >= separator.startPoint)
-					{
-						// change separator start's point coordinate
-						separator.startPoint = blockEnd+1;
-						break;
-					}
-					// if block is inside the separator
-					if (blockStart >= separator.startPoint && blockEnd < separator.endPoint)
-					{
-						if (blockStart == separator.startPoint)
-						{
-							separator.startPoint = blockEnd+1;
-							break;
-						}
-						if (blockEnd == separator.endPoint)
-						{
-							separator.endPoint = blockStart - 1;
-							break;
-						}
-						// add new separator that starts behind the block
-						horizontalSeparators.add(horizontalSeparators.indexOf(separator) + 1,
-						        new Separator(blockEnd + 1, separator.endPoint, false));
-						// change end point coordinates of separator, that's before block
-						separator.endPoint = blockStart - 1;
-						break;
-					}
-					// if in one block is one separator ending and another one starting
-					if (blockStart > separator.startPoint && blockStart < separator.endPoint)
-					{
-						// find the next one
-						int nextSeparatorIndex =horizontalSeparators.indexOf(separator);
-
-						// if it's not the last separator
-						if (nextSeparatorIndex + 1 < horizontalSeparators.size())
-						{
-							Separator nextSeparator = horizontalSeparators.get(horizontalSeparators.indexOf(separator) + 1);
-
-							// next separator is really starting before the block ends
-							if (blockEnd > nextSeparator.startPoint && blockEnd < nextSeparator.endPoint)
-							{
-								// change separator start point coordinate
-								separator.endPoint = blockStart - 1;
-								nextSeparator.startPoint = blockEnd + 1;
-								break;
-							}
-							else
-							{
-								List<Separator> tempSeparators = new ArrayList<Separator>();
-								tempSeparators.addAll(horizontalSeparators);
-
-								//remove all separators, that are included in block
-								for (Separator other : tempSeparators)
-								{
-									if (blockStart < other.startPoint && other.endPoint < blockEnd)
-									{
-										horizontalSeparators.remove(other);
-										continue;
-									}
-									if (blockEnd > other.startPoint && blockEnd < other.endPoint)
-									{
-										// change separator start's point coordinate
-										other.startPoint = blockEnd+1;
-										break;
-									}
-									if (blockStart > other.startPoint && blockStart < other.endPoint)
-									{
-										other.endPoint = blockStart-1;
-										continue;
-									}
-								}
-								break;
-							}
-						}
-					}
-					// if separator ends in the middle of block
-					// change it's end point coordinate
-					separator.endPoint = blockStart-1;
-					break;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Detects horizontal visual separators from Vips blocks.
-	 * @return a list of detected separators
-	 */
-	public List<Separator> detectHorizontalSeparators()
-	{
-        horizontalSeparators.clear();
-		if (visualBlocks.size() > 0)
-		{
-    		horizontalSeparators.add(new Separator(0, getHeight(), false));
-    		findHorizontalSeparators();
-    		removeBorderSeparators(horizontalSeparators, getHeight());
-    		computeHorizontalWeights();
-    		sortSeparatorsByWeight(horizontalSeparators);
-		}		
-		return horizontalSeparators;
-	}
-
-	/**
-	 * Detects vertical visual separators from Vips blocks.
-	 * @return 
-	 */
-	public List<Separator> detectVerticalSeparators()
-	{
-        verticalSeparators.clear();
-		if (visualBlocks.size() > 0)
-		{
-    		verticalSeparators.add(new Separator(0, getWidth(), true));
-    		findVerticalSeparators();
-            removeBorderSeparators(verticalSeparators, getWidth());
-    		computeVerticalWeights();
-    		sortSeparatorsByWeight(verticalSeparators);
-		}
-		return verticalSeparators;
 	}
 
     /**
+     * Computes the horizontal visual separators.
+     */
+    private void findHorizontalSeparators()
+    {
+        for (VipsBlock vipsBlock : visualBlocks)
+        {
+            final int blockStart = vipsBlock.getBox().getContentBounds().getY1();
+            final int blockEnd = vipsBlock.getBox().getContentBounds().getY2();
+            updateSeparatorsForBlock(horizontalSeparators, blockStart, blockEnd);
+        }
+    }
+
+    private void updateSeparatorsForBlock(List<Separator> separators, final int blockStart, final int blockEnd)
+    {
+        List<Separator> toAdd = new ArrayList<>();
+        for (Iterator<Separator> it = separators.iterator(); it.hasNext(); )
+        {
+            final Separator sep = it.next();
+            // c. If the block covers the separator, remove the separator
+            if (blockStart <= sep.startPoint && blockEnd >= sep.endPoint)
+            {
+                it.remove();
+            }
+            // a. If the block is contained in the separator, split the separator
+            else if (blockStart > sep.startPoint && blockEnd < sep.endPoint)
+            {
+                final Separator newsep = new Separator(sep);
+                sep.endPoint = blockStart - 1;
+                newsep.startPoint = blockEnd + 1;
+                toAdd.add(newsep);
+            }
+            // b. If the block crosses with the separator, update the separator’s parameters
+            else if (blockStart < sep.startPoint && blockEnd >= sep.startPoint && blockEnd < sep.endPoint)
+            {
+                sep.startPoint = blockEnd + 1;
+            }
+            else if (blockEnd > sep.endPoint && blockStart > sep.startPoint && blockStart <= sep.endPoint)
+            {
+                sep.endPoint = blockStart - 1;
+            }
+        }
+        separators.addAll(toAdd);
+    }
+
+    /**
      * Removes the border separators from the list.
-     * @param list
-     * @param the maximum coordinate for recognizing the right/bottom border
+     * @param list the list of separators
+     * @param max the maximum coordinate for recognizing the right/bottom border
      */
     private void removeBorderSeparators(List<Separator> list, int max)
     {

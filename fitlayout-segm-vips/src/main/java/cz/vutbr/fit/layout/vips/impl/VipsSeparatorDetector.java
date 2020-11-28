@@ -47,11 +47,7 @@ public class VipsSeparatorDetector
 	 */
 	public void setVisualBlocks(List<VipsBlock> visualBlocks)
 	{
-		this.visualBlocks.clear();
-		for (VipsBlock block : visualBlocks)
-		{
-		    this.visualBlocks.add(block);
-		}
+		this.visualBlocks = visualBlocks;
 	}
 
 	/**
@@ -190,8 +186,8 @@ public class VipsSeparatorDetector
 		for (Separator separator : verticalSeparators)
 		{
 			ruleOne(separator);
-			ruleTwo(separator, false);
-			ruleThree(separator, false);
+			ruleTwo(separator);
+			ruleThree(separator);
 		}
 	}
 
@@ -203,8 +199,8 @@ public class VipsSeparatorDetector
 		for (Separator separator : horizontalSeparators)
 		{
 			ruleOne(separator);
-			ruleTwo(separator, true);
-			ruleThree(separator,true);
+			ruleTwo(separator);
+			ruleThree(separator);
 			ruleFour(separator);
 			ruleFive(separator);
 		}
@@ -218,9 +214,7 @@ public class VipsSeparatorDetector
 	 */
 	private void ruleOne(Separator separator)
 	{
-		int width = separator.endPoint - separator.startPoint + 1;
-
-		//separator.weight += width;
+		final int width = separator.endPoint - separator.startPoint + 1;
 
 		if (width > 55 )
 			separator.weight += 12;
@@ -244,17 +238,9 @@ public class VipsSeparatorDetector
 	 * tags (e.g., the &lt;HR&gt; HTML tag), its weight is set to be higher.
 	 * @param separator Separator
 	 */
-	private void ruleTwo(Separator separator, boolean horizontal)
+	private void ruleTwo(Separator separator)
 	{
-		List<VipsBlock> overlappedElements = new ArrayList<VipsBlock>();
-		if (horizontal)
-			findHorizontalOverlappedElements(separator, overlappedElements);
-		else
-			findVerticalOverlappedElements(separator, overlappedElements);
-
-		if (overlappedElements.size() == 0)
-			return;
-
+		final List<VipsBlock> overlappedElements = findOverlappedElements(separator);
 		for (VipsBlock vipsBlock : overlappedElements)
 		{
 			if ("hr".equalsIgnoreCase(vipsBlock.getBox().getTagName()))
@@ -266,105 +252,65 @@ public class VipsSeparatorDetector
 	}
 
 	/**
-	 * Finds elements that are overlapped with horizontal separator.
+	 * Finds elements that are overlapped with a separator.
 	 * @param separator Separator, that we look at
-	 * @param vipsBlock Visual block corresponding to element
-	 * @param result Elements, that we found
 	 */
-	private void findHorizontalOverlappedElements(Separator separator, List<VipsBlock> result)
+	private List<VipsBlock> findOverlappedElements(Separator separator)
 	{
+	    final List<VipsBlock> result = new ArrayList<>();
 		for (VipsBlock vipsBlock : visualBlocks)
 		{
-			int topEdge = vipsBlock.getBox().getContentBounds().getY1();
-			int bottomEdge = topEdge + vipsBlock.getBox().getContentBounds().getHeight();
+            final int blockStart;
+            final int blockEnd;
+		    if (separator.isVertical())
+		    {
+                blockStart = vipsBlock.getBox().getContentBounds().getX1();
+                blockEnd = vipsBlock.getBox().getContentBounds().getX2();
+		    }
+		    else
+		    {
+                blockStart = vipsBlock.getBox().getContentBounds().getY1();
+                blockEnd = vipsBlock.getBox().getContentBounds().getY2();
+		    }
 
-			// two upper edges of element are overlapped with separator
-			if (topEdge > separator.startPoint && topEdge < separator.endPoint && bottomEdge > separator.endPoint)
-			{
-				result.add(vipsBlock);
-			}
-
-			// two bottom edges of element are overlapped with separator
-			if (topEdge < separator.startPoint && bottomEdge > separator.startPoint && bottomEdge < separator.endPoint)
-			{
-				result.add(vipsBlock);
-			}
-
-			// all edges of element are overlapped with separator
-			if (topEdge >= separator.startPoint && bottomEdge <= separator.endPoint)
-			{
-				result.add(vipsBlock);
-			}
+            if ((blockStart >= separator.startPoint && blockStart <= separator.endPoint)
+                    || (blockEnd >= separator.startPoint && blockEnd <= separator.endPoint))
+            {
+                result.add(vipsBlock);
+            }
 		}
-	}
-
-	/**
-	 * Finds elements that are overlapped with vertical separator.
-	 * @param separator Separator, that we look at
-	 * @param vipsBlock Visual block corresponding to element
-	 * @param result Elements, that we found
-	 */
-	private void findVerticalOverlappedElements(Separator separator, List<VipsBlock> result)
-	{
-		for (VipsBlock vipsBlock : visualBlocks)
-		{
-			final int leftEdge = vipsBlock.getBox().getContentBounds().getX1();
-			final int rightEdge = leftEdge + vipsBlock.getBox().getContentBounds().getWidth();
-
-			// two left edges of element are overlapped with separator
-			if (leftEdge > separator.startPoint && leftEdge < separator.endPoint && rightEdge > separator.endPoint)
-			{
-				result.add(vipsBlock);
-			}
-
-			// two right edges of element are overlapped with separator
-			if (leftEdge < separator.startPoint && rightEdge > separator.startPoint && rightEdge < separator.endPoint)
-			{
-				result.add(vipsBlock);
-			}
-
-			// all edges of element are overlapped with separator
-			if (leftEdge >= separator.startPoint && rightEdge <= separator.endPoint)
-			{
-				result.add(vipsBlock);
-			}
-		}
+		return result;
 	}
 
 	/**
 	 * If background colors of the blocks on two sides of the separator
 	 * are different, the weight will be increased.
+	 * 
 	 * @param separator Separator
 	 */
-	private void ruleThree(Separator separator, boolean horizontal)
+	private void ruleThree(Separator separator)
 	{
-		// for vertical is represents elements on left side
-		List<VipsBlock> topAdjacentElements = new ArrayList<VipsBlock>();
-		// for vertical is represents elements on right side
-		List<VipsBlock> bottomAdjacentElements = new ArrayList<VipsBlock>();
-		if (horizontal)
-			findHorizontalAdjacentBlocks(separator, topAdjacentElements, bottomAdjacentElements);
-		else
-			findVerticalAdjacentBlocks(separator, topAdjacentElements, bottomAdjacentElements);
+		List<VipsBlock> adjacentBefore = new ArrayList<>();
+		List<VipsBlock> adjacentAfter = new ArrayList<>();
+		findAdjacentBlocks(separator, adjacentBefore, adjacentAfter);
 
-		if (topAdjacentElements.size() < 1 || bottomAdjacentElements.size() < 1)
-			return;
-
-		boolean weightIncreased = false;
-
-		for (VipsBlock top : topAdjacentElements)
+		if (!adjacentBefore.isEmpty() && !adjacentAfter.isEmpty())
 		{
-			for (VipsBlock bottom : bottomAdjacentElements)
-			{
-				if (!top.getBgColor().equals(bottom.getBgColor()))
-				{
-					separator.weight += 2;
-					weightIncreased = true;
-					break;
-				}
-			}
-			if (weightIncreased)
-				break;
+    		boolean weightIncreased = false;
+    		for (VipsBlock before : adjacentBefore)
+    		{
+    			for (VipsBlock after : adjacentAfter)
+    			{
+    				if (!before.getBgColor().equals(after.getBgColor()))
+    				{
+    					separator.weight += 2;
+    					weightIncreased = true;
+    					break;
+    				}
+    			}
+    			if (weightIncreased)
+    				break;
+    		}
 		}
 	}
 
@@ -372,54 +318,33 @@ public class VipsSeparatorDetector
 	 * Finds elements that are adjacent to horizontal separator.
 	 * @param separator Separator, that we look at
 	 * @param vipsBlock Visual block corresponding to element
-	 * @param resultTop Elements, that we found on top side of separator
-	 * @param resultBottom Elements, that we found on bottom side side of separator
+	 * @param before Elements, that we found on top side of separator
+	 * @param after Elements, that we found on bottom side side of separator
 	 */
-	private void findHorizontalAdjacentBlocks(Separator separator, List<VipsBlock> resultTop, List<VipsBlock> resultBottom)
+	private void findAdjacentBlocks(Separator separator, List<VipsBlock> before, List<VipsBlock> after)
 	{
 		for (VipsBlock vipsBlock : visualBlocks)
 		{
-			int topEdge = vipsBlock.getBox().getContentBounds().getY1();
-			int bottomEdge = topEdge + vipsBlock.getBox().getContentBounds().getHeight();
+            final int blockStart;
+            final int blockEnd;
+            if (separator.isVertical())
+            {
+                blockStart = vipsBlock.getBox().getContentBounds().getX1();
+                blockEnd = vipsBlock.getBox().getContentBounds().getX2();
+            }
+            else
+            {
+                blockStart = vipsBlock.getBox().getContentBounds().getY1();
+                blockEnd = vipsBlock.getBox().getContentBounds().getY2();
+            }
 
-			// if box is adjancent to separator from bottom
-			if (topEdge == separator.endPoint + 1 && bottomEdge > separator.endPoint + 1)
+			if (blockStart == separator.endPoint + 1)
 			{
-				resultBottom.add(vipsBlock);
+				after.add(vipsBlock);
 			}
-
-			// if box is adjancent to separator from top
-			if (bottomEdge == separator.startPoint - 1 && topEdge < separator.startPoint - 1)
+			else if (blockEnd == separator.startPoint - 1)
 			{
-				resultTop.add(0, vipsBlock);
-			}
-		}
-	}
-
-	/**
-	 * Finds elements that are adjacent to vertical separator.
-	 * @param separator Separator, that we look at
-	 * @param vipsBlock Visual block corresponding to element
-	 * @param resultLeft Elements, that we found on left side of separator
-	 * @param resultRight Elements, that we found on right side side of separator
-	 */
-	private void findVerticalAdjacentBlocks(Separator separator, List<VipsBlock> resultLeft, List<VipsBlock> resultRight)
-	{
-		for (VipsBlock vipsBlock : visualBlocks)
-		{
-			final int leftEdge = vipsBlock.getBox().getContentBounds().getX1() + 1;
-			final int rightEdge = leftEdge + vipsBlock.getBox().getContentBounds().getWidth();
-
-			// if box is adjancent to separator from right
-			if (leftEdge == separator.endPoint + 1 && rightEdge > separator.endPoint + 1)
-			{
-				resultRight.add(vipsBlock);
-			}
-
-			// if box is adjancent to separator from left
-			if (rightEdge == separator.startPoint - 1 && leftEdge < separator.startPoint - 1)
-			{
-				resultLeft.add(0, vipsBlock);
+				before.add(0, vipsBlock);
 			}
 		}
 	}
@@ -435,54 +360,51 @@ public class VipsSeparatorDetector
 	 */
 	private void ruleFour(Separator separator)
 	{
-		List<VipsBlock> topAdjacentElements = new ArrayList<VipsBlock>();
-		List<VipsBlock> bottomAdjacentElements = new ArrayList<VipsBlock>();
-
-		findHorizontalAdjacentBlocks(separator, topAdjacentElements, bottomAdjacentElements);
-
-		if (topAdjacentElements.size() < 1 || bottomAdjacentElements.size() < 1)
-			return;
-
-		boolean weightIncreased = false;
-
-		for (VipsBlock top : topAdjacentElements)
+		final List<VipsBlock> adjacentTop = new ArrayList<>();
+		final List<VipsBlock> adjacentBottom = new ArrayList<>();
+		findAdjacentBlocks(separator, adjacentTop, adjacentBottom);
+		
+		if (!adjacentTop.isEmpty() && !adjacentBottom.isEmpty())
 		{
-			for (VipsBlock bottom : bottomAdjacentElements)
-			{
-				int diff = Math.abs(top.getFontSize() - bottom.getFontSize());
-				if (diff != 0)
-				{
-					separator.weight += 2;
-					weightIncreased = true;
-					break;
-				}
-				else
-				{
-					if (!top.getFontWeight().equals(bottom.getFontWeight()))
-					{
-						separator.weight += 2;
-					}
-				}
-			}
-			if (weightIncreased)
-				break;
-		}
-
-		weightIncreased = false;
-
-		for (VipsBlock top : topAdjacentElements)
-		{
-			for (VipsBlock bottom : bottomAdjacentElements)
-			{
-				if (top.getFontSize() < bottom.getFontSize())
-				{
-					separator.weight += 2;
-					weightIncreased = true;
-					break;
-				}
-			}
-			if (weightIncreased)
-				break;
+    		boolean weightIncreased = false;
+    		for (VipsBlock top : adjacentTop)
+    		{
+    			for (VipsBlock bottom : adjacentBottom)
+    			{
+    				int diff = Math.abs(top.getFontSize() - bottom.getFontSize());
+    				if (diff != 0)
+    				{
+    					separator.weight += 2;
+    					weightIncreased = true;
+    					break;
+    				}
+    				else
+    				{
+    					if (!top.getFontWeight().equals(bottom.getFontWeight()))
+    					{
+    						separator.weight += 2;
+    					}
+    				}
+    			}
+    			if (weightIncreased)
+    				break;
+    		}
+    
+    		weightIncreased = false;
+    		for (VipsBlock top : adjacentTop)
+    		{
+    			for (VipsBlock bottom : adjacentBottom)
+    			{
+    				if (top.getFontSize() < bottom.getFontSize())
+    				{
+    					separator.weight += 2;
+    					weightIncreased = true;
+    					break;
+    				}
+    			}
+    			if (weightIncreased)
+    				break;
+    		}
 		}
 	}
 
@@ -494,49 +416,45 @@ public class VipsSeparatorDetector
 	 */
 	private void ruleFive(Separator separator)
 	{
-		List<VipsBlock> topAdjacentElements = new ArrayList<VipsBlock>();
-		List<VipsBlock> bottomAdjacentElements = new ArrayList<VipsBlock>();
+		final List<VipsBlock> adjacentTop = new ArrayList<>();
+		final List<VipsBlock> adjacentBottom = new ArrayList<>();
+		findAdjacentBlocks(separator, adjacentTop, adjacentBottom);
 
-		findHorizontalAdjacentBlocks(separator, topAdjacentElements, bottomAdjacentElements);
-
-		if (topAdjacentElements.size() < 1 || bottomAdjacentElements.size() < 1)
-			return;
-
-		boolean weightDecreased = false;
-
-		for (VipsBlock top : topAdjacentElements)
-		{
-			for (VipsBlock bottom : bottomAdjacentElements)
-			{
-				if (top.getBox().getType() == Type.TEXT_CONTENT && bottom.getBox().getType() == Type.TEXT_CONTENT)
-				{
-					separator.weight -= 2;
-					weightDecreased = true;
-					break;
-				}
-			}
-			if (weightDecreased)
-				break;
-		}
+        if (!adjacentTop.isEmpty() && !adjacentBottom.isEmpty())
+        {
+    		boolean weightDecreased = false;
+    		for (VipsBlock top : adjacentTop)
+    		{
+    			for (VipsBlock bottom : adjacentBottom)
+    			{
+    				if (top.getBox().getType() == Type.TEXT_CONTENT && bottom.getBox().getType() == Type.TEXT_CONTENT)
+    				{
+    					separator.weight -= 2;
+    					weightDecreased = true;
+    					break;
+    				}
+    			}
+    			if (weightDecreased)
+    				break;
+    		}
+        }
 	}
 
-	/**
-	 * @return the _horizontalSeparators
-	 */
 	public List<Separator> getHorizontalSeparators()
 	{
 		return horizontalSeparators;
 	}
 
-	/**
-	 * @return the _verticalSeparators
-	 */
 	public List<Separator> getVerticalSeparators()
 	{
 		return verticalSeparators;
 	}
 
-    public List<Separator> getAllSeparators()
+    /**
+     * Gets all the separators (both horizontal and vertical) sorted by weight.
+     * @return a list of all separators
+     */
+	public List<Separator> getAllSeparators()
     {
         List<Separator> ret = new ArrayList<>(horizontalSeparators.size() + verticalSeparators.size());
         ret.addAll(horizontalSeparators);

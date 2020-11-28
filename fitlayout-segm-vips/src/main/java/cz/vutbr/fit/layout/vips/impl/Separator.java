@@ -82,7 +82,14 @@ public class Separator implements Comparable<Separator>
     @Override
 	public int compareTo(Separator otherSeparator)
 	{
-		return this.weight - otherSeparator.weight;
+        final int dif = this.weight - otherSeparator.weight;
+        if (dif == 0)
+        {
+            //if the weight is equal, prefer horizontal separators over vertical ones
+            return (this.vertical ? 0 : 1) - (otherSeparator.vertical ? 0 : 1);
+        }
+        else
+            return dif;
 	}
 
     @Override

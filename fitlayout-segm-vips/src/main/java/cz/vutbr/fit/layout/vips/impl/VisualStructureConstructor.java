@@ -7,6 +7,8 @@
 package cz.vutbr.fit.layout.vips.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -55,10 +57,11 @@ public class VisualStructureConstructor
 	    while (change && !seps.isEmpty())
 	    {
 	        change = false;
-            //collect pairs of areas separated by a separator with the same weight
+            //collect pairs of areas separated by a separator with the same weight and direction
             final int w = seps.get(0).weight;
+            final boolean vertical = seps.get(0).vertical;
 	        List<SepPair> pairs = new ArrayList<>();
-	        while (!seps.isEmpty() && seps.get(0).weight == w)
+	        while (!seps.isEmpty() && seps.get(0).vertical == vertical && seps.get(0).weight == w)
 	        {
 	            SepPair pair = findPairForSeparator(seps.remove(0), pool);
 	            if (pair.isComplete())
@@ -116,6 +119,7 @@ public class VisualStructureConstructor
     	        }
     	    }
     	    newstr.getChildren().addAll(children);
+            sortChildren(newstr.getChildren(), seed.separator.isVertical());
     	    pool.removeAll(children);
 	    }
 	    return ret;
@@ -200,7 +204,7 @@ public class VisualStructureConstructor
 
         VisualStructure bottom = new VisualStructure();
         bottom.setX1(current.getX1());
-        bottom.setY1(separator.endPoint+1);
+        bottom.setY1(separator.endPoint + 1);
         bottom.setX2(current.getX2());
         bottom.setY2(current.getY2());
         bottom.setTop(separator);
@@ -250,6 +254,33 @@ public class VisualStructureConstructor
         list.add(right);
 	}
 	
+	private void sortChildren(List<VisualStructure> children, boolean vertical)
+	{
+	    Comparator<VisualStructure> comp;
+	    if (vertical)
+	    {
+	        comp = new Comparator<VisualStructure>()
+            {
+                @Override
+                public int compare(VisualStructure o1, VisualStructure o2)
+                {
+                    return o1.getX1() - o2.getX1();
+                }
+            };
+	    }
+	    else
+	    {
+            comp = new Comparator<VisualStructure>()
+            {
+                @Override
+                public int compare(VisualStructure o1, VisualStructure o2)
+                {
+                    return o1.getY1() - o2.getY1();
+                }
+            };
+	    }
+	    Collections.sort(children, comp);
+	}
 	
 	/**
 	 * Sets page's size

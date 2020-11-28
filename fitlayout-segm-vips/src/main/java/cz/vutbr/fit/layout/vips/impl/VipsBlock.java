@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.vutbr.fit.layout.model.Box;
+import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
  * A class that represents a block on the page.
@@ -177,6 +178,15 @@ public class VipsBlock
 		this.alreadyDivided = alreadyDivided;
 	}
 
+	/**
+	 * Gets the visual bounds of the block.
+	 * @return the visual bounds
+	 */
+	public Rectangular getBounds()
+	{
+	    return getBox().getVisualBounds();
+	}
+	
 	/**
 	 * Finds background color of element
 	 * @param element Element

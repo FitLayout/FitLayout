@@ -148,7 +148,7 @@ public class VipsParser
 		if (bounds.getX1() < 0 || bounds.getY1() < 0)
 			return false;
 
-		if (node.getX2() > pageWidth)
+		if (node.getX2() > pageWidth) //TODO subpage bounds
 		{
 			return false;
 		}
@@ -287,18 +287,6 @@ public class VipsParser
 	 */
 	private Box getFirstValidChildNode(Box node)
 	{
-		/*if ("img".equalsIgnoreCase(node.getTagName()) || "input".equalsIgnoreCase(node.getTagName()))
-		{
-			if (node.getContentBounds().getWidth() > 0 && node.getContentBounds().getHeight() > 0)
-			{
-				_currentVipsBlock.setIsVisualBlock(true);
-				_currentVipsBlock.setDoC(8);
-				return true;
-			}
-			else
-				return false;
-		}*/ //TODO treat this elsewhere
-
         for (Box childNode : node.getChildren())
         {
             if (isValidNode(childNode))

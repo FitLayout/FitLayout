@@ -213,7 +213,7 @@ public class VisualStructureConstructor
         List<VipsBlock> nestedBlocks = current.getBlockRoots();
         for (VipsBlock vipsBlock : nestedBlocks)
         {
-            if (vipsBlock.getBox().getContentBounds().getY1() <= separator.startPoint)
+            if (vipsBlock.getBounds().getY1() <= separator.startPoint)
                 top.addBlock(vipsBlock);
             else
                 bottom.addBlock(vipsBlock);
@@ -244,7 +244,7 @@ public class VisualStructureConstructor
         List<VipsBlock> nestedBlocks = current.getBlockRoots();
         for (VipsBlock vipsBlock : nestedBlocks)
         {
-            if (vipsBlock.getBox().getContentBounds().getX1() <= separator.startPoint)
+            if (vipsBlock.getBounds().getX1() <= separator.startPoint)
                 left.addBlock(vipsBlock);
             else
                 right.addBlock(vipsBlock);

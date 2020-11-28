@@ -102,8 +102,8 @@ public class VipsSeparatorDetector
 	{
 		for (VipsBlock vipsBlock : visualBlocks)
 		{
-			final int blockStart = vipsBlock.getBox().getContentBounds().getX1();
-			final int blockEnd = vipsBlock.getBox().getContentBounds().getX2();
+			final int blockStart = vipsBlock.getBounds().getX1();
+			final int blockEnd = vipsBlock.getBounds().getX2();
 			updateSeparatorsForBlock(verticalSeparators, blockStart, blockEnd);
 		}
 	}
@@ -115,8 +115,8 @@ public class VipsSeparatorDetector
     {
         for (VipsBlock vipsBlock : visualBlocks)
         {
-            final int blockStart = vipsBlock.getBox().getContentBounds().getY1();
-            final int blockEnd = vipsBlock.getBox().getContentBounds().getY2();
+            final int blockStart = vipsBlock.getBounds().getY1();
+            final int blockEnd = vipsBlock.getBounds().getY2();
             updateSeparatorsForBlock(horizontalSeparators, blockStart, blockEnd);
         }
     }
@@ -264,13 +264,13 @@ public class VipsSeparatorDetector
             final int blockEnd;
 		    if (separator.isVertical())
 		    {
-                blockStart = vipsBlock.getBox().getContentBounds().getX1();
-                blockEnd = vipsBlock.getBox().getContentBounds().getX2();
+                blockStart = vipsBlock.getBounds().getX1();
+                blockEnd = vipsBlock.getBounds().getX2();
 		    }
 		    else
 		    {
-                blockStart = vipsBlock.getBox().getContentBounds().getY1();
-                blockEnd = vipsBlock.getBox().getContentBounds().getY2();
+                blockStart = vipsBlock.getBounds().getY1();
+                blockEnd = vipsBlock.getBounds().getY2();
 		    }
 
             if ((blockStart >= separator.startPoint && blockStart <= separator.endPoint)
@@ -329,13 +329,13 @@ public class VipsSeparatorDetector
             final int blockEnd;
             if (separator.isVertical())
             {
-                blockStart = vipsBlock.getBox().getContentBounds().getX1();
-                blockEnd = vipsBlock.getBox().getContentBounds().getX2();
+                blockStart = vipsBlock.getBounds().getX1();
+                blockEnd = vipsBlock.getBounds().getX2();
             }
             else
             {
-                blockStart = vipsBlock.getBox().getContentBounds().getY1();
-                blockEnd = vipsBlock.getBox().getContentBounds().getY2();
+                blockStart = vipsBlock.getBounds().getY1();
+                blockEnd = vipsBlock.getBounds().getY2();
             }
 
 			if (blockStart == separator.endPoint + 1)

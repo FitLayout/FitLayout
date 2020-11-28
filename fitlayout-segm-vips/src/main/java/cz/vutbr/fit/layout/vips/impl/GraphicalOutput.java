@@ -97,9 +97,7 @@ public class GraphicalOutput
      */
     private void drawVisualBlock(VipsBlock vipsBlock)
     {
-        Box elementBox = vipsBlock.getBox();
-
-        Rectangular bb = elementBox.getContentBounds();
+        Rectangular bb = vipsBlock.getBounds();
         Rectangle rect = new Rectangle(bb.getX1(), bb.getY1(), bb.getWidth(), bb.getHeight());
 
         displayPool.setColor(BLOCK_COLOR);

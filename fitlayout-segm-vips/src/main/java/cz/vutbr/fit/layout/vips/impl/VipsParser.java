@@ -16,7 +16,8 @@ import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
- * Class that parses blocks on page and finds visual blocks.
+ * Detects the visual blocks in the page.
+ * 
  * @author Tomas Popela
  * @author burgetr
  */
@@ -31,7 +32,7 @@ public class VipsParser
 	private int pageHeight = 0;
 
 	/**
-	 * Default constructor
+	 * Creates the detector for the given page.
 	 * 
 	 * @param page Rendered's page viewport
 	 */
@@ -150,13 +151,11 @@ public class VipsParser
 		if (node.getX2() > pageWidth)
 		{
 			return false;
-			//System.out.println("X " + node.getAbsoluteContentX() + "\t" + (node.getAbsoluteContentX() + node.getContentWidth()) + "\t" + _pageWidth);
 		}
 
 		if (node.getY2() > pageHeight)
 		{
 			return false;
-			//System.out.println("Y " + node.getAbsoluteContentY() + "\t" + (node.getAbsoluteContentY() + node.getContentHeight()) + "\t" + _pageHeight);
 		}
 
 		if (node.getWidth() <= 0 || node.getHeight() <= 0)

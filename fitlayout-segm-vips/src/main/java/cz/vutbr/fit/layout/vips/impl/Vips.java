@@ -8,20 +8,25 @@ package cz.vutbr.fit.layout.vips.impl;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
- * Vision-based Page Segmentation algorithm
+ * Vision-based Page Segmentation algorithm.
+ * 
  * @author Tomas Popela
- *
+ * @author burgetr
  */
-public class Vips {
+public class Vips 
+{
+    private static Logger log = LoggerFactory.getLogger(Vips.class);
+    
 	private Page page = null;
 	private VisualStructure visualStructure;
 
@@ -30,9 +35,6 @@ public class Vips {
 	private int pDoC = 11;
 	private	int sizeTresholdWidth = 350;
 	private	int sizeTresholdHeight = 400;
-
-	private long startTime = 0;
-	private long endTime = 0;
 
 	/**
 	 * Default constructor
@@ -61,19 +63,16 @@ public class Vips {
 
 	/**
 	 * Sets permitted degree of coherence (pDoC) value.
-	 * @param value pDoC value.
+	 * 
+	 * @param value pDoC value (1 .. 11)
 	 */
 	public void setPredefinedDoC(int value)
 	{
 		if (value <= 0 || value > 11)
 		{
-			System.err.println("pDoC value must be between 1 and 11! Not " + value + "!");
-			return;
+			log.error("pDoC value must be between 1 and 11! ({} given)", value);
 		}
-		else
-		{
-			pDoC = value;
-		}
+		pDoC = value;
 	}
 
 	/**
@@ -95,24 +94,6 @@ public class Vips {
 	    return new VipsTreeBuilder();
 	}
 	
-	/**
-	 * Exports rendered page to image.
-	 */
-	private void exportPageToImage()
-	{
-	    //TODO is this used?
-		/*try
-		{
-			BufferedImage page = _browserCanvas.getImage();
-			String filename = System.getProperty("user.dir") + "/page.png";
-			ImageIO.write(page, "png", new File(filename));
-		} catch (Exception e)
-		{
-			System.err.println("Error: " + e.getMessage());
-			e.printStackTrace();
-		}*/
-	}
-
 	/**
 	 * Generates folder filename
 	 * @return Folder filename
@@ -291,8 +272,6 @@ public class Vips {
 	{
 		try
 		{
-			startTime = System.nanoTime();
-
 			String outputFolder = "";
 			String oldWorkingDirectory = "";
 			String newWorkingDirectory = "";

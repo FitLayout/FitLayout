@@ -13,16 +13,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
- * Class that constructs final visual structure of page.
+ * Constructs the final visual structure of page.
+ * 
  * @author Tomas Popela
  * @author burgetr
  */
 public class VisualStructureConstructor 
 {
-	//private int iteration;
+    private static Logger log = LoggerFactory.getLogger(VisualStructureConstructor.class);
+    
     private List<VipsBlock> visualBlocks;
 	private VisualStructure rootStructure;
 	private List<Separator> separators;
@@ -62,7 +67,7 @@ public class VisualStructureConstructor
 	                change = true;
 	            }
 	            else
-	                System.err.println("Incomplete pair?!");
+	                log.error("Incomplete pair?!");
 	        }
 	        //group by pairs
 	        List<VisualStructure> groups = groupByPairs(pairs, pool);
@@ -72,7 +77,7 @@ public class VisualStructureConstructor
 	    if (pool.size() >= 1)
 	        rootStructure = pool.get(0);
 	    if (pool.size() != 1)
-	        System.err.println(pool.size() + " areas left in pool");
+	       log.error("{} areas left in pool", pool.size());
 	}
 	
 	/**

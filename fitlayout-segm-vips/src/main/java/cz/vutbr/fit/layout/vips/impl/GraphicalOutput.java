@@ -16,6 +16,9 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Rectangular;
 
@@ -27,6 +30,8 @@ import cz.vutbr.fit.layout.model.Rectangular;
  */
 public class GraphicalOutput 
 {
+    private static Logger log = LoggerFactory.getLogger(GraphicalOutput.class);
+
     private static final Color VSEP_COLOR = Color.RED;
     private static final Color HSEP_COLOR = Color.BLUE;
     private static final Color BLOCK_COLOR = Color.BLACK;
@@ -228,8 +233,7 @@ public class GraphicalOutput
             ImageIO.write(image, "png", new File(filename));
         } catch (Exception e)
         {
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Couldn't save {}: {}", filename, e.getMessage());
         }
     }
 

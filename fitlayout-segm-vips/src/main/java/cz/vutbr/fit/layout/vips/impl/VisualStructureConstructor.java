@@ -63,7 +63,8 @@ public class VisualStructureConstructor
 	        List<SepPair> pairs = new ArrayList<>();
 	        while (!seps.isEmpty() && seps.get(0).vertical == vertical && seps.get(0).weight == w)
 	        {
-	            SepPair pair = findPairForSeparator(seps.remove(0), pool);
+	            Separator sep = seps.remove(0);
+	            SepPair pair = findPairForSeparator(sep, pool);
 	            if (pair.isComplete())
 	            {
 	                pairs.add(pair);
@@ -133,6 +134,7 @@ public class VisualStructureConstructor
 	 */
 	private SepPair findPairForSeparator(Separator sep, List<VisualStructure> list)
 	{
+	    List<SepPair> ret = new ArrayList<>();
 	    SepPair pair = new SepPair();
 	    pair.separator = sep;
 	    for (VisualStructure vs : list)
@@ -152,9 +154,19 @@ public class VisualStructureConstructor
                     pair.b = vs;
 	        }
 	        if (pair.a != null && pair.b != null)
-	            break;
+	        {
+	            ret.add(pair);
+	            pair = new SepPair();
+	        }
 	    }
-	    return pair;
+	    if (!ret.isEmpty())
+	    {
+	        if (ret.size() > 1)
+	            System.out.println("heh?");
+	        return ret.get(0);
+	    }
+	    else
+	        return pair; //incomplete pair?
 	}
 	
 	private List<VisualStructure> extractLeafStructures()
@@ -194,21 +206,13 @@ public class VisualStructureConstructor
 
 	private void splitHorizontally(VisualStructure current, Separator separator, List<VisualStructure> list)
 	{
-        VisualStructure top = new VisualStructure();
-        top.setX1(current.getX1());
-        top.setY1(current.getY1());
-        top.setX2(current.getX2());
+        VisualStructure top = new VisualStructure(current);
         top.setY2(separator.startPoint - 1);
-        top.setTop(current.getTop());
         top.setBottom(separator);
 
-        VisualStructure bottom = new VisualStructure();
-        bottom.setX1(current.getX1());
+        VisualStructure bottom = new VisualStructure(current);
         bottom.setY1(separator.endPoint + 1);
-        bottom.setX2(current.getX2());
-        bottom.setY2(current.getY2());
         bottom.setTop(separator);
-        bottom.setBottom(current.getBottom());
         
         List<VipsBlock> nestedBlocks = current.getBlockRoots();
         for (VipsBlock vipsBlock : nestedBlocks)
@@ -225,21 +229,13 @@ public class VisualStructureConstructor
 	
 	private void splitVertically(VisualStructure current, Separator separator, List<VisualStructure> list)
 	{
-        VisualStructure left = new VisualStructure();
-        left.setX1(current.getX1());
-        left.setY1(current.getY1());
+        VisualStructure left = new VisualStructure(current);
         left.setX2(separator.startPoint - 1);
-        left.setY2(current.getY2());
-        left.setLeft(current.getLeft());
         left.setRight(separator);
 
-        VisualStructure right = new VisualStructure();
+        VisualStructure right = new VisualStructure(current);
         right.setX1(separator.endPoint + 1);
-        right.setY1(current.getY1());
-        right.setX2(current.getX2());
-        right.setY2(current.getY2());
         right.setLeft(separator);
-        right.setRight(current.getRight());
 	    
         List<VipsBlock> nestedBlocks = current.getBlockRoots();
         for (VipsBlock vipsBlock : nestedBlocks)

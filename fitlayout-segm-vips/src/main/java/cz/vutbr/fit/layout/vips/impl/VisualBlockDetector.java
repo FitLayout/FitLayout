@@ -61,6 +61,7 @@ public class VisualBlockDetector
 	    for (VisualBlock rootBlock : rootArea.getBlockRoots())
 	    {
     	    //construct the tree of blocks, one for each source box
+	        rootBlock.reset();
 	        rootBlock.setRoot(rootBlock); //the root block is the root of the whole subtree
     		constructVipsBlockTree(rootBlock);
     		//divide the blocks according to the block extraction algorithm
@@ -602,8 +603,8 @@ public class VisualBlockDetector
 	 */
 	private boolean ruleThree(VisualBlock block)
 	{
-	    //TODO this is not very clear
-	    if (block.getBox().isRoot())
+	    if (rootArea.getBlockRoots().size() == 1
+	            && rootArea.getBlockRoots().get(0) == block)
 	    {
 	        return true;
 	    }

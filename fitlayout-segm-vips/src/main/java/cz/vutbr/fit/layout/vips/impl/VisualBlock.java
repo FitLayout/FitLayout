@@ -46,6 +46,16 @@ public class VisualBlock
 	}
 
 	/**
+	 * Resets the block parametres to consider the block again.
+	 */
+	public void reset()
+	{
+	    visualBlock = false;
+	    alreadyDivided = false;
+	    dividable = true;
+	}
+	
+	/**
 	 * Sets block as visual block
 	 * @param isVisualBlock Value
 	 */

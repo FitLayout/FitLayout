@@ -79,14 +79,31 @@ public class Separator implements Comparable<Separator>
         this.weight = weight;
     }
 
+    /**
+     * Check whether this separator is inside a visual area (it splits the area in two parts)
+     * @param area the visual area to check
+     * @return {@code true} if the separator splits the area in two parts
+     */
+    public boolean isInside(VisualStructure area)
+    {
+        if (vertical)
+        {
+            return startPoint > area.getX1() && endPoint < area.getX2();
+        }
+        else
+        {
+            return startPoint > area.getY1() && endPoint < area.getY2();
+        }
+    }
+    
     @Override
 	public int compareTo(Separator otherSeparator)
 	{
-        final int dif = this.weight - otherSeparator.weight;
+        final int dif = otherSeparator.weight - this.weight;
         if (dif == 0)
         {
             //if the weight is equal, prefer horizontal separators over vertical ones
-            return (this.vertical ? 0 : 1) - (otherSeparator.vertical ? 0 : 1);
+            return (otherSeparator.vertical ? 0 : 1) - (this.vertical ? 0 : 1);
         }
         else
             return dif;

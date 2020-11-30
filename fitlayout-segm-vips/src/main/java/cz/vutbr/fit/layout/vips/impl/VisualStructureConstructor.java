@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +30,7 @@ public class VisualStructureConstructor
     private static Logger log = LoggerFactory.getLogger(VisualStructureConstructor.class);
     
     private List<VipsBlock> visualBlocks;
-	private VisualStructure rootStructure;
+	private VisualStructure root;
 	private List<Separator> separators;
 	private Rectangular pageBounds;
 	
@@ -49,126 +48,144 @@ public class VisualStructureConstructor
 	 */
 	public void constructVisualStructure()
 	{
+	    root = new VisualStructure();
+	    root.setBounds(pageBounds);
 	    //collect all leaf structures
 	    List<VisualStructure> pool = extractLeafStructures();
+	    root.addChildren(pool);
+	    //a set of parent structures (just above the leaves)
+	    Set<VisualStructure> parents = new HashSet<>();
+	    parents.add(root);
 	    //reconstruct the visual structure tree based on the separator weights
 	    List<Separator> seps = new LinkedList<>(separators);
-	    boolean change = true;
-	    while (change && !seps.isEmpty())
+	    while (!seps.isEmpty())
 	    {
-	        change = false;
-            //collect pairs of areas separated by a separator with the same weight and direction
+            //collect separators of the same weight and direction
             final int w = seps.get(0).weight;
             final boolean vertical = seps.get(0).vertical;
-	        List<SepPair> pairs = new ArrayList<>();
+            List<Separator> equalSeps = new ArrayList<>();
 	        while (!seps.isEmpty() && seps.get(0).vertical == vertical && seps.get(0).weight == w)
 	        {
-	            Separator sep = seps.remove(0);
-	            SepPair pair = findPairForSeparator(sep, pool);
-	            if (pair.isComplete())
-	            {
-	                pairs.add(pair);
-	                change = true;
-	            }
+	            final Separator sep = seps.remove(0);
+	            equalSeps.add(sep);
+	        }
+            sortSeparatorsByPosition(equalSeps);
+	        parents = splitParents(parents, equalSeps);
+	    }
+	}
+	
+	/**
+	 * Applies the given set of separators to given parents.
+	 * @param parents the parents to split by the separators
+	 * @param seps the separators
+	 * @return a set of newly created parents
+	 */
+	private Set<VisualStructure> splitParents(Set<VisualStructure> parents, List<Separator> seps)
+	{
+	    Set<VisualStructure> newParents = new HashSet<>();
+	    //distribute separators to parents
+	    for (VisualStructure parent : parents)
+	    {
+	        //find separators for parent
+	        List<Separator> plist = new ArrayList<>();
+	        for (Separator sep : seps)
+	        {
+	            if (sep.isInside(parent))
+	                plist.add(sep);
+	        }
+	        //find new parents
+	        if (!plist.isEmpty()) //the parent has been split by a separator
+	        {
+    	        List<VisualStructure> subParents = splitParent(parent, plist);
+    	        newParents.addAll(subParents);
+	        }
+	        else //not split, it remains among the parents
+	        {
+	            newParents.add(parent);
+	        }
+	    }
+	    return newParents;
+	}
+	
+	/**
+	 * Splits a parent to sub-parents by the given separators.
+	 * @param parent the parent area to split
+	 * @param seps the list of separators
+	 * @return a list of newly created sub-parents
+	 */
+	private List<VisualStructure> splitParent(VisualStructure parent, List<Separator> seps)
+	{
+	    //create n+1 new parents
+	    List<VisualStructure> newParents = new ArrayList<>(seps.size() + 1);
+	    Separator prevSep = null;
+	    for (int i = 0; i < seps.size() + 1; i++)
+	    {
+	        final VisualStructure newParent = new VisualStructure(parent);
+	        Separator nextSep = (i < seps.size()) ? seps.get(i) : null;
+	        if (prevSep != null)
+	        {
+	            if (prevSep.vertical)
+	                newParent.setX1(prevSep.endPoint + 1);
 	            else
-	                log.error("Incomplete pair?!");
+	                newParent.setY1(prevSep.endPoint + 1);
 	        }
-	        //group by pairs
-	        List<VisualStructure> groups = groupByPairs(pairs, pool);
-	        pool.addAll(groups);
+	        if (nextSep != null)
+	        {
+                if (nextSep.vertical)
+                    newParent.setX2(nextSep.startPoint - 1);
+                else
+                    newParent.setY2(nextSep.startPoint - 1);
+	        }
+	        newParents.add(newParent);
+	        prevSep = nextSep;
 	    }
-	    
-	    if (pool.size() >= 1)
-	        rootStructure = pool.get(0);
-	    if (pool.size() != 1)
-	       log.error("{} areas left in pool", pool.size());
+	    //distribute the children among the new parents
+	    for (VisualStructure child : parent.getChildren())
+	    {
+	        final int pos = findSeparatorIndexAfter(child, seps);
+	        newParents.get(pos).addChild(child);
+	    }
+	    //make the new parents the children of the current parent
+        parent.getChildren().clear(); //children have been moved to sub-parents
+        List<VisualStructure> subParents = new ArrayList<>(newParents.size());
+        for (VisualStructure subParent : newParents)
+        {
+            if (subParent.getChildren().size() > 1)
+                subParents.add(subParent);
+            else if (subParent.getChildren().size() == 1)
+                subParents.add(subParent.getChildren().get(0)); //only one child, no need for parent
+        }
+        parent.addChildren(subParents);
+        parent.setSeparators(seps);
+        return subParents;
 	}
 	
 	/**
-	 * Find the groups of connectable pairs and creates joint visual structures
-	 * for the groups. The joint visual structures are removed from the pool.
-	 * @param pairs the pairs to group
-	 * @param pool the pool of available visual structures
-	 * @return
+	 * Finds the index of the first separator after the given visual area in the separator list.
+	 * The list must be ordered by positions.
+	 * @param area the visual area
+	 * @param seps the list of separators
+	 * @return the index of the first separator after or the list size when there is no separator after
 	 */
-	private List<VisualStructure> groupByPairs(List<SepPair> pairs, List<VisualStructure> pool)
+	private int findSeparatorIndexAfter(VisualStructure area, List<Separator> seps)
 	{
-	    List<VisualStructure> ret = new ArrayList<>();
-	    while (!pairs.isEmpty())
+	    for (int i = 0; i < seps.size(); i++)
 	    {
-    	    //get the first pair and join all connected pairs
-    	    SepPair seed = pairs.remove(0);
-    	    Set<VisualStructure> children = new HashSet<>();
-    	    VisualStructure newstr = new VisualStructure(seed);
-    	    children.add(seed.a);
-            children.add(seed.b);
-    	    ret.add(newstr);
-    	    boolean change = true;
-    	    while (change && !pairs.isEmpty())
-    	    {
-    	        change = false;
-    	        for (Iterator<SepPair> it = pairs.iterator(); it.hasNext(); )
-    	        {
-    	            final SepPair cand = it.next();
-    	            if (newstr.joinPair(cand, children))
-    	            {
-    	                it.remove();
-    	                children.add(cand.a);
-    	                children.add(cand.b);
-    	                change = true;
-    	            }
-    	        }
-    	    }
-    	    newstr.getChildren().addAll(children);
-            sortChildren(newstr.getChildren(), seed.separator.isVertical());
-    	    pool.removeAll(children);
+	        final Separator sep = seps.get(i);
+	        if ((sep.vertical && sep.startPoint > area.getX2())
+	                || (!sep.vertical && sep.startPoint > area.getY2()))
+	        {
+	            return i;
+	        }
 	    }
-	    return ret;
+	    return seps.size();
 	}
+	
 	
 	/**
-	 * Finds a pair of areas separated by the given separator in the list of areas.
-	 * @param sep
-	 * @param list
-	 * @return
+	 * Extracts the smallest visual areas based on the separators.
+	 * @return a list of extracted visual areas 
 	 */
-	private SepPair findPairForSeparator(Separator sep, List<VisualStructure> list)
-	{
-	    List<SepPair> ret = new ArrayList<>();
-	    SepPair pair = new SepPair();
-	    pair.separator = sep;
-	    for (VisualStructure vs : list)
-	    {
-	        if (sep.isVertical())
-	        {
-	            if (sep.equals(vs.getRight()))
-	                pair.a = vs;
-	            else if (sep.equals(vs.getLeft()))
-	                pair.b = vs;
-	        }
-	        else
-	        {
-                if (sep.equals(vs.getBottom()))
-                    pair.a = vs;
-                else if (sep.equals(vs.getTop()))
-                    pair.b = vs;
-	        }
-	        if (pair.a != null && pair.b != null)
-	        {
-	            ret.add(pair);
-	            pair = new SepPair();
-	        }
-	    }
-	    if (!ret.isEmpty())
-	    {
-	        if (ret.size() > 1)
-	            System.out.println("heh?");
-	        return ret.get(0);
-	    }
-	    else
-	        return pair; //incomplete pair?
-	}
-	
 	private List<VisualStructure> extractLeafStructures()
 	{
 	    List<VisualStructure> list = new ArrayList<>();
@@ -223,8 +240,10 @@ public class VisualStructureConstructor
                 bottom.addBlock(vipsBlock);
         }
         
-        list.add(top);
-        list.add(bottom);
+        if (!top.isEmpty())
+            list.add(top);
+        if (!bottom.isEmpty())
+            list.add(bottom);
 	}
 	
 	private void splitVertically(VisualStructure current, Separator separator, List<VisualStructure> list)
@@ -246,8 +265,10 @@ public class VisualStructureConstructor
                 right.addBlock(vipsBlock);
         }
         
-        list.add(left);
-        list.add(right);
+        if (!left.isEmpty())
+            list.add(left);
+        if (!right.isEmpty())
+            list.add(right);
 	}
 	
 	private void sortChildren(List<VisualStructure> children, boolean vertical)
@@ -278,6 +299,18 @@ public class VisualStructureConstructor
 	    Collections.sort(children, comp);
 	}
 	
+	private void sortSeparatorsByPosition(List<Separator> separators)
+	{
+	    Collections.sort(separators, new Comparator<Separator>()
+        {
+            @Override
+            public int compare(Separator o1, Separator o2)
+            {
+                return o1.startPoint - o2.startPoint;
+            }
+        });
+	}
+	
 	/**
 	 * Sets page's size
 	 * @param width Page's width
@@ -293,7 +326,7 @@ public class VisualStructureConstructor
 	 */
 	public VisualStructure getVisualStructure()
 	{
-		return rootStructure;
+		return root;
 	}
 
 	/**
@@ -335,7 +368,7 @@ public class VisualStructureConstructor
 	 */
 	public int getMinimalDoC()
 	{
-		return findMinimalDoC(rootStructure);
+		return findMinimalDoC(root);
 	}
 
 }

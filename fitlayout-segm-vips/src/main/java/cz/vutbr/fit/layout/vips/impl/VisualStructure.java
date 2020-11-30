@@ -22,6 +22,7 @@ public class VisualStructure
 	private List<VipsBlock> blockRoots;
 	private List<VisualStructure> childStructures;
 	private List<Separator> separators;
+	private VisualStructure parent;
 	private Separator top;
     private Separator bottom;
     private Separator left;
@@ -33,7 +34,6 @@ public class VisualStructure
 	{
 		blockRoots = new ArrayList<>();
 		childStructures = new ArrayList<>();
-		separators = new ArrayList<>();
 		bounds = new Rectangular();
 	}
 
@@ -101,32 +101,49 @@ public class VisualStructure
 		this.blockRoots.clear();
 	}
 
+	/**
+	 * Checks whether the area is empty (it contains no visual blocks)
+	 * @return {@code true} when the area is empty
+	 */
+	public boolean isEmpty()
+	{
+	    return blockRoots.isEmpty();
+	}
+	
     /**
      * Adds new child to visual structure children
-     * @param visualStructure New child
+     * @param child New child
      */
-    public void addChild(VisualStructure visualStructure)
+    public void addChild(VisualStructure child)
     {
-        this.childStructures.add(visualStructure);
+        child.setParent(this);
+        childStructures.add(child);
     }
 
 	/**
 	 * Adds new child to visual structure at given index
-	 * @param visualStructure New child
+	 * @param child New child
 	 * @param index Index
 	 */
-	public void addChildAt(VisualStructure visualStructure, int index)
+	public void addChildAt(VisualStructure child, int index)
 	{
-		this.childStructures.add(index, visualStructure);
+        child.setParent(this);
+		childStructures.add(index, child);
 	}
 
+	public void addChildren(List<VisualStructure> children)
+	{
+	    for (VisualStructure child : children)
+	        addChild(child);
+	}
+	
     /**
      * Removes given child from structures children
-     * @param visualStructure Child
+     * @param child Child
      */
-    public void removeChild(VisualStructure visualStructure)
+    public void removeChild(VisualStructure child)
     {
-        this.childStructures.remove(visualStructure);
+        this.childStructures.remove(child);
     }
 
 	/**
@@ -147,9 +164,24 @@ public class VisualStructure
 		this.childStructures = childStructures;
 	}
 
-	public List<Separator> getSeparators()
+	public void setSeparators(List<Separator> separators)
+    {
+        this.separators = separators;
+    }
+
+    public List<Separator> getSeparators()
     {
         return separators;
+    }
+
+    public VisualStructure getParent()
+    {
+        return parent;
+    }
+
+    public void setParent(VisualStructure parent)
+    {
+        this.parent = parent;
     }
 
     public Separator getTop()

@@ -350,14 +350,17 @@ public class VisualStructureConstructor
      */
 	public void normalizeSeparators(List<Separator> separators)
     {
-        final double maxWeight = separators.get(0).weight;
-        final double minWeight = separators.get(separators.size() - 1).weight;
-
-        for (Separator separator : separators)
-        {
-            double normalizedValue = (separator.weight - minWeight) / (maxWeight - minWeight) * (11 - 1) + 1;
-            separator.setNormalizedWeight((int) Math.ceil(normalizedValue));
-        }
+	    if (!separators.isEmpty())
+	    {
+            final double maxWeight = separators.get(0).weight;
+            final double minWeight = separators.get(separators.size() - 1).weight;
+    
+            for (Separator separator : separators)
+            {
+                double normalizedValue = (separator.weight - minWeight) / (maxWeight - minWeight) * (11 - 1) + 1;
+                separator.setNormalizedWeight((int) Math.ceil(normalizedValue));
+            }
+	    }
     }
 
 	/**

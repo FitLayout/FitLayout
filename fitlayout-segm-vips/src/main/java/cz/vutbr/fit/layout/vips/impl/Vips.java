@@ -9,6 +9,7 @@ package cz.vutbr.fit.layout.vips.impl;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -125,142 +126,68 @@ public class Vips
         rootArea.setBounds(pageBounds);
         rootArea.addBlock(rootBlock);
         
+        iteration(1, rootArea);
+        //iteration(2, rootArea);
+        //iteration(3, rootArea);
+        
+        visualStructure = rootArea;
+
+        System.out.println("done");
+        
+    }
+
+    private void iteration(int index, VisualArea root)
+    {
+        List<VisualArea> leaves = new ArrayList<>();
+        getLeafAreas(root, leaves);
+        int li = 1;
+        for (VisualArea leaf : leaves)
+        {
+            segmentArea(index, li++, leaf);
+        }
+    }
+    
+    private void segmentArea(int iterationIndex, int leafIndex, VisualArea area)
+    {
         //extract the blocks
-        VisualBlockDetector vipsParser = new VisualBlockDetector(rootArea);
+        VisualBlockDetector vipsParser = new VisualBlockDetector(area);
         vipsParser.setSizeTresholdHeight(sizeTresholdHeight);
         vipsParser.setSizeTresholdWidth(sizeTresholdWidth);
         vipsParser.parse();
         List<VisualBlock> vipsBlocks = vipsParser.getVisualBlocks();
         
         //find separators
-        SeparatorDetector detector = new SeparatorDetector(vipsBlocks, pageBounds);
+        SeparatorDetector detector = new SeparatorDetector(vipsBlocks, area.getBounds());
         List<Separator> hsep = detector.detectHorizontalSeparators();
         List<Separator> vsep = detector.detectVerticalSeparators();
         List<Separator> asep = detector.getAllSeparators();
         if (_graphicsOutput)
         {
-            exportSeparators(1, pageBounds, vipsBlocks, hsep, vsep);
+            String suffix = "-" + iterationIndex + "-" + leafIndex;
+            exportSeparators(suffix, area.getBounds(), vipsBlocks, hsep, vsep);
         }
         
         // visual structure construction
-        VisualStructureConstructor constructor = new VisualStructureConstructor(pageBounds, vipsBlocks, asep);
+        VisualStructureConstructor constructor = new VisualStructureConstructor(area.getBounds(), vipsBlocks, asep);
         constructor.constructVisualStructure();
-        visualStructure = constructor.getVisualStructure();
-
-        System.out.println("done");
-        
-    }	
-	
-	/**
-	 * Performs page segmentation.
-	 */
-	/*private void xperformSegmentation()
-	{
-
-		startTime = System.nanoTime();
-		int numberOfIterations = 1;
-		int pageWidth = page.getWidth();
-		int pageHeight = page.getHeight();
-
-		if (_graphicsOutput)
-			exportPageToImage();
-
-		VipsSeparatorGraphicsDetector detector;
-		VipsParser vipsParser = new VipsParser(page, page.getRoot());
-		VisualStructureConstructor constructor = new VisualStructureConstructor(pDoC);
-		constructor.setGraphicsOutput(_graphicsOutput);
-
-		for (int iterationNumber = 1; iterationNumber < numberOfIterations+1; iterationNumber++)
-		{
-			detector = new VipsSeparatorGraphicsDetector(pageWidth, pageHeight);
-
-			//visual blocks detection
-			vipsParser.setSizeTresholdHeight(sizeTresholdHeight);
-			vipsParser.setSizeTresholdWidth(sizeTresholdWidth);
-
-			vipsParser.parse();
-
-			VipsBlock vipsBlocks = vipsParser.getVipsBlocks();
-
-			if (iterationNumber == 1)
-			{
-				if (_graphicsOutput)
-				{
-					// in first round we'll export global separators
-					detector.setVipsBlock(vipsBlocks);
-					detector.fillPool();
-					detector.saveToImage("blocks" + iterationNumber);
-					detector.setCleanUpSeparators(0);
-					detector.detectHorizontalSeparators();
-					detector.detectVerticalSeparators();
-					detector.exportHorizontalSeparatorsToImage();
-					detector.exportVerticalSeparatorsToImage();
-					detector.exportAllToImage();
-				}
-
-				// visual structure construction
-				constructor.setVipsBlocks(vipsBlocks);
-				constructor.setPageSize(pageWidth, pageHeight);
-			}
-			else
-			{
-				vipsBlocks = vipsParser.getVipsBlocks();
-				constructor.updateVipsBlocks(vipsBlocks);
-
-				if (_graphicsOutput)
-				{
-					detector.setVisualBlocks(constructor.getVisualBlocks());
-					detector.fillPool();
-					detector.saveToImage("blocks" + iterationNumber);
-				}
-			}
-
-			// visual structure construction
-			constructor.constructVisualStructure();
-
-			// prepare tresholds for next iteration
-			if (iterationNumber <= 5 )
-			{
-				sizeTresholdHeight -= 50;
-				sizeTresholdWidth -= 50;
-
-			}
-			if (iterationNumber == 6)
-			{
-				sizeTresholdHeight = 100;
-				sizeTresholdWidth = 100;
-			}
-			if (iterationNumber == 7)
-			{
-				sizeTresholdHeight = 80;
-				sizeTresholdWidth = 80;
-			}
-			if (iterationNumber == 8)
-			{
-				sizeTresholdHeight = 40;
-				sizeTresholdWidth = 10;
-			}
-			if (iterationNumber == 9)
-			{
-				sizeTresholdHeight = 1;
-				sizeTresholdWidth = 1;
-			}
-
-		}
-
-		//		constructor.normalizeSeparatorsSoftMax();
-		constructor.normalizeSeparatorsMinMax();
-
-		visualStructure = constructor.getVisualStructure();
-		
-		endTime = System.nanoTime();
-
-		long diff = endTime - startTime;
-
-		System.out.println("Execution time of VIPS: " + diff + " ns; " +
-				(diff / 1000000.0) + " ms; " +
-				(diff / 1000000000.0) + " sec");
-	}*/
+        VisualArea resultRoot = constructor.getVisualStructure();
+        // connect the discovered structure to the processed area
+        area.addChildren(resultRoot.getChildren());
+    }   
+    
+    private void getLeafAreas(VisualArea root, List<VisualArea> dest)
+    {
+        if (root.getChildren().isEmpty())
+        {
+            dest.add(root);
+        }
+        else
+        {
+            for (VisualArea child : root.getChildren())
+                getLeafAreas(child, dest);
+        }
+    }
+    
 
 	/**
 	 * Starts segmentation on given address
@@ -315,18 +242,18 @@ public class Vips
    /**
      * Exports all separators to output images
      */
-    private void exportSeparators(int iteration, Rectangular bounds,
+    private void exportSeparators(String suffix, Rectangular bounds,
             List<VisualBlock> blocks, List<Separator> hsep, List<Separator> vsep)
     {
         GraphicalOutput out = new GraphicalOutput(bounds);
         out.setHorizontalSeparators(hsep);
-        out.exportHorizontalSeparatorsToImage(iteration);
+        out.exportHorizontalSeparatorsToImage(suffix);
 
         out.setVerticalSeparators(vsep);
-        out.exportVerticalSeparatorsToImage(iteration);
+        out.exportVerticalSeparatorsToImage(suffix);
 
         out.setVisualBlocks(blocks);
-        out.exportAllToImage(iteration);
+        out.exportAllToImage(suffix);
     }
 
 	

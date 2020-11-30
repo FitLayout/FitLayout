@@ -13,7 +13,6 @@ import java.util.List;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Box.DisplayType;
 import cz.vutbr.fit.layout.model.Box.Type;
-import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
  * Detects the visual blocks in the page.
@@ -131,24 +130,22 @@ public class VisualBlockDetector
 		else
 		{
 		    //remove invalid blocks
-			if (!verifyValidity(block.getBox()))
+			if (!verifyValidity(block))
 			{
 				block.setIsVisualBlock(false);
 			}
 		}
 	}
 
-	private boolean verifyValidity(Box node)
+	private boolean verifyValidity(VisualBlock block)
 	{
-	    final Rectangular bounds = node.getContentBounds();
-	    
-	    if (!rootArea.getBounds().encloses(bounds))
+	    if (!rootArea.getBounds().encloses(block.getBounds()))
 	        return false;
 	    
-		if (node.getWidth() <= 0 || node.getHeight() <= 0) //TODO thresholds?
+		if (block.getBounds().getWidth() <= 0 || block.getBounds().getHeight() <= 0) //TODO thresholds?
 			return false;
 
-		if (!node.isVisible())
+		if (!block.getBox().isVisible())
 			return false;
 
 		return true;

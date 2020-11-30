@@ -173,7 +173,7 @@ public class GraphicalOutput
     /**
      * Saves everything (separators + block) to image with given suffix.
      */
-    public void exportAllToImage(int suffix)
+    public void exportAllToImage(String suffix)
     {
         createDisplayPool();
         drawAll();
@@ -193,7 +193,7 @@ public class GraphicalOutput
     /**
      * Saves vertical separators to image.
      */
-    public void exportVerticalSeparatorsToImage(int suffix)
+    public void exportVerticalSeparatorsToImage(String suffix)
     {
         createDisplayPool();
         drawVerticalSeparators();
@@ -213,7 +213,7 @@ public class GraphicalOutput
     /**
      * Saves horizontal separators to image.
      */
-    public void exportHorizontalSeparatorsToImage(int suffix)
+    public void exportHorizontalSeparatorsToImage(String suffix)
     {
         createDisplayPool();
         drawHorizontalSeparators();

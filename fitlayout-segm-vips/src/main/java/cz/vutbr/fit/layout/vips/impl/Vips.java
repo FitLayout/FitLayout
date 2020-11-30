@@ -30,7 +30,7 @@ public class Vips
     private static Logger log = LoggerFactory.getLogger(Vips.class);
     
 	private Page page = null;
-	private VisualArea visualStructure;
+	private VisualArea rootArea;
 
 	private boolean _graphicsOutput = false;
 	private boolean _outputToFolder = false;
@@ -88,7 +88,7 @@ public class Vips
 
 	public VisualArea getVisualStructure()
 	{
-	    return visualStructure; 
+	    return rootArea; 
 	}
 	
 	public VipsTreeBuilder getTreeBuilder()
@@ -119,19 +119,17 @@ public class Vips
         final int pageHeight = page.getHeight();
         final Rectangular pageBounds = new Rectangular(0, 0, pageWidth - 1, pageHeight - 1);
         
-        //create a root visual area
+        //create the root visual area
         VisualBlock rootBlock = new VisualBlock();
         rootBlock.setBox(page.getRoot());
-        VisualArea rootArea = new VisualArea();
+        rootArea = new VisualArea();
         rootArea.setBounds(pageBounds);
         rootArea.addBlock(rootBlock);
         
         iteration(1, rootArea);
-        //iteration(2, rootArea);
-        //iteration(3, rootArea);
+        iteration(2, rootArea);
+        iteration(3, rootArea);
         
-        visualStructure = rootArea;
-
         System.out.println("done");
         
     }
@@ -164,7 +162,7 @@ public class Vips
         if (_graphicsOutput)
         {
             String suffix = "-" + iterationIndex + "-" + leafIndex;
-            exportSeparators(suffix, area.getBounds(), vipsBlocks, hsep, vsep);
+            exportSeparators(suffix, rootArea.getBounds(), vipsBlocks, hsep, vsep);
         }
         
         // visual structure construction

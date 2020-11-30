@@ -8,7 +8,6 @@ package cz.vutbr.fit.layout.vips.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import cz.vutbr.fit.layout.model.Rectangular;
 
@@ -22,11 +21,6 @@ public class VisualStructure
 	private List<VipsBlock> blockRoots;
 	private List<VisualStructure> childStructures;
 	private List<Separator> separators;
-	private VisualStructure parent;
-	private Separator top;
-    private Separator bottom;
-    private Separator left;
-    private Separator right;
     private Rectangular bounds;
 	private int doC = 12;
 
@@ -40,22 +34,8 @@ public class VisualStructure
     public VisualStructure(VisualStructure src)
     {
         this();
-        top = src.top;
-        bottom = src.bottom;
-        left = src.left;
-        right = src.right;
         bounds = new Rectangular(src.bounds);
         doC = src.doC;
-    }
-	
-    /**
-     * Creates a visual structure covering a pair of visual structures.
-     * @param pair
-     */
-    public VisualStructure(SepPair pair)
-    {
-        this(pair.a);
-        joinPair(pair, Set.of(pair.a));
     }
 	
 	/**
@@ -116,20 +96,8 @@ public class VisualStructure
      */
     public void addChild(VisualStructure child)
     {
-        child.setParent(this);
         childStructures.add(child);
     }
-
-	/**
-	 * Adds new child to visual structure at given index
-	 * @param child New child
-	 * @param index Index
-	 */
-	public void addChildAt(VisualStructure child, int index)
-	{
-        child.setParent(this);
-		childStructures.add(index, child);
-	}
 
 	public void addChildren(List<VisualStructure> children)
 	{
@@ -172,56 +140,6 @@ public class VisualStructure
     public List<Separator> getSeparators()
     {
         return separators;
-    }
-
-    public VisualStructure getParent()
-    {
-        return parent;
-    }
-
-    public void setParent(VisualStructure parent)
-    {
-        this.parent = parent;
-    }
-
-    public Separator getTop()
-    {
-        return top;
-    }
-
-    public void setTop(Separator top)
-    {
-        this.top = top;
-    }
-
-    public Separator getBottom()
-    {
-        return bottom;
-    }
-
-    public void setBottom(Separator bottom)
-    {
-        this.bottom = bottom;
-    }
-
-    public Separator getLeft()
-    {
-        return left;
-    }
-
-    public void setLeft(Separator left)
-    {
-        this.left = left;
-    }
-
-    public Separator getRight()
-    {
-        return right;
-    }
-
-    public void setRight(Separator right)
-    {
-        this.right = right;
     }
 
 	public void setBounds(Rectangular bounds)
@@ -292,50 +210,6 @@ public class VisualStructure
 		return doC;
 	}
 	
-	/**
-	 * Concatenates a pair with this structure. Extends the structure and adds the separator.
-	 * @param pair
-	 * @param knownChildren the existing already known children of this structure. The pair must contain some
-	 * of them to be joined
-	 * @return
-	 */
-    public boolean joinPair(SepPair pair, Set<VisualStructure> knownChildren)
-    {
-        if (knownChildren.contains(pair.a))
-        {
-            if (pair.separator.isVertical()) //we're on the left
-            {
-                setX2(pair.b.getX2());
-                setRight(pair.b.getRight());
-            }
-            else //we're above
-            {
-                setY2(pair.b.getY2());
-                setBottom(pair.b.bottom);
-            }
-            separators.add(pair.separator);
-            return true;
-        }
-        else if (knownChildren.contains(pair.b))
-        {
-            if (pair.separator.isVertical()) //we're on the right
-            {
-                setX1(pair.a.getX1());
-                setLeft(pair.a.getLeft());
-            }
-            else //we're below
-            {
-                setY1(pair.a.getY1());
-                setTop(pair.a.getTop());
-            }
-            separators.add(pair.separator);
-            return true;
-        }
-        else
-            return false;
-    }
-    
-
     @Override
     public String toString()
     {

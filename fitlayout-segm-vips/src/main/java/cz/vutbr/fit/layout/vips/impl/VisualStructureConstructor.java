@@ -225,11 +225,9 @@ public class VisualStructureConstructor
 	{
         VisualStructure top = new VisualStructure(current);
         top.setY2(separator.startPoint - 1);
-        top.setBottom(separator);
 
         VisualStructure bottom = new VisualStructure(current);
         bottom.setY1(separator.endPoint + 1);
-        bottom.setTop(separator);
         
         List<VipsBlock> nestedBlocks = current.getBlockRoots();
         for (VipsBlock vipsBlock : nestedBlocks)
@@ -250,11 +248,9 @@ public class VisualStructureConstructor
 	{
         VisualStructure left = new VisualStructure(current);
         left.setX2(separator.startPoint - 1);
-        left.setRight(separator);
 
         VisualStructure right = new VisualStructure(current);
         right.setX1(separator.endPoint + 1);
-        right.setLeft(separator);
 	    
         List<VipsBlock> nestedBlocks = current.getBlockRoots();
         for (VipsBlock vipsBlock : nestedBlocks)

@@ -176,6 +176,8 @@ public class Vips
      */
     private boolean segmentArea(int iterationIndex, int leafIndex, VisualArea area)
     {
+        if (iterationIndex == 3 && leafIndex == 15)
+            System.out.println("jo!");
         //extract the blocks
         VisualBlockDetector vipsParser = new VisualBlockDetector(area);
         vipsParser.setSizeTresholdHeight(sizeTresholdHeight);

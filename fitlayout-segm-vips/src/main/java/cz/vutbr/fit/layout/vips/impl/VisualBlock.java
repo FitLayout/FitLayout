@@ -53,6 +53,8 @@ public class VisualBlock
 	    visualBlock = false;
 	    alreadyDivided = false;
 	    dividable = true;
+	    doC = 0;
+	    children.clear();
 	}
 	
 	/**

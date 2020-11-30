@@ -142,11 +142,11 @@ public class SeparatorDetector
                 toAdd.add(newsep);
             }
             // b. If the block crosses with the separator, update the separator’s parameters
-            else if (blockStart < sep.startPoint && blockEnd >= sep.startPoint && blockEnd < sep.endPoint)
+            else if (blockStart <= sep.startPoint && blockEnd >= sep.startPoint && blockEnd < sep.endPoint)
             {
                 sep.startPoint = blockEnd + 1;
             }
-            else if (blockEnd > sep.endPoint && blockStart > sep.startPoint && blockStart <= sep.endPoint)
+            else if (blockEnd >= sep.endPoint && blockStart > sep.startPoint && blockStart <= sep.endPoint)
             {
                 sep.endPoint = blockStart - 1;
             }

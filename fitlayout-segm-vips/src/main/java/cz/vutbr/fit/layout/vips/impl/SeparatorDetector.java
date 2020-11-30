@@ -1,7 +1,8 @@
-/*
+/**
+ * VIPS - Visual Internet Page Segmentation for FitLayout
+ * 
  * Tomas Popela, 2012
- * VIPS - Visual Internet Page Segmentation
- * Module - VipsSeparatorGraphicsDetector.java
+ * Radek Burget, 2020 
  */
 
 package cz.vutbr.fit.layout.vips.impl;
@@ -20,9 +21,9 @@ import cz.vutbr.fit.layout.model.Rectangular;
  * @author Tomas Popela
  * @author burgetr
  */
-public class VipsSeparatorDetector 
+public class SeparatorDetector 
 {
-	private List<VipsBlock> visualBlocks;
+	private List<VisualBlock> visualBlocks;
 	private List<Separator> horizontalSeparators;
 	private List<Separator> verticalSeparators;
 	private Rectangular pageBounds;
@@ -33,7 +34,7 @@ public class VipsSeparatorDetector
 	 * @param visualBlocks the visual blocks to consider
 	 * @param pageBounds the sub-page bounds
 	 */
-	public VipsSeparatorDetector(List<VipsBlock> visualBlocks, Rectangular pageBounds) 
+	public SeparatorDetector(List<VisualBlock> visualBlocks, Rectangular pageBounds) 
 	{
 	    this.pageBounds = pageBounds;
         this.visualBlocks = visualBlocks;
@@ -45,7 +46,7 @@ public class VipsSeparatorDetector
 	 * Sets VIPS block, that will be used for separators computing.
 	 * @param visualBlocks List of visual blocks
 	 */
-	public void setVisualBlocks(List<VipsBlock> visualBlocks)
+	public void setVisualBlocks(List<VisualBlock> visualBlocks)
 	{
 		this.visualBlocks = visualBlocks;
 	}
@@ -54,7 +55,7 @@ public class VipsSeparatorDetector
 	 * Gets VIPS block that is used for separators computing.
 	 * @return Visual structure
 	 */
-	public List<VipsBlock> getVisualBlocks()
+	public List<VisualBlock> getVisualBlocks()
 	{
 		return visualBlocks;
 	}
@@ -100,7 +101,7 @@ public class VipsSeparatorDetector
 	 */
 	private void findVerticalSeparators()
 	{
-		for (VipsBlock vipsBlock : visualBlocks)
+		for (VisualBlock vipsBlock : visualBlocks)
 		{
 			final int blockStart = vipsBlock.getBounds().getX1();
 			final int blockEnd = vipsBlock.getBounds().getX2();
@@ -113,7 +114,7 @@ public class VipsSeparatorDetector
      */
     private void findHorizontalSeparators()
     {
-        for (VipsBlock vipsBlock : visualBlocks)
+        for (VisualBlock vipsBlock : visualBlocks)
         {
             final int blockStart = vipsBlock.getBounds().getY1();
             final int blockEnd = vipsBlock.getBounds().getY2();
@@ -232,8 +233,8 @@ public class VipsSeparatorDetector
 	 */
 	private void ruleTwo(Separator separator)
 	{
-		final List<VipsBlock> overlappedElements = findOverlappedElements(separator);
-		for (VipsBlock vipsBlock : overlappedElements)
+		final List<VisualBlock> overlappedElements = findOverlappedElements(separator);
+		for (VisualBlock vipsBlock : overlappedElements)
 		{
 			if ("hr".equalsIgnoreCase(vipsBlock.getBox().getTagName()))
 			{
@@ -247,10 +248,10 @@ public class VipsSeparatorDetector
 	 * Finds elements that are overlapped with a separator.
 	 * @param separator Separator, that we look at
 	 */
-	private List<VipsBlock> findOverlappedElements(Separator separator)
+	private List<VisualBlock> findOverlappedElements(Separator separator)
 	{
-	    final List<VipsBlock> result = new ArrayList<>();
-		for (VipsBlock vipsBlock : visualBlocks)
+	    final List<VisualBlock> result = new ArrayList<>();
+		for (VisualBlock vipsBlock : visualBlocks)
 		{
             final int blockStart;
             final int blockEnd;
@@ -282,16 +283,16 @@ public class VipsSeparatorDetector
 	 */
 	private void ruleThree(Separator separator)
 	{
-		List<VipsBlock> adjacentBefore = new ArrayList<>();
-		List<VipsBlock> adjacentAfter = new ArrayList<>();
+		List<VisualBlock> adjacentBefore = new ArrayList<>();
+		List<VisualBlock> adjacentAfter = new ArrayList<>();
 		findAdjacentBlocks(separator, adjacentBefore, adjacentAfter);
 
 		if (!adjacentBefore.isEmpty() && !adjacentAfter.isEmpty())
 		{
     		boolean weightIncreased = false;
-    		for (VipsBlock before : adjacentBefore)
+    		for (VisualBlock before : adjacentBefore)
     		{
-    			for (VipsBlock after : adjacentAfter)
+    			for (VisualBlock after : adjacentAfter)
     			{
     				if (!before.getBgColor().equals(after.getBgColor()))
     				{
@@ -313,9 +314,9 @@ public class VipsSeparatorDetector
 	 * @param before Elements, that we found on top side of separator
 	 * @param after Elements, that we found on bottom side side of separator
 	 */
-	private void findAdjacentBlocks(Separator separator, List<VipsBlock> before, List<VipsBlock> after)
+	private void findAdjacentBlocks(Separator separator, List<VisualBlock> before, List<VisualBlock> after)
 	{
-		for (VipsBlock vipsBlock : visualBlocks)
+		for (VisualBlock vipsBlock : visualBlocks)
 		{
             final int blockStart;
             final int blockEnd;
@@ -352,16 +353,16 @@ public class VipsSeparatorDetector
 	 */
 	private void ruleFour(Separator separator)
 	{
-		final List<VipsBlock> adjacentTop = new ArrayList<>();
-		final List<VipsBlock> adjacentBottom = new ArrayList<>();
+		final List<VisualBlock> adjacentTop = new ArrayList<>();
+		final List<VisualBlock> adjacentBottom = new ArrayList<>();
 		findAdjacentBlocks(separator, adjacentTop, adjacentBottom);
 		
 		if (!adjacentTop.isEmpty() && !adjacentBottom.isEmpty())
 		{
     		boolean weightIncreased = false;
-    		for (VipsBlock top : adjacentTop)
+    		for (VisualBlock top : adjacentTop)
     		{
-    			for (VipsBlock bottom : adjacentBottom)
+    			for (VisualBlock bottom : adjacentBottom)
     			{
     				int diff = Math.abs(top.getFontSize() - bottom.getFontSize());
     				if (diff != 0)
@@ -383,9 +384,9 @@ public class VipsSeparatorDetector
     		}
     
     		weightIncreased = false;
-    		for (VipsBlock top : adjacentTop)
+    		for (VisualBlock top : adjacentTop)
     		{
-    			for (VipsBlock bottom : adjacentBottom)
+    			for (VisualBlock bottom : adjacentBottom)
     			{
     				if (top.getFontSize() < bottom.getFontSize())
     				{
@@ -408,16 +409,16 @@ public class VipsSeparatorDetector
 	 */
 	private void ruleFive(Separator separator)
 	{
-		final List<VipsBlock> adjacentTop = new ArrayList<>();
-		final List<VipsBlock> adjacentBottom = new ArrayList<>();
+		final List<VisualBlock> adjacentTop = new ArrayList<>();
+		final List<VisualBlock> adjacentBottom = new ArrayList<>();
 		findAdjacentBlocks(separator, adjacentTop, adjacentBottom);
 
         if (!adjacentTop.isEmpty() && !adjacentBottom.isEmpty())
         {
     		boolean weightDecreased = false;
-    		for (VipsBlock top : adjacentTop)
+    		for (VisualBlock top : adjacentTop)
     		{
-    			for (VipsBlock bottom : adjacentBottom)
+    			for (VisualBlock bottom : adjacentBottom)
     			{
     				if (top.getBox().getType() == Type.TEXT_CONTENT && bottom.getBox().getType() == Type.TEXT_CONTENT)
     				{

@@ -1,7 +1,8 @@
-/*
+/**
+ * VIPS - Visual Internet Page Segmentation for FitLayout
+ * 
  * Tomas Popela, 2012
- * VIPS - Visual Internet Page Segmentation
- * Module - VisualStructurejava
+ * Radek Burget, 2020 
  */
 
 package cz.vutbr.fit.layout.vips.impl;
@@ -12,26 +13,27 @@ import java.util.List;
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
- * A class that represents visual structure.
+ * A class that represents a visual area in the resulting constructed visual structure.
+ * 
  * @author Tomas Popela
- *
+ * @author burgetr
  */
-public class VisualStructure 
+public class VisualArea 
 {
-	private List<VipsBlock> blockRoots;
-	private List<VisualStructure> childStructures;
+	private List<VisualBlock> blockRoots;
+	private List<VisualArea> childStructures;
 	private List<Separator> separators;
     private Rectangular bounds;
 	private int doC = 12;
 
-	public VisualStructure()
+	public VisualArea()
 	{
 		blockRoots = new ArrayList<>();
 		childStructures = new ArrayList<>();
 		bounds = new Rectangular();
 	}
 
-    public VisualStructure(VisualStructure src)
+    public VisualArea(VisualArea src)
     {
         this();
         bounds = new Rectangular(src.bounds);
@@ -39,50 +41,38 @@ public class VisualStructure
     }
 	
 	/**
-	 * @return Nested blocks in structure
+	 * Gets the visual blocks contained in this area.
+	 *  
+	 * @return A list of visual blocks.
 	 */
-	public List<VipsBlock> getBlockRoots()
+	public List<VisualBlock> getBlockRoots()
 	{
 		return blockRoots;
 	}
 
 	/**
-	 * Adds block to nested blocks
+	 * Adds a block to contained blocks.
+	 * 
 	 * @param blockRoot New block
 	 */
-	public void addBlock(VipsBlock blockRoot)
+	public void addBlock(VisualBlock blockRoot)
 	{
-		this.blockRoots.add(blockRoot);
+		blockRoots.add(blockRoot);
 	}
 
 	/**
-	 * Adds blocks to nested blocks
-	 * @param blockRoots
+	 * Sets the blocks contained in this area.
+	 * 
+	 * @param vipsBlocks a list of the block root nodes
 	 */
-	public void addBlocks(List<VipsBlock> blockRoots)
-	{
-		this.blockRoots.addAll(blockRoots);
-	}
-
-	/**
-	 * Sets blocks as nested blocks
-	 * @param vipsBlocks
-	 */
-	public void setBlockRoots(List<VipsBlock> vipsBlocks)
+	public void setBlockRoots(List<VisualBlock> vipsBlocks)
 	{
 		this.blockRoots = vipsBlocks;
 	}
 
 	/**
-	 * Clears nested blocks list
-	 */
-	public void clearBlocks()
-	{
-		this.blockRoots.clear();
-	}
-
-	/**
-	 * Checks whether the area is empty (it contains no visual blocks)
+	 * Checks whether the area is empty (it contains no visual blocks).
+	 * 
 	 * @return {@code true} when the area is empty
 	 */
 	public boolean isEmpty()
@@ -91,57 +81,61 @@ public class VisualStructure
 	}
 	
     /**
-     * Adds new child to visual structure children
-     * @param child New child
+     * Adds a new child area to this area.
+     * 
+     * @param child New child area
      */
-    public void addChild(VisualStructure child)
+    public void addChild(VisualArea child)
     {
         childStructures.add(child);
     }
 
-	public void addChildren(List<VisualStructure> children)
+	/**
+	 * Adds a set of children to the area.
+	 * 
+	 * @param children
+	 */
+    public void addChildren(List<VisualArea> children)
 	{
-	    for (VisualStructure child : children)
+	    for (VisualArea child : children)
 	        addChild(child);
 	}
 	
-    /**
-     * Removes given child from structures children
-     * @param child Child
-     */
-    public void removeChild(VisualStructure child)
-    {
-        this.childStructures.remove(child);
-    }
-
 	/**
-	 * Returns all children structures
-	 * @return Children structures
+	 * Gets all child areas.
+	 * 
+	 * @return A list of child areas.
 	 */
-	public List<VisualStructure> getChildren()
+	public List<VisualArea> getChildren()
 	{
 		return childStructures;
 	}
 
 	/**
-	 * Sets visual structures as children of visual structure
-	 * @param childStructures List of visual structures
+	 * Sets a list of separators contained in this area.
+	 * 
+	 * @param separators the new list of separators
 	 */
-	public void setChildren(List<VisualStructure> childStructures)
-	{
-		this.childStructures = childStructures;
-	}
-
 	public void setSeparators(List<Separator> separators)
     {
         this.separators = separators;
     }
 
-    public List<Separator> getSeparators()
+    /**
+     * Gets a list of separators contained in this area.
+     * 
+     * @return a list of separators
+     */
+	public List<Separator> getSeparators()
     {
         return separators;
     }
 
+	/**
+	 * Sets the visual area bounds.
+	 * 
+	 * @param bounds the new bounds.
+	 */
 	public void setBounds(Rectangular bounds)
 	{
 	    this.bounds = new Rectangular(bounds);

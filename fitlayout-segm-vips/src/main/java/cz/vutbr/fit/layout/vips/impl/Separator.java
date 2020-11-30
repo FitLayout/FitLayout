@@ -1,13 +1,14 @@
-/*
+/**
+ * VIPS - Visual Internet Page Segmentation for FitLayout
+ * 
  * Tomas Popela, 2012
- * VIPS - Visual Internet Page Segmentation
- * Module - Separator.java
+ * Radek Burget, 2020 
  */
 
 package cz.vutbr.fit.layout.vips.impl;
 
 /**
- * Class that represents a visual separator.
+ * A detected visual separator.
  * @author burgetr
  */
 public class Separator implements Comparable<Separator> 
@@ -84,7 +85,7 @@ public class Separator implements Comparable<Separator>
      * @param area the visual area to check
      * @return {@code true} if the separator splits the area in two parts
      */
-    public boolean isInside(VisualStructure area)
+    public boolean isInside(VisualArea area)
     {
         if (vertical)
         {

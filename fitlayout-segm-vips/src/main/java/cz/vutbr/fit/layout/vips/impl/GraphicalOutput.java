@@ -1,7 +1,8 @@
-/*
+/**
+ * VIPS - Visual Internet Page Segmentation for FitLayout
+ * 
  * Tomas Popela, 2012
- * VIPS - Visual Internet Page Segmentation
- * Module - VipsSeparatorGraphicsDetector.java
+ * Radek Burget, 2020 
  */
 
 package cz.vutbr.fit.layout.vips.impl;
@@ -19,7 +20,6 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
@@ -41,7 +41,7 @@ public class GraphicalOutput
     private BufferedImage image;
     private Rectangular bounds;
 
-    private List<VipsBlock> visualBlocks;
+    private List<VisualBlock> visualBlocks;
     private List<Separator> horizontalSeparators;
     private List<Separator> verticalSeparators;
 
@@ -53,12 +53,12 @@ public class GraphicalOutput
         createDisplayPool();
     }
     
-    public List<VipsBlock> getVisualBlocks()
+    public List<VisualBlock> getVisualBlocks()
     {
         return visualBlocks;
     }
 
-    public void setVisualBlocks(List<VipsBlock> visualBlocks)
+    public void setVisualBlocks(List<VisualBlock> visualBlocks)
     {
         this.visualBlocks = visualBlocks;
     }
@@ -95,7 +95,7 @@ public class GraphicalOutput
     /**
      * Shows a visual block in the resulting image.
      */
-    private void drawVisualBlock(VipsBlock vipsBlock)
+    private void drawVisualBlock(VisualBlock vipsBlock)
     {
         Rectangular bb = vipsBlock.getBounds();
         Rectangle rect = new Rectangle(bb.getX1(), bb.getY1(), bb.getWidth(), bb.getHeight());
@@ -109,7 +109,7 @@ public class GraphicalOutput
     
     private void drawVisualBlocks()
     {
-        for (VipsBlock block : getVisualBlocks())
+        for (VisualBlock block : getVisualBlocks())
         {
             drawVisualBlock(block);
         }

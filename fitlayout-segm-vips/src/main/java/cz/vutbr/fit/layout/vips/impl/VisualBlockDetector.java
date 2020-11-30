@@ -1,7 +1,8 @@
-/*
+/**
+ * VIPS - Visual Internet Page Segmentation for FitLayout
+ * 
  * Tomas Popela, 2012
- * VIPS - Visual Internet Page Segmentation
- * Module - VipsParser.java
+ * Radek Burget, 2020 
  */
 
 package cz.vutbr.fit.layout.vips.impl;
@@ -21,10 +22,10 @@ import cz.vutbr.fit.layout.model.Rectangular;
  * @author Tomas Popela
  * @author burgetr
  */
-public class VipsParser 
+public class VisualBlockDetector 
 {
     private Page page;
-    private VipsBlock rootBlock;
+    private VisualBlock rootBlock;
 
 	private int sizeTresholdWidth = 0;
 	private int sizeTresholdHeight = 0;
@@ -32,14 +33,14 @@ public class VipsParser
 	private int pageHeight = 0;
 
 	/**
-	 * Creates the detector for the given page.
+	 * Creates a detector for the given page.
 	 * 
-	 * @param page Rendered's page viewport
+	 * @param page Rendered page
 	 */
-	public VipsParser(Page page, Box rootBox) 
+	public VisualBlockDetector(Page page, Box rootBox) 
 	{
 		this.page = page;
-		this.rootBlock = new VipsBlock();
+		this.rootBlock = new VisualBlock();
 		this.sizeTresholdHeight = 80;
 		this.sizeTresholdWidth = 80;
 		this.pageWidth = page.getWidth();
@@ -47,12 +48,13 @@ public class VipsParser
 	}
 
 	/**
-	 * Constructor, where we can define element's size treshold
-	 * @param page	Rendered page
+	 * Creates a new detector with the specified thresholds.
+	 * 
+	 * @param page The rendered page
 	 * @param sizeTresholdWidth Element's width treshold
 	 * @param sizeTresholdHeight Element's height treshold
 	 */
-	public VipsParser(Page page, Box rootBox, int sizeTresholdWidth, int sizeTresholdHeight) 
+	public VisualBlockDetector(Page page, Box rootBox, int sizeTresholdWidth, int sizeTresholdHeight) 
 	{
 	    this(page, rootBox);
 		this.sizeTresholdHeight = sizeTresholdHeight;
@@ -64,17 +66,17 @@ public class VipsParser
 	 */
 	public void parse()
 	{
-	    //construct the tree of block, one for each source box
+	    //construct the tree of blocks, one for each source box
 		constructVipsBlockTree(page.getRoot(), rootBlock);
 		//divide the blocks according to the block extraction algorithm
 		divideVipsBlockTree(rootBlock);
 	}
 
-	private void findVisualBlocks(VipsBlock vipsBlock, List<VipsBlock> list)
+	private void findVisualBlocks(VisualBlock vipsBlock, List<VisualBlock> list)
 	{
 		if (vipsBlock.isVisualBlock())
 			list.add(vipsBlock);
-		for (VipsBlock vipsStructureChild : vipsBlock.getChildren())
+		for (VisualBlock vipsStructureChild : vipsBlock.getChildren())
 			findVisualBlocks(vipsStructureChild, list);
 	}
 
@@ -82,9 +84,9 @@ public class VipsParser
 	 * Selects all the extracted blocks from the tree of blocks.
 	 * @return a list of extracted blocks
 	 */
-	public List<VipsBlock> getVisualBlocks()
+	public List<VisualBlock> getVisualBlocks()
 	{
-		List<VipsBlock> list = new ArrayList<VipsBlock>();
+		List<VisualBlock> list = new ArrayList<VisualBlock>();
 		findVisualBlocks(rootBlock, list);
 		return list;
 	}
@@ -96,14 +98,14 @@ public class VipsParser
 	 * @param root Box that represents the current box
 	 * @param rootBlock Visual structure tree node
 	 */
-	private void constructVipsBlockTree(Box root, VipsBlock rootBlock)
+	private void constructVipsBlockTree(Box root, VisualBlock rootBlock)
 	{
 		rootBlock.setBox(root);
 		if (root.getType() != Box.Type.TEXT_CONTENT)
 		{
 			for (Box child : root.getChildren())
 			{
-			    final VipsBlock childBlock = new VipsBlock();
+			    final VisualBlock childBlock = new VisualBlock();
 				rootBlock.addChild(childBlock);
 				constructVipsBlockTree(child, childBlock);
 			}
@@ -114,14 +116,14 @@ public class VipsParser
 	 * Tries to divide DOM elements and finds visual blocks.
 	 * @param block Visual structure
 	 */
-	private void divideVipsBlockTree(VipsBlock block)
+	private void divideVipsBlockTree(VisualBlock block)
 	{
 		// With VIPS rules it tries to determine if element is dividable
 		if (applyVipsRules(block) && block.isDividable() && !block.isVisualBlock())
 		{
 			// if element is dividable, let's divide it
 			block.setAlreadyDivided(true);
-			for (VipsBlock child : block.getChildren())
+			for (VisualBlock child : block.getChildren())
 			{
 		        divideVipsBlockTree(child);
 			}
@@ -305,7 +307,7 @@ public class VipsParser
 	 * @param node DOM node
 	 * @return Returns true if element is dividable, otherwise false.
 	 */
-	private boolean applyVipsRules(VipsBlock block)
+	private boolean applyVipsRules(VisualBlock block)
 	{
 	    final Box node = block.getBox();
 		boolean retVal = false;
@@ -345,7 +347,7 @@ public class VipsParser
 	 * @param block Node
 	 * @return Returns true if one of rules success and node is dividable.
 	 */
-	private boolean applyOtherNodeVipsRules(VipsBlock block)
+	private boolean applyOtherNodeVipsRules(VisualBlock block)
 	{
 		// 1 2 3 4 6 8 9 11
 
@@ -381,7 +383,7 @@ public class VipsParser
 	 * @param block Node
 	 * @return Returns true if one of rules success and node is dividable.
 	 */
-	private boolean applyPNodeVipsRules(VipsBlock block)
+	private boolean applyPNodeVipsRules(VisualBlock block)
 	{
 		// 1 2 3 4 5 6 8 9 11
 
@@ -429,7 +431,7 @@ public class VipsParser
 	 * @param block Node
 	 * @return Returns true if one of rules success and node is dividable.
 	 */
-	private boolean applyTdNodeVipsRules(VipsBlock block)
+	private boolean applyTdNodeVipsRules(VisualBlock block)
 	{
 		// 1 2 3 4 8 9 10 12
 
@@ -465,7 +467,7 @@ public class VipsParser
 	 * @param block Node
 	 * @return Returns true if one of rules success and node is dividable.
 	 */
-	private boolean applyTrNodeVipsRules(VipsBlock block)
+	private boolean applyTrNodeVipsRules(VisualBlock block)
 	{
 		// 1 2 3 7 9 12
 
@@ -495,7 +497,7 @@ public class VipsParser
 	 * @param block Node
 	 * @return Returns true if one of rules success and node is dividable.
 	 */
-	private boolean applyTableNodeVipsRules(VipsBlock block)
+	private boolean applyTableNodeVipsRules(VisualBlock block)
 	{
 		// 1 2 3 7 9 12
 
@@ -525,7 +527,7 @@ public class VipsParser
 	 * @param block Node
 	 * @return Returns true if one of rules success and node is dividable.
 	 */
-	private boolean applyInlineTextNodeVipsRules(VipsBlock block)
+	private boolean applyInlineTextNodeVipsRules(VisualBlock block)
 	{
 		// 1 2 3 4 5 6 8 9 11
 
@@ -570,7 +572,7 @@ public class VipsParser
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleOne(VipsBlock block)
+	private boolean ruleOne(VisualBlock block)
 	{
 	    final Box node = block.getBox();
 		if (!isTextNode(node) && !hasValidChildNodes(node))
@@ -593,7 +595,7 @@ public class VipsParser
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleTwo(VipsBlock block)
+	private boolean ruleTwo(VisualBlock block)
 	{
 	    final Box node = block.getBox();
 		if (countValidChildNodes(node) == 1)
@@ -616,7 +618,7 @@ public class VipsParser
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleThree(VipsBlock block)
+	private boolean ruleThree(VisualBlock block)
 	{
 	    //TODO this is not very clear
 	    if (block.getBox().isRoot())
@@ -640,7 +642,7 @@ public class VipsParser
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleFour(VipsBlock block)
+	private boolean ruleFour(VisualBlock block)
 	{
         final Box node = block.getBox();
 
@@ -693,7 +695,7 @@ public class VipsParser
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleFive(VipsBlock block)
+	private boolean ruleFive(VisualBlock block)
 	{
         final Box node = block.getBox();
 
@@ -717,7 +719,7 @@ public class VipsParser
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleSix(VipsBlock block)
+	private boolean ruleSix(VisualBlock block)
 	{
         final Box node = block.getBox();
 		for (Box child : node.getChildren())
@@ -742,7 +744,7 @@ public class VipsParser
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleSeven(VipsBlock block)
+	private boolean ruleSeven(VisualBlock block)
 	{
         final Box node = block.getBox();
         
@@ -753,7 +755,7 @@ public class VipsParser
 			return false;
 
 		String nodeBgColor = block.getBgColor();
-		for (VipsBlock child : block.getChildren())
+		for (VisualBlock child : block.getChildren())
 		{
 			if (!(child.getBgColor().equals(nodeBgColor)))
 			{
@@ -781,7 +783,7 @@ public class VipsParser
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleEight(VipsBlock block)
+	private boolean ruleEight(VisualBlock block)
 	{
         final Box node = block.getBox();
         
@@ -834,7 +836,7 @@ public class VipsParser
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleNine(VipsBlock block)
+	private boolean ruleNine(VisualBlock block)
 	{
         final Box node = block.getBox();
         
@@ -878,13 +880,13 @@ public class VipsParser
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleTen(VipsBlock block)
+	private boolean ruleTen(VisualBlock block)
 	{
         final Box node = block.getBox();
 
         if (node.getPreviousSibling() != null)
         {
-            final VipsBlock siblingBlock = findBlockForBox(node.getPreviousSibling(), rootBlock);
+            final VisualBlock siblingBlock = findBlockForBox(node.getPreviousSibling(), rootBlock);
             if (siblingBlock != null && siblingBlock.isAlreadyDivided())
             {
                 block.setIsDividable(true);
@@ -906,7 +908,7 @@ public class VipsParser
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleEleven(VipsBlock block)
+	private boolean ruleEleven(VisualBlock block)
 	{
         return true;
 	}
@@ -921,7 +923,7 @@ public class VipsParser
 	 * 
 	 * @return True, if rule is applied, otherwise false.
 	 */
-	private boolean ruleTwelve(VipsBlock block)
+	private boolean ruleTwelve(VisualBlock block)
 	{
         final Box node = block.getBox();
 
@@ -976,7 +978,7 @@ public class VipsParser
 		this.sizeTresholdHeight = sizeTresholdHeight;
 	}
 
-	public VipsBlock getRootBlock()
+	public VisualBlock getRootBlock()
 	{
 		return rootBlock;
 	}
@@ -987,7 +989,7 @@ public class VipsParser
 	 * @param root Subtree root
 	 * @returns VIPS block for the gien block or {@code null}
 	 */
-	private VipsBlock findBlockForBox(Box node, VipsBlock root)
+	private VisualBlock findBlockForBox(Box node, VisualBlock root)
 	{
 		if (root.getBox().equals(node))
 		{
@@ -995,9 +997,9 @@ public class VipsParser
 		}
 		else
 		{
-			for (VipsBlock child : root.getChildren())
+			for (VisualBlock child : root.getChildren())
 			{
-				final VipsBlock found = findBlockForBox(node, child);
+				final VisualBlock found = findBlockForBox(node, child);
 				if (found != null)
 				    return found;
 			}

@@ -1,7 +1,8 @@
-/*
+/**
+ * VIPS - Visual Internet Page Segmentation for FitLayout
+ * 
  * Tomas Popela, 2012
- * VIPS - Visual Internet Page Segmentation
- * Module - VipsBlock.java
+ * Radek Burget, 2020 
  */
 
 package cz.vutbr.fit.layout.vips.impl;
@@ -13,20 +14,19 @@ import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
- * A class that represents a block on the page.
+ * An extracted visual block in the page.
+ * 
  * @author Tomas Popela
  * @author burgetr
  */
-public class VipsBlock 
+public class VisualBlock 
 {
 	//rendered Box, that corresponds to DOM element
 	private Box box = null;
 	//children of this node
-	private List<VipsBlock> children = null;
-	//node id
-	private int _id = 0;
+	private List<VisualBlock> children = null;
 	//node's Degree Of Coherence
-	private int _DoC = 0;
+	private int doC = 0;
 
 	//if node is visual block
 	private boolean visualBlock = false;
@@ -34,22 +34,13 @@ public class VipsBlock
 	private boolean alreadyDivided = false;
 	//if node can be divided
 	private boolean dividable = true;
-
+	//background color of the block
 	private String bgColor = null;
 
-	private int frameSourceIndex = 0;
 
-
-	public VipsBlock() 
+	public VisualBlock() 
 	{
-		this.children = new ArrayList<VipsBlock>();
-	}
-
-	public VipsBlock(int id, VipsBlock node) 
-	{
-		this.children = new ArrayList<VipsBlock>();
-		setId(id);
-		addChild(node);
+		this.children = new ArrayList<VisualBlock>();
 	}
 
 	/**
@@ -74,7 +65,7 @@ public class VipsBlock
 	 * Adds new child to blocks children
 	 * @param child New child
 	 */
-	public void addChild(VipsBlock child)
+	public void addChild(VisualBlock child)
 	{
 		children.add(child);
 	}
@@ -83,7 +74,7 @@ public class VipsBlock
 	 * Gets all blocks children
 	 * @return List of children
 	 */
-	public List<VipsBlock> getChildren()
+	public List<VisualBlock> getChildren()
 	{
 		return children;
 	}
@@ -107,30 +98,12 @@ public class VipsBlock
 	}
 
 	/**
-	 * Sets block's id
-	 * @param id Id
-	 */
-	public void setId(int id)
-	{
-		this._id = id;
-	}
-
-	/**
-	 * Gets blocks id
-	 * @return Id
-	 */
-	public int getId()
-	{
-		return _id;
-	}
-
-	/**
 	 * Returns block's degree of coherence DoC
 	 * @return Degree of coherence
 	 */
 	public int getDoC()
 	{
-		return _DoC;
+		return doC;
 	}
 
 	/**
@@ -139,7 +112,7 @@ public class VipsBlock
 	 */
 	public void setDoC(int doC)
 	{
-		this._DoC = doC;
+		this.doC = doC;
 	}
 
 	/**
@@ -238,15 +211,6 @@ public class VipsBlock
 	public String getFontWeight()
 	{
 	    return Utils.fontWeight(getBox());
-	}
-
-	/**
-	 * Gets frame source index of block
-	 * @return Frame source index
-	 */
-	public int getFrameSourceIndex()
-	{
-		return frameSourceIndex;
 	}
 
     @Override

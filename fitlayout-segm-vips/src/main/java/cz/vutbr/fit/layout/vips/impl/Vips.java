@@ -1,7 +1,8 @@
-/*
+/**
+ * VIPS - Visual Internet Page Segmentation for FitLayout
+ * 
  * Tomas Popela, 2012
- * VIPS - Visual Internet Page Segmentation
- * Module - Vips.java
+ * Radek Burget, 2020 
  */
 
 package cz.vutbr.fit.layout.vips.impl;
@@ -18,7 +19,7 @@ import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
- * Vision-based Page Segmentation algorithm.
+ * The VIPS algorithm implementation.
  * 
  * @author Tomas Popela
  * @author burgetr
@@ -28,7 +29,7 @@ public class Vips
     private static Logger log = LoggerFactory.getLogger(Vips.class);
     
 	private Page page = null;
-	private VisualStructure visualStructure;
+	private VisualArea visualStructure;
 
 	private boolean _graphicsOutput = false;
 	private boolean _outputToFolder = false;
@@ -84,7 +85,7 @@ public class Vips
 	    this.page = page;
 	}
 
-	public VisualStructure getVisualStructure()
+	public VisualArea getVisualStructure()
 	{
 	    return visualStructure; 
 	}
@@ -118,14 +119,14 @@ public class Vips
         final Rectangular pageBounds = new Rectangular(0, 0, pageWidth - 1, pageHeight - 1);
         
         //extract the blocks
-        VipsParser vipsParser = new VipsParser(page, page.getRoot());
+        VisualBlockDetector vipsParser = new VisualBlockDetector(page, page.getRoot());
         vipsParser.setSizeTresholdHeight(sizeTresholdHeight);
         vipsParser.setSizeTresholdWidth(sizeTresholdWidth);
         vipsParser.parse();
-        List<VipsBlock> vipsBlocks = vipsParser.getVisualBlocks();
+        List<VisualBlock> vipsBlocks = vipsParser.getVisualBlocks();
         
         //find separators
-        VipsSeparatorDetector detector = new VipsSeparatorDetector(vipsBlocks, pageBounds);
+        SeparatorDetector detector = new SeparatorDetector(vipsBlocks, pageBounds);
         List<Separator> hsep = detector.detectHorizontalSeparators();
         List<Separator> vsep = detector.detectVerticalSeparators();
         List<Separator> asep = detector.getAllSeparators();
@@ -308,7 +309,7 @@ public class Vips
      * Exports all separators to output images
      */
     private void exportSeparators(int iteration, Rectangular bounds,
-            List<VipsBlock> blocks, List<Separator> hsep, List<Separator> vsep)
+            List<VisualBlock> blocks, List<Separator> hsep, List<Separator> vsep)
     {
         GraphicalOutput out = new GraphicalOutput(bounds);
         out.setHorizontalSeparators(hsep);

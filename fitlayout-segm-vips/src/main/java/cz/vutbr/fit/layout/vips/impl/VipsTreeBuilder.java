@@ -20,18 +20,18 @@ public class VipsTreeBuilder
     {
     }
     
-    public Area buildAreaTree(VisualStructure vs)
+    public Area buildAreaTree(VisualArea vs)
     {
         Area root = createSubtree(vs);
         return root;
     }
     
-    private Area createSubtree(VisualStructure vs)
+    private Area createSubtree(VisualArea vs)
     {
         DefaultArea ret = createArea(vs);
         if (vs.getChildren().size() == 0)
         {
-            for (VipsBlock block : vs.getBlockRoots())
+            for (VisualBlock block : vs.getBlockRoots())
             {
                 Box box = block.getBox();
                 ret.addBox(box);
@@ -39,7 +39,7 @@ public class VipsTreeBuilder
         }
         else
         {
-            for (VisualStructure child : vs.getChildren())
+            for (VisualArea child : vs.getChildren())
             {
                 Area childArea = createSubtree(child);
                 ret.appendChild(childArea);
@@ -48,7 +48,7 @@ public class VipsTreeBuilder
         return ret;
     }
     
-    private DefaultArea createArea(VisualStructure vs)
+    private DefaultArea createArea(VisualArea vs)
     {
         DefaultArea ret = new DefaultArea(vs.getBounds());
         return ret;

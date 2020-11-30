@@ -209,23 +209,15 @@ public class VipsSeparatorDetector
 	/**
 	 * The greater the distance between blocks on different
 	 * side of the separator, the higher the weight. <p>
-	 * For every 10 points of width we increase weight by 1 points.
+	 * For every 10 points of width we increase weight by 2 points.
 	 * @param separator Separator
 	 */
 	private void ruleOne(Separator separator)
 	{
 		final int width = separator.endPoint - separator.startPoint + 1;
 
-		if (width > 55 )
-			separator.weight += 12;
-		if (width > 45 && width <= 55)
-			separator.weight += 10;
-		if (width > 35 && width <= 45)
-			separator.weight += 8;
-		if (width > 25 && width <= 35)
-			separator.weight += 6;
-		else if (width > 15 && width <= 25)
-			separator.weight += 4;
+		if (width > 15)
+			separator.weight += ((width - 16) / 10 + 1) * 2 + 2; // 6 for 16, 8 for 26, 10 for 36, etc.
 		else if (width > 8 && width <= 15)
 			separator.weight += 2;
 		else

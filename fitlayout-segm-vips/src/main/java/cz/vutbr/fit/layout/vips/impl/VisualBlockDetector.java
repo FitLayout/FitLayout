@@ -13,7 +13,6 @@ import java.util.List;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Box.DisplayType;
 import cz.vutbr.fit.layout.model.Box.Type;
-import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
@@ -24,27 +23,21 @@ import cz.vutbr.fit.layout.model.Rectangular;
  */
 public class VisualBlockDetector 
 {
-    private Page page;
-    private VisualBlock rootBlock;
+    private VisualArea rootArea;
 
 	private int sizeTresholdWidth = 0;
 	private int sizeTresholdHeight = 0;
-	private int pageWidth = 0;
-	private int pageHeight = 0;
 
 	/**
 	 * Creates a detector for the given page.
 	 * 
 	 * @param page Rendered page
 	 */
-	public VisualBlockDetector(Page page, Box rootBox) 
+	public VisualBlockDetector(VisualArea rootArea) 
 	{
-		this.page = page;
-		this.rootBlock = new VisualBlock();
+	    this.rootArea = rootArea;
 		this.sizeTresholdHeight = 80;
 		this.sizeTresholdWidth = 80;
-		this.pageWidth = page.getWidth();
-		this.pageHeight = page.getHeight();
 	}
 
 	/**
@@ -54,22 +47,26 @@ public class VisualBlockDetector
 	 * @param sizeTresholdWidth Element's width treshold
 	 * @param sizeTresholdHeight Element's height treshold
 	 */
-	public VisualBlockDetector(Page page, Box rootBox, int sizeTresholdWidth, int sizeTresholdHeight) 
+	public VisualBlockDetector(VisualArea rootArea, int sizeTresholdWidth, int sizeTresholdHeight) 
 	{
-	    this(page, rootBox);
+	    this(rootArea);
 		this.sizeTresholdHeight = sizeTresholdHeight;
 		this.sizeTresholdWidth = sizeTresholdWidth;
 	}
 
 	/**
-	 * Starts visual page segmentation on given page
+	 * Creates the VIPS block trees and identifies the visual blocks.
 	 */
 	public void parse()
 	{
-	    //construct the tree of blocks, one for each source box
-		constructVipsBlockTree(page.getRoot(), rootBlock);
-		//divide the blocks according to the block extraction algorithm
-		divideVipsBlockTree(rootBlock);
+	    for (VisualBlock rootBlock : rootArea.getBlockRoots())
+	    {
+    	    //construct the tree of blocks, one for each source box
+	        rootBlock.setRoot(rootBlock); //the root block is the root of the whole subtree
+    		constructVipsBlockTree(rootBlock);
+    		//divide the blocks according to the block extraction algorithm
+    		divideVipsBlockTree(rootBlock);
+	    }
 	}
 
 	private void findVisualBlocks(VisualBlock vipsBlock, List<VisualBlock> list)
@@ -87,7 +84,8 @@ public class VisualBlockDetector
 	public List<VisualBlock> getVisualBlocks()
 	{
 		List<VisualBlock> list = new ArrayList<VisualBlock>();
-		findVisualBlocks(rootBlock, list);
+        for (VisualBlock rootBlock : rootArea.getBlockRoots())
+            findVisualBlocks(rootBlock, list);
 		return list;
 	}
 
@@ -98,16 +96,18 @@ public class VisualBlockDetector
 	 * @param root Box that represents the current box
 	 * @param rootBlock Visual structure tree node
 	 */
-	private void constructVipsBlockTree(Box root, VisualBlock rootBlock)
+	private void constructVipsBlockTree(VisualBlock rootBlock)
 	{
-		rootBlock.setBox(root);
+		final Box root = rootBlock.getBox();
 		if (root.getType() != Box.Type.TEXT_CONTENT)
 		{
 			for (Box child : root.getChildren())
 			{
 			    final VisualBlock childBlock = new VisualBlock();
+			    childBlock.setRoot(rootBlock.getRoot());
+			    childBlock.setBox(child);
 				rootBlock.addChild(childBlock);
-				constructVipsBlockTree(child, childBlock);
+				constructVipsBlockTree(childBlock);
 			}
 		}
 	}
@@ -130,11 +130,6 @@ public class VisualBlockDetector
 		}
 		else
 		{
-			/*if (block.isDividable())
-			{
-				block.setIsVisualBlock(true);
-				block.setDoC(11);
-			}*/ //TODO what was this?
 		    //remove invalid blocks
 			if (!verifyValidity(block.getBox()))
 			{
@@ -147,20 +142,10 @@ public class VisualBlockDetector
 	{
 	    final Rectangular bounds = node.getContentBounds();
 	    
-		if (bounds.getX1() < 0 || bounds.getY1() < 0)
-			return false;
-
-		if (node.getX2() > pageWidth) //TODO subpage bounds
-		{
-			return false;
-		}
-
-		if (node.getY2() > pageHeight)
-		{
-			return false;
-		}
-
-		if (node.getWidth() <= 0 || node.getHeight() <= 0)
+	    if (!rootArea.getBounds().encloses(bounds))
+	        return false;
+	    
+		if (node.getWidth() <= 0 || node.getHeight() <= 0) //TODO thresholds?
 			return false;
 
 		if (!node.isVisible())
@@ -886,7 +871,7 @@ public class VisualBlockDetector
 
         if (node.getPreviousSibling() != null)
         {
-            final VisualBlock siblingBlock = findBlockForBox(node.getPreviousSibling(), rootBlock);
+            final VisualBlock siblingBlock = findBlockForBox(node.getPreviousSibling(), block.getRoot());
             if (siblingBlock != null && siblingBlock.isAlreadyDivided())
             {
                 block.setIsDividable(true);
@@ -976,11 +961,6 @@ public class VisualBlockDetector
 	public void setSizeTresholdHeight(int sizeTresholdHeight)
 	{
 		this.sizeTresholdHeight = sizeTresholdHeight;
-	}
-
-	public VisualBlock getRootBlock()
-	{
-		return rootBlock;
 	}
 
 	/**

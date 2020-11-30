@@ -21,6 +21,8 @@ import cz.vutbr.fit.layout.model.Rectangular;
  */
 public class VisualBlock 
 {
+    //root of the whole tree
+    private VisualBlock root;
 	//rendered Box, that corresponds to DOM element
 	private Box box = null;
 	//children of this node
@@ -79,7 +81,17 @@ public class VisualBlock
 		return children;
 	}
 
-	/**
+	public VisualBlock getRoot()
+    {
+        return root;
+    }
+
+    public void setRoot(VisualBlock root)
+    {
+        this.root = root;
+    }
+
+    /**
 	 * Sets block corresponding Box
 	 * @param box Box
 	 */

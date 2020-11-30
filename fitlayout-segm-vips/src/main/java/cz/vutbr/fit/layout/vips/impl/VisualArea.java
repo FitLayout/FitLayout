@@ -24,7 +24,7 @@ public class VisualArea
 	private List<VisualArea> childStructures;
 	private List<Separator> separators;
     private Rectangular bounds;
-	private int doC = 12;
+    private int doC = 12;
 
 	public VisualArea()
 	{
@@ -37,7 +37,6 @@ public class VisualArea
     {
         this();
         bounds = new Rectangular(src.bounds);
-        doC = src.doC;
     }
 	
 	/**
@@ -187,27 +186,24 @@ public class VisualArea
 	}
 
 	/**
-	 * Sets visual structure's degree of coherence DoC
-	 * @param doC Degree of coherence - DoC
-	 */
-	public void setDoC(int doC)
-	{
-		this.doC = doC;
-	}
-
-	/**
-	 * Returns structure's degree of coherence DoC
+	 * Returns areas's degree of coherence DoC. The DoC of each new block is set
+	 * based on the maximum weight of the separators in the block’s region.
 	 * @return Degree of coherence - DoC
 	 */
 	public int getDoC()
 	{
-		return doC;
+	    return doC;
 	}
 	
+    public void setDoC(int doC)
+    {
+        this.doC = doC;
+    }
+
     @Override
     public String toString()
     {
-        return "[blockRoots=" + blockRoots + ", doC=" + doC + "]";
+        return "[blockRoots=" + blockRoots + ", doC=" + getDoC() + "]";
     }
 
 }

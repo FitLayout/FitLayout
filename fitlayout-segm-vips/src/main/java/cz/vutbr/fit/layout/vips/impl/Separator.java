@@ -17,6 +17,8 @@ public class Separator implements Comparable<Separator>
 	public int startPoint = 0;
 	public int endPoint = 0;
 	public int weight = 3;
+	public int normalizedWeight;
+	
 
 	public Separator(int start, int end, boolean vertical) 
 	{
@@ -78,6 +80,16 @@ public class Separator implements Comparable<Separator>
     public void setWeight(int weight)
     {
         this.weight = weight;
+    }
+
+    public int getNormalizedWeight()
+    {
+        return normalizedWeight;
+    }
+
+    public void setNormalizedWeight(int normalizedWeight)
+    {
+        this.normalizedWeight = normalizedWeight;
     }
 
     /**

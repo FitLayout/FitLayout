@@ -51,6 +51,7 @@ public class VipsTreeBuilder
     private DefaultArea createArea(VisualArea vs)
     {
         DefaultArea ret = new DefaultArea(vs.getBounds());
+        ret.setName("VB (" + vs.getDoC() + ")");
         return ret;
     }
     

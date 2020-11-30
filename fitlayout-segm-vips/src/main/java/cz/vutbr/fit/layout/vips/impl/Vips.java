@@ -118,8 +118,15 @@ public class Vips
         final int pageHeight = page.getHeight();
         final Rectangular pageBounds = new Rectangular(0, 0, pageWidth - 1, pageHeight - 1);
         
+        //create a root visual area
+        VisualBlock rootBlock = new VisualBlock();
+        rootBlock.setBox(page.getRoot());
+        VisualArea rootArea = new VisualArea();
+        rootArea.setBounds(pageBounds);
+        rootArea.addBlock(rootBlock);
+        
         //extract the blocks
-        VisualBlockDetector vipsParser = new VisualBlockDetector(page, page.getRoot());
+        VisualBlockDetector vipsParser = new VisualBlockDetector(rootArea);
         vipsParser.setSizeTresholdHeight(sizeTresholdHeight);
         vipsParser.setSizeTresholdWidth(sizeTresholdWidth);
         vipsParser.parse();

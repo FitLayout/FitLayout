@@ -44,6 +44,41 @@ public class VisualStructureConstructor
 		this.separators = separators;
 	}
 
+    /**
+     * Sets the page bounds.
+     * @param bounds the new page bounds
+     */
+    public void setPageSize(Rectangular bounds)
+    {
+        this.pageBounds = new Rectangular(bounds);
+    }
+
+    /**
+     * @return Returns final visual structure
+     */
+    public VisualArea getVisualStructure()
+    {
+        return root;
+    }
+
+    /**
+     * Sets VipsBlock structure and also finds and saves all visual blocks from its
+     * @param vipsBlocks VipsBlock structure
+     */
+    public void setVipsBlocks(List<VisualBlock> vipsBlocks)
+    {
+        visualBlocks = vipsBlocks;
+    }
+
+    /**
+     * Returns all visual blocks in page
+     * @return Visual Blocks
+     */
+    public List<VisualBlock> getVisualBlocks()
+    {
+        return visualBlocks;
+    }
+    
 	/**
 	 * Constructs the new visual structure.
 	 */
@@ -59,6 +94,7 @@ public class VisualStructureConstructor
 	    parents.add(root);
 	    //reconstruct the visual structure tree based on the separator weights
 	    List<Separator> seps = new LinkedList<>(separators);
+	    normalizeSeparators(seps);
 	    while (!seps.isEmpty())
 	    {
             //collect separators of the same weight and direction
@@ -308,41 +344,21 @@ public class VisualStructureConstructor
         });
 	}
 	
-	/**
-	 * Sets page's size
-	 * @param width Page's width
-	 * @param height Page's height
-	 */
-	public void setPageSize(Rectangular bounds)
-	{
-	    this.pageBounds = new Rectangular(bounds);
-	}
+    /**
+     * Computes the normalized weights of the separators in the interval (1..11)
+     * @param separators a sorted list of separators to normalize.
+     */
+	public void normalizeSeparators(List<Separator> separators)
+    {
+        final double maxWeight = separators.get(0).weight;
+        final double minWeight = separators.get(separators.size() - 1).weight;
 
-	/**
-	 * @return Returns final visual structure
-	 */
-	public VisualArea getVisualStructure()
-	{
-		return root;
-	}
-
-	/**
-	 * Sets VipsBlock structure and also finds and saves all visual blocks from its
-	 * @param vipsBlocks VipsBlock structure
-	 */
-	public void setVipsBlocks(List<VisualBlock> vipsBlocks)
-	{
-		visualBlocks = vipsBlocks;
-	}
-
-	/**
-	 * Returns all visual blocks in page
-	 * @return Visual Blocks
-	 */
-	public List<VisualBlock> getVisualBlocks()
-	{
-		return visualBlocks;
-	}
+        for (Separator separator : separators)
+        {
+            double normalizedValue = (separator.weight - minWeight) / (maxWeight - minWeight) * (11 - 1) + 1;
+            separator.setNormalizedWeight((int) Math.ceil(normalizedValue));
+        }
+    }
 
 	/**
 	 * Finds minimal DoC in given structure

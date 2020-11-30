@@ -27,6 +27,9 @@ import cz.vutbr.fit.layout.model.Rectangular;
  */
 public class Vips 
 {
+    /** Maximal number of iterations when the process does not seem to end in a normal way */
+    private static final int MAX_ITERATIONS = 20;
+    
     private static Logger log = LoggerFactory.getLogger(Vips.class);
     
 	private Page page = null;
@@ -113,7 +116,10 @@ public class Vips
 		return outputFolder;
 	}
 
-    private void performSegmentation()
+    /**
+     * Performs the VIPS segmentation itself.
+     */
+	private void performSegmentation()
     {
         final int pageWidth = page.getWidth();
         final int pageHeight = page.getHeight();
@@ -126,26 +132,49 @@ public class Vips
         rootArea.setBounds(pageBounds);
         rootArea.addBlock(rootBlock);
         
-        iteration(1, rootArea);
-        iteration(2, rootArea);
-        iteration(3, rootArea);
-        
-        System.out.println("done");
-        
+        //perform the iterations until there are no changes or we reach the maximal number of iterations
+        int iteration = 0;
+        boolean change = true;
+        while (change && iteration < MAX_ITERATIONS)
+        {
+            change = iteration(iteration, rootArea);
+            iteration++;
+        }
+        log.debug("Segmentation finished after {} iterations", iteration);
     }
 
-    private void iteration(int index, VisualArea root)
+    /**
+     * Runs a single iteration on the visual structure tree. Chooses the leaf nodes
+     * of the tree and tries to perform segmentation on them.
+     * @param index the iteration index (for reporting only)
+     * @param root the root of the visual area tree
+     * @return {@code true} when some leaf areas have been segmented, {@code false} when no
+     * changes have been made to the tree.
+     */
+    private boolean iteration(int index, VisualArea root)
     {
         List<VisualArea> leaves = new ArrayList<>();
         getLeafAreas(root, leaves);
         int li = 1;
+        boolean changed = false;
         for (VisualArea leaf : leaves)
         {
-            segmentArea(index, li++, leaf);
+            changed |= segmentArea(index, li++, leaf);
         }
+        return changed;
     }
     
-    private void segmentArea(int iterationIndex, int leafIndex, VisualArea area)
+    /**
+     * Applies the VIPS algorihm on a visual area that represents a (sub-)page. Detects a tree
+     * of descendant areas in the given area.
+     * @param iterationIndex current iteration index (for reporting only)
+     * @param leafIndex leaf area index in this iteration (for reporting only)
+     * @param area the area to perform segmentation on. The detected sub-areas will be
+     * added to this area as its child areas.
+     * @return {@code true} when some sub-areas have been detected, {@code false} when no changes
+     * have been made to the area structure (no structure detected)
+     */
+    private boolean segmentArea(int iterationIndex, int leafIndex, VisualArea area)
     {
         //extract the blocks
         VisualBlockDetector vipsParser = new VisualBlockDetector(area);
@@ -165,12 +194,18 @@ public class Vips
             exportSeparators(suffix, rootArea.getBounds(), vipsBlocks, hsep, vsep);
         }
         
-        // visual structure construction
-        VisualStructureConstructor constructor = new VisualStructureConstructor(area.getBounds(), vipsBlocks, asep);
-        constructor.constructVisualStructure();
-        VisualArea resultRoot = constructor.getVisualStructure();
-        // connect the discovered structure to the processed area
-        area.addChildren(resultRoot.getChildren());
+        if (!asep.isEmpty()) //some separators detected
+        {
+            // visual structure construction
+            VisualStructureConstructor constructor = new VisualStructureConstructor(area.getBounds(), vipsBlocks, asep);
+            constructor.constructVisualStructure();
+            VisualArea resultRoot = constructor.getVisualStructure();
+            // connect the discovered structure to the processed area
+            area.addChildren(resultRoot.getChildren());
+            return true;
+        }
+        else
+            return false; //no separators detected, nothing has been changed
     }   
     
     private void getLeafAreas(VisualArea root, List<VisualArea> dest)

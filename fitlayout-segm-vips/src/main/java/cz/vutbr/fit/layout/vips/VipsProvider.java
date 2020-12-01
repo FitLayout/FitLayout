@@ -101,14 +101,13 @@ public class VipsProvider extends BaseArtifactService
         atree.setCreator(getId());
         atree.setCreatorParams(getParamString());
         
+        boolean graphOutput = (System.getProperty("fitlayout.vips.debug") != null);
+        
+        // perform the segmentation
         Vips vips = new Vips();
-        // disable graphics output
-        vips.enableGraphicsOutput(true);
-        // disable output to separate folder (no necessary, it's default value is false)
+        vips.enableGraphicsOutput(graphOutput);
         vips.enableOutputToFolder(false);
-        // set permitted degree of coherence
         vips.setPredefinedDoC(pDoC);
-        // start segmentation on page
         vips.startSegmentation(page);
         // build the tree
         VipsTreeBuilder builder = vips.getTreeBuilder();

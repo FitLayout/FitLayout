@@ -25,6 +25,8 @@ public class VisualArea
 	private List<Separator> separators;
     private Rectangular bounds;
     private int doC = 12;
+    private boolean finished = false;
+    
 
 	public VisualArea()
 	{
@@ -198,6 +200,21 @@ public class VisualArea
     public void setDoC(int doC)
     {
         this.doC = doC;
+    }
+
+    /**
+     * Checks whether the visual area is finished. The area is finished when it cannot be segmented
+     * anymore.
+     * @return {@code true} when the area is finished
+     */
+    public boolean isFinished()
+    {
+        return finished;
+    }
+
+    public void setFinished(boolean finished)
+    {
+        this.finished = finished;
     }
 
     /**

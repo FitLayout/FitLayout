@@ -171,7 +171,8 @@ public class Vips
         boolean changed = false;
         for (VisualArea leaf : leaves)
         {
-            changed |= segmentArea(index, li++, leaf);
+            if (!leaf.isFinished())
+                changed |= segmentArea(index, li++, leaf);
         }
         return changed;
     }
@@ -219,7 +220,10 @@ public class Vips
             return true;
         }
         else
+        {
+            area.setFinished(true); //do not try to segment this in future iterations
             return false; //no separators detected, nothing has been changed
+        }
     }   
     
     private void getLeafAreas(VisualArea root, List<VisualArea> dest)

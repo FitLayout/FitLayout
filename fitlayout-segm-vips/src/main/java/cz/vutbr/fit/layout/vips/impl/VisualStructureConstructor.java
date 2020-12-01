@@ -15,9 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
@@ -28,7 +25,7 @@ import cz.vutbr.fit.layout.model.Rectangular;
  */
 public class VisualStructureConstructor 
 {
-    private static Logger log = LoggerFactory.getLogger(VisualStructureConstructor.class);
+    //private static Logger log = LoggerFactory.getLogger(VisualStructureConstructor.class);
     
     private List<VisualBlock> visualBlocks;
 	private VisualArea root;
@@ -94,7 +91,6 @@ public class VisualStructureConstructor
 	    parents.add(root);
 	    //reconstruct the visual structure tree based on the separator weights
 	    List<Separator> seps = new LinkedList<>(separators);
-	    normalizeSeparators(seps);
 	    while (!seps.isEmpty())
 	    {
             //collect separators of the same weight and direction
@@ -304,34 +300,6 @@ public class VisualStructureConstructor
             list.add(right);
 	}
 	
-	private void sortChildren(List<VisualArea> children, boolean vertical)
-	{
-	    Comparator<VisualArea> comp;
-	    if (vertical)
-	    {
-	        comp = new Comparator<VisualArea>()
-            {
-                @Override
-                public int compare(VisualArea o1, VisualArea o2)
-                {
-                    return o1.getX1() - o2.getX1();
-                }
-            };
-	    }
-	    else
-	    {
-            comp = new Comparator<VisualArea>()
-            {
-                @Override
-                public int compare(VisualArea o1, VisualArea o2)
-                {
-                    return o1.getY1() - o2.getY1();
-                }
-            };
-	    }
-	    Collections.sort(children, comp);
-	}
-	
 	private void sortSeparatorsByPosition(List<Separator> separators)
 	{
 	    Collections.sort(separators, new Comparator<Separator>()
@@ -344,25 +312,6 @@ public class VisualStructureConstructor
         });
 	}
 	
-    /**
-     * Computes the normalized weights of the separators in the interval (1..11)
-     * @param separators a sorted list of separators to normalize.
-     */
-	public void normalizeSeparators(List<Separator> separators)
-    {
-	    if (!separators.isEmpty())
-	    {
-            final double maxWeight = separators.get(0).weight;
-            final double minWeight = separators.get(separators.size() - 1).weight;
-    
-            for (Separator separator : separators)
-            {
-                double normalizedValue = (separator.weight - minWeight) / (maxWeight - minWeight) * (11 - 1) + 1;
-                separator.setNormalizedWeight((int) Math.ceil(normalizedValue));
-            }
-	    }
-    }
-
 	/**
 	 * Finds minimal DoC in given structure
 	 * @param visualStructure

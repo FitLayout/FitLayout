@@ -24,7 +24,7 @@ public class VisualArea
 	private List<VisualArea> childStructures;
 	private List<Separator> separators;
     private Rectangular bounds;
-    private int doC = 12;
+    private int doC = 1; //low initial DoC means we will always segment this until DoC is recomputed
     private boolean finished = false;
     
 

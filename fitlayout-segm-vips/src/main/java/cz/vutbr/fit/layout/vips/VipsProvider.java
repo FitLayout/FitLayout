@@ -5,11 +5,16 @@
  */
 package cz.vutbr.fit.layout.vips;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.rdf4j.model.IRI;
 
+import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.impl.DefaultAreaTree;
+import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
@@ -25,6 +30,7 @@ import cz.vutbr.fit.layout.vips.impl.VipsTreeBuilder;
  */
 public class VipsProvider extends BaseArtifactService
 {
+    private int pDoC = 10;
 
     public VipsProvider()
     {
@@ -49,6 +55,14 @@ public class VipsProvider extends BaseArtifactService
     }
 
     @Override
+    public List<Parameter> defineParams()
+    {
+        List<Parameter> ret = new ArrayList<>(1);
+        ret.add(new ParameterInt("pDoC", 1, 11));
+        return ret;
+    }
+    
+    @Override
     public IRI getConsumes()
     {
         return BOX.Page;
@@ -64,6 +78,16 @@ public class VipsProvider extends BaseArtifactService
     public Artifact process(Artifact input) throws ServiceException
     {
         return createAreaTree((Page) input);
+    }
+
+    public int getPDoC()
+    {
+        return pDoC;
+    }
+
+    public void setPDoC(int pDoC)
+    {
+        this.pDoC = pDoC;
     }
 
     //==============================================================================
@@ -83,7 +107,7 @@ public class VipsProvider extends BaseArtifactService
         // disable output to separate folder (no necessary, it's default value is false)
         vips.enableOutputToFolder(false);
         // set permitted degree of coherence
-        vips.setPredefinedDoC(8);
+        vips.setPredefinedDoC(pDoC);
         // start segmentation on page
         vips.startSegmentation(page);
         // build the tree

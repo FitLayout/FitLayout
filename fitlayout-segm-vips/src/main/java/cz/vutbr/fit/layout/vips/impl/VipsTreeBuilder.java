@@ -16,8 +16,11 @@ import cz.vutbr.fit.layout.model.Box;
  */
 public class VipsTreeBuilder
 {
-    public VipsTreeBuilder()
+    private int pDoC;
+    
+    public VipsTreeBuilder(int pDoC)
     {
+        this.pDoC = pDoC;
     }
     
     public Area buildAreaTree(VisualArea vs)
@@ -39,10 +42,13 @@ public class VipsTreeBuilder
         }
         else
         {
-            for (VisualArea child : vs.getChildren())
+            if (vs.getDoC() <= pDoC)
             {
-                Area childArea = createSubtree(child);
-                ret.appendChild(childArea);
+                for (VisualArea child : vs.getChildren())
+                {
+                        Area childArea = createSubtree(child);
+                        ret.appendChild(childArea);
+                }
             }
         }
         return ret;

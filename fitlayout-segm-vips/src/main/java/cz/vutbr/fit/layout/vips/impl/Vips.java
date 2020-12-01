@@ -102,7 +102,7 @@ public class Vips
 	
 	public VipsTreeBuilder getTreeBuilder()
 	{
-	    return new VipsTreeBuilder();
+	    return new VipsTreeBuilder(pDoC);
 	}
 	
 	/**
@@ -147,12 +147,11 @@ public class Vips
         while (change && iteration < MAX_ITERATIONS)
         {
             change = iteration(iteration, rootArea);
+            recursiveComputeDoC(rootArea); //recompute the DoC for all the areas
             iteration++;
         }
         log.debug("Segmentation finished after {} iterations", iteration);
         
-        //assign the doC
-        recursiveComputeDoC(rootArea);
     }
 
     /**

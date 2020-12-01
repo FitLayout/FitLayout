@@ -200,6 +200,30 @@ public class VisualArea
         this.doC = doC;
     }
 
+    /**
+     * Finds the maximal separator weight in this area and all sub-areas.
+     * @return the maximal separator weight
+     */
+    public int getMaxSeparator()
+    {
+        int max = 0;
+        if (getSeparators() != null)
+        {
+            for (Separator sep : getSeparators())
+            {
+                if (sep.getWeight() > max)
+                    max = sep.getWeight();
+            }
+        }
+        for (VisualArea child : getChildren())
+        {
+            final int cmax = child.getMaxSeparator();
+            if (cmax > max)
+                max = cmax;
+        }
+        return max;
+    }
+    
     @Override
     public String toString()
     {

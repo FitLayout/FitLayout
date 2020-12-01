@@ -40,6 +40,12 @@ public class Vips
 	private int pDoC = 11;
 	private	int sizeTresholdWidth = 350;
 	private	int sizeTresholdHeight = 400;
+	
+	/** Overall minimal separator weight for the whole segmentation */
+	private int minSepWeight;
+    /** Overall maximal separator weight for the whole segmentation */
+	private int maxSepWeight;
+	
 
 	/**
 	 * Default constructor
@@ -125,6 +131,9 @@ public class Vips
         final int pageHeight = page.getHeight();
         final Rectangular pageBounds = new Rectangular(0, 0, pageWidth - 1, pageHeight - 1);
         
+        minSepWeight = Integer.MAX_VALUE;
+        maxSepWeight = 1;
+        
         //create the root visual area
         VisualBlock rootBlock = new VisualBlock();
         rootBlock.setBox(page.getRoot());
@@ -141,6 +150,9 @@ public class Vips
             iteration++;
         }
         log.debug("Segmentation finished after {} iterations", iteration);
+        
+        //assign the doC
+        recursiveComputeDoC(rootArea);
     }
 
     /**
@@ -176,8 +188,6 @@ public class Vips
      */
     private boolean segmentArea(int iterationIndex, int leafIndex, VisualArea area)
     {
-        if (iterationIndex == 3 && leafIndex == 15)
-            System.out.println("jo!");
         //extract the blocks
         VisualBlockDetector vipsParser = new VisualBlockDetector(area);
         vipsParser.setSizeTresholdHeight(sizeTresholdHeight);
@@ -190,6 +200,7 @@ public class Vips
         List<Separator> hsep = detector.detectHorizontalSeparators();
         List<Separator> vsep = detector.detectVerticalSeparators();
         List<Separator> asep = detector.getAllSeparators();
+        updateSeparatorStats(asep);
         if (_graphicsOutput)
         {
             String suffix = "-" + iterationIndex + "-" + leafIndex;
@@ -204,6 +215,7 @@ public class Vips
             VisualArea resultRoot = constructor.getVisualStructure();
             // connect the discovered structure to the processed area
             area.addChildren(resultRoot.getChildren());
+            area.setSeparators(resultRoot.getSeparators());
             return true;
         }
         else
@@ -274,7 +286,49 @@ public class Vips
 		}
 	}
 
-   /**
+	/**
+	 * Updates the values of maximal/minimal separator weights according to sorted list of separators.
+	 * @param separators a list of separators sorted by weights from the highest to the lowest weight
+	 */
+	private void updateSeparatorStats(List<Separator> separators)
+	{
+	    if (!separators.isEmpty())
+	    {
+            final int maxWeight = separators.get(0).weight;
+            final int minWeight = separators.get(separators.size() - 1).weight;
+            
+            if (minWeight < minSepWeight)
+                minSepWeight = minWeight;
+            if (maxWeight > maxSepWeight)
+                maxSepWeight = maxWeight;
+	    }
+	}
+	
+	private void recursiveComputeDoC(VisualArea root)
+	{
+	    for (VisualArea child : root.getChildren())
+	        recursiveComputeDoC(child);
+	    root.setDoC(computeDoC(root));
+	}
+	
+	private int computeDoC(VisualArea area)
+	{
+	    int maxsep = area.getMaxSeparator();
+	    if (maxsep == 0)
+	    {
+	        return 11; //no separators - maximal DoC
+	    }
+	    else
+	    {
+	        //some separators found, return 1..10 based on the relative separator weight
+    	    final double minWeight = minSepWeight;
+    	    final double maxWeight = maxSepWeight;
+            double normalizedValue = (maxsep - minWeight) / (maxWeight - minWeight) * (10 - 1) + 1;
+            return 11 - (int) Math.ceil(normalizedValue);
+	    }
+	}
+	
+    /**
      * Exports all separators to output images
      */
     private void exportSeparators(String suffix, Rectangular bounds,

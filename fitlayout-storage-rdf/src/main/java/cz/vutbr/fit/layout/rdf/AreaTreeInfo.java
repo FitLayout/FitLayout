@@ -5,6 +5,7 @@
  */
 package cz.vutbr.fit.layout.rdf;
 
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
 
 import cz.vutbr.fit.layout.rdf.model.RDFAreaTree;
@@ -13,12 +14,12 @@ import cz.vutbr.fit.layout.rdf.model.RDFAreaTree;
  * 
  * @author burgetr
  */
-public class AreaTreeInfo extends ArtifactInfo
+public class AreaTreeInfo extends RDFArtifactInfo
 {
 
-    public AreaTreeInfo(Model model)
+    public AreaTreeInfo(Model model, IRI areaTreeIri)
     {
-        super(model);
+        super(model, areaTreeIri);
     }
 
     public void applyToAreaTree(RDFAreaTree atree)

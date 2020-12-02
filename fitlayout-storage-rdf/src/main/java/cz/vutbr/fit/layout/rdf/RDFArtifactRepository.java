@@ -101,6 +101,23 @@ public class RDFArtifactRepository implements ArtifactRepository
     }
     
     @Override
+    public Collection<Artifact> getArtifactInfo()
+    {
+        Collection<IRI> iris = getArtifactIRIs();
+        List<Artifact> ret = new ArrayList<>(iris.size());
+        for (IRI iri : iris)
+        {
+            Model artifactModel = getStorage().getSubjectModel(iri);
+            if (artifactModel.size() > 0)
+            {
+                RDFArtifactInfo info = new RDFArtifactInfo(artifactModel, iri);
+                ret.add(info);
+            }
+        }
+        return ret;
+    }
+
+    @Override
     public Artifact getArtifact(IRI artifactIri)
     {
         Model model = getArtifactModel(artifactIri);

@@ -2,6 +2,7 @@ package cz.vutbr.fit.layout.rdf;
 
 import java.util.Base64;
 
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Statement;
 
@@ -14,16 +15,16 @@ import cz.vutbr.fit.layout.rdf.model.RDFPage;
  * 
  * @author burgetr
  */
-public class PageInfo extends ArtifactInfo
+public class PageInfo extends RDFArtifactInfo
 {
 	private String title;
     private String url;
 	private byte[] pngImage;
 	
 	
-    public PageInfo(Model model) 
+    public PageInfo(Model model, IRI pageIri) 
     {
-        super(model);
+        super(model, pageIri);
     }
 
     protected void processStatement(Statement st)

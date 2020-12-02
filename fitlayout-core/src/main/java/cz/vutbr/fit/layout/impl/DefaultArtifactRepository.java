@@ -48,6 +48,12 @@ public class DefaultArtifactRepository implements ArtifactRepository
     }
 
     @Override
+    public Collection<Artifact> getArtifactInfo()
+    {
+        return repo.values();
+    }
+
+    @Override
     public Artifact getArtifact(IRI artifactIri)
     {
         return repo.get(artifactIri);

@@ -26,6 +26,14 @@ public interface ArtifactRepository
     public Collection<IRI> getArtifactIRIs();
     
     /**
+     * Obtains the basic information about the artifacts. Note that the resulting objects are not
+     * necessarily the complete artifacts. Use {@link ArtifactRepository#getArtifact(IRI)} to
+     * load the complete artifacts of the appropriate types.
+     * @return A collection of objects that represent the available artifacts. 
+     */
+    public Collection<Artifact> getArtifactInfo();
+    
+    /**
      * Obtains an artifact from the repository.
      * @param artifactIri the artifact IRI
      * @return the artifact or {@code null} when there is no such artifact available

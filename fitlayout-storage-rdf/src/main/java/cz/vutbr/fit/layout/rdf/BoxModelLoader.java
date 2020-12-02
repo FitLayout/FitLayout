@@ -60,7 +60,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
         if (pageModel.size() > 0)
         {
             //create the page
-            PageInfo info = new PageInfo(pageModel);
+            PageInfo info = new PageInfo(pageModel, pageIri);
             URL srcURL;
             try {
                 srcURL = new URL(info.getUrl());

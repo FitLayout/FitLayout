@@ -20,6 +20,7 @@ public abstract class BaseArtifact implements Artifact
 {
     private IRI iri;
     private IRI parentIri;
+    private String label;
     private Date createdOn;
     private String creator;
     private String creatorParams;
@@ -52,6 +53,17 @@ public abstract class BaseArtifact implements Artifact
     public void setParentIri(IRI parentIri)
     {
         this.parentIri = parentIri;
+    }
+
+    @Override
+    public String getLabel()
+    {
+        return label;
+    }
+
+    public void setLabel(String label)
+    {
+        this.label = label;
     }
 
     public Date getCreatedOn()

@@ -42,6 +42,12 @@ public interface Artifact
     public IRI getParentIri();
     
     /**
+     * Gets the element label when it is defined.
+     * @return the label or {@code null} when no label is defined
+     */
+    public String getLabel();
+    
+    /**
      * The artifact creation date.
      * @return the date/time of the artifact creation.
      */

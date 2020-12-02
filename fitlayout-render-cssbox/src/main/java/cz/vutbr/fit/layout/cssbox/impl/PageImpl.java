@@ -20,6 +20,18 @@ public class PageImpl extends DefaultPage
     {
         super(url);
     }
-    
+
+    @Override
+    public String getLabel()
+    {
+        if (super.getLabel() != null)
+            return super.getLabel();
+        else if (getTitle() != null)
+            return getTitle();
+        else if (getSourceURL() != null)
+            return getSourceURL().toString();
+        else
+            return null;
+    }
     
 }

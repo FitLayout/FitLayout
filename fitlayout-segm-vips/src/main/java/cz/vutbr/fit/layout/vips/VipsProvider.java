@@ -98,6 +98,7 @@ public class VipsProvider extends BaseArtifactService
         atree.setParentIri(page.getIri());
         IRI atreeIri = getServiceManager().getArtifactRepository().createArtifactIri(page);
         atree.setIri(atreeIri);
+        atree.setLabel(getId());
         atree.setCreator(getId());
         atree.setCreatorParams(getParamString());
         

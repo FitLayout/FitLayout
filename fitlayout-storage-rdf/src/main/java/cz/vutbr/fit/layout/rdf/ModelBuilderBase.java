@@ -10,6 +10,7 @@ import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.model.vocabulary.RDFS;
 
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.ontology.FL;
@@ -36,6 +37,8 @@ public class ModelBuilderBase
         graph.add(node, RDF.TYPE, a.getArtifactType());
         if (a.getParentIri() != null)
             graph.add(node, FL.hasParentArtifact, a.getParentIri());
+        if (a.getLabel() != null)
+            graph.add(node, RDFS.LABEL, vf.createLiteral(a.getLabel()));
         if (a.getCreatedOn() != null)
             graph.add(node, FL.createdOn, vf.createLiteral(a.getCreatedOn()));
         if (a.getCreator() != null)

@@ -11,6 +11,7 @@ import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.model.vocabulary.RDFS;
 
 import cz.vutbr.fit.layout.api.ArtifactInfo;
 import cz.vutbr.fit.layout.impl.BaseArtifact;
@@ -42,6 +43,10 @@ public class RDFArtifactInfo extends ArtifactInfo
             Value val = st.getObject();
             if (val instanceof IRI)
                 setArtifactType((IRI) val);
+        }
+        else if (st.getPredicate().equals(RDFS.LABEL))
+        {
+            setLabel(st.getObject().stringValue());
         }
         else if (st.getPredicate().equals(FL.createdOn))
         {

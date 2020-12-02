@@ -3,6 +3,7 @@ package cz.vutbr.fit.layout.rdf;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -141,6 +142,31 @@ public class RDFStorage implements Closeable
         return createModel(getContextStatements(context));
     }
     
+    /**
+     * Obtains all statements in a given contexts.
+     * 
+     * @param contexts the context IRIs
+     * @return
+     * @throws RepositoryException
+     */
+    public RepositoryResult<Statement> getContextStatements(Collection<Resource> contexts) throws RepositoryException
+    {
+        final Resource[] res = contexts.toArray(new Resource[contexts.size()]);
+        return getConnection().getStatements(null, null, null, res);
+    }
+    
+    /**
+     * Obtains a model containing all statements in a given context.
+     * 
+     * @param contexts the context IRIs
+     * @return
+     * @throws RepositoryException
+     */
+    public Model getContextModel(Collection<Resource> contexts) throws RepositoryException
+    {
+        return createModel(getContextStatements(contexts));
+    }
+    
 	/**
 	 * Obtains the value of the given predicate for the given subject.
 	 * @param subject the subject resource
@@ -172,6 +198,26 @@ public class RDFStorage implements Closeable
 		return ret;
 	}
 
+    /**
+     * Obtains a model for the specific subjects.
+     * @param subjects
+     * @return
+     * @throws RepositoryException 
+     */
+    public Model getSubjectModel(Collection<IRI> subjects) throws RepositoryException 
+    {
+        Model model = new LinkedHashModel();
+        for (Resource subject : subjects)
+        {
+            RepositoryResult<Statement> result = getSubjectStatements(subject);
+            while (result.hasNext())
+                model.add(result.next());
+            result.close();
+        }
+        closeConnection();
+        return model;
+    }
+    
 	/**
 	 * Executes a SPARQL query on the databse
 	 * @param query the SPARQL query

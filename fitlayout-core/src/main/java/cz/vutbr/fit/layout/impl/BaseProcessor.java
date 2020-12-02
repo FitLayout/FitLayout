@@ -3,7 +3,7 @@
  *
  * Created on 5. 2. 2015, 9:34:28 by burgetr
  */
-package cz.vutbr.fit.layout.process;
+package cz.vutbr.fit.layout.impl;
 
 import java.util.Map;
 
@@ -20,6 +20,7 @@ import cz.vutbr.fit.layout.model.Artifact;
 
 /**
  * A base of a processor. It takes care about the existing providers and operators and their invocation.
+ * It manages a repository where the resulting artifacts are stored.
  * 
  * @author burgetr
  */

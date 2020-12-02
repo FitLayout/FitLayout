@@ -3,7 +3,7 @@
  *
  * Created on 14. 1. 2015, 11:08:12 by burgetr
  */
-package cz.vutbr.fit.layout.process;
+package cz.vutbr.fit.layout.console;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,6 +15,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
+import cz.vutbr.fit.layout.console.process.ScriptableProcessor;
 
 /**
  * 

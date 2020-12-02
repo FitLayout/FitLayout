@@ -3,7 +3,7 @@
  *
  * Created on 27. 1. 2015, 13:40:51 by burgetr
  */
-package cz.vutbr.fit.layout.tools;
+package cz.vutbr.fit.layout.console;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -25,7 +25,7 @@ import org.jline.reader.UserInterruptException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.vutbr.fit.layout.process.ScriptableProcessor;
+import cz.vutbr.fit.layout.console.process.ScriptableProcessor;
 
 /**
  * 

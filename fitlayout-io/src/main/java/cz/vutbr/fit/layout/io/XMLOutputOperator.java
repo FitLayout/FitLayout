@@ -3,7 +3,7 @@
  *
  * Created on 2. 2. 2015, 13:04:11 by burgetr
  */
-package cz.vutbr.fit.layout.tools.io;
+package cz.vutbr.fit.layout.io;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;

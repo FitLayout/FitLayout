@@ -17,7 +17,7 @@
  *
  * Created on 9.11.2010, 17:31:58 by burgetr
  */
-package cz.vutbr.fit.layout.tools;
+package cz.vutbr.fit.layout.io;
 
 import java.awt.BasicStroke;
 import java.awt.Rectangle;

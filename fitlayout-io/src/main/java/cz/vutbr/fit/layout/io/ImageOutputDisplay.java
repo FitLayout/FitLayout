@@ -3,7 +3,7 @@
  *
  * Created on 16. 11. 2016, 9:53:03 by burgetr
  */
-package cz.vutbr.fit.layout.tools;
+package cz.vutbr.fit.layout.io;
 
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
@@ -15,7 +15,7 @@ import javax.imageio.ImageIO;
  * 
  * @author burgetr
  */
-public class ImageOutputDisplay extends OutputDisplayImpl
+public class ImageOutputDisplay extends Graphics2DDisplay
 {
     private BufferedImage image;
     

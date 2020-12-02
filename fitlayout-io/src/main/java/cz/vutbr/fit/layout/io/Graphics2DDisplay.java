@@ -3,7 +3,7 @@
  *
  * Created on 31. 10. 2014, 13:47:46 by burgetr
  */
-package cz.vutbr.fit.layout.tools;
+package cz.vutbr.fit.layout.io;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -33,14 +33,14 @@ import cz.vutbr.fit.layout.model.Tag;
  * 
  * @author burgetr
  */
-public class OutputDisplayImpl implements OutputDisplay
+public class Graphics2DDisplay implements OutputDisplay
 {
     private Graphics2D g;
     private Color boxLogicalColor = Color.RED;
     private Color boxContentColor = Color.GREEN;
     private Color areaBoundsColor = Color.MAGENTA;
     
-    public OutputDisplayImpl(Graphics2D g)
+    public Graphics2DDisplay(Graphics2D g)
     {
         this.g = g;
     }

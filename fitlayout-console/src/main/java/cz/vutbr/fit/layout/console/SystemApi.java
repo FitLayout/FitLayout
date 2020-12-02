@@ -3,7 +3,7 @@
  *
  * Created on 16. 11. 2016, 9:24:20 by burgetr
  */
-package cz.vutbr.fit.layout.tools;
+package cz.vutbr.fit.layout.console;
 
 import java.io.BufferedReader;
 import java.io.File;

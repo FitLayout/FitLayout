@@ -1,0 +1,51 @@
+<configuration>
+	<!-- <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+		<resetJUL>true</resetJUL>
+	</contextListener> -->
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<!-- <pattern>%-5level %logger{36} - %msg</pattern> -->
+			<pattern>%-5level %logger - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="cz.vutbr.fit.layout" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="cz.vutbr.web.css" additivity="false">
+		<level value="off" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="cz.vutbr.web.csskit" additivity="false">
+		<level value="off" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="cz.vutbr.web.domassign" additivity="false">
+		<level value="off" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="org.eclipse.rdf4j" additivity="false">
+		<level value="info" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="org.apache.http" additivity="false">
+		<level value="info" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="org.eclipse.rdf4j.query.resultio" additivity="false">
+		<level value="info" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<root level="info">
+		<appender-ref ref="STDOUT" />
+	</root>
+</configuration>

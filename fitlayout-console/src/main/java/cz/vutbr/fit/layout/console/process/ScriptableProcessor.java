@@ -3,7 +3,7 @@
  *
  * Created on 14. 1. 2015, 14:52:04 by burgetr
  */
-package cz.vutbr.fit.layout.process;
+package cz.vutbr.fit.layout.console.process;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,11 +33,12 @@ import cz.vutbr.fit.layout.api.OutputDisplay;
 import cz.vutbr.fit.layout.api.ParametrizedOperation;
 import cz.vutbr.fit.layout.api.ScriptObject;
 import cz.vutbr.fit.layout.api.ServiceManager;
+import cz.vutbr.fit.layout.impl.BaseProcessor;
+import cz.vutbr.fit.layout.io.ImageOutputDisplay;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
-import cz.vutbr.fit.layout.model.LogicalAreaTree;
-import cz.vutbr.fit.layout.tools.ImageOutputDisplay;
+import cz.vutbr.fit.layout.model.Page;
 
 /**
  * 
@@ -80,7 +81,7 @@ public class ScriptableProcessor extends BaseProcessor
     {
         ParametrizedOperation op = getServiceManager().findParmetrizedService(serviceName);
         if (op != null)
-            getServiceManager().setServiceParams(op, params);
+            ServiceManager.setServiceParams(op, params);
         else
             log.error("setServiceParams: Unknown service: {}", serviceName);
     }
@@ -120,19 +121,19 @@ public class ScriptableProcessor extends BaseProcessor
     
     /**
      * Draws the current page to an image file.
+     * @param page the page to draw
      * @param path The path to the destination image file.
      */
-    public void drawToImage(String path)
+    public void drawToImage(Page page, String path)
     {
-        /*try
+        try
         {
-            ImageOutputDisplay disp = new ImageOutputDisplay(getPage().getWidth(), getPage().getHeight());
-            disp.drawPage(getPage());
+            ImageOutputDisplay disp = new ImageOutputDisplay(page.getWidth(), page.getHeight());
+            disp.drawPage(page);
             disp.saveTo(path);
         } catch (IOException e) {
             log.error("Couldn't write to " + path + ": " + e.getMessage());
-        }*/
-        //TODO
+        }
     }
     
     /**
@@ -140,18 +141,17 @@ public class ScriptableProcessor extends BaseProcessor
      * @param path The path to the destination image file.
      * @param areaNames A substring of the names of areas that should be marked in the image. When set to {@code null}, all the areas are marked.
      */
-    public void drawToImageWithAreas(String path, String areaNames)
+    public void drawToImageWithAreas(Page page, AreaTree areaTree, String path, String areaNames)
     {
-        /*try
+        try
         {
-            ImageOutputDisplay disp = new ImageOutputDisplay(getPage().getWidth(), getPage().getHeight());
-            disp.drawPage(getPage());
-            showAreas(disp, getAreaTree().getRoot(), areaNames);
+            ImageOutputDisplay disp = new ImageOutputDisplay(page.getWidth(), page.getHeight());
+            disp.drawPage(page);
+            showAreas(disp, areaTree.getRoot(), areaNames);
             disp.saveTo(path);
         } catch (IOException e) {
             log.error("Couldn't write to " + path + ": " + e.getMessage());
-        }*/
-        //TODO
+        }
     }
     
     private void showAreas(OutputDisplay disp, Area root, String nameSubstring)

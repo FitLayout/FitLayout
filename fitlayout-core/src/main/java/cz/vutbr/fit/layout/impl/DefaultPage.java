@@ -45,6 +45,7 @@ public class DefaultPage extends BaseArtifact implements Page
         root = src.getRoot();
         width = src.getWidth();
         height = src.getHeight();
+        pngImage = src.getPngImage();
     }
     
     @Override

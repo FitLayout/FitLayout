@@ -16,7 +16,6 @@ import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.impl.ParameterBoolean;
-import cz.vutbr.fit.layout.impl.ParameterFloat;
 import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.impl.ParameterString;
 import cz.vutbr.fit.layout.model.Artifact;
@@ -34,7 +33,6 @@ public class PuppeteerTreeProvider extends BaseArtifactService
     private String urlstring;
     private int width;
     private int height;
-    private float zoom;
     private boolean useVisualBounds;
     private boolean preserveAux;
     private boolean replaceImagesWithAlt; //not published as a parameter now
@@ -46,7 +44,6 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         urlstring = null;
         width = 1200;
         height = 800;
-        zoom = 1.0f;
         useVisualBounds = true;
         preserveAux = false;
     }
@@ -56,7 +53,6 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         this.urlstring = url.toString();
         this.width = width;
         this.height = height;
-        this.zoom = zoom;
         this.useVisualBounds = useVisualBounds;
         this.preserveAux = preserveAux;
     }
@@ -86,7 +82,6 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         ret.add(new ParameterString("url", 0, 64));
         ret.add(new ParameterInt("width", 10, 9999));
         ret.add(new ParameterInt("height", 10, 9999));
-        ret.add(new ParameterFloat("zoom", -5.0f, 5.0f));
         ret.add(new ParameterBoolean("useVisualBounds"));
         ret.add(new ParameterBoolean("preserveAux"));
         return ret;
@@ -122,16 +117,6 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         this.height = height;
     }
     
-    public float getZoom()
-    {
-        return zoom;
-    }
-
-    public void setZoom(float zoom)
-    {
-        this.zoom = zoom;
-    }
-
     public boolean getUseVisualBounds()
     {
         return useVisualBounds;

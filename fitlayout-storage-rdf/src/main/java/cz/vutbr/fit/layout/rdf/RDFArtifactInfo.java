@@ -74,6 +74,7 @@ public class RDFArtifactInfo extends ArtifactInfo
     {
         a.setIri(getIri());
         a.setParentIri(getParentIri());
+        a.setLabel(getLabel());
         a.setCreatedOn(getCreatedOn());
         a.setCreator(getCreator());
         a.setCreatorParams(getCreatorParams());

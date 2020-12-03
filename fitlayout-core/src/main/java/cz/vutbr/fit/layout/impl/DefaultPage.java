@@ -39,9 +39,10 @@ public class DefaultPage extends BaseArtifact implements Page
     
     public DefaultPage(Page src)
     {
-        super(null);
+        super(null, src);
         url = src.getSourceURL();
-        title = new String(src.getTitle());
+        if (src.getTitle() != null)
+            title = new String(src.getTitle());
         root = src.getRoot();
         width = src.getWidth();
         height = src.getHeight();

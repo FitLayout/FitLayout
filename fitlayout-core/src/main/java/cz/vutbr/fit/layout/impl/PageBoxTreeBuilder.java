@@ -21,7 +21,7 @@ import cz.vutbr.fit.layout.model.Rectangular;
  */
 public class PageBoxTreeBuilder extends BaseBoxTreeBuilder
 {
-    private Page page;
+    private DefaultPage page;
     
 
     public PageBoxTreeBuilder(boolean useVisualBounds, boolean preserveAux)
@@ -29,9 +29,20 @@ public class PageBoxTreeBuilder extends BaseBoxTreeBuilder
         super(useVisualBounds, preserveAux);
     }
 
-    public Page processPage(Page input)
+    /**
+     * Creates the new page from an input page.
+     * @param input the input page
+     * @param the label to be set for the new page
+     * @param creator the creator ID to be set for the new page
+     * @param creatorParams the creator parametres to be set for the new page
+     * @return the new page
+     */
+    public Page processPage(Page input, String label, String creator, String creatorParams)
     {
         page = createTree(input);
+        page.setLabel(label);
+        page.setCreator(creator);
+        page.setCreatorParams(creatorParams);
         return page;
     }
     
@@ -43,9 +54,10 @@ public class PageBoxTreeBuilder extends BaseBoxTreeBuilder
 
     //===================================================================================
     
-    private Page createTree(Page input)
+    private DefaultPage createTree(Page input)
     {
         DefaultPage page = new DefaultPage(input);
+        page.setParentIri(input.getIri());
         //create a copy of the tree and the box list
         List<Box> boxes = new LinkedList<>();
         createBoxTree(page.getRoot(), boxes);

@@ -67,7 +67,12 @@ public class VisualBoxTreeProvider extends BaseArtifactService
     private Page createVisualTree(Page input)
     {
         PageBoxTreeBuilder builder = new PageBoxTreeBuilder(true, false);
-        return builder.processPage(input);
+        String label;
+        if (input.getLabel() == null)
+            label = "[visual tree]";
+        else
+            label = "[V] " + input.getLabel();
+        return builder.processPage(input, label, getId(), null);
     }
 
 }

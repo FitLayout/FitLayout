@@ -32,6 +32,14 @@ public abstract class BaseArtifact implements Artifact
         createdOn = new Date();
     }
 
+    public BaseArtifact(IRI parentIri, Artifact src)
+    {
+        label = (src.getLabel() == null) ? null : new String(src.getLabel());
+        creator = (src.getCreator() == null) ? null : new String(src.getCreator());
+        creatorParams = (src.getCreatorParams() == null) ? null : new String(src.getCreatorParams());
+        createdOn = new Date();
+    }
+    
     @Override
     public IRI getIri()
     {

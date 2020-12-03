@@ -10,6 +10,4 @@ module cz.vutbr.fit.layout.rdf
     
     exports cz.vutbr.fit.layout.rdf;
     exports cz.vutbr.fit.layout.rdf.model;
-    
-    provides cz.vutbr.fit.layout.api.ArtifactService with cz.vutbr.fit.layout.rdf.RDFBoxTreeProvider;
 }

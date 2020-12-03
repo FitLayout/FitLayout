@@ -52,19 +52,24 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
         displayType = DisplayType.BLOCK;
     }
     
-    public DefaultBox(DefaultBox src)
+    public DefaultBox(Box src)
     {
         super(Box.class);
-        visible = src.visible;
-        color = new Color(src.color.getRed(), src.color.getGreen(), src.color.getBlue(), src.color.getAlpha());
-        fontFamily = new String(src.fontFamily);
-        text = new String(src.text);
-        contentObject = src.contentObject;
-        tagName = new String(src.tagName);
-        if (src.attributes != null)
-            attributes = new HashMap<String, String>(src.attributes);
-        type = src.type;
-        displayType = src.displayType;
+        visible = src.isVisible();
+        color = new Color(src.getColor().getRed(), src.getColor().getGreen(), src.getColor().getBlue(), src.getColor().getAlpha());
+        fontFamily = new String(src.getFontFamily());
+        if (src.getOwnText() != null)
+            text = new String(src.getOwnText());
+        contentObject = src.getContentObject();
+        intrinsicBounds = (src.getIntrinsicBounds() == null) ? null : new Rectangular(src.getIntrinsicBounds());
+        contentBounds = (src.getContentBounds() == null) ? null : new Rectangular(src.getContentBounds());
+        visualBounds = (src.getVisualBounds() == null) ? null : new Rectangular(src.getVisualBounds());
+        sourceNodeId = src.getSourceNodeId();
+        tagName = new String(src.getTagName());
+        if (src.getAttributes() != null)
+            attributes = new HashMap<String, String>(src.getAttributes());
+        type = src.getType();
+        displayType = src.getDisplayType();
     }
     
     public int getOrder()

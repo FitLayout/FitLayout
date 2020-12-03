@@ -11,6 +11,7 @@ import java.util.List;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.Page;
+import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
  * A simple box tree builder that takes another page as its input, re-builds the box tree
@@ -45,19 +46,32 @@ public class PageBoxTreeBuilder extends BaseBoxTreeBuilder
     private Page createTree(Page input)
     {
         DefaultPage page = new DefaultPage(input);
-        //create the box list
+        //create a copy of the tree and the box list
         List<Box> boxes = new LinkedList<>();
-        createBoxList(page.getRoot(), boxes);
+        createBoxTree(page.getRoot(), boxes);
+        //use the current values as the intrinsic ones
+        for (Box box : boxes)
+        {
+            ((DefaultBox) box).setIntrinsicParent(box.getParent());
+            ((DefaultBox) box).setIntrinsicBounds(new Rectangular(box.getContentBounds()));
+        }
         //create the new tree
         Box root = buildTree(boxes, Color.WHITE);
         page.setRoot(root);
         return page;
     }
 
-    private void createBoxList(Box root, List<Box> target)
+    /**
+     * Copies a box tree to a new tree. Moreover, the created boxes are stored in a target list.
+     * @param root the subtree root
+     * @param target the taget box list
+     */
+    private Box createBoxTree(Box root, List<Box> target)
     {
+        DefaultBox ret = new DefaultBox(root);
         target.add(root);
         for (Box child : root.getChildren())
-            createBoxList(child, target);
+            ret.appendChild(createBoxTree(child, target));
+        return ret;
     }
 }

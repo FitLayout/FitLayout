@@ -15,7 +15,6 @@ import org.eclipse.rdf4j.model.IRI;
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
-import cz.vutbr.fit.layout.impl.ParameterBoolean;
 import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.impl.ParameterString;
 import cz.vutbr.fit.layout.model.Artifact;
@@ -33,8 +32,6 @@ public class PuppeteerTreeProvider extends BaseArtifactService
     private String urlstring;
     private int width;
     private int height;
-    private boolean useVisualBounds;
-    private boolean preserveAux;
     private boolean replaceImagesWithAlt; //not published as a parameter now
     
     private BoxTreeBuilder builder;
@@ -44,17 +41,13 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         urlstring = null;
         width = 1200;
         height = 800;
-        useVisualBounds = true;
-        preserveAux = false;
     }
     
-    public PuppeteerTreeProvider(URL url, int width, int height, float zoom, boolean useVisualBounds, boolean preserveAux)
+    public PuppeteerTreeProvider(URL url, int width, int height, float zoom)
     {
         this.urlstring = url.toString();
         this.width = width;
         this.height = height;
-        this.useVisualBounds = useVisualBounds;
-        this.preserveAux = preserveAux;
     }
 
     @Override
@@ -82,8 +75,6 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         ret.add(new ParameterString("url", 0, 64));
         ret.add(new ParameterInt("width", 10, 9999));
         ret.add(new ParameterInt("height", 10, 9999));
-        ret.add(new ParameterBoolean("useVisualBounds"));
-        ret.add(new ParameterBoolean("preserveAux"));
         return ret;
     }
     
@@ -117,26 +108,6 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         this.height = height;
     }
     
-    public boolean getUseVisualBounds()
-    {
-        return useVisualBounds;
-    }
-
-    public void setUseVisualBounds(boolean useVisualBounds)
-    {
-        this.useVisualBounds = useVisualBounds;
-    }
-
-    public boolean getPreserveAux()
-    {
-        return preserveAux;
-    }
-
-    public void setPreserveAux(boolean preserveAux)
-    {
-        this.preserveAux = preserveAux;
-    }
-
     public boolean getReplaceImagesWithAlt()
     {
         return replaceImagesWithAlt;
@@ -173,7 +144,7 @@ public class PuppeteerTreeProvider extends BaseArtifactService
 
     public Page getPage() throws IOException, InterruptedException
     {
-        builder = new BoxTreeBuilder(width, height, useVisualBounds, preserveAux);
+        builder = new BoxTreeBuilder(width, height, false, true);
         builder.parse(urlstring);
         PageImpl page = (PageImpl) builder.getPage();
         page.setCreator(getId());

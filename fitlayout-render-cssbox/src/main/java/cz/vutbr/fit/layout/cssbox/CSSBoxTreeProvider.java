@@ -19,7 +19,6 @@ import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.cssbox.impl.CSSBoxTreeBuilder;
 import cz.vutbr.fit.layout.cssbox.impl.PageImpl;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
-import cz.vutbr.fit.layout.impl.ParameterBoolean;
 import cz.vutbr.fit.layout.impl.ParameterFloat;
 import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.impl.ParameterString;
@@ -38,8 +37,6 @@ public class CSSBoxTreeProvider extends BaseArtifactService
     private int width;
     private int height;
     private float zoom;
-    private boolean useVisualBounds;
-    private boolean preserveAux;
     private boolean replaceImagesWithAlt; //not published as a parameter now
     
     private CSSBoxTreeBuilder builder;
@@ -50,18 +47,14 @@ public class CSSBoxTreeProvider extends BaseArtifactService
         width = 1200;
         height = 800;
         zoom = 1.0f;
-        useVisualBounds = true;
-        preserveAux = false;
     }
     
-    public CSSBoxTreeProvider(URL url, int width, int height, float zoom, boolean useVisualBounds, boolean preserveAux)
+    public CSSBoxTreeProvider(URL url, int width, int height, float zoom)
     {
         this.urlstring = url.toString();
         this.width = width;
         this.height = height;
         this.zoom = zoom;
-        this.useVisualBounds = useVisualBounds;
-        this.preserveAux = preserveAux;
     }
 
     @Override
@@ -90,8 +83,6 @@ public class CSSBoxTreeProvider extends BaseArtifactService
         ret.add(new ParameterInt("width", 10, 9999));
         ret.add(new ParameterInt("height", 10, 9999));
         ret.add(new ParameterFloat("zoom", -5.0f, 5.0f));
-        ret.add(new ParameterBoolean("useVisualBounds"));
-        ret.add(new ParameterBoolean("preserveAux"));
         return ret;
     }
     
@@ -135,26 +126,6 @@ public class CSSBoxTreeProvider extends BaseArtifactService
         this.zoom = zoom;
     }
 
-    public boolean getUseVisualBounds()
-    {
-        return useVisualBounds;
-    }
-
-    public void setUseVisualBounds(boolean useVisualBounds)
-    {
-        this.useVisualBounds = useVisualBounds;
-    }
-
-    public boolean getPreserveAux()
-    {
-        return preserveAux;
-    }
-
-    public void setPreserveAux(boolean preserveAux)
-    {
-        this.preserveAux = preserveAux;
-    }
-
     public boolean getReplaceImagesWithAlt()
     {
         return replaceImagesWithAlt;
@@ -189,7 +160,7 @@ public class CSSBoxTreeProvider extends BaseArtifactService
 
     public Page getPage() throws IOException, SAXException
     {
-        builder = new CSSBoxTreeBuilder(new Dimension(width, height), useVisualBounds, preserveAux, replaceImagesWithAlt);
+        builder = new CSSBoxTreeBuilder(new Dimension(width, height), false, true, replaceImagesWithAlt);
         builder.setZoom(zoom);
         builder.parse(urlstring);
         PageImpl page = (PageImpl) builder.getPage();

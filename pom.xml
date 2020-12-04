@@ -54,7 +54,8 @@
 		<module>fitlayout-segm-vips</module>
 		<module>fitlayout-console</module>
 		<module>fitlayout-io</module>
-	</modules>
+    <module>fitlayout-segm-bcs</module>
+  </modules>
 
 	<build>
 		<plugins>

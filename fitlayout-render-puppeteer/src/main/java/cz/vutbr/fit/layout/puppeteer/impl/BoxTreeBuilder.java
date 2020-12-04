@@ -52,6 +52,8 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
     private int width;
     /** Browser window height for rendering */
     private int height;
+    /** Inlcude screen shots? */
+    private boolean includeScreenshot;
     
 
     public BoxTreeBuilder(int width, int height, boolean useVisualBounds, boolean preserveAux)
@@ -59,8 +61,14 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
         super(useVisualBounds, preserveAux);
         this.width = width;
         this.height = height;
+        this.includeScreenshot = true;
     }
     
+    public void setIncludeScreenshot(boolean includeScreenshot)
+    {
+        this.includeScreenshot = includeScreenshot;
+    }
+
     public void parse(String urlstring) throws MalformedURLException, IOException, InterruptedException
     {
         urlstring = urlstring.trim();
@@ -153,7 +161,8 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
         cmds.add("index.js");
         cmds.add("-W" + String.valueOf(width));
         cmds.add("-H" + String.valueOf(height));
-        cmds.add("-s"); //include screenshot
+        if (includeScreenshot)
+            cmds.add("-s"); //include screenshot
         cmds.add(url.toString());
         
         ProcessBuilder pb = new ProcessBuilder(cmds);

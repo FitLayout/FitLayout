@@ -15,6 +15,7 @@ import org.eclipse.rdf4j.model.IRI;
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
+import cz.vutbr.fit.layout.impl.ParameterBoolean;
 import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.impl.ParameterString;
 import cz.vutbr.fit.layout.model.Artifact;
@@ -32,6 +33,7 @@ public class PuppeteerTreeProvider extends BaseArtifactService
     private String urlstring;
     private int width;
     private int height;
+    private boolean includeScreenshot;
     private boolean replaceImagesWithAlt; //not published as a parameter now
     
     private BoxTreeBuilder builder;
@@ -41,13 +43,15 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         urlstring = null;
         width = 1200;
         height = 800;
+        includeScreenshot = true;
     }
     
-    public PuppeteerTreeProvider(URL url, int width, int height, float zoom)
+    public PuppeteerTreeProvider(URL url, int width, int height, float zoom, boolean includeScreenshot)
     {
         this.urlstring = url.toString();
         this.width = width;
         this.height = height;
+        this.includeScreenshot = includeScreenshot;
     }
 
     @Override
@@ -75,6 +79,7 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         ret.add(new ParameterString("url", 0, 64));
         ret.add(new ParameterInt("width", 10, 9999));
         ret.add(new ParameterInt("height", 10, 9999));
+        ret.add(new ParameterBoolean("includeScreenshot"));
         return ret;
     }
     
@@ -108,6 +113,16 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         this.height = height;
     }
     
+    public boolean getIncludeScreenshot()
+    {
+        return includeScreenshot;
+    }
+
+    public void setIncludeScreenshot(boolean includeScreenshot)
+    {
+        this.includeScreenshot = includeScreenshot;
+    }
+
     public boolean getReplaceImagesWithAlt()
     {
         return replaceImagesWithAlt;
@@ -145,6 +160,7 @@ public class PuppeteerTreeProvider extends BaseArtifactService
     public Page getPage() throws IOException, InterruptedException
     {
         builder = new BoxTreeBuilder(width, height, false, true);
+        builder.setIncludeScreenshot(includeScreenshot);
         builder.parse(urlstring);
         PageImpl page = (PageImpl) builder.getPage();
         page.setCreator(getId());

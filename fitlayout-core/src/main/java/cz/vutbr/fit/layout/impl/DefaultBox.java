@@ -396,7 +396,7 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
         {
             return true;
         }
-        //list item boxes with a bullet
+        //list item boxes with a bullet TODO bullet detection
         else if (getDisplayType() == DisplayType.LIST_ITEM)
         {
             return true;

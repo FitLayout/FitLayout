@@ -201,6 +201,8 @@ public abstract class BaseBoxTreeBuilder
             }
             else
             {
+                if (child.getId() == 11 && parent.getId() == 10)
+                    System.out.println("jo!");
                 if (child != this 
                         && visuallyEncloses(parent, child)
                         && (parents.get(i) == null || !visuallyEncloses(parent, parents.get(i)))) 
@@ -249,7 +251,7 @@ public abstract class BaseBoxTreeBuilder
         else
         {
             final int shared = parent.getVisualBounds().intersection(child.getVisualBounds()).getArea();
-            final double sharedperc = (double) shared / child.getBounds().getArea();
+            final double sharedperc = (double) shared / child.getVisualBounds().getArea();
             return parent.getOrder() < child.getOrder() && sharedperc >= AREAP;
         }
     }
@@ -322,10 +324,11 @@ public abstract class BaseBoxTreeBuilder
         }
         else if (box.getType() == Type.ELEMENT)
         {
-            //one border only -- the box represents the border only
+            //one border only -- the box represents the border itself and the contained children
             if (box.getBorderCount() == 1 && !box.isBackgroundSeparated())
             {
-                Rectangular b = box.getIntrinsicBounds();
+                //consider borders
+                final Rectangular b = box.getIntrinsicBounds();
                 if (box.hasTopBorder())
                     ret = new Rectangular(b.getX1(), b.getY1(), b.getX2(), b.getY1() + box.getTopBorder() - 1);
                 else if (box.hasBottomBorder())
@@ -334,6 +337,8 @@ public abstract class BaseBoxTreeBuilder
                     ret = new Rectangular(b.getX1(), b.getY1(), b.getX1() + box.getLeftBorder() - 1, b.getY2());
                 else if (box.hasRightBorder())
                     ret = new Rectangular(b.getX2() - box.getRightBorder() + 1, b.getY1(), b.getX2(), b.getY2());
+                //consider contents
+                ret.expandToEnclose(getMinimalVisualBounds(box));
             }
             //at least two borders or a border and background - take the border bounds
             else if (box.getBorderCount() >= 2 || (box.getBorderCount() == 1 && box.isBackgroundSeparated()))
@@ -341,7 +346,7 @@ public abstract class BaseBoxTreeBuilder
                 ret = new Rectangular(box.getIntrinsicBounds()); //intrinsic bounds should correspond include the border(s)
             }
             //no borders and visually separated
-            else if (box.isBackgroundSeparated())
+            else if (box.isVisuallySeparated())
             {
                 ret = new Rectangular(box.getIntrinsicBounds()); //intrinsic bounds should correspond to background bounds
             }

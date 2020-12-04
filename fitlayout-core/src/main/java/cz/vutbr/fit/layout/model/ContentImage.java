@@ -21,4 +21,10 @@ public interface ContentImage extends ContentObject
      */
     public URL getUrl();
     
+    /**
+     * Gets the PNG data of the image if available.
+     * @return The PNG data or {@code null} when the data is not available.
+     */
+    public byte[] getPngData();
+    
 }

@@ -31,6 +31,7 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
     private IRI pageIri;
     private Rectangular bounds;
     private Color backgroundColor;
+    private byte[] backgroundImagePng;
     private boolean backgroundSeparated;
 
     private TextStyle textStyle;
@@ -102,6 +103,23 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
         this.backgroundColor = backgroundColor;
     }
     
+    @Override
+    public byte[] getBackgroundImagePng()
+    {
+        return backgroundImagePng;
+    }
+
+    @Override
+    public boolean hasBackground()
+    {
+        return (getBackgroundColor() != null) || (getBackgroundImagePng() != null);
+    }
+
+    public void setBackgroundImagePng(byte[] backgroundImagePng)
+    {
+        this.backgroundImagePng = backgroundImagePng;
+    }
+
     @Override
     public boolean isBackgroundSeparated()
     {

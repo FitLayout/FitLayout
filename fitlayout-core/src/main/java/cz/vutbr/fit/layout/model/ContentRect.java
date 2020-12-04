@@ -46,6 +46,19 @@ public interface ContentRect extends Rect
     public Color getBackgroundColor();
 
     /**
+     * Gets the PNG image data of the background image if present. The image should
+     * have the same size as the content bounds. 
+     * @return the image data or {@code null} if no image is present in the background
+     */
+    public byte[] getBackgroundImagePng();
+
+    /**
+     * Checks whether the box has a background color or image.
+     * @return {@code true} when the box has a defined background color or image
+     */
+    public boolean hasBackground();
+
+    /**
      * Gets the text style statistics of the content.
      * @return the text style statistics
      */

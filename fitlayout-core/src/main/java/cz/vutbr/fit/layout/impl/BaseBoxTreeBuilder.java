@@ -201,8 +201,6 @@ public abstract class BaseBoxTreeBuilder
             }
             else
             {
-                if (child.getId() == 11 && parent.getId() == 10)
-                    System.out.println("jo!");
                 if (child != this 
                         && visuallyEncloses(parent, child)
                         && (parents.get(i) == null || !visuallyEncloses(parent, parents.get(i)))) 
@@ -267,7 +265,8 @@ public abstract class BaseBoxTreeBuilder
         Color newbg = root.getBackgroundColor();
         if (newbg == null)
             newbg = currentbg;
-        root.setBackgroundSeparated(!newbg.equals(currentbg));
+        byte[] bgimg = root.getBackgroundImagePng();
+        root.setBackgroundSeparated(!newbg.equals(currentbg) || bgimg != null);
         
         for (int i = 0; i < root.getChildCount(); i++)
             computeBackgrounds(root.getChildAt(i), newbg);

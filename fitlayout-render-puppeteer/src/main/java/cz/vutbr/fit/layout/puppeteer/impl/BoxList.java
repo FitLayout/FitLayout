@@ -118,6 +118,8 @@ public class BoxList
                 final Rectangular parentBounds = newbox.getOffsetParent().getIntrinsicBounds();
                 newbox.getIntrinsicBounds().move(parentBounds.getX1(), parentBounds.getY1());
                 newbox.applyIntrinsicBounds();
+                if (!newbox.getOffsetParent().isVisible())
+                    newbox.setVisible(false);
             }
             //apply clipping when applicable
             if (newbox.getClipBox() != null)

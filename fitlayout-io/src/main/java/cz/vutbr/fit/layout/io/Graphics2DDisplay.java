@@ -14,16 +14,23 @@ import java.awt.Stroke;
 import java.awt.font.TextAttribute;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.text.AttributedString;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
+
 import cz.vutbr.fit.layout.api.OutputDisplay;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Box;
+import cz.vutbr.fit.layout.model.ContentImage;
+import cz.vutbr.fit.layout.model.ContentObject;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
@@ -115,9 +122,23 @@ public class Graphics2DDisplay implements OutputDisplay
         }
         else if (type == Box.Type.REPLACED_CONTENT)
         {
-            g.setColor(toAWTColor(box.getColor()));
-            Rectangular r = box.getBounds();
-            g.drawRect(r.getX1(), r.getY1(), r.getWidth() - 1, r.getHeight() - 1);
+            final ContentObject obj = box.getContentObject();
+            if (obj != null && obj instanceof ContentImage && ((ContentImage) obj).getPngData() != null)
+            {
+                try
+                {
+                    byte[] pngData = ((ContentImage) obj).getPngData();
+                    BufferedImage image = ImageIO.read(new ByteArrayInputStream(pngData));
+                    g.drawImage(image, box.getBounds().getX1(), box.getBounds().getY1(), null);
+                } catch (IOException e) {
+                }
+            }
+            else
+            {
+                g.setColor(toAWTColor(box.getColor()));
+                Rectangular r = box.getBounds();
+                g.drawRect(r.getX1(), r.getY1(), r.getWidth() - 1, r.getHeight() - 1);
+            }
         }
         else //element boxes
         {

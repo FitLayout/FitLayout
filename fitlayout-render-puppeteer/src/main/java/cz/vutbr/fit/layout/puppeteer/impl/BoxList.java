@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.vutbr.fit.layout.impl.DefaultContentImage;
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
@@ -23,6 +25,7 @@ import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.TextStyle;
 import cz.vutbr.fit.layout.puppeteer.parser.Attribute;
 import cz.vutbr.fit.layout.puppeteer.parser.BoxInfo;
+import cz.vutbr.fit.layout.puppeteer.parser.ImageInfo;
 import cz.vutbr.fit.layout.puppeteer.parser.InputFile;
 import cz.vutbr.web.css.CSSException;
 import cz.vutbr.web.css.CSSFactory;
@@ -64,6 +67,8 @@ public class BoxList
     {
         availFonts = Set.of(inputFile.getFonts());
         createBoxList(inputFile);
+        if (inputFile.getImages() != null)
+            loadImages(inputFile.getImages());
     }
 
     /**
@@ -359,6 +364,33 @@ public class BoxList
         } catch (IOException e) {
         }
         return style;
+    }
+    
+    private void loadImages(ImageInfo[] images)
+    {
+        for (ImageInfo img : images)
+        {
+            if (img.getData() != null && img.getBg() != null 
+                    && img.getId() != null && img.getId() >= 0 && img.getId() < boxes.size())
+            {
+                Box box = boxes.get(img.getId());
+                try {
+                    byte[] imgdata = Base64.getDecoder().decode(img.getData());
+                    if (img.getBg())
+                    {
+                        ((BoxImpl) box).setBackgroundImagePng(imgdata);
+                    }
+                    else
+                    {
+                        DefaultContentImage cimg = new DefaultContentImage();
+                        cimg.setPngData(imgdata);
+                        ((BoxImpl) box).setContentObject(cimg);
+                    }
+                } catch (IllegalArgumentException e) {
+                    log.error("Couldn't decode background image for id={}", img.getId());
+                }
+            }
+        }
     }
     
 }

@@ -44,4 +44,11 @@ public class ContentImageImpl implements ContentImage
             return null;
     }
 
+    @Override
+    public byte[] getPngData()
+    {
+        // TODO
+        return null;
+    }
+
 }

@@ -14,6 +14,7 @@ public class InputFile
     public PageInfo page;
     public String[] fonts;
     public BoxInfo[] boxes;
+    public ImageInfo[] images;
     public String screenshot;
     
 
@@ -45,6 +46,16 @@ public class InputFile
     public void setBoxes(BoxInfo[] boxes)
     {
         this.boxes = boxes;
+    }
+
+    public ImageInfo[] getImages()
+    {
+        return images;
+    }
+
+    public void setImages(ImageInfo[] images)
+    {
+        this.images = images;
     }
 
     public String getScreenshot()

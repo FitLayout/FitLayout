@@ -40,4 +40,11 @@ public class DefaultContentImage implements ContentImage
         this.pngData = pngData;
     }
 
+    @Override
+    public String toString()
+    {
+        return "DefaultContentImage [url=" + url + ", data="
+                + ((pngData == null) ? "null" : (pngData.length + " bytes")) + "]";
+    }
+
 }

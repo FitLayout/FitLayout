@@ -150,6 +150,15 @@ public class Graphics2DDisplay implements OutputDisplay
                 g.setColor(bg);
                 g.fillRect(r.getX1(), r.getY1(), r.getWidth() - 1, r.getHeight() - 1);
             }
+            //background image
+            if (box.getBackgroundImagePng() != null)
+            {
+                try {
+                    final BufferedImage image = ImageIO.read(new ByteArrayInputStream(box.getBackgroundImagePng()));
+                    g.drawImage(image, r.getX1(), r.getY1(), null);
+                } catch (IOException e) {
+                }
+            }
             //borders
             Stroke oldStroke = g.getStroke();
             if (box.hasTopBorder())

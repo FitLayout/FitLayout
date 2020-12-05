@@ -131,6 +131,10 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		{
             graph.add(individual, BOX.backgroundColor, vf.createLiteral(Serialization.colorString(box.getBackgroundColor())));
 		}
+		if (box.getBackgroundImagePng() != null)
+		{
+		    graph.add(individual, BOX.backgroundImageData, vf.createLiteral(Base64.getEncoder().encodeToString(box.getBackgroundImagePng())));
+		}
 
 		// add text content into element
 		if (box.getType() == Type.TEXT_CONTENT) 
@@ -149,6 +153,9 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
                 java.net.URL url = ((ContentImage) obj).getUrl();
                 if (url != null)
                     graph.add(objuri, BOX.imageUrl, vf.createLiteral(url.toString()));
+                byte[] imageData = ((ContentImage) obj).getPngData();
+                if (imageData != null)
+                    graph.add(objuri, BOX.imageData, vf.createLiteral(Base64.getEncoder().encodeToString(imageData)));
                 graph.add(individual, BOX.containsImage, objuri);
             }
             else

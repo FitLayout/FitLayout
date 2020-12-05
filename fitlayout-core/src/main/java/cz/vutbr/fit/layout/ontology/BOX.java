@@ -24,6 +24,13 @@ public class BOX {
 	public static final IRI backgroundColor;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#backgroundImageData}.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#backgroundImageData">backgroundImageData</a>
+	 */
+	public static final IRI backgroundImageData;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#backgroundImagePosition}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#backgroundImagePosition">backgroundImagePosition</a>
@@ -248,6 +255,13 @@ public class BOX {
 	public static final IRI Image;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#imageData}.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#imageData">imageData</a>
+	 */
+	public static final IRI imageData;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#imageUrl}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#imageUrl">imageUrl</a>
@@ -365,6 +379,7 @@ public class BOX {
 		ValueFactory factory = SimpleValueFactory.getInstance();
 
 		backgroundColor = factory.createIRI(BOX.NAMESPACE, "backgroundColor");
+		backgroundImageData = factory.createIRI(BOX.NAMESPACE, "backgroundImageData");
 		backgroundImagePosition = factory.createIRI(BOX.NAMESPACE, "backgroundImagePosition");
 		backgroundImageUrl = factory.createIRI(BOX.NAMESPACE, "backgroundImageUrl");
 		belongsTo = factory.createIRI(BOX.NAMESPACE, "belongsTo");
@@ -396,6 +411,7 @@ public class BOX {
 		height = factory.createIRI(BOX.NAMESPACE, "height");
 		htmlTagName = factory.createIRI(BOX.NAMESPACE, "htmlTagName");
 		Image = factory.createIRI(BOX.NAMESPACE, "Image");
+		imageData = factory.createIRI(BOX.NAMESPACE, "imageData");
 		imageUrl = factory.createIRI(BOX.NAMESPACE, "imageUrl");
 		isChildOf = factory.createIRI(BOX.NAMESPACE, "isChildOf");
 		lineThrough = factory.createIRI(BOX.NAMESPACE, "lineThrough");

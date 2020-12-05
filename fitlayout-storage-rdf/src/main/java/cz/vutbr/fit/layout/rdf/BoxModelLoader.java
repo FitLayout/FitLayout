@@ -8,6 +8,7 @@ package cz.vutbr.fit.layout.rdf;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,6 +170,15 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             else if (BOX.backgroundImageUrl.equals(pred)) 
             {
             }
+            else if (BOX.backgroundImageData.equals(pred)) 
+            {
+                String dataStr = value.stringValue();
+                try {
+                    box.setBackgroundImagePng(Base64.getDecoder().decode(dataStr));
+                } catch (IllegalArgumentException e) {
+                    box.setBackgroundImagePng(null);
+                }
+            }
             else if (BOX.color.equals(pred)) 
             {
                 box.setColor(Serialization.decodeHexColor(value.stringValue()));
@@ -248,15 +258,25 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                 if (value instanceof IRI)
                 {
                     RDFContentImage obj = new RDFContentImage((IRI) value);
-                    Value val = storage.getPropertyValue((IRI) value, BOX.imageUrl);
-                    if (val != null && val instanceof Literal)
+                    Value urlVal = storage.getPropertyValue((IRI) value, BOX.imageUrl);
+                    if (urlVal != null && urlVal instanceof Literal)
                     {
                         try {
-                            obj.setUrl(((Literal) val).stringValue());
+                            obj.setUrl(((Literal) urlVal).stringValue());
                         } catch (MalformedURLException e) {
                             log.error(e.getMessage());
                         }
-                    }   
+                    }
+                    Value dataVal = storage.getPropertyValue((IRI) value, BOX.imageData);
+                    if (dataVal != null && dataVal instanceof Literal)
+                    {
+                        final String dataStr = dataVal.stringValue();
+                        try {
+                            obj.setPngData(Base64.getDecoder().decode(dataStr));
+                        } catch (IllegalArgumentException e) {
+                            obj.setPngData(null);
+                        }
+                    }
                     box.setContentObject(obj);
                 }
             }

@@ -20,6 +20,7 @@ import cz.vutbr.fit.layout.model.ContentImage;
 public class RDFContentImage extends RDFContentObject implements ContentImage
 {
     private URL url;
+    private byte[] pngData;
 
     public RDFContentImage(IRI iri)
     {
@@ -43,12 +44,21 @@ public class RDFContentImage extends RDFContentObject implements ContentImage
     }
     
     @Override
+    public byte[] getPngData()
+    {
+        return pngData;
+    }
+
+    public void setPngData(byte[] pngData)
+    {
+        this.pngData = pngData;
+    }
+
+    @Override
     public String toString()
     {
-        if (url != null)
-            return "img: " + url.toString();
-        else
-            return "img: no url";
+        return "RDFContentImage [url=" + url + ", data="
+                + ((pngData == null) ? "null" : (pngData.length + " bytes")) + "]";
     }
     
 }

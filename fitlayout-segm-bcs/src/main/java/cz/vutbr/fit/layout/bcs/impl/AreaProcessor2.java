@@ -1,7 +1,5 @@
 package cz.vutbr.fit.layout.bcs.impl;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,34 +8,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.infomatiq.jsi.Rectangle;
 import com.infomatiq.jsi.SpatialIndex;
 import com.infomatiq.jsi.rtree.RTree;
 
 import gnu.trove.TIntProcedure;
 
-class AreaMatch implements TIntProcedure
-{
-    private final ArrayList<Integer> ids;
-
-    public AreaMatch()
-    {
-        this.ids = new ArrayList<>();
-    }
-
-    @Override
-    public boolean execute(int id) {
-        ids.add(id);
-        return true;
-    }
-
-    public ArrayList<Integer> getIds() {
-        return ids;
-    }
-};
-
 public class AreaProcessor2
 {
+    private static Logger log = LoggerFactory.getLogger(AreaProcessor2.class);
+
     private boolean DEBUG = false;
     private final ArrayList<PageArea> areas;
 
@@ -54,9 +37,8 @@ public class AreaProcessor2
 
     private final StopWatch time;
 
-    private BufferedWriter log;
 
-    public AreaProcessor2(ArrayList<PageArea> areas, int width, int height) throws IOException
+    public AreaProcessor2(List<PageArea> areas, int width, int height) throws IOException
     {
         Collections.sort(areas, new AreaSizeComparator());
         /* Note: we store only leaf areas */
@@ -94,7 +76,7 @@ public class AreaProcessor2
         this.DEBUG = d;
     }
 
-    private void buildHierarchy(ArrayList<PageArea> areas)
+    private void buildHierarchy(List<PageArea> areas)
     {
         ArrayList<PageArea> pool = new ArrayList<>();
         ArrayList<PageArea> deleteList = new ArrayList<>();
@@ -126,7 +108,7 @@ public class AreaProcessor2
         return this.areas;
     }
 
-    private void extractLeafAreas(ArrayList<PageArea> areas)
+    private void extractLeafAreas(List<PageArea> areas)
     {
         this.areas.clear();
         for (PageArea a: areas)
@@ -156,15 +138,10 @@ public class AreaProcessor2
         return this.groupMap;
     }
 
-    public ArrayList<PageArea> extractGroups(List<PageArea> areas) throws Exception
+    public List<PageArea> extractGroups(List<PageArea> areas)
     {
         ArrayList<PageAreaRelation> relations;
         ArrayList<PageArea> ret = new ArrayList<>();
-        FileWriter fstream;
-
-        if (DEBUG) fstream = new FileWriter("out.txt");
-        else fstream = new FileWriter("/dev/null");
-        this.log = new BufferedWriter(fstream);
 
         relations = this.getAreaGraph(areas);
         this.locateGroups(relations);
@@ -182,12 +159,11 @@ public class AreaProcessor2
                 this.ungrouped.add(area);
             }
         }
-        this.log.close();
 
         return ret;
     }
 
-    private void locateGroups(ArrayList<PageAreaRelation> relations) throws Exception
+    private void locateGroups(ArrayList<PageAreaRelation> relations)
     {
         PageArea a, b;
         int v1, v2, vsum, groupCnt;
@@ -214,7 +190,7 @@ public class AreaProcessor2
 
             if (relations.size() == 0 && a.getParent() == null && b.getParent() == null) break;
 
-            if (DEBUG) this.log.write("Picked "+relation.toString()+"\n");
+            if (DEBUG) log.debug("Picked "+relation.toString()+"\n");
 
             v1 = a.getAreaCount();
             v2 = b.getAreaCount();
@@ -230,12 +206,12 @@ public class AreaProcessor2
             {
                 if (similarity <= threshold && !mergeTest)
                 {
-                    if (DEBUG) this.log.write("Merge attempt failed\n");
+                    if (DEBUG) log.debug("Merge attempt failed\n");
                     mtRelations.add(relation);
                 }
                 else if (similarity >= threshold)
                 {
-                    if (DEBUG) this.log.write("Similarity comparison failed: "+similarity+" >= "+threshold+"\n");
+                    if (DEBUG) log.debug("Similarity comparison failed: "+similarity+" >= "+threshold+"\n");
                 }
                 if (relations.size() == 0 && mtRelations.size() < relCnt)
                 {
@@ -248,7 +224,7 @@ public class AreaProcessor2
 
             group = this.createGroup(a, b);
             mergeCandidates.clear();
-            if (DEBUG) this.log.write("Group: "+group.getTop()+"-"+group.getLeft()+"("+group.getWidth()+"x"+group.getHeight()+") - ("+v1+", "+v2+")\n");
+            if (DEBUG) log.debug("Group: "+group.getTop()+"-"+group.getLeft()+"("+group.getWidth()+"x"+group.getHeight()+") - ("+v1+", "+v2+")\n");
 
             match = new AreaMatch();
             this.groupTree.intersects(group.getRectangle(), match);
@@ -269,11 +245,11 @@ public class AreaProcessor2
 
                 if (area_overlap)
                 {
-                    if (DEBUG) this.log.write("overlap = true; vsum = "+vsum+"; matches = "+match.getIds().size()+"\n");
+                    if (DEBUG) log.debug("overlap = true; vsum = "+vsum+"; matches = "+match.getIds().size()+"\n");
                     /* First try to include all those overlapping areas in the group */
                     if (!this.growGroup(group, match.getIds(), mergeCandidates))
                     {
-                        if (DEBUG) this.log.write("group grow failed\n");
+                        if (DEBUG) log.debug("group grow failed\n");
                         a.reclaimChildren();
                         b.reclaimChildren();
                         group.giveUpChildren();
@@ -282,20 +258,20 @@ public class AreaProcessor2
                     else
                     {
                         vsum = group.getChildren().size()+mergeCandidates.size();
-                        if (DEBUG) this.log.write("updated vsum: " + vsum+"\n");
+                        if (DEBUG) log.debug("updated vsum: " + vsum+"\n");
                     }
                 }
                 else
                 {
-                    if (DEBUG) this.log.write("overlap = false; vsum = "+vsum+"; matches = "+match.getIds().size()+"\n");
+                    if (DEBUG) log.debug("overlap = false; vsum = "+vsum+"; matches = "+match.getIds().size()+"\n");
                     if (mergeCandidates.size() > 0)
                     {
                         /* The group can't be expanded more by overlapping children,
                          * try to merge those areas that might be somewhere in between them */
-                        if (DEBUG) this.log.write("trying to merge group "+group.toString()+" and "+mergeCandidates.size()+" candidates\n");
+                        if (DEBUG) log.debug("trying to merge group "+group.toString()+" and "+mergeCandidates.size()+" candidates\n");
                         if (!this.tryMerge(group, mergeCandidates))
                         {
-                            if (DEBUG) this.log.write("merging failed\n");
+                            if (DEBUG) log.debug("merging failed\n");
                             a.reclaimChildren();
                             b.reclaimChildren();
                             group.giveUpChildren();
@@ -311,7 +287,7 @@ public class AreaProcessor2
             if (!area_overlap)
             {
                 /* Now we have to add children completely */
-                if (DEBUG) this.log.write("Final Group: "+group.getTop()+"-"+group.getLeft()+"("+group.getWidth()+"x"+group.getHeight()+")\n");
+                if (DEBUG) log.debug("Final Group: "+group.getTop()+"-"+group.getLeft()+"("+group.getWidth()+"x"+group.getHeight()+")\n");
                 this.transferNeighbors(a, b, group);
                 this.transferRelations(a, b, group, relations);
                 if (a.getId() != null) this.groupMap.remove(a.getId());
@@ -334,7 +310,7 @@ public class AreaProcessor2
         System.out.println(this.time.getTotal()/1000000 + " ms");
     }
 
-    private boolean growGroup(PageArea group, ArrayList<Integer> matches, ArrayList<PageArea> mergeCandidates) throws IOException
+    private boolean growGroup(PageArea group, ArrayList<Integer> matches, ArrayList<PageArea> mergeCandidates)
     {
         boolean merged = true;
         PageArea area;
@@ -357,10 +333,10 @@ public class AreaProcessor2
             for (int i = 0 ; i < areas.size() ; i++)
             {
                 area = areas.get(i);
-                if (DEBUG) this.log.write("area test for merge: "+area.toString());
+                if (DEBUG) log.debug("area test for merge: "+area.toString());
                 if (area.getParent() == group)
                 {
-                    if (DEBUG) this.log.write(" (already in the group)\n");
+                    if (DEBUG) log.debug(" (already in the group)\n");
                     areas.remove(i);
                     i--;
                     continue;
@@ -368,7 +344,7 @@ public class AreaProcessor2
                 else if (area.getParent() != null)
                 {
                     /* This belongs to another group - that's a show stopper */
-                    if (DEBUG) this.log.write(" (belongs to another group)\n");
+                    if (DEBUG) log.debug(" (belongs to another group)\n");
                     return false;
                 }
                 else
@@ -379,7 +355,7 @@ public class AreaProcessor2
                         {
                             merged = true;
                             group.addChild(area);
-                            if (DEBUG) this.log.write(" (merged - overlap)\n");
+                            if (DEBUG) log.debug(" (merged - overlap)\n");
                             break;
                         }
                     }
@@ -396,7 +372,7 @@ public class AreaProcessor2
                         {
                             mergeCandidates.add(area);
                         }
-                        if (DEBUG) this.log.write(" (not merged)\n");
+                        if (DEBUG) log.debug(" (not merged)\n");
                     }
                 }
             }
@@ -405,7 +381,7 @@ public class AreaProcessor2
         return true;
     }
 
-    private boolean tryMerge(PageArea group, ArrayList<PageArea> areas) throws IOException
+    private boolean tryMerge(PageArea group, ArrayList<PageArea> areas)
     {
         PageArea tmpArea;
         PageArea mark;
@@ -418,13 +394,13 @@ public class AreaProcessor2
 
         for (PageArea area: areas)
         {
-            if (DEBUG) this.log.write("candidate: "+area.toString());
+            if (DEBUG) log.debug("candidate: "+area.toString());
             mark = new PageArea(tmpGroup);
             tmpGroup.addChild(area, true);
             if (group.contains(tmpGroup))
             {
                 /* The new area doesn't make the group expand - it can be added */
-                if (DEBUG) this.log.write(" is within the group\n");
+                if (DEBUG) log.debug(" is within the group\n");
                 group.addChild(area);
                 candidateCnt--;
             }
@@ -445,7 +421,7 @@ public class AreaProcessor2
                         if (tmpArea.getDistanceAbsolute(mark) <= 1)
                         {
                             mergeList.add(area);
-                            if (DEBUG) this.log.write(" brings new adjacent box\n");
+                            if (DEBUG) log.debug(" brings new adjacent box\n");
                             merge = true;
                             break;
                         }
@@ -453,7 +429,7 @@ public class AreaProcessor2
 
                     if (!merge)
                     {
-                        if (DEBUG) this.log.write(" would bring more boxes to the group\n");
+                        if (DEBUG) log.debug(" would bring more boxes to the group\n");
                         return false;
                     }
                 }
@@ -461,7 +437,7 @@ public class AreaProcessor2
                 {
                     /* Adding the area to the group extended the group but
                      * it didn't bring in any new areas */
-                    if (DEBUG) this.log.write(" expands the group but can be included\n");
+                    if (DEBUG) log.debug(" expands the group but can be included\n");
                     group.addChild(area);
                     candidateCnt--;
                 }
@@ -470,7 +446,7 @@ public class AreaProcessor2
 
         for (PageArea a: mergeList)
         {
-            if (DEBUG) this.log.write("merging "+a.toString()+"\n");
+            if (DEBUG) log.debug("merging "+a.toString()+"\n");
             group.addChild(a);
         }
 
@@ -580,7 +556,7 @@ public class AreaProcessor2
         else return false;
     }
 
-    private void transferRelations(PageArea oldGroup1, PageArea oldGroup2, PageArea newGroup, List<PageAreaRelation> relations) throws IOException
+    private void transferRelations(PageArea oldGroup1, PageArea oldGroup2, PageArea newGroup, List<PageAreaRelation> relations)
     {
         int i;
         PageAreaRelation rel;
@@ -612,7 +588,7 @@ public class AreaProcessor2
                     /* This is a corner case that both endpoints
                      * of the relation are in the new group */
                     // TODO: do some recalculations here like H/V edge count
-                    if (DEBUG) this.log.write("remove "+rel.toString()+" (within group)\n");
+                    if (DEBUG) log.debug("remove "+rel.toString()+" (within group)\n");
                     if (rel.getDirection() == PageAreaRelation.DIRECTION_HORIZONTAL)
                     {
                         newGroup.addHEdgeCount(rel.getCardinality());
@@ -645,7 +621,7 @@ public class AreaProcessor2
                     bestRel.setCardinality(rel.getCardinality());
                     tmpRelations.put(candidate, bestRel);
                 }
-                if (DEBUG) this.log.write("remove "+rel.toString()+"\n");
+                if (DEBUG) log.debug("remove "+rel.toString()+"\n");
                 relations.remove(i); /* Using "i" here instead of "rel" boosts perf. (6s -> 2.5s) */
                 i--; // since we removed the relation, we need to scan the one that took its place
             }
@@ -821,8 +797,30 @@ public class AreaProcessor2
         }
     }
 
-    public ArrayList<PageArea> getUngrouped()
+    public List<PageArea> getUngrouped()
     {
         return this.ungrouped;
     }
 }
+
+class AreaMatch implements TIntProcedure
+{
+    private final ArrayList<Integer> ids;
+
+    public AreaMatch()
+    {
+        this.ids = new ArrayList<>();
+    }
+
+    @Override
+    public boolean execute(int id) 
+    {
+        ids.add(id);
+        return true;
+    }
+
+    public ArrayList<Integer> getIds() 
+    {
+        return ids;
+    }
+};

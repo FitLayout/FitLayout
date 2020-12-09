@@ -1,14 +1,15 @@
 package cz.vutbr.fit.layout.bcs.impl;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.w3c.dom.Node;
-
 import com.infomatiq.jsi.Rectangle;
+
+import cz.vutbr.fit.layout.model.Box;
+import cz.vutbr.fit.layout.model.Color;
+import cz.vutbr.fit.layout.model.Rectangular;
 
 public class PageArea
 {
@@ -31,7 +32,7 @@ public class PageArea
     private int vEdgeCount;
     private int hEdgeCount;
 
-    private Node node;
+    private Box node;
 
     public static final int ALIGNMENT_NONE = 0;
     public static final int ALIGNMENT_LINE = 1;
@@ -50,13 +51,13 @@ public class PageArea
     public static final double MAX_DIFF_LAB = 258.68384120267046;
     public static final double MAX_DIFF_LCH = 149.93691702034678;
 
-    public PageArea(Color c, int l, int t, int r, int b)
+    public PageArea(Color c, Rectangular rect)
     {
         this.color = c;
-        this.left = l;
-        this.top = t;
-        this.right = r;
-        this.bottom = b;
+        this.left = rect.getX1();
+        this.top = rect.getY1();
+        this.right = rect.getX2();
+        this.bottom = rect.getY2();
         this.children = new ArrayList<>();
         this.neighbors = new HashMap<>();
         this.maxNeighborDistance = 0;
@@ -104,7 +105,7 @@ public class PageArea
     public void setId(int top, int left)
     {
         // TODO: this can cause problems if the page is wider than 9999px
-        this.id = new Integer(top*10000+left);
+        this.id = (top * 10000 + left);
     }
 
     public void calculateId()
@@ -846,12 +847,12 @@ public class PageArea
         return !(this.isColumn() || this.isRow());
     }
 
-    public Node getNode()
+    public Box getNode()
     {
         return node;
     }
 
-    public void setNode(Node node)
+    public void setNode(Box node)
     {
         this.node = node;
     }

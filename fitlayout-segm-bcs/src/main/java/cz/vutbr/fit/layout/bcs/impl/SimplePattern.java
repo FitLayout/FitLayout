@@ -1,7 +1,8 @@
 package cz.vutbr.fit.layout.bcs.impl;
 
-import java.awt.Color;
 import java.util.ArrayList;
+
+import cz.vutbr.fit.layout.model.Color;
 
 public class SimplePattern
 {

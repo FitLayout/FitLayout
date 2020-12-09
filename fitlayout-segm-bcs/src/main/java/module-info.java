@@ -5,6 +5,8 @@ module cz.vutbr.fit.layout.vips
 
     requires transitive cz.vutbr.fit.layout.core;
     requires rdf4j.onejar;
+    requires jsi;
+    requires trove4j;
     
     exports cz.vutbr.fit.layout.bcs;
 

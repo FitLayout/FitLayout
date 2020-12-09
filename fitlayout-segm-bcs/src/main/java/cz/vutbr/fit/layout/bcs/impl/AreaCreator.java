@@ -1,25 +1,22 @@
 package cz.vutbr.fit.layout.bcs.impl;
 
-import java.awt.Color;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 
-import org.fit.cssbox.layout.BackgroundImage;
-import org.fit.cssbox.layout.Box;
-import org.fit.cssbox.layout.ContentImage;
-import org.fit.cssbox.layout.ElementBox;
-import org.fit.cssbox.layout.ReplacedBox;
-import org.fit.cssbox.layout.TextBox;
-import org.fit.pis.cssbox.AverageColor;
+import javax.imageio.ImageIO;
 
 import com.infomatiq.jsi.SpatialIndex;
 import com.infomatiq.jsi.rtree.RTree;
 
-import cz.vutbr.web.css.CSSProperty.TextDecoration;
+import cz.vutbr.fit.layout.model.Box;
+import cz.vutbr.fit.layout.model.Box.Type;
+import cz.vutbr.fit.layout.model.Color;
+import cz.vutbr.fit.layout.model.ContentImage;
+import cz.vutbr.fit.layout.model.Rectangular;
 
 public class AreaCreator
 {
@@ -36,7 +33,7 @@ public class AreaCreator
         this.pageHeight = h;
     }
 
-    public ArrayList<PageArea> getAreas(ElementBox root)
+    public ArrayList<PageArea> getAreas(Box root)
     {
         ArrayList<PageArea> ret;
 
@@ -46,7 +43,7 @@ public class AreaCreator
         this.mask = new HashSet<>();
         ret = new ArrayList<>();
 
-        this.getAreasSubtree(root, Color.white);
+        this.getAreasSubtree(root, Color.WHITE);
 
         for (int index = 0; index < this.areas.size(); index++) {
             if (this.mask.contains(index)) {
@@ -60,18 +57,11 @@ public class AreaCreator
         return ret;
     }
 
-    private void getAreasSubtree(ElementBox root, Color parentBg)
+    private void getAreasSubtree(Box root, Color parentBg)
     {
-        Box child;
-        int i;
-        int start, end;
-        Color bgColor;
+        Color bgColor = this.getBgColor(root, parentBg);
 
-        start = root.getStartChild();
-        end = root.getEndChild();
-        bgColor = this.getBgColor(root, parentBg);
-
-        if (start == end)
+        if (root.getChildCount() == 0)
         {
             /* No children */
             if (!this.isTransparent(root))
@@ -80,18 +70,18 @@ public class AreaCreator
             }
             return;
         }
-        else if (start+1 == end)
+        else if (root.getChildCount() == 1)
         {
             // figure out if this line of "one child" continues to the bottom of tree
-            child = root.getSubBox(start);
-            if (child instanceof TextBox)
+            final Box child = root.getChildAt(0);
+            if (child.getType() == Type.TEXT_CONTENT)
             {
-                this.getTextArea((TextBox)child, bgColor);
+                this.getTextArea(child, bgColor);
                 return;
             }
             else
             {
-                if (this.hasNoBranches((ElementBox)child))
+                if (this.hasNoBranches(child))
                 {
                     this.getSmallestBox(root, parentBg);
                     return;
@@ -102,38 +92,36 @@ public class AreaCreator
         }
 
         /* Recurse to the rest of the tree */
-        for (i = root.getStartChild(); i < root.getEndChild(); i++)
+        for (Box child : root.getChildren())
         {
-            child = root.getSubBox(i);
-            if (child instanceof TextBox)
+            if (child.getType() == Type.TEXT_CONTENT)
             {
-                this.getTextArea((TextBox)child, bgColor);
+                this.getTextArea(child, bgColor);
             }
-            else if (child instanceof ReplacedBox)
+            else if (child.getType() == Type.REPLACED_CONTENT)
             {
-                this.getImageArea((ReplacedBox)child, child.getAbsoluteContentBounds());
+                this.getImageArea(child, child.getContentBounds());
             }
             else
             {
-                this.getAreasSubtree((ElementBox)child, bgColor);
+                this.getAreasSubtree(child, bgColor);
             }
         }
     }
 
-    private boolean hasNoBranches(ElementBox root)
+    private boolean hasNoBranches(Box root)
     {
-        int start, end;
-        Box child;
-
-        start = root.getStartChild();
-        end = root.getEndChild();
-
-        if (start == end) return true;
-        else if (start+1 == end)
+        if (root.getChildCount() == 0)
         {
-            child = root.getSubBox(start);
-            if (child instanceof TextBox) return true;
-            else return hasNoBranches((ElementBox)child);
+            return true;
+        }
+        else if (root.getChildCount() == 1)
+        {
+            final Box child = root.getChildAt(0);
+            if (child.getType() == Type.TEXT_CONTENT)
+                return true;
+            else
+                return hasNoBranches(child);
         }
         else
         {
@@ -141,237 +129,243 @@ public class AreaCreator
         }
     }
 
-    private void getSmallestBox(ElementBox root, Color parentBg)
+    private void getSmallestBox(Box root, Color parentBg)
     {
-        int start, end;
-        Box child;
-        Color bgColor;
-
-
-        start = root.getStartChild();
-        end = root.getEndChild();
-
-        if (start == end)
+        if (root.getChildCount() == 0)
         {
             /* No children - we have to return this one */
             this.getArea(root, parentBg);
         }
         else
         {
-            child = root.getSubBox(start);
-            bgColor = this.getBgColor(root, parentBg);
-            if (child instanceof TextBox)
+            final Box child = root.getChildAt(0);
+            final Color bgColor = this.getBgColor(root, parentBg);
+            if (child.getType() == Type.TEXT_CONTENT)
             {
-                this.getTextArea((TextBox)child, bgColor);
+                this.getTextArea(child, bgColor);
             }
-            else if (child instanceof ReplacedBox)
+            else if (child.getType() == Type.REPLACED_CONTENT)
             {
-                this.getImageArea((ReplacedBox)child, child.getAbsoluteContentBounds());
+                this.getImageArea(child, child.getContentBounds());
             }
             else
             {
                 if (this.isTransparent(root))
                 {
-                    getSmallestBox((ElementBox)child, parentBg);
+                    getSmallestBox(child, parentBg);
                 }
                 else
                 {
-                    this.getArea((ElementBox)child, parentBg);
+                    this.getArea(child, parentBg);
                 }
             }
         }
     }
 
-    private Color getBgColor(ElementBox box, Color parentBg)
+    private Color getBgColor(Box box, Color parentBg)
     {
-        List<BackgroundImage> images;
-        BufferedImage bgImg;
-        Color color;
-        AverageColor imgColor;
+        BufferedImage bgImg = getBackgroundImage(box);
+        Color color = box.getBackgroundColor();
 
-        images = box.getBackgroundImages();
-        color = box.getBgcolor();
         if (color == null)
         { /* BG is transparent - use the color of the parent */
             color = parentBg;
         }
 
-        if (images != null && images.size() > 0)
+        if (bgImg != null)
         {
-            bgImg = images.get(images.size()-1).getBufferedImage();
-            if (bgImg == null)
-            {
-                imgColor = new AverageColor(Color.white, 1);
-            }
+            AverageColor imgColor = new AverageColor(bgImg);
+            if (imgColor.getColor() != null)
+                return imgColor.mixWithBackground(color);
             else
-            {
-                imgColor = new AverageColor(bgImg);
-            }
-            if (imgColor.getColor() == null) return color; //an empty image?
+                return color;
             /* DOC: mixing color of bg image with bg
              * - more precise -> if the bg is small compared to the box, it won't be so visual distinct
              * - also consider not mixing (original functionality)
              *   -> gives more distinct outline of the box
              *   -> even if small, the bg image may be used to visually higlight the box
              */
-
-            return imgColor.mixWithBackground(color);
         }
-
-        return color;
+        else
+            return color;
     }
 
-    private boolean isTransparent(ElementBox box)
+    private BufferedImage getBackgroundImage(Box box)
     {
-        List<BackgroundImage> images;
-        Color color;
-
-        images = box.getBackgroundImages();
-        color = box.getBgcolor();
-
-        return (color == null && (images == null || images.size() == 0));
+        if (box.getBackgroundImagePng() != null)
+        {
+            try {
+                final BufferedImage image = ImageIO.read(new ByteArrayInputStream(box.getBackgroundImagePng()));
+                return image;
+            } catch (IOException e) {
+                return null;
+            }
+        }
+        else
+            return null;
+    }
+    
+    private BufferedImage getContentImage(Box box)
+    {
+        if (box.getContentObject() != null && box.getContentObject() instanceof ContentImage)
+        {
+            final ContentImage img = (ContentImage) box.getContentObject();
+            if (img.getPngData() != null)
+            {
+                try {
+                    final BufferedImage image = ImageIO.read(new ByteArrayInputStream(img.getPngData()));
+                    return image;
+                } catch (IOException e) {
+                    return null;
+                }
+            }
+            else
+                return null;
+        }
+        else
+            return null;
+    }
+    
+    private boolean isTransparent(Box box)
+    {
+        return !box.hasBackground();
     }
 
-    private void getTextArea(TextBox box, Color bgColor)
+    private void getTextArea(Box box, Color bgColor)
     {
-        Color color;
+        /*Color color;
         float []hsb;
         float []bgHsb;
         int white_multiplier;
         int hsb_index;
-        PageArea area;
-        java.awt.Rectangle pos = box.getAbsoluteContentBounds();
-
-        color = box.getVisualContext().getColor();
-        hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
-
-        /* DOC: white and grey need special treatment */
-        if (hsb[1] == 0)
+        PageArea area;*/
+        int white_multiplier;
+        int hsb_index;
+        Rectangular pos = box.getContentBounds();
+        
+        if (onPage(pos))
         {
-            if (hsb[2] == 1)
+            Color color = box.getColor();
+            float[] hsb = java.awt.Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
+    
+            /* DOC: white and grey need special treatment */
+            if (hsb[1] == 0)
             {
-                /* The text is white, we want to get the color of background ... */
-
-                bgHsb = Color.RGBtoHSB(bgColor.getRed(), bgColor.getGreen(), bgColor.getBlue(), null);
-                hsb[0] = bgHsb[0];
-
-                /* ... we want to slightly modify the initial value (so bold can be actually emphasized) ... */
-                hsb[1] = (float)0.2;
-
-                /* ... we want to modify saturation ... */
-                hsb_index = 1;
-                /* ... and we want to subtract from it for emphasis */
-                white_multiplier = -1;
+                if (hsb[2] == 1)
+                {
+                    /* The text is white, we want to get the color of background ... */
+    
+                    float[] bgHsb = java.awt.Color.RGBtoHSB(bgColor.getRed(), bgColor.getGreen(), bgColor.getBlue(), null);
+                    hsb[0] = bgHsb[0];
+    
+                    /* ... we want to slightly modify the initial value (so bold can be actually emphasized) ... */
+                    hsb[1] = (float)0.2;
+    
+                    /* ... we want to modify saturation ... */
+                    hsb_index = 1;
+                    /* ... and we want to subtract from it for emphasis */
+                    white_multiplier = -1;
+                }
+                else
+                {
+                    /* The text is grey - we want to modify brightness ... */
+                    hsb_index = 2;
+                    /* ... and we want to subtract from it for emphasis ... */
+                    white_multiplier = -1;
+    
+                    if (hsb[2] == 0)
+                    {
+                        /* The color is black, set the initial value higher so bold can be actually emphasized */
+                        hsb[2] = (float)0.2;
+                    }
+                }
             }
             else
             {
-                /* The text is grey - we want to modify brightness ... */
-                hsb_index = 2;
-                /* ... and we want to subtract from it for emphasis ... */
-                white_multiplier = -1;
-
-                if (hsb[2] == 0)
-                {
-                    /* The color is black, set the initial value higher so bold can be actually emphasized */
-                    hsb[2] = (float)0.2;
-                }
+                /* The text colored - we want to modify saturation ... */
+                hsb_index = 1;
+                /* ... and we want to add to it for emphasis */
+                white_multiplier = 1;
             }
-        }
-        else
-        {
-            /* The text colored - we want to modify saturation ... */
-            hsb_index = 1;
-            /* ... and we want to add to it for emphasis */
-            white_multiplier = 1;
-        }
-
-        for (TextDecoration dec: box.getVisualContext().getTextDecoration())
-        {
-            if (dec == TextDecoration.UNDERLINE)
+    
+            if (box.getTextStyle().getUnderline() > 0.5f) //underlined
             {
-                hsb[hsb_index] += white_multiplier*0.2;
-                break;
+                hsb[hsb_index] += white_multiplier * 0.2f;
             }
-        }
-        if (box.getVisualContext().getFont().isItalic())
-        {
-            hsb[hsb_index] -= white_multiplier*0.2;
-        }
-
-        if (box.getVisualContext().getFont().isBold())
-        {
-            hsb[hsb_index] += white_multiplier*0.3;
-        }
-
-        if (hsb[hsb_index] > 1.0) hsb[hsb_index] = (float)1.0;
-        else if (hsb[hsb_index] < 0.0) hsb[hsb_index] = (float)0.0;
-
-        if (!this.onPage(pos.x, pos.y, pos.width, pos.height)) return;
-
-        area = new PageArea(new Color(Color.HSBtoRGB(hsb[0], hsb[1], hsb[2])),
-                            pos.x, pos.y, pos.x+pos.width, pos.y+pos.height);
-        area.setNode(box.getNode());
-        this.addArea(area);
-    }
-
-
-    private void getImageArea(ReplacedBox box, java.awt.Rectangle pos)
-    {
-        AverageColor avg;
-        PageArea area;
-        ContentImage imgObj = (ContentImage)box.getContentObj();
-
-        try {
-            avg = new AverageColor(imgObj.getBufferedImage());
-        } catch (IllegalArgumentException e) {
-            /* Sometimes the image can have width or height equal to zero */
-            return;
-        }
-        if (avg.getColor() == null || !this.onPage(pos.x, pos.y, pos.width, pos.height)) return;
-
-        area = new PageArea(avg.getColor(), pos.x, pos.y, pos.x+pos.width, pos.y+pos.height);
-        area.setNode(((Box)box).getNode());
-        this.addArea(area);
-    }
-
-    private void getArea(ElementBox box, Color parentBg)
-    {
-        PageArea area;
-        Rectangle rect;
-        Color c;
-        int t, l, r, b;
-
-        rect = box.getAbsoluteBackgroundBounds(); // background is bounded by content and padding
-        l = rect.x;
-        t = rect.y;
-        r = rect.x+rect.width;
-        b = rect.y+rect.height;
-
-        if (l > this.pageWidth || t > this.pageHeight || !this.onPage(l, t, rect.width, rect.height)) return;
-
-        c = this.getBgColor(box, parentBg);
-        if (c != null)
-        {
-            area = new PageArea(c, l, t, r, b);
-            area.setNode(box.getNode());
+            if (box.getTextStyle().getFontStyle() > 0.5f) //italics
+            {
+                hsb[hsb_index] -= white_multiplier * 0.2f;
+            }
+            if (box.getTextStyle().getFontWeight() > 0.5f) //bold
+            {
+                hsb[hsb_index] += white_multiplier * 0.3f;
+            }
+    
+            if (hsb[hsb_index] > 1.0f)
+                hsb[hsb_index] = 1.0f;
+            else if (hsb[hsb_index] < 0.0)
+                hsb[hsb_index] = 0.0f;
+    
+            final Color avgcolor = new Color(java.awt.Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]));
+            final PageArea area = new PageArea(avgcolor, pos);
+            area.setNode(box);
             this.addArea(area);
         }
     }
 
-    private boolean onPage(int x, int y, int w, int h)
+
+    private void getImageArea(Box box, Rectangular pos)
     {
-        if (x > this.pageWidth || y > this.pageHeight) return false;
-        if (w == 0 || h == 0) return false;
-        if (x+w < 0 || y+h < 0) return false;
+        if (onPage(pos))
+        {
+            final BufferedImage img = getContentImage(box);
+            if (img != null && img.getWidth() > 0 && img.getHeight() > 0)
+            {
+                AverageColor avg = new AverageColor(img);
+                if (avg.getColor() != null)
+                {
+                    PageArea area = new PageArea(avg.getColor(), pos);
+                    area.setNode(box);
+                    this.addArea(area);
+                }
+            }
+        }
+    }
+
+    private void getArea(Box box, Color parentBg)
+    {
+        Rectangular rect = box.getContentBounds(); // background is bounded by content and padding
+        if (onPage(rect))
+        {
+            final Color c = this.getBgColor(box, parentBg);
+            if (c != null)
+            {
+                PageArea area = new PageArea(c, rect);
+                area.setNode(box);
+                this.addArea(area);
+            }
+        }
+    }
+
+    private boolean onPage(Rectangular r)
+    {
+        if (r.getX1() > this.pageWidth || r.getY1() > this.pageHeight)
+            return false;
+        if (r.isEmpty())
+            return false;
+        if (r.getX2() < 0 || r.getY2() < 0)
+            return false;
         return true;
     }
 
-    private void addArea(PageArea area) {
+    private void addArea(PageArea area) 
+    {
         AreaMatch match;
 
         match = new AreaMatch();
         this.areaTree.intersects(area.getRectangle(), match);
-        for (Integer id: match.getIds()) {
+        for (Integer id: match.getIds())
+        {
             this.mask.add(id);
         }
 

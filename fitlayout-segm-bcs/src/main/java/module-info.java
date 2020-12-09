@@ -1,4 +1,4 @@
-module cz.vutbr.fit.layout.vips
+module cz.vutbr.fit.layout.bcs
 {
     requires java.desktop;
     requires org.slf4j;
@@ -10,6 +10,6 @@ module cz.vutbr.fit.layout.vips
     
     exports cz.vutbr.fit.layout.bcs;
 
-    //provides cz.vutbr.fit.layout.api.ArtifactService
-    //        with cz.vutbr.fit.layout.bcs.BCSProvider;
+    provides cz.vutbr.fit.layout.api.ArtifactService
+            with cz.vutbr.fit.layout.bcs.BCSProvider;
 }

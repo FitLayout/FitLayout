@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -33,7 +34,7 @@ public class AreaCreator
         this.pageHeight = h;
     }
 
-    public ArrayList<PageArea> getAreas(Box root)
+    public List<PageArea> getAreas(Box root)
     {
         ArrayList<PageArea> ret;
 
@@ -45,10 +46,10 @@ public class AreaCreator
 
         this.getAreasSubtree(root, Color.WHITE);
 
-        for (int index = 0; index < this.areas.size(); index++) {
-            if (this.mask.contains(index)) {
+        for (int index = 0; index < this.areas.size(); index++)
+        {
+            if (this.mask.contains(index)) 
                 continue;
-            }
 
             ret.add(this.areas.get(index));
         }

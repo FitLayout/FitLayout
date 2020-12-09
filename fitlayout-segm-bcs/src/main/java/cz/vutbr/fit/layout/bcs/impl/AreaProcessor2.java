@@ -1,6 +1,5 @@
 package cz.vutbr.fit.layout.bcs.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,7 +37,7 @@ public class AreaProcessor2
     private final StopWatch time;
 
 
-    public AreaProcessor2(List<PageArea> areas, int width, int height) throws IOException
+    public AreaProcessor2(List<PageArea> areas, int width, int height)
     {
         Collections.sort(areas, new AreaSizeComparator());
         /* Note: we store only leaf areas */

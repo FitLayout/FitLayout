@@ -170,25 +170,25 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
     @Override
     public boolean hasTopBorder()
     {
-        return topBorder.getStyle() != Style.NONE;
+        return topBorder.getStyle() != Style.NONE && topBorder.getColor().getAlpha() > 0;
     }
 
     @Override
     public boolean hasBottomBorder()
     {
-        return bottomBorder.getStyle() != Style.NONE;
+        return bottomBorder.getStyle() != Style.NONE && bottomBorder.getColor().getAlpha() > 0;
     }
 
     @Override
     public boolean hasLeftBorder()
     {
-        return leftBorder.getStyle() != Style.NONE;
+        return leftBorder.getStyle() != Style.NONE && leftBorder.getColor().getAlpha() > 0;
     }
 
     @Override
     public boolean hasRightBorder()
     {
-        return rightBorder.getStyle() != Style.NONE;
+        return rightBorder.getStyle() != Style.NONE && rightBorder.getColor().getAlpha() > 0;
     }
 
     @Override

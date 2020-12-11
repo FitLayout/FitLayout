@@ -115,8 +115,9 @@ public class BoxList
             //map the offset parent if any, the coordinates are computed from the parent
             if (newbox.getOffsetParent() != null)
             {
-                final Rectangular parentBounds = newbox.getOffsetParent().getIntrinsicBounds();
-                newbox.getIntrinsicBounds().move(parentBounds.getX1(), parentBounds.getY1());
+                final int leftOfs = getContentOffsetLeft(newbox.getOffsetParent());
+                final int topOfs = getContentOffsetTop(newbox.getOffsetParent());
+                newbox.getIntrinsicBounds().move(leftOfs, topOfs);
                 newbox.applyIntrinsicBounds();
                 if (!newbox.getOffsetParent().isVisible())
                     newbox.setVisible(false);
@@ -315,6 +316,16 @@ public class BoxList
             else if (boxes.size() > 0)
                 log.error("Backend data error: absolutely positioned box <{}> has no DOM parent", box.getOrder());
         }
+    }
+    
+    private int getContentOffsetLeft(Box box)
+    {
+        return box.getIntrinsicBounds().getX1() + box.getLeftBorder();
+    }
+    
+    private int getContentOffsetTop(Box box)
+    {
+        return box.getIntrinsicBounds().getY1() + box.getTopBorder();
     }
     
     /**

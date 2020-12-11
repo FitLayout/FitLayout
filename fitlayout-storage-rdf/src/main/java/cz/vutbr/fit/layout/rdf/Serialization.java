@@ -29,15 +29,27 @@ public class Serialization
     
     public static String colorString(Color color)
     {
-        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+        if (color.getAlpha() == 255)
+            return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+        else
+            return String.format("#%02x%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
     }
 
     public static Color decodeHexColor(String colorStr) 
     {
-        return new Color(
-                Integer.valueOf( colorStr.substring( 1, 3 ), 16 ),
-                Integer.valueOf( colorStr.substring( 3, 5 ), 16 ),
-                Integer.valueOf( colorStr.substring( 5, 7 ), 16 ) );
+        if (colorStr.length() == 7)
+            return new Color(
+                    Integer.valueOf( colorStr.substring( 1, 3 ), 16 ),
+                    Integer.valueOf( colorStr.substring( 3, 5 ), 16 ),
+                    Integer.valueOf( colorStr.substring( 5, 7 ), 16 ) );
+        else if (colorStr.length() == 9)
+            return new Color(
+                    Integer.valueOf( colorStr.substring( 1, 3 ), 16 ),
+                    Integer.valueOf( colorStr.substring( 3, 5 ), 16 ),
+                    Integer.valueOf( colorStr.substring( 5, 7 ), 16 ),
+                    Integer.valueOf( colorStr.substring( 7, 9 ), 16 ) );
+        else
+            return Color.BLACK; //invalid color, this should not happen
     }
     
     public static String displayTypeString(Box.DisplayType type)

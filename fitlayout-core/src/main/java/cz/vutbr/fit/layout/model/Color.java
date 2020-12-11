@@ -32,6 +32,7 @@ public class Color
      * @param red
      * @param green
      * @param blue
+     * @param alpha
      */
     public Color(final int red, final int green, final int blue, final int alpha)
     {

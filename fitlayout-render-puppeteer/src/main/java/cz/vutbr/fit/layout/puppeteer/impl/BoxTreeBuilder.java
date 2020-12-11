@@ -98,7 +98,10 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
     public void parse(URL url) throws IOException, InterruptedException
     {
         inputFile = invokeRenderer(url);
-        parseInputFile(inputFile, url);
+        if (inputFile != null)
+            parseInputFile(inputFile, url);
+        else
+            throw new IOException("Backend execution failed");
     }
     
     public void parseJSON(String path) throws IOException
@@ -153,7 +156,7 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
     /**
      * Invokes the backend and parses its ouptut.
      * @param url
-     * @return the parsed output of the backend
+     * @return the parsed output of the backend, or {@code null} for an unexpected EOF
      * @throws IOException
      * @throws InterruptedException
      */

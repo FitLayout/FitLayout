@@ -6,6 +6,8 @@
 package cz.vutbr.fit.layout.bcs;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -107,15 +109,11 @@ public class BCSProvider extends BaseArtifactService
 
         List<PageArea> groups = h.extractGroups(h.getAreas());
         List<PageArea> ungrouped = h.getUngrouped();
-
+        List<PageArea> all = unifyAreas(groups, ungrouped);
+        
         DefaultArea root = new DefaultArea(new Rectangular(0, 0, page.getWidth() - 1, page.getHeight() - 1));
         root.setName("root");
-        for (PageArea pa : groups)
-        {
-            Rectangular pos = new Rectangular(pa.getLeft(), pa.getTop(), pa.getRight(), pa.getBottom());
-            DefaultArea child = new DefaultArea(pos); 
-            root.appendChild(child);
-        }
+        appendGroups(root, all);
         
         //create the resulting area "tree"
         DefaultAreaTree atree = new DefaultAreaTree(page.getIri());
@@ -128,5 +126,34 @@ public class BCSProvider extends BaseArtifactService
         atree.setRoot(root);
         
         return atree;
+    }
+
+    private List<PageArea> unifyAreas(List<PageArea> groups, List<PageArea> ungrouped)
+    {
+        List<PageArea> all = new ArrayList<>(groups.size() + ungrouped.size());
+        all.addAll(groups);
+        all.addAll(ungrouped);
+        Collections.sort(all, new Comparator<PageArea>() {
+            @Override
+            public int compare(PageArea a1, PageArea a2)
+            {
+                if (a1.getTop() == a2.getTop())
+                    return a1.getLeft() - a2.getLeft();
+                else
+                    return a1.getTop() - a2.getTop();
+            }
+        });
+        return all;
+    }
+    
+    
+    private void appendGroups(DefaultArea root, List<PageArea> groups)
+    {
+        for (PageArea pa : groups)
+        {
+            Rectangular pos = new Rectangular(pa.getLeft(), pa.getTop(), pa.getRight(), pa.getBottom());
+            DefaultArea child = new DefaultArea(pos); 
+            root.appendChild(child);
+        }
     }
 }

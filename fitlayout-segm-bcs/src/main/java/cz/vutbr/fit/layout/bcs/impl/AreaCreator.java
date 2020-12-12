@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import com.infomatiq.jsi.Rectangle;
 import com.infomatiq.jsi.SpatialIndex;
 import com.infomatiq.jsi.rtree.RTree;
 
@@ -21,6 +22,13 @@ import cz.vutbr.fit.layout.model.Rectangular;
 
 public class AreaCreator
 {
+    /** Allowed box overlap in pixels for element boxes */
+    private static final int ALLOWED_OVERLAP_ELEMENT = 1;
+    /** Allowed box overlap in pixels for replaced content boxes */
+    private static final int ALLOWED_OVERLAP_REPLACED = 1;
+    /** Allowed box overlap in pixels for text boxes */
+    private static final int ALLOWED_OVERLAP_TEXT = 2; //text lines sometimes overlap when line-height is too small
+    
     private ArrayList<PageArea> areas;
     private HashSet<Integer> mask;
     private final int pageWidth;
@@ -310,7 +318,7 @@ public class AreaCreator
             final Color avgcolor = new Color(java.awt.Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]));
             final PageArea area = new PageArea(avgcolor, pos);
             area.setNode(box);
-            this.addArea(area);
+            this.addArea(area, ALLOWED_OVERLAP_TEXT);
         }
     }
 
@@ -327,7 +335,7 @@ public class AreaCreator
                 {
                     PageArea area = new PageArea(avg.getColor(), pos);
                     area.setNode(box);
-                    this.addArea(area);
+                    this.addArea(area, ALLOWED_OVERLAP_REPLACED);
                 }
             }
         }
@@ -335,7 +343,7 @@ public class AreaCreator
 
     private void getArea(Box box, Color parentBg)
     {
-        Rectangular rect = box.getContentBounds(); // background is bounded by content and padding
+        Rectangular rect = box.getContentBounds();
         if (onPage(rect))
         {
             final Color c = this.getBgColor(box, parentBg);
@@ -343,7 +351,7 @@ public class AreaCreator
             {
                 PageArea area = new PageArea(c, rect);
                 area.setNode(box);
-                this.addArea(area);
+                this.addArea(area, ALLOWED_OVERLAP_ELEMENT);
             }
         }
     }
@@ -359,12 +367,14 @@ public class AreaCreator
         return true;
     }
 
-    private void addArea(PageArea area) 
+    private void addArea(PageArea area, int allowedOverlap) 
     {
-        AreaMatch match;
-
-        match = new AreaMatch();
-        this.areaTree.intersects(area.getRectangle(), match);
+        //allow <T>px overlaps for intersection detection
+        Rectangle areaRect = new Rectangle(area.getLeft() + allowedOverlap, area.getTop() + allowedOverlap,
+                area.getRight() - allowedOverlap, area.getBottom() - allowedOverlap);
+        //detect overlaps
+        AreaMatch match = new AreaMatch();
+        this.areaTree.intersects(areaRect, match);
         for (Integer id: match.getIds())
         {
             this.mask.add(id);

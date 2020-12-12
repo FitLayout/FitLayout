@@ -52,7 +52,7 @@ public class AreaCreator
         this.mask = new HashSet<>();
         ret = new ArrayList<>();
 
-        this.getAreasSubtree(root, Color.WHITE);
+        this.createAreasSubtree(root, Color.WHITE);
 
         for (int index = 0; index < this.areas.size(); index++)
         {
@@ -66,7 +66,7 @@ public class AreaCreator
         return ret;
     }
 
-    private void getAreasSubtree(Box root, Color parentBg)
+    private void createAreasSubtree(Box root, Color parentBg)
     {
         Color bgColor = this.getBgColor(root, parentBg);
 
@@ -75,7 +75,7 @@ public class AreaCreator
             /* No children */
             if (!this.isTransparent(root))
             {
-                this.getArea(root, parentBg);
+                this.createElementArea(root, parentBg);
             }
             return;
         }
@@ -85,14 +85,14 @@ public class AreaCreator
             final Box child = root.getChildAt(0);
             if (child.getType() == Type.TEXT_CONTENT)
             {
-                this.getTextArea(child, bgColor);
+                this.createTextArea(child, bgColor);
                 return;
             }
             else
             {
                 if (this.hasNoBranches(child))
                 {
-                    this.getSmallestBox(root, parentBg);
+                    this.createSmallestBox(root, parentBg);
                     return;
                 }
 
@@ -105,15 +105,15 @@ public class AreaCreator
         {
             if (child.getType() == Type.TEXT_CONTENT)
             {
-                this.getTextArea(child, bgColor);
+                this.createTextArea(child, bgColor);
             }
             else if (child.getType() == Type.REPLACED_CONTENT)
             {
-                this.getImageArea(child, child.getContentBounds());
+                this.createImageArea(child, child.getContentBounds());
             }
             else
             {
-                this.getAreasSubtree(child, bgColor);
+                this.createAreasSubtree(child, bgColor);
             }
         }
     }
@@ -138,12 +138,12 @@ public class AreaCreator
         }
     }
 
-    private void getSmallestBox(Box root, Color parentBg)
+    private void createSmallestBox(Box root, Color parentBg)
     {
         if (root.getChildCount() == 0)
         {
             /* No children - we have to return this one */
-            this.getArea(root, parentBg);
+            this.createElementArea(root, parentBg);
         }
         else
         {
@@ -151,21 +151,21 @@ public class AreaCreator
             final Color bgColor = this.getBgColor(root, parentBg);
             if (child.getType() == Type.TEXT_CONTENT)
             {
-                this.getTextArea(child, bgColor);
+                this.createTextArea(child, bgColor);
             }
             else if (child.getType() == Type.REPLACED_CONTENT)
             {
-                this.getImageArea(child, child.getContentBounds());
+                this.createImageArea(child, child.getContentBounds());
             }
             else
             {
                 if (this.isTransparent(root))
                 {
-                    getSmallestBox(child, parentBg);
+                    createSmallestBox(child, parentBg);
                 }
                 else
                 {
-                    this.getArea(child, parentBg);
+                    this.createElementArea(child, parentBg);
                 }
             }
         }
@@ -240,14 +240,8 @@ public class AreaCreator
         return !box.hasBackground();
     }
 
-    private void getTextArea(Box box, Color bgColor)
+    private void createTextArea(Box box, Color bgColor)
     {
-        /*Color color;
-        float []hsb;
-        float []bgHsb;
-        int white_multiplier;
-        int hsb_index;
-        PageArea area;*/
         int white_multiplier;
         int hsb_index;
         Rectangular pos = box.getContentBounds();
@@ -323,7 +317,7 @@ public class AreaCreator
     }
 
 
-    private void getImageArea(Box box, Rectangular pos)
+    private void createImageArea(Box box, Rectangular pos)
     {
         if (onPage(pos))
         {
@@ -341,7 +335,7 @@ public class AreaCreator
         }
     }
 
-    private void getArea(Box box, Color parentBg)
+    private void createElementArea(Box box, Color parentBg)
     {
         Rectangular rect = box.getContentBounds();
         if (onPage(rect))
@@ -369,7 +363,7 @@ public class AreaCreator
 
     private void addArea(PageArea area, int allowedOverlap) 
     {
-        //allow <T>px overlaps for intersection detection
+        //allow overlaps for intersection detection
         Rectangle areaRect = new Rectangle(area.getLeft() + allowedOverlap, area.getTop() + allowedOverlap,
                 area.getRight() - allowedOverlap, area.getBottom() - allowedOverlap);
         //detect overlaps

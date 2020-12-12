@@ -16,6 +16,7 @@ import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.bcs.impl.AreaCreator;
 import cz.vutbr.fit.layout.bcs.impl.AreaProcessor2;
+import cz.vutbr.fit.layout.bcs.impl.ImageOutput;
 import cz.vutbr.fit.layout.bcs.impl.PageArea;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.impl.DefaultArea;
@@ -101,6 +102,13 @@ public class BCSProvider extends BaseArtifactService
     {
         AreaCreator c = new AreaCreator(page.getWidth(), page.getHeight());
         List<PageArea> areas = c.getAreas(page.getRoot());
+        
+        final boolean graphOutput = (System.getProperty("fitlayout.bcs.debug") != null);
+        if (graphOutput)
+        {
+            ImageOutput imgout = new ImageOutput(areas, page.getWidth(), page.getHeight());
+            imgout.save("areas.png");
+        }
 
         AreaProcessor2 h = new AreaProcessor2(areas, page.getWidth(), page.getHeight());
         if (threshold > 0)

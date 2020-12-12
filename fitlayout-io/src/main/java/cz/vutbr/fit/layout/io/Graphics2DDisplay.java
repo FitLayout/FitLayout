@@ -5,6 +5,7 @@
  */
 package cz.vutbr.fit.layout.io;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -253,6 +254,14 @@ public class Graphics2DDisplay implements OutputDisplay
         }
     }
 
+    @Override
+    public void clearArea(int x, int y, int width, int height)
+    {
+        g.setComposite(AlphaComposite.Clear);
+        g.fillRect(x, y, width, height);
+        g.setComposite(AlphaComposite.SrcOver);
+    }
+    
     @Override
     public void colorizeByClass(Area area, String cname)
     {

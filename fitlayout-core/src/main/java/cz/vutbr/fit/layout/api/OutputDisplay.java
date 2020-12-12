@@ -79,5 +79,13 @@ public interface OutputDisplay
      */
     public void colorizeByClass(Area area, String cname);
 
+    /**
+     * Clears the given area of the display.
+     * @param x the area X coordinate
+     * @param y the area Y coordinate
+     * @param width the area width
+     * @param height the area height
+     */
+    public void clearArea(int x, int y, int width, int height);
     
 }

@@ -127,8 +127,8 @@ public class BoxList
             {
                 final Rectangular clipBounds = newbox.getClipBox().getIntrinsicBounds();
                 final Rectangular clipped = newbox.getIntrinsicBounds().intersection(clipBounds);
-                newbox.setIntrinsicBounds(clipped);
-                newbox.applyIntrinsicBounds();
+                newbox.setBounds(clipped);
+                newbox.setContentBounds(new Rectangular(clipped));
                 if (clipped.isEmpty())
                     newbox.setVisible(false);
             }

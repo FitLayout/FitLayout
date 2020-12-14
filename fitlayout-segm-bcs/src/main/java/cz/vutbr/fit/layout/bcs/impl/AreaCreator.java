@@ -26,8 +26,8 @@ public class AreaCreator
     private static final int ALLOWED_OVERLAP_ELEMENT = 1;
     /** Allowed box overlap in pixels for replaced content boxes */
     private static final int ALLOWED_OVERLAP_REPLACED = 1;
-    /** Allowed box overlap in pixels for text boxes */
-    private static final int ALLOWED_OVERLAP_TEXT = 2; //text lines sometimes overlap when line-height is too small
+    /** Allowed box overlap for text boxes - size percentage */
+    private static final float ALLOWED_OVERLAP_TEXT = 0.1f; //text lines sometimes overlap when line-height is too small
     
     private ArrayList<PageArea> areas;
     private HashSet<Integer> mask;
@@ -312,10 +312,13 @@ public class AreaCreator
             final Color avgcolor = new Color(java.awt.Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]));
             final PageArea area = new PageArea(avgcolor, pos);
             area.setNode(box);
-            this.addArea(area, ALLOWED_OVERLAP_TEXT);
+            
+            //calculate allowed overlap from the smaller size
+            final int size = Math.min(pos.getWidth(), pos.getHeight());
+            final int overlap = Math.round(size * ALLOWED_OVERLAP_TEXT);
+            this.addArea(area, overlap);
         }
     }
-
 
     private void createImageArea(Box box, Rectangular pos)
     {

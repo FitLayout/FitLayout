@@ -26,6 +26,9 @@ import cz.vutbr.fit.layout.model.Color;
  */
 public class Serialization
 {
+    public static final String JSONLD = "application/ld+json";
+    public static final String TURTLE = "text/turtle";
+    
     
     public static String colorString(Color color)
     {
@@ -66,10 +69,8 @@ public class Serialization
         }
     }
     
-    public static RDFWriter createRioWriter(OutputStream os) throws RDFHandlerException
+    private static void configureNamespaces(RDFWriter writer)
     {
-        RDFWriter writer = Rio.createWriter(RDFFormat.JSONLD, os);
-        writer.startRDF();
         writer.handleNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         writer.handleNamespace("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
         writer.handleNamespace("xsd", "http://www.w3.org/2001/XMLSchema#");
@@ -77,18 +78,42 @@ public class Serialization
         writer.handleNamespace("a", "http://fitlayout.github.io/ontology/segmentation.owl#");
         writer.handleNamespace("fl", "http://fitlayout.github.io/ontology/fitlayout.owl#");
         writer.handleNamespace("r", "http://fitlayout.github.io/resource/");
+    }
+    
+    public static RDFWriter createRioWriterJsonLD(OutputStream os) throws RDFHandlerException
+    {
+        RDFWriter writer = Rio.createWriter(RDFFormat.JSONLD, os);
+        writer.startRDF();
+        configureNamespaces(writer);
         writer.getWriterConfig().set(JSONLDSettings.JSONLD_MODE, JSONLDMode.COMPACT);
         writer.getWriterConfig().set(JSONLDSettings.OPTIMIZE, true);
         writer.getWriterConfig().set(BasicWriterSettings.PRETTY_PRINT, true);
         return writer;
     }
-    
-    public static void modelToJsonLDStream(Model model, OutputStream os)
+
+    public static RDFWriter createRioWriterTurtle(OutputStream os) throws RDFHandlerException
     {
-        RDFWriter rdfw = createRioWriter(os);
+        RDFWriter writer = Rio.createWriter(RDFFormat.TURTLE, os);
+        writer.startRDF();
+        configureNamespaces(writer);
+        writer.getWriterConfig().set(BasicWriterSettings.PRETTY_PRINT, true);
+        return writer;
+    }
+    
+    public static void modelToStream(Model model, OutputStream os, String mimeType)
+    {
+        RDFWriter rdfw;
+        switch (mimeType)
+        {
+            case TURTLE:
+                rdfw = createRioWriterTurtle(os);
+                break;
+            default:
+                rdfw = createRioWriterJsonLD(os);
+                break;
+        }
         for (Statement stmt : model)
             rdfw.handleStatement(stmt);
         rdfw.endRDF();
     }
-    
 }

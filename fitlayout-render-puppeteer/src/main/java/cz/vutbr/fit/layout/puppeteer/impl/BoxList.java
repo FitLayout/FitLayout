@@ -48,12 +48,17 @@ public class BoxList
 {
     private static Logger log = LoggerFactory.getLogger(BoxList.class);
     
+    private static final int BOX_OFFSET = 1; //the index of the first real box in the list (excluding the artificial viewport)
+    
     /** Accepted generic font families */
     private Set<String> defaultFonts = Set.of("serif", "sans-serif", "monospace");
     
     /** Font families available in the backend browser */ 
     private Set<String> availFonts;
 
+    /** The viewport box used as a default parent */
+    private BoxImpl viewport;
+    
     /** Managed list of boxes */
     private List<Box> boxes;
     
@@ -66,7 +71,10 @@ public class BoxList
     public BoxList(InputFile inputFile)
     {
         availFonts = Set.of(inputFile.getFonts());
+        viewport = createViewport(inputFile);
         createBoxList(inputFile);
+        if (boxes.size() > BOX_OFFSET)
+            updateViewport((BoxImpl) boxes.get(BOX_OFFSET));
         if (inputFile.getImages() != null)
             loadImages(inputFile.getImages());
     }
@@ -93,11 +101,41 @@ public class BoxList
     
     //=======================================================================================
     
+    private BoxImpl createViewport(InputFile input)
+    {
+        BoxImpl box = new BoxImpl(this);
+        box.setOrder(0);
+        box.setId(0);
+        box.setTagName("viewport");
+        box.setSourceNodeId(-1);
+        box.setIntrinsicBounds(new Rectangular(0, 0,
+                Math.round(input.getPage().getWidth()), 
+                Math.round(input.getPage().getHeight())));
+        box.applyIntrinsicBounds();
+        box.setAbsolute(true);
+        box.setFontFamily(BoxTreeBuilder.DEFAULT_FONT_FAMILY);
+        box.setColor(Color.BLACK);
+        box.setBackgroundColor(Color.WHITE);
+        return box;
+    }
+    
+    /**
+     * Updates the viewport using the body properties
+     */
+    private void updateViewport(BoxImpl body)
+    {
+        if (body.getBackgroundColor() != null)
+            viewport.setBackgroundColor(body.getBackgroundColor());
+        viewport.setColor(body.getColor());
+    }
+    
     private List<Box> createBoxList(InputFile input)
     {
         boxes = new ArrayList<>();
+        //add the viewport as the first item
+        boxes.add(viewport);
+        int nextOrder = BOX_OFFSET;
         //create the element and text boxes
-        int nextOrder = 0;
         for (BoxInfo boxInfo : input.getBoxes())
         {
             final NodeData style = parseCss(boxInfo.getCss());
@@ -115,9 +153,6 @@ public class BoxList
             //map the offset parent if any, the coordinates are computed from the parent
             if (newbox.getOffsetParent() != null)
             {
-                final int leftOfs = getContentOffsetLeft(newbox.getOffsetParent());
-                final int topOfs = getContentOffsetTop(newbox.getOffsetParent());
-                newbox.getIntrinsicBounds().move(leftOfs, topOfs);
                 newbox.applyIntrinsicBounds();
                 if (!newbox.getOffsetParent().isVisible())
                     newbox.setVisible(false);
@@ -270,7 +305,7 @@ public class BoxList
     {
         if (boxInfo.getParent() != null)
         {
-            final int pindex = boxInfo.getParent();
+            final int pindex = boxInfo.getParent() + BOX_OFFSET;
             if (pindex < boxes.size())
             {
                 final BoxImpl parent = (BoxImpl) boxes.get(pindex);
@@ -281,9 +316,14 @@ public class BoxList
                 log.error("Backend data error: the offset parent element <{}> is not available for <{}>.", pindex, boxInfo.getId());
             }
         }
+        else
+        {
+            box.setOffsetParent(viewport); //no parent specified, use the viewport
+        }
+        
         if (boxInfo.getDomParent() != null)
         {
-            final int pindex = boxInfo.getDomParent();
+            final int pindex = boxInfo.getDomParent() + BOX_OFFSET;
             if (pindex < boxes.size())
             {
                 final BoxImpl parent = (BoxImpl) boxes.get(pindex);
@@ -294,6 +334,11 @@ public class BoxList
                 log.error("Backend data error: the DOM parent element <{}> is not available for <{}>.", pindex, boxInfo.getId());
             }
         }
+        else
+        {
+            box.setDomParent(viewport); //no parent specified, use the viewport
+        }
+        
         //compute the intrinsic parent
         if (box.isAbsolute())
         {
@@ -305,7 +350,7 @@ public class BoxList
         else if (box.isFixed())
         {
             if (boxes.size() > 0)
-                box.setIntrinsicParent(boxes.get(0)); //use the root box
+                box.setIntrinsicParent(viewport); //use the viewport box
             else
                 log.warn("Backend data warning: root box <{}> has a fixed position", box.getOrder());
         }
@@ -316,16 +361,6 @@ public class BoxList
             else if (boxes.size() > 0)
                 log.error("Backend data error: absolutely positioned box <{}> has no DOM parent", box.getOrder());
         }
-    }
-    
-    private int getContentOffsetLeft(Box box)
-    {
-        return box.getIntrinsicBounds().getX1() + box.getLeftBorder();
-    }
-    
-    private int getContentOffsetTop(Box box)
-    {
-        return box.getIntrinsicBounds().getY1() + box.getTopBorder();
     }
     
     /**

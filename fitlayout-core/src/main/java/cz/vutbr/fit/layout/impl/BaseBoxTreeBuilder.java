@@ -77,7 +77,7 @@ public abstract class BaseBoxTreeBuilder
             log.trace("A3");
             root = createBoxTree(rootNode, boxlist, true, true, preserveAux); //create the nesting tree based on the visual bounds or content bounds depending on the settings
             recomputeVisualBounds(root); //compute the visual bounds for the whole tree
-            recomputeBounds(root); //compute the real bounds of each node
+            recomputeBounds(root, true); //compute the real bounds of each node
             log.trace("A4");
             return root;
         }
@@ -89,7 +89,7 @@ public abstract class BaseBoxTreeBuilder
             if (bg == null) bg = Color.WHITE;
             computeBackgrounds(root, bg); //compute the efficient background colors
             recomputeVisualBounds(root); //compute the visual bounds for the whole tree
-            recomputeBounds(root); //compute the real bounds of each node
+            recomputeBounds(root, false); //compute the real bounds of each node
             return root;
         }
     }
@@ -279,13 +279,17 @@ public abstract class BaseBoxTreeBuilder
      * correspond to its visual bounds. If the child boxes exceed the parent box,
      * the parent box bounds will be expanded accordingly.
      * @param root the root node of the subtree
+     * @param useVisualBounds use the visual bounds instead of the content bounds
      */
-    public void recomputeBounds(Box root)
+    public void recomputeBounds(Box root, boolean useVisualBounds)
     {
-        root.setBounds(new Rectangular(root.getVisualBounds()));
+        if (useVisualBounds)
+            root.setBounds(new Rectangular(root.getVisualBounds()));
+        else
+            root.setBounds(new Rectangular(root.getContentBounds()));
         for (Box child : root.getChildren())
         {
-            recomputeBounds(child);
+            recomputeBounds(child, useVisualBounds);
             root.getBounds().expandToEnclose(child.getBounds());
         }
     }

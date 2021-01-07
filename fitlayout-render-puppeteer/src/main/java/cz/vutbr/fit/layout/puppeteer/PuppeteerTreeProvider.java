@@ -33,6 +33,7 @@ public class PuppeteerTreeProvider extends BaseArtifactService
     private String urlstring;
     private int width;
     private int height;
+    private int persist;
     private boolean acquireImages;
     private boolean includeScreenshot;
     private boolean replaceImagesWithAlt; //not published as a parameter now
@@ -44,15 +45,17 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         urlstring = null;
         width = 1200;
         height = 800;
+        persist = 1;
         acquireImages = false;
         includeScreenshot = true;
     }
     
-    public PuppeteerTreeProvider(URL url, int width, int height, float zoom, boolean acquireImages, boolean includeScreenshot)
+    public PuppeteerTreeProvider(URL url, int width, int height, int persist, boolean acquireImages, boolean includeScreenshot)
     {
         this.urlstring = url.toString();
         this.width = width;
         this.height = height;
+        this.persist = persist;
         this.acquireImages = acquireImages;
         this.includeScreenshot = includeScreenshot;
     }
@@ -82,6 +85,7 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         ret.add(new ParameterString("url", 0, 64));
         ret.add(new ParameterInt("width", 10, 9999));
         ret.add(new ParameterInt("height", 10, 9999));
+        ret.add(new ParameterInt("persist", 0, 3));
         ret.add(new ParameterBoolean("acquireImages"));
         ret.add(new ParameterBoolean("includeScreenshot"));
         return ret;
@@ -117,6 +121,16 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         this.height = height;
     }
     
+    public int getPersist()
+    {
+        return persist;
+    }
+
+    public void setPersist(int persist)
+    {
+        this.persist = persist;
+    }
+
     public boolean getAcquireImages()
     {
         return acquireImages;
@@ -174,6 +188,7 @@ public class PuppeteerTreeProvider extends BaseArtifactService
     public Page getPage() throws IOException, InterruptedException
     {
         builder = new BoxTreeBuilder(width, height, false, true);
+        builder.setPersist(persist);
         builder.setAcquireImages(acquireImages);
         builder.setIncludeScreenshot(includeScreenshot);
         builder.parse(urlstring);

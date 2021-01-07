@@ -52,6 +52,8 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
     private int width;
     /** Browser window height for rendering */
     private int height;
+    /** Connection persistence */
+    private int persist; 
     /** Acquire images? */
     private boolean acquireImages;
     /** Inlcude screen shots? */
@@ -63,10 +65,16 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
         super(useVisualBounds, preserveAux);
         this.width = width;
         this.height = height;
+        this.persist = 1;
         this.acquireImages = false;
         this.includeScreenshot = true;
     }
     
+    public void setPersist(int persist)
+    {
+        this.persist = persist;
+    }
+
     public void setAcquireImages(boolean acquireImages)
     {
         this.acquireImages = acquireImages;
@@ -172,6 +180,7 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
         cmds.add("index.js");
         cmds.add("-W" + String.valueOf(width));
         cmds.add("-H" + String.valueOf(height));
+        cmds.add("-P" + String.valueOf(persist));
         if (acquireImages)
             cmds.add("-I"); //acquire images
         if (includeScreenshot)

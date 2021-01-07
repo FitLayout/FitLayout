@@ -53,18 +53,17 @@ public interface Page extends Artifact
     public byte[] getPngImage();
     
     /**
-     * Finds the deepest node in the tree that contains the given point.
+     * Finds all the boxes that contain the given point within their visual bounds.
      * @param x The point X coordinate
      * @param y The point Y coordinate
-     * @return The deepest box at the given coordinates or {@code null} when there is no box
-     * in the tree placed at the given coordinates.
+     * @return A list of boxes that contain [x, y] within their visual bounds.
      */
-    public Box getBoxAt(int x, int y);
+    public List<Box> getBoxesAt(int x, int y);
     
     /**
      * Finds the root boxes of subtrees that are fully contained in the given region based on their visual bounds.
      * @param r The region to be tested
-     * @return A vector of subtree root boxes (possibly empty)
+     * @return A list of subtree root boxes (possibly empty)
      */
     public List<Box> getBoxesInRegion(Rectangular r);
     

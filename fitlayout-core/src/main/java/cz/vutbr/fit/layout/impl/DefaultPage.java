@@ -117,25 +117,21 @@ public class DefaultPage extends BaseArtifact implements Page
     }
 
     @Override
-    public Box getBoxAt(int x, int y)
+    public List<Box> getBoxesAt(int x, int y)
     {
-        return recursiveGetBoxAt(root, x, y);
+        List<Box> ret = new ArrayList<>();
+        recursiveGetBoxesAt(root, x, y, ret);
+        return ret;
     }
     
-    protected Box recursiveGetBoxAt(Box root, int x, int y)
+    private void recursiveGetBoxesAt(Box root, int x, int y, List<Box> dest)
     {
         if (root.getBounds().contains(x, y))
         {
+            dest.add(root);
             for (int i = 0; i < root.getChildCount(); i++)
-            {
-                Box ret = recursiveGetBoxAt(root.getChildAt(i), x, y);
-                if (ret != null)
-                    return ret;
-            }
-            return root;
+                recursiveGetBoxesAt(root.getChildAt(i), x, y, dest);
         }
-        else
-            return null;
     }
 
     @Override

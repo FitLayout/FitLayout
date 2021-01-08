@@ -273,8 +273,13 @@ public class BoxList
     {
         box.setOrder(order);
         box.setId(order);
-        box.setIntrinsicBounds(new Rectangular(Math.round(boxInfo.getX()), Math.round(boxInfo.getY()),
-                Math.round(boxInfo.getX() + boxInfo.getWidth() - 1), Math.round(boxInfo.getY() + boxInfo.getHeight() - 1)));
+        
+        box.setIntrinsicBounds(new Rectangular(
+                Math.round(boxInfo.getX()),
+                Math.round(boxInfo.getY()),
+                Math.round(boxInfo.getX() + boxInfo.getWidth() - 1),
+                Math.round(boxInfo.getY() + boxInfo.getHeight() - 1),
+                false)); //preserve the order of coordinates
         box.applyIntrinsicBounds();
         
         CSSProperty.Position pos = style.getProperty("position");

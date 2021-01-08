@@ -26,7 +26,9 @@ public class Rectangular implements Rect
 	}
 	
 	/**
-	 * Creates a rectangle at the given coordinates.
+	 * Creates a rectangle at the given coordinates. The x1:x2 and y1:y2 coordinates are automatically
+	 * reordered so that x1 &lt; x2 and y1 &lt; y2. Note that this behavior does not allow creating
+	 * empty rectangles using this constructor. 
 	 * @param x1
 	 * @param y1
 	 * @param x2
@@ -40,6 +42,33 @@ public class Rectangular implements Rect
 		this.y2 = Math.max(y1, y2);
 	}
 	
+    /**
+     * Creates a rectangle at the given coordinates. The x1:x2 and y1:y2 coordinates may be automatically
+     * reordered so that x1 &lt; x2 and y1 &lt; y2. 
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @param reorder Allow reordering the x and y values so that x1 &lt; x2 and y1 &lt; y2
+     */
+    public Rectangular(int x1, int y1, int x2, int y2, boolean reorder)
+    {
+        if (reorder)
+        {
+            this.x1 = Math.min(x1, x2);
+            this.x2 = Math.max(x1, x2);
+            this.y1 = Math.min(y1, y2);
+            this.y2 = Math.max(y1, y2);
+        }
+        else
+        {
+            this.x1 = x1;
+            this.x2 = x2;
+            this.y1 = y1;
+            this.y2 = y2;
+        }
+    }
+    
     /**
      * Creates an empty rectangle at the given coordinates.
      * @param x1

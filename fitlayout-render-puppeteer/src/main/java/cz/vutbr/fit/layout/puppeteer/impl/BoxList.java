@@ -36,7 +36,9 @@ import cz.vutbr.web.css.RuleSet;
 import cz.vutbr.web.css.StyleSheet;
 import cz.vutbr.web.css.Term;
 import cz.vutbr.web.css.TermColor;
+import cz.vutbr.web.css.TermInteger;
 import cz.vutbr.web.css.TermList;
+import cz.vutbr.web.css.TermNumber;
 import cz.vutbr.web.css.TermString;
 
 /**
@@ -282,6 +284,23 @@ public class BoxList
                 false)); //preserve the order of coordinates
         box.applyIntrinsicBounds();
         
+        //check the visibility and opacity for finding hidden elements
+        CSSProperty.Visibility visibility = style.getProperty("visibility");
+        if (visibility == CSSProperty.Visibility.HIDDEN || visibility == CSSProperty.Visibility.COLLAPSE)
+            box.setVisible(false);
+        CSSProperty.Opacity opacity = style.getProperty("opacity");
+        if (opacity == CSSProperty.Opacity.number)
+        {
+            Term<?> num = style.getValue("opacity", false);
+            if (num != null)
+            {
+                if ((num instanceof TermInteger && ((TermInteger) num).getIntValue() == 0)
+                        || (num instanceof TermNumber && ((TermNumber) num).getValue() < 0.01f))
+                    box.setVisible(false);
+            }
+        }
+        
+        //check special position values
         CSSProperty.Position pos = style.getProperty("position");
         if (pos == CSSProperty.Position.ABSOLUTE)
             box.setAbsolute(true);

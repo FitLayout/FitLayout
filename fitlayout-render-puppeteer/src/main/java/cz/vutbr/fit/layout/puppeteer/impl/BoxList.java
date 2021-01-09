@@ -284,6 +284,10 @@ public class BoxList
                 false)); //preserve the order of coordinates
         box.applyIntrinsicBounds();
         
+        //makr the elements outside of the viewport as invisible
+        if (!viewport.getIntrinsicBounds().intersects(box.getIntrinsicBounds()))
+            box.setVisible(false);
+        
         //check the visibility and opacity for finding hidden elements
         CSSProperty.Visibility visibility = style.getProperty("visibility");
         if (visibility == CSSProperty.Visibility.HIDDEN || visibility == CSSProperty.Visibility.COLLAPSE)

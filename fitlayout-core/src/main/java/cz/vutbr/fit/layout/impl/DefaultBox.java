@@ -54,7 +54,8 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
     
     public DefaultBox(Box src)
     {
-        super(Box.class);
+        super(Box.class, src);
+        order = src.getOrder();
         visible = src.isVisible();
         color = new Color(src.getColor().getRed(), src.getColor().getGreen(), src.getColor().getBlue(), src.getColor().getAlpha());
         fontFamily = new String(src.getFontFamily());

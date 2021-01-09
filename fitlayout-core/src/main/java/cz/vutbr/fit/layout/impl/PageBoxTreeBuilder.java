@@ -60,7 +60,7 @@ public class PageBoxTreeBuilder extends BaseBoxTreeBuilder
         page.setParentIri(input.getIri());
         //create a copy of the tree and the box list
         List<Box> boxes = new LinkedList<>();
-        createBoxTree(page.getRoot(), boxes);
+        createBoxTree(page.getRoot(), null, boxes);
         //use the current values as the intrinsic ones
         for (Box box : boxes)
         {
@@ -76,14 +76,22 @@ public class PageBoxTreeBuilder extends BaseBoxTreeBuilder
     /**
      * Copies a box tree to a new tree. Moreover, the created boxes are stored in a target list.
      * @param root the subtree root
+     * @param treeRoot the whole tree root. {@code null} means that the newly created box should be used as the new root.
      * @param target the taget box list
      */
-    private Box createBoxTree(Box root, List<Box> target)
+    private Box createBoxTree(Box root, Box treeRoot, List<Box> target)
     {
-        DefaultBox ret = new DefaultBox(root);
-        target.add(root);
+        final DefaultBox ret = new DefaultBox(root);
+        target.add(ret);
+        // hadle the root node of the whole tree
+        if (treeRoot == null)
+        {
+            ret.setRoot(ret);
+            treeRoot = ret;
+        }
+        // continue recursively
         for (Box child : root.getChildren())
-            ret.appendChild(createBoxTree(child, target));
+            ret.appendChild(createBoxTree(child, treeRoot, target));
         return ret;
     }
 }

@@ -201,7 +201,7 @@ public abstract class BaseBoxTreeBuilder
             }
             else
             {
-                if (child != this 
+                if (child != parent 
                         && visuallyEncloses(parent, child)
                         && (parents.get(i) == null || !visuallyEncloses(parent, parents.get(i)))) 
                 {

@@ -36,18 +36,21 @@ public class CSSTextStyle extends TextStyle
             setFontSizeSum(BoxTreeBuilder.DEFAULT_FONT_SIZE * textLen);
         
         FontWeight fweight = style.getProperty("font-weight");
-        switch (fweight)
+        if (fweight != null)
         {
-            case BOLD:
-            case BOLDER:
-            case numeric_600:
-            case numeric_700:
-            case numeric_800:
-            case numeric_900:
-                setFontWeightSum(1 * textLen);
-                break;
-            default:
-                break;
+            switch (fweight)
+            {
+                case BOLD:
+                case BOLDER:
+                case numeric_600:
+                case numeric_700:
+                case numeric_800:
+                case numeric_900:
+                    setFontWeightSum(1 * textLen);
+                    break;
+                default:
+                    break;
+            }
         }
         
         FontStyle fstyle = style.getProperty("font-style");

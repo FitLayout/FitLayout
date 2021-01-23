@@ -162,12 +162,21 @@ public class BoxList
             //apply clipping when applicable
             if (newbox.getClipBox() != null)
             {
+                final Rectangular iBounds = newbox.getIntrinsicBounds();
                 final Rectangular clipBounds = newbox.getClipBox().getIntrinsicBounds();
-                final Rectangular clipped = newbox.getIntrinsicBounds().intersection(clipBounds);
-                newbox.setBounds(clipped);
-                newbox.setContentBounds(new Rectangular(clipped));
-                if (clipped.isEmpty())
-                    newbox.setVisible(false);
+                if (iBounds.isEmpty()) //for empty boxes, test the top-left corner only
+                {
+                    if (!clipBounds.contains(iBounds.getX1(), iBounds.getY1()))
+                        newbox.setVisible(false);
+                }
+                else
+                {
+                    final Rectangular clipped = newbox.getIntrinsicBounds().intersection(clipBounds);
+                    newbox.setBounds(clipped);
+                    newbox.setContentBounds(new Rectangular(clipped));
+                    if (clipped.isEmpty()) 
+                        newbox.setVisible(false);
+                }
             }
             //add the box
             boxes.add(newbox);
@@ -276,17 +285,35 @@ public class BoxList
         box.setOrder(order);
         box.setId(order);
         
-        box.setIntrinsicBounds(new Rectangular(
+        final Rectangular ibounds = new Rectangular(
                 Math.round(boxInfo.getX()),
                 Math.round(boxInfo.getY()),
                 Math.round(boxInfo.getX() + boxInfo.getWidth() - 1),
                 Math.round(boxInfo.getY() + boxInfo.getHeight() - 1),
-                false)); //preserve the order of coordinates
+                false); //preserve the order of coordinates 
+        box.setIntrinsicBounds(ibounds);
         box.applyIntrinsicBounds();
         
-        //makr the elements outside of the viewport as invisible
-        if (!viewport.getIntrinsicBounds().intersects(box.getIntrinsicBounds()))
+        //mark the elements outside of the viewport as invisible
+        if (ibounds.isEmpty()) //treat zero width/height boxes separately
+        {
+            if (boxInfo.getText() != null)
+            {
+                //zero width/height text boxes are invisible
+                box.setVisible(false); 
+            }
+            else
+            {
+                //element boxes are invisible only if they are outside of the viewport
+                //otherwise, they may contain visible children (e.g. overflowing child boxes)
+                if (!viewport.getIntrinsicBounds().contains(ibounds.getX1(), ibounds.getY1()))
+                    box.setVisible(false);
+            }
+        }
+        else if (!viewport.getIntrinsicBounds().intersects(ibounds)) //non-zero boxes must intersect with viewport
+        {
             box.setVisible(false);
+        }
         
         //check the visibility and opacity for finding hidden elements
         CSSProperty.Visibility visibility = style.getProperty("visibility");

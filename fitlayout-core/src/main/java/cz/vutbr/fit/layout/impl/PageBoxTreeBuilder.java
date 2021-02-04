@@ -11,7 +11,6 @@ import java.util.List;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.Page;
-import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
  * A simple box tree builder that takes another page as its input, re-builds the box tree
@@ -61,11 +60,10 @@ public class PageBoxTreeBuilder extends BaseBoxTreeBuilder
         //create a copy of the tree and the box list
         List<Box> boxes = new LinkedList<>();
         createBoxTree(page.getRoot(), null, boxes);
-        //use the current values as the intrinsic ones
+        //use the current parent as the intrinsic one
         for (Box box : boxes)
         {
             ((DefaultBox) box).setIntrinsicParent(box.getParent());
-            ((DefaultBox) box).setIntrinsicBounds(new Rectangular(box.getContentBounds()));
         }
         //create the new tree
         Box root = buildTree(boxes, Color.WHITE);

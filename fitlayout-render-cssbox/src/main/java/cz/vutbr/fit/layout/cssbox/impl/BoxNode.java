@@ -167,7 +167,10 @@ public class BoxNode extends DefaultBox
         setBackgroundSeparated((box instanceof ElementBox && ((ElementBox) box).getBgcolor() != null));
     }
     
-    @Override
+    /**
+     * Gets the original bounds of a box as provided by CSSBox.
+     * @return the intrinsic bounds
+     */
     public Rectangular getIntrinsicBounds()
     {
         final Box box = getBox();

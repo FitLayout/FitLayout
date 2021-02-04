@@ -29,7 +29,6 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
     private String text;
     private ContentObject contentObject;
     
-    private Rectangular intrinsicBounds;
     private Rectangular contentBounds;
     private Rectangular visualBounds;
     
@@ -62,7 +61,6 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
         if (src.getOwnText() != null)
             text = new String(src.getOwnText());
         contentObject = src.getContentObject();
-        intrinsicBounds = (src.getIntrinsicBounds() == null) ? null : new Rectangular(src.getIntrinsicBounds());
         contentBounds = (src.getContentBounds() == null) ? null : new Rectangular(src.getContentBounds());
         visualBounds = (src.getVisualBounds() == null) ? null : new Rectangular(src.getVisualBounds());
         sourceNodeId = src.getSourceNodeId();
@@ -161,17 +159,6 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
         this.contentObject = contentObject;
     }
     
-    @Override
-    public Rectangular getIntrinsicBounds()
-    {
-        return intrinsicBounds;
-    }
-
-    public void setIntrinsicBounds(Rectangular intrinsicBounds)
-    {
-        this.intrinsicBounds = intrinsicBounds;
-    }
-
     @Override
     public Rectangular getContentBounds()
     {

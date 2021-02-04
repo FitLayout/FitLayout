@@ -323,7 +323,7 @@ public abstract class BaseBoxTreeBuilder
         
         if (box.getIntrinsicParent() == null) //the root box is always visually separated
         {
-            ret = box.getIntrinsicBounds();
+            ret = box.getContentBounds();
         }
         else if (box.getType() == Type.ELEMENT)
         {
@@ -331,7 +331,7 @@ public abstract class BaseBoxTreeBuilder
             if (box.getBorderCount() == 1 && !box.isBackgroundSeparated())
             {
                 //consider borders
-                final Rectangular b = box.getIntrinsicBounds();
+                final Rectangular b = box.getContentBounds();
                 if (box.hasTopBorder())
                     ret = new Rectangular(b.getX1(), b.getY1(), b.getX2(), b.getY1() + box.getTopBorder() - 1);
                 else if (box.hasBottomBorder())
@@ -346,12 +346,12 @@ public abstract class BaseBoxTreeBuilder
             //at least two borders or a border and background - take the border bounds
             else if (box.getBorderCount() >= 2 || (box.getBorderCount() == 1 && box.isBackgroundSeparated()))
             {
-                ret = new Rectangular(box.getIntrinsicBounds()); //intrinsic bounds should correspond include the border(s)
+                ret = new Rectangular(box.getContentBounds()); //intrinsic bounds should correspond include the border(s)
             }
             //no borders and visually separated
             else if (box.isVisuallySeparated())
             {
-                ret = new Rectangular(box.getIntrinsicBounds()); //intrinsic bounds should correspond to background bounds
+                ret = new Rectangular(box.getContentBounds()); //intrinsic bounds should correspond to background bounds
             }
             //no visual separators, consider the contents
             else
@@ -373,7 +373,7 @@ public abstract class BaseBoxTreeBuilder
     {
         if (box.getType() == Type.TEXT_CONTENT || box.getType() == Type.REPLACED_CONTENT)
         {
-            return box.getIntrinsicBounds();
+            return box.getContentBounds();
         }
         else
         {
@@ -392,7 +392,7 @@ public abstract class BaseBoxTreeBuilder
             //if nothing has been found return an empty rectangle at the top left corner
             if (ret == null)
             {
-                Rectangular b = box.getIntrinsicBounds();
+                Rectangular b = box.getContentBounds();
                 return new Rectangular(b.getX1(), b.getY1());
             }
             else

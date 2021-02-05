@@ -46,6 +46,8 @@ public class BOX {
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#belongsTo}.
+	 * <p>
+	 * Assigns an owning page to a rectangle
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#belongsTo">belongsTo</a>
 	 */
@@ -122,11 +124,55 @@ public class BOX {
 	public static final IRI ContentBox;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#contentHeight}.
+	 * <p>
+	 * The height of the content bounds of a box. The content bounds
+	 * correspond to the box border bounds as provided by the box source
+	 * (renderer).
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#contentHeight">contentHeight</a>
+	 */
+	public static final IRI contentHeight;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#ContentObject}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#ContentObject">ContentObject</a>
 	 */
 	public static final IRI ContentObject;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#contentWidth}.
+	 * <p>
+	 * The width of the content bounds of a box. The content bounds
+	 * correspond to the box border bounds as provided by the box source
+	 * (renderer).
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#contentWidth">contentWidth</a>
+	 */
+	public static final IRI contentWidth;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#contentX}.
+	 * <p>
+	 * The X coordinate of the content bounds of a box. The content bounds
+	 * correspond to the box border bounds as provided by the box source
+	 * (renderer).
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#contentX">contentX</a>
+	 */
+	public static final IRI contentX;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#contentY}.
+	 * <p>
+	 * The Y coordinate of the content bounds of a box. The content bounds
+	 * correspond to the box border bounds as provided by the box source
+	 * (renderer).
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#contentY">contentY</a>
+	 */
+	public static final IRI contentY;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#displayType}.
@@ -235,6 +281,8 @@ public class BOX {
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#height}.
+	 * <p>
+	 * Effective height of a rectangle.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#height">height</a>
 	 */
@@ -307,6 +355,8 @@ public class BOX {
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#positionX}.
+	 * <p>
+	 * Effective X coordinate of a rectangle.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#positionX">positionX</a>
 	 */
@@ -314,6 +364,8 @@ public class BOX {
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#positionY}.
+	 * <p>
+	 * Effective Y coordinate of a rectangle.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#positionY">positionY</a>
 	 */
@@ -342,6 +394,8 @@ public class BOX {
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#visualHeight}.
+	 * <p>
+	 * The height of the visual bounds of a box.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#visualHeight">visualHeight</a>
 	 */
@@ -349,6 +403,8 @@ public class BOX {
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#visualWidth}.
+	 * <p>
+	 * The width of the visual bounds of a box.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#visualWidth">visualWidth</a>
 	 */
@@ -356,6 +412,8 @@ public class BOX {
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#visualX}.
+	 * <p>
+	 * The X coordinate of the visual bounds of a box.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#visualX">visualX</a>
 	 */
@@ -363,6 +421,8 @@ public class BOX {
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#visualY}.
+	 * <p>
+	 * The Y coordinate of the visual bounds of a box.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#visualY">visualY</a>
 	 */
@@ -370,6 +430,8 @@ public class BOX {
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#width}.
+	 * <p>
+	 * Effective width of a rectangle.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#width">width</a>
 	 */
@@ -393,7 +455,11 @@ public class BOX {
 		containsImage = factory.createIRI(BOX.NAMESPACE, "containsImage");
 		containsObject = factory.createIRI(BOX.NAMESPACE, "containsObject");
 		ContentBox = factory.createIRI(BOX.NAMESPACE, "ContentBox");
+		contentHeight = factory.createIRI(BOX.NAMESPACE, "contentHeight");
 		ContentObject = factory.createIRI(BOX.NAMESPACE, "ContentObject");
+		contentWidth = factory.createIRI(BOX.NAMESPACE, "contentWidth");
+		contentX = factory.createIRI(BOX.NAMESPACE, "contentX");
+		contentY = factory.createIRI(BOX.NAMESPACE, "contentY");
 		displayType = factory.createIRI(BOX.NAMESPACE, "displayType");
 		documentOrder = factory.createIRI(BOX.NAMESPACE, "documentOrder");
 		fontFamily = factory.createIRI(BOX.NAMESPACE, "fontFamily");

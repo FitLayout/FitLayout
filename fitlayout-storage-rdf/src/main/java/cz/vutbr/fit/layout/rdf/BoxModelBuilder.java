@@ -115,13 +115,18 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		    graph.add(individual, BOX.hasAttribute, attrUri);
 		}
 		
-		// store position and size of element
-		Rectangular content = box.getContentBounds();
-		graph.add(individual, BOX.height, vf.createLiteral(content.getHeight()));
-		graph.add(individual, BOX.width, vf.createLiteral(content.getWidth()));
-		graph.add(individual, BOX.positionX, vf.createLiteral(content.getX1()));
-		graph.add(individual, BOX.positionY, vf.createLiteral(content.getY1()));
-        Rectangular visual = box.getVisualBounds();
+		// store the positions and sizes of the element
+        final Rectangular bounds = box.getContentBounds();
+        graph.add(individual, BOX.height, vf.createLiteral(bounds.getHeight()));
+        graph.add(individual, BOX.width, vf.createLiteral(bounds.getWidth()));
+        graph.add(individual, BOX.positionX, vf.createLiteral(bounds.getX1()));
+        graph.add(individual, BOX.positionY, vf.createLiteral(bounds.getY1()));
+        final Rectangular content = box.getContentBounds();
+		graph.add(individual, BOX.contentHeight, vf.createLiteral(content.getHeight()));
+		graph.add(individual, BOX.contentWidth, vf.createLiteral(content.getWidth()));
+		graph.add(individual, BOX.contentX, vf.createLiteral(content.getX1()));
+		graph.add(individual, BOX.contentY, vf.createLiteral(content.getY1()));
+		final Rectangular visual = box.getVisualBounds();
         graph.add(individual, BOX.visualHeight, vf.createLiteral(visual.getHeight()));
         graph.add(individual, BOX.visualWidth, vf.createLiteral(visual.getWidth()));
         graph.add(individual, BOX.visualX, vf.createLiteral(visual.getX1()));

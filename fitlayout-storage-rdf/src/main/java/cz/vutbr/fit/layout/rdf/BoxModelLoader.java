@@ -145,6 +145,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
         box.setType(Box.Type.ELEMENT);
         box.setDisplayType(Box.DisplayType.BLOCK);
         int x = 0, y = 0, width = 0, height = 0;
+        int cx = 0, cy = 0, cwidth = 0, cheight = 0;
         int vx = 0, vy = 0, vwidth = 0, vheight = 0;
         RDFTextStyle style = new RDFTextStyle();
         
@@ -309,6 +310,26 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                 if (value instanceof Literal)
                     y = ((Literal) value).intValue();
             }
+            else if (BOX.contentHeight.equals(pred)) 
+            {
+                if (value instanceof Literal)
+                    cheight = ((Literal) value).intValue();
+            }
+            else if (BOX.contentWidth.equals(pred)) 
+            {
+                if (value instanceof Literal)
+                    cwidth = ((Literal) value).intValue();
+            }
+            else if (BOX.contentX.equals(pred)) 
+            {
+                if (value instanceof Literal)
+                    cx = ((Literal) value).intValue();
+            }   
+            else if (BOX.contentY.equals(pred)) 
+            {
+                if (value instanceof Literal)
+                    cy = ((Literal) value).intValue();
+            }
             else if (BOX.visualHeight.equals(pred)) 
             {
                 if (value instanceof Literal)
@@ -352,7 +373,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
         style.contentLength = box.getText().length();
         box.setTextStyle(style.toTextStyle());
         box.setBounds(new Rectangular(x, y, x + width - 1, y + height - 1));
-        box.setContentBounds(new Rectangular(x, y, x + width - 1, y + height - 1));
+        box.setContentBounds(new Rectangular(cx, cy, cx + cwidth - 1, cy + cheight - 1));
         box.setVisualBounds(new Rectangular(vx, vy, vx + vwidth - 1, vy + vheight - 1));
         
         return box;

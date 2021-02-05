@@ -53,6 +53,8 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		
 		// store basic page data
 		addArtifactData(graph, page);
+		graph.add(pageNode, BOX.width, vf.createLiteral(page.getWidth()));
+        graph.add(pageNode, BOX.height, vf.createLiteral(page.getHeight()));
 		graph.add(pageNode, BOX.sourceUrl, vf.createLiteral(baseUrl));
 		if (page.getTitle() != null)
 		    graph.add(pageNode, BOX.hasTitle, vf.createLiteral(page.getTitle()));

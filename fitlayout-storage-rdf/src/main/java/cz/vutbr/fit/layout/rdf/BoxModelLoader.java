@@ -84,8 +84,11 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             RDFBox root = constructBoxTree(artifactRepo.getStorage(), boxTreeModel, borderModel, attributeModel, pageIri, boxes); 
             page.setRoot(root);
             page.setBoxIris(boxes);
-            page.setWidth(root.getWidth());
-            page.setHeight(root.getHeight());
+            if (page.getWidth() == -1 && page.getHeight() == -1) //when the page width and height was not set
+            {
+                page.setWidth(root.getWidth());
+                page.setHeight(root.getHeight());
+            }
             
             return page;
         }

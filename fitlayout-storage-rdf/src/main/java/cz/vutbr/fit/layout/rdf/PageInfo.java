@@ -17,7 +17,9 @@ import cz.vutbr.fit.layout.rdf.model.RDFPage;
  */
 public class PageInfo extends RDFArtifactInfo
 {
-	private String title;
+	private int width;
+	private int height;
+    private String title;
     private String url;
 	private byte[] pngImage;
 	
@@ -25,6 +27,7 @@ public class PageInfo extends RDFArtifactInfo
     public PageInfo(Model model, IRI pageIri) 
     {
         super(model, pageIri);
+        width = height = -1; //-1 means not set
     }
 
     protected void processStatement(Statement st)
@@ -50,7 +53,27 @@ public class PageInfo extends RDFArtifactInfo
         }
     }
     
-	public String getTitle() 
+	public int getWidth()
+    {
+        return width;
+    }
+
+    public void setWidth(int width)
+    {
+        this.width = width;
+    }
+
+    public int getHeight()
+    {
+        return height;
+    }
+
+    public void setHeight(int height)
+    {
+        this.height = height;
+    }
+
+    public String getTitle() 
 	{
 	    return title;
 	}
@@ -68,6 +91,8 @@ public class PageInfo extends RDFArtifactInfo
     public void applyToPage(RDFPage page)
     {
         applyToArtifact(page);
+        page.setWidth(width);
+        page.setHeight(height);
         page.setTitle(getTitle());
         if (getPngImage() != null)
             page.setPngImage(getPngImage());

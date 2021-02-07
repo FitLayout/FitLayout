@@ -6,6 +6,11 @@ module cz.vutbr.fit.layout.tools
     requires cz.vutbr.fit.layout.cssbox;
     requires cz.vutbr.fit.layout.puppeteer;
     requires cz.vutbr.fit.layout.segm;
+    requires cz.vutbr.fit.layout.rdf;
+    
+    exports cz.vutbr.fit.layout.tools;
+    opens cz.vutbr.fit.layout.tools;
     
     requires rdf4j.onejar;
+    requires cli.parser;
 }

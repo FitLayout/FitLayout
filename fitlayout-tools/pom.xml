@@ -16,7 +16,7 @@
 	
 	<name>FitLayout - Tools</name>
 	<description>
-		FitLayout - Runnable tools
+		FitLayout - Command-line interface tools
 	</description>
 	<url>https://github.com/FitLayout/FitLayout</url>
 
@@ -71,27 +71,18 @@
 			<groupId>cz.vutbr.fit.layout</groupId>
 			<artifactId>fitlayout-segm-base</artifactId>
 		</dependency>
-		<!-- <dependency>
-			<groupId>cz.vutbr.fit.layout</groupId>
-			<artifactId>layout-logical</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>cz.vutbr.fit.layout</groupId>
-			<artifactId>layout-classify</artifactId>
+			<artifactId>fitlayout-storage-rdf</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>cz.vutbr.fit.layout</groupId>
-			<artifactId>layout-storage-rdf</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>slf4j-log4j12</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency> -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.spullara.cli-parser</groupId>
+			<artifactId>cli-parser</artifactId>
+			<version>1.1.5</version>
 		</dependency>
 	</dependencies>
 

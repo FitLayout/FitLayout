@@ -7,6 +7,7 @@ package cz.vutbr.fit.layout.tools;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -20,6 +21,7 @@ import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.api.ServiceManager;
 import cz.vutbr.fit.layout.cssbox.CSSBoxTreeProvider;
 import cz.vutbr.fit.layout.impl.DefaultArtifactRepository;
+import cz.vutbr.fit.layout.io.XMLBoxOutput;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.puppeteer.PuppeteerTreeProvider;
@@ -122,7 +124,7 @@ public class Renderer
         }
         else if ("xml".equals(format))
         {
-            
+            outputXML(page, outfile);
         }
         else
             throw new IllegalArgumentException("Illegal format name: " + backend + ". Legal values: [xml, turtle]");
@@ -135,6 +137,15 @@ public class Renderer
         FileOutputStream os = new FileOutputStream(outfile);
         Serialization.modelToStream(graph, os, mimeType);
         os.close();
+    }
+    
+    public void outputXML(Page page, String outfile) throws IOException
+    {
+        FileOutputStream os = new FileOutputStream(outfile);
+        PrintWriter out = new PrintWriter(os);
+        XMLBoxOutput xml = new XMLBoxOutput(true);
+        xml.dumpTo(page, out);
+        out.close();
     }
     
     /**

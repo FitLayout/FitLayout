@@ -76,6 +76,10 @@
 			<artifactId>fitlayout-storage-rdf</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>cz.vutbr.fit.layout</groupId>
+			<artifactId>fitlayout-io</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>

@@ -5,17 +5,15 @@
  */
 package cz.vutbr.fit.layout.tools;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.eclipse.rdf4j.model.Model;
-
-import com.sampullara.cli.Args;
-import com.sampullara.cli.Argument;
 
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.api.ServiceManager;
@@ -27,50 +25,46 @@ import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.puppeteer.PuppeteerTreeProvider;
 import cz.vutbr.fit.layout.rdf.BoxModelBuilder;
 import cz.vutbr.fit.layout.rdf.Serialization;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
 /**
  * A command-line interface to page rendering.
  * 
  * @author burgetr
  */
-public class Renderer
+@Command(name = "Renderer")
+public class Renderer implements Callable<Integer>
 {
-    @Argument(alias = "h", description = "print help")
+    public enum Backend { cssbox, puppeteer };
+    public enum Format { xml, turtle };
+    
+    @Option(names = {"-h", "--help"}, usageHelp = true, description = "print help")
     private boolean help;
     
-    @Argument(alias = "W", description = "Browser window width")
-    private Integer width = 1200;
+    @Option(names = {"-W", "--width"}, paramLabel = "width", description = "Browser window width in pixels (${DEFAULT-VALUE})")
+    private int width = 1200;
     
-    @Argument(alias = "H", description = "Browser window height")
-    private Integer height = 800;
+    @Option(names = {"-H", "--height"}, paramLabel = "height", description = "Browser window height in pixels (${DEFAULT-VALUE})")
+    private int height = 800;
     
-    @Argument(alias = "b", description = "Rendering backend to be used")
-    private String backend = "cssbox";
+    @Option(names = {"-b", "--backend"}, paramLabel = "backend_name", description = "The backend to use: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
+    private Backend backend = Backend.cssbox;
     
-    @Argument(alias = "f", description = "Output format")
-    private String format = "xml";
-    
+    @Option(names = {"-f", "--format"}, paramLabel = "format", description = "Output format: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
+    private Format format = Format.xml;
 
-    public void invoke(String[] args)
+    @Parameters(arity = "1", index = "0", description = "Input page URL")
+    private URL url;
+
+    @Parameters(arity = "1", index = "1", description = "Output file path")
+    private File outfile;
+
+    @Override
+    public Integer call() throws Exception
     {
         try {
-            List<String> params = Args.parse(this, args, true);
-            
-            if (help)
-            {
-                printHelp();
-                return;
-            }
-            
-            if (params.size() < 2)
-            {
-                System.err.println("Page URL and/or output file not provided");
-                printHelp();
-                return;
-            }
-            
-            final URL url = new URL(params.get(0));
-            final String outfile = params.get(1);
             Page page = render(url, backend, width, height);
             
             System.out.println(page);
@@ -86,6 +80,12 @@ public class Renderer
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
+        
+        return 0;
+    }
+
+    public void invoke(String[] args)
+    {
     }
     
     /**
@@ -96,41 +96,38 @@ public class Renderer
      * @param height
      * @return The created page.
      */
-    public Page render(URL url, String backend, int width, int height)
+    public Page render(URL url, Backend backend, int width, int height)
     {
-        if ("cssbox".equalsIgnoreCase(backend))
+        switch (backend) 
         {
-            CSSBoxTreeProvider provider = new CSSBoxTreeProvider(url, width, height, 1.0f);
-            provider.setServiceManager(getServiceManager());
-            Artifact page = provider.process(null);
-            return (Page) page;
+            case cssbox:
+                CSSBoxTreeProvider cprovider = new CSSBoxTreeProvider(url, width, height, 1.0f);
+                cprovider.setServiceManager(getServiceManager());
+                Artifact cpage = cprovider.process(null);
+                return (Page) cpage;
+            case puppeteer:
+                PuppeteerTreeProvider pprovider = new PuppeteerTreeProvider(url, width, height, 1, false, false);
+                pprovider.setServiceManager(getServiceManager());
+                Artifact ppage = pprovider.process(null);
+                return (Page) ppage;
         }
-        else if ("puppeteer".equalsIgnoreCase(backend))
-        {
-            PuppeteerTreeProvider provider = new PuppeteerTreeProvider(url, width, height, 1, false, false);
-            provider.setServiceManager(getServiceManager());
-            Artifact page = provider.process(null);
-            return (Page) page;
-        }
-        else
-            throw new IllegalArgumentException("Illegal backend name: " + backend + ". Legal values: [cssbox, puppeteer]");
+        return null;
     }
     
-    public void writeOutput(Page page, String outfile, String format) throws IOException
+    public void writeOutput(Page page, File outfile, Format format) throws IOException
     {
-        if ("turtle".equals(format))
+        switch (format)
         {
-            outputRDF(page, outfile, Serialization.TURTLE);
+            case turtle:
+                outputRDF(page, outfile, Serialization.TURTLE);
+                break;
+            case xml:
+                outputXML(page, outfile);
+                break;
         }
-        else if ("xml".equals(format))
-        {
-            outputXML(page, outfile);
-        }
-        else
-            throw new IllegalArgumentException("Illegal format name: " + backend + ". Legal values: [xml, turtle]");
     }
     
-    public void outputRDF(Page page, String outfile, String mimeType) throws IOException
+    public void outputRDF(Page page, File outfile, String mimeType) throws IOException
     {
         BoxModelBuilder builder = new BoxModelBuilder();
         Model graph = builder.createGraph(page);
@@ -139,7 +136,7 @@ public class Renderer
         os.close();
     }
     
-    public void outputXML(Page page, String outfile) throws IOException
+    public void outputXML(Page page, File outfile) throws IOException
     {
         FileOutputStream os = new FileOutputStream(outfile);
         PrintWriter out = new PrintWriter(os);
@@ -159,10 +156,4 @@ public class Renderer
         return sm;
     }
     
-    public void printHelp()
-    {
-        Args.usage(System.err, this, Cli.class);
-    }
-    
-
 }

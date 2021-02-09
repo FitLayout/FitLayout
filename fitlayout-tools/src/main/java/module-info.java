@@ -13,5 +13,5 @@ module cz.vutbr.fit.layout.tools
     opens cz.vutbr.fit.layout.tools;
     
     requires rdf4j.onejar;
-    requires cli.parser;
+    requires info.picocli;
 }

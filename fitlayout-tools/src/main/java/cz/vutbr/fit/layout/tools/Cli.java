@@ -5,6 +5,8 @@
  */
 package cz.vutbr.fit.layout.tools;
 
+import picocli.CommandLine;
+
 /**
  * 
  * @author burgetr
@@ -19,8 +21,11 @@ public class Cli
     {
         Renderer renderer = new Renderer();
         
-        renderer.invoke(args);
-
+        CommandLine cmd = new CommandLine(renderer);
+        cmd.setUsageHelpWidth(120);
+        cmd.setUsageHelpLongOptionsMaxWidth(40);
+        int exitCode = cmd.execute(args);
+        System.exit(exitCode);
     }
 
 }

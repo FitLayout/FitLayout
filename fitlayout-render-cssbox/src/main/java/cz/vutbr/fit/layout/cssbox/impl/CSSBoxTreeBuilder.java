@@ -5,7 +5,9 @@
  */
 package cz.vutbr.fit.layout.cssbox.impl;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -17,6 +19,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.eclipse.rdf4j.model.IRI;
@@ -73,6 +77,8 @@ public class CSSBoxTreeBuilder extends BaseBoxTreeBuilder
     /** Replace the images with their {@code alt} text */
     protected boolean replaceImagesWithAlt;
     
+    private boolean includeScreenshot;
+    
     private float zoom;
     
    
@@ -83,6 +89,7 @@ public class CSSBoxTreeBuilder extends BaseBoxTreeBuilder
         this.useVisualBounds = useVisualBounds;
         this.preserveAux = preserveAux;
         this.replaceImagesWithAlt = replaceImagesWithAlt;
+        this.includeScreenshot = true;
         this.zoom = 1.0f;
     }
     
@@ -96,6 +103,16 @@ public class CSSBoxTreeBuilder extends BaseBoxTreeBuilder
         this.zoom = zoom;
     }
     
+    public boolean isIncludeScreenshot()
+    {
+        return includeScreenshot;
+    }
+
+    public void setIncludeScreenshot(boolean includeScreenshot)
+    {
+        this.includeScreenshot = includeScreenshot;
+    }
+
     public void setPageIri(IRI pageIri)
     {
         if (page != null)
@@ -109,6 +126,15 @@ public class CSSBoxTreeBuilder extends BaseBoxTreeBuilder
         viewport = engine.getViewport();
         PageImpl pg = page = new PageImpl(pageUrl);
         pg.setTitle(pageTitle);
+        
+        //add the screenshot
+        if (includeScreenshot)
+        {
+            BufferedImage img = ((GraphicsEngine) engine).getImage();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(img, "png", baos);
+            pg.setPngImage(baos.toByteArray());
+        }
         
         //construct the box tree
         Viewport rootbox = engine.getViewport();
@@ -247,7 +273,7 @@ public class CSSBoxTreeBuilder extends BaseBoxTreeBuilder
             engine.getConfig().setLoadFonts(false);
             engine.getConfig().setReplaceImagesWithAlt(replaceImagesWithAlt);
             defineLogicalFonts(engine.getConfig());
-            engine.createLayout(pageSize, new Rectangle(pageSize), false);
+            engine.createLayout(pageSize, new Rectangle(pageSize), includeScreenshot);
             
             src.close();
 

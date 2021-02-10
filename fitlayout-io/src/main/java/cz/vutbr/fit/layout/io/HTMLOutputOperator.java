@@ -167,6 +167,9 @@ public class HTMLOutputOperator extends BaseOperator
                 out.println("<title>" + sourcePage.getTitle() + "</title>");
             out.println("<meta charset=\"utf-8\">");
             out.println("<meta name=\"generator\" content=\"FITLayout - area tree dump\">");
+            out.println("<style>");
+            out.println("span { white-space: nowrap; }");
+            out.println("</style>");
             out.println("</head>");
             out.println("<body>");
         }
@@ -193,6 +196,9 @@ public class HTMLOutputOperator extends BaseOperator
             out.println("<title>" + page.getTitle() + "</title>");
             out.println("<meta charset=\"utf-8\">");
             out.println("<meta name=\"generator\" content=\"FITLayout - box tree dump\">");
+            out.println("<style>");
+            out.println("span { white-space: nowrap; }");
+            out.println("</style>");
             out.println("</head>");
             out.println("<body>");
         }
@@ -244,8 +250,6 @@ public class HTMLOutputOperator extends BaseOperator
         List<Box> boxes = a.getBoxes();
         for (Box box : boxes)
         {
-            //Dump only the text boxes. The style of the element boxes should be
-            //already taken into account in the areas.
             if (box.getType() == Type.TEXT_CONTENT)
             {
                 indent(level, p);
@@ -256,6 +260,24 @@ public class HTMLOutputOperator extends BaseOperator
                 p.print(stag);
                 p.print(HTMLEntities(box.getText()));
                 p.println("</span>");
+            }
+            else
+            {
+                Style style = getBoxStyle(a, box);
+                style.put("width", getContentWidth(box), "px");
+                style.put("height", getContentHeight(box), "px");
+                String stag = "<div"
+                                + " id=\"b" + box.getId() + "\""
+                                + " style=\"" + style + "\"" 
+                                + ">";
+                indent(level, p);
+                p.println(stag);
+                
+                for (int i = 0; i < box.getChildCount(); i++)
+                    recursiveDumpBoxes(box.getChildAt(i), level + 1, p);
+                
+                indent(level, p);
+                p.println("</div>");
             }
         }
     }

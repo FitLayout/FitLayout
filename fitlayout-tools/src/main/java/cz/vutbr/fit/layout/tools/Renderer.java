@@ -24,6 +24,7 @@ import cz.vutbr.fit.layout.api.ServiceManager;
 import cz.vutbr.fit.layout.bcs.BCSProvider;
 import cz.vutbr.fit.layout.cssbox.CSSBoxTreeProvider;
 import cz.vutbr.fit.layout.impl.DefaultArtifactRepository;
+import cz.vutbr.fit.layout.io.HTMLOutputOperator;
 import cz.vutbr.fit.layout.io.XMLBoxOutput;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
@@ -45,7 +46,7 @@ import picocli.CommandLine.Parameters;
 public class Renderer implements Callable<Integer>
 {
     public enum Backend { cssbox, puppeteer };
-    public enum Format { xml, turtle };
+    public enum Format { xml, turtle, html };
     
     @Option(order = 100, names = {"-h", "--help"}, usageHelp = true, description = "print help")
     protected boolean help;
@@ -143,21 +144,6 @@ public class Renderer implements Callable<Integer>
         {
             return null;
         }
-        
-        /*switch (backend) 
-        {
-            case cssbox:
-                CSSBoxTreeProvider cprovider = new CSSBoxTreeProvider(url, width, height, 1.0f);
-                cprovider.setServiceManager(getServiceManager());
-                Artifact cpage = cprovider.process(null);
-                return (Page) cpage;
-            case puppeteer:
-                PuppeteerTreeProvider pprovider = new PuppeteerTreeProvider(url, width, height, 1, false, false);
-                pprovider.setServiceManager(getServiceManager());
-                Artifact ppage = pprovider.process(null);
-                return (Page) ppage;
-        }
-        return null;*/
     }
     
     public void writeOutput(Page page, File outfile, Format format) throws IOException
@@ -169,6 +155,9 @@ public class Renderer implements Callable<Integer>
                 break;
             case xml:
                 outputXML(page, outfile);
+                break;
+            case html:
+                outputHTML(page, outfile);
                 break;
         }
     }
@@ -188,6 +177,15 @@ public class Renderer implements Callable<Integer>
         PrintWriter out = new PrintWriter(os);
         XMLBoxOutput xml = new XMLBoxOutput(true);
         xml.dumpTo(page, out);
+        out.close();
+    }
+    
+    public void outputHTML(Page page, File outfile) throws IOException
+    {
+        FileOutputStream os = new FileOutputStream(outfile);
+        PrintWriter out = new PrintWriter(os);
+        HTMLOutputOperator html = new HTMLOutputOperator();
+        html.dumpTo(page, out);
         out.close();
     }
     

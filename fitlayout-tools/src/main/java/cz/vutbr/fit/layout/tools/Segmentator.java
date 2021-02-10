@@ -8,6 +8,7 @@ package cz.vutbr.fit.layout.tools;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,13 +18,13 @@ import cz.vutbr.fit.layout.api.ArtifactService;
 import cz.vutbr.fit.layout.api.ParametrizedOperation;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.api.ServiceManager;
+import cz.vutbr.fit.layout.io.HTMLOutputOperator;
 import cz.vutbr.fit.layout.io.XMLOutputOperator;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.rdf.AreaModelBuilder;
 import cz.vutbr.fit.layout.rdf.Serialization;
-import cz.vutbr.fit.layout.tools.Renderer.Format;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -53,7 +54,7 @@ public class Segmentator extends Renderer
             AreaTree atree = segment(page, method, sopts);
             System.out.println("  Created: " + atree);
             
-            writeOutput(atree, outfile, format);
+            writeOutput(atree, page, outfile, format);
             System.out.println("Written to " + outfile);
             
             return 0;
@@ -102,7 +103,7 @@ public class Segmentator extends Renderer
         }
     }
     
-    public void writeOutput(AreaTree atree, File outfile, Format format) throws IOException
+    public void writeOutput(AreaTree atree, Page page, File outfile, Format format) throws IOException
     {
         switch (format)
         {
@@ -111,6 +112,9 @@ public class Segmentator extends Renderer
                 break;
             case xml:
                 outputXML(atree, outfile);
+                break;
+            case html:
+                outputHTML(atree, page, outfile);
                 break;
         }
     }
@@ -124,10 +128,19 @@ public class Segmentator extends Renderer
         os.close();
     }
     
-    public void outputXML(AreaTree page, File outfile) throws IOException
+    public void outputXML(AreaTree atree, File outfile) throws IOException
     {
         XMLOutputOperator out = new XMLOutputOperator(outfile.getAbsolutePath(), true);
-        out.apply(page);
+        out.apply(atree);
+    }
+    
+    public void outputHTML(AreaTree atree, Page page, File outfile) throws IOException
+    {
+        FileOutputStream os = new FileOutputStream(outfile);
+        PrintWriter out = new PrintWriter(os);
+        HTMLOutputOperator html = new HTMLOutputOperator();
+        html.dumpTo(atree, page, out);
+        out.close();
     }
     
 }

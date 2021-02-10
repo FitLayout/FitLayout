@@ -73,6 +73,14 @@
 		</dependency>
 		<dependency>
 			<groupId>cz.vutbr.fit.layout</groupId>
+			<artifactId>fitlayout-segm-vips</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cz.vutbr.fit.layout</groupId>
+			<artifactId>fitlayout-segm-bcs</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cz.vutbr.fit.layout</groupId>
 			<artifactId>fitlayout-storage-rdf</artifactId>
 		</dependency>
 		<dependency>

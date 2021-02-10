@@ -11,12 +11,17 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.eclipse.rdf4j.model.Model;
 
+import cz.vutbr.fit.layout.api.ArtifactService;
+import cz.vutbr.fit.layout.api.ParametrizedOperation;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.api.ServiceManager;
+import cz.vutbr.fit.layout.bcs.BCSProvider;
 import cz.vutbr.fit.layout.cssbox.CSSBoxTreeProvider;
 import cz.vutbr.fit.layout.impl.DefaultArtifactRepository;
 import cz.vutbr.fit.layout.io.XMLBoxOutput;
@@ -25,6 +30,8 @@ import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.puppeteer.PuppeteerTreeProvider;
 import cz.vutbr.fit.layout.rdf.BoxModelBuilder;
 import cz.vutbr.fit.layout.rdf.Serialization;
+import cz.vutbr.fit.layout.segm.Provider;
+import cz.vutbr.fit.layout.vips.VipsProvider;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -34,42 +41,49 @@ import picocli.CommandLine.Parameters;
  * 
  * @author burgetr
  */
-@Command(name = "Renderer")
+@Command(name = "render", sortOptions = false, abbreviateSynopsis = true)
 public class Renderer implements Callable<Integer>
 {
     public enum Backend { cssbox, puppeteer };
     public enum Format { xml, turtle };
     
-    @Option(names = {"-h", "--help"}, usageHelp = true, description = "print help")
-    private boolean help;
+    @Option(order = 100, names = {"-h", "--help"}, usageHelp = true, description = "print help")
+    protected boolean help;
     
-    @Option(names = {"-W", "--width"}, paramLabel = "width", description = "Browser window width in pixels (${DEFAULT-VALUE})")
-    private int width = 1200;
+    @Option(order = 1, names = {"-W", "--width"}, paramLabel = "width", description = "Browser window width in pixels (${DEFAULT-VALUE})")
+    protected int width = 1200;
     
-    @Option(names = {"-H", "--height"}, paramLabel = "height", description = "Browser window height in pixels (${DEFAULT-VALUE})")
-    private int height = 800;
+    @Option(order = 2, names = {"-H", "--height"}, paramLabel = "height", description = "Browser window height in pixels (${DEFAULT-VALUE})")
+    protected int height = 800;
     
-    @Option(names = {"-b", "--backend"}, paramLabel = "backend_name", description = "The backend to use: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
-    private Backend backend = Backend.cssbox;
+    @Option(order = 3, names = {"-b", "--backend"}, paramLabel = "backend_name", description = "The backend to use: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
+    protected Backend backend = Backend.cssbox;
     
-    @Option(names = {"-f", "--format"}, paramLabel = "format", description = "Output format: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
-    private Format format = Format.xml;
+    @Option(order = 4, names = {"-f", "--format"}, paramLabel = "format", description = "Output format: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
+    protected Format format = Format.xml;
+    
+    @Option(order = 5, names = {"--ropts"}, paramLabel = "KEY=VALUE", split = "\\,", splitSynopsisLabel = ",", description = "Additional rendering backend options")
+    protected Map<String, String> ropts;
 
     @Parameters(arity = "1", index = "0", description = "Input page URL")
-    private URL url;
+    protected URL url;
 
     @Parameters(arity = "1", index = "1", description = "Output file path")
-    private File outfile;
+    protected File outfile;
 
+    protected ServiceManager serviceManager;
+    
     @Override
     public Integer call() throws Exception
     {
         try {
-            Page page = render(url, backend, width, height);
+            Page page = render(url, backend, width, height, ropts);
             
-            System.out.println(page);
+            System.out.println("  Created: " + page);
             writeOutput(page, outfile, format);
             System.out.println("Written to " + outfile);
+            
+            return 0;
             
         } catch (IllegalArgumentException e) {
             System.err.println("Error: " + e.getMessage());
@@ -81,7 +95,7 @@ public class Renderer implements Callable<Integer>
             System.err.println(e.getMessage());
         }
         
-        return 0;
+        return 1;
     }
 
     public void invoke(String[] args)
@@ -96,9 +110,41 @@ public class Renderer implements Callable<Integer>
      * @param height
      * @return The created page.
      */
-    public Page render(URL url, Backend backend, int width, int height)
+    public Page render(URL url, Backend backend, int width, int height, Map<String, String> params)
     {
-        switch (backend) 
+        String serviceId = "";
+        switch (backend)
+        {
+            case cssbox:
+                serviceId = "FitLayout.CSSBox";
+                break;
+            case puppeteer:
+                serviceId = "FitLayout.Puppeteer";
+                break;
+        }
+        
+        ParametrizedOperation op = getServiceManager().findParmetrizedService(serviceId);
+        System.out.println("Rendering: " + op);
+        if (op != null)
+        {
+            Map<String, Object> sparams = new HashMap<>();
+            sparams.put("url", url.toString());
+            sparams.put("width", width);
+            sparams.put("height", height);
+            if (params != null)
+                sparams.putAll(params);
+            ServiceManager.setServiceParams(op, sparams);
+            System.out.println("  Params: " + op.getParamString());
+            
+            Artifact page = ((ArtifactService) op).process(null);
+            return (Page) page;
+        }
+        else
+        {
+            return null;
+        }
+        
+        /*switch (backend) 
         {
             case cssbox:
                 CSSBoxTreeProvider cprovider = new CSSBoxTreeProvider(url, width, height, 1.0f);
@@ -111,7 +157,7 @@ public class Renderer implements Callable<Integer>
                 Artifact ppage = pprovider.process(null);
                 return (Page) ppage;
         }
-        return null;
+        return null;*/
     }
     
     public void writeOutput(Page page, File outfile, Format format) throws IOException
@@ -151,9 +197,29 @@ public class Renderer implements Callable<Integer>
      */
     protected ServiceManager getServiceManager()
     {
-        ServiceManager sm = ServiceManager.create();
-        sm.setArtifactRepository(new DefaultArtifactRepository());
-        return sm;
+        if (serviceManager == null)
+        {
+            serviceManager = ServiceManager.create();
+            //initialize the services
+            CSSBoxTreeProvider cssboxProvider = new CSSBoxTreeProvider();
+            serviceManager.addArtifactService(cssboxProvider);
+            
+            PuppeteerTreeProvider puppeteerProvider = new PuppeteerTreeProvider();
+            serviceManager.addArtifactService(puppeteerProvider);
+            
+            Provider segmProvider = new Provider();
+            serviceManager.addArtifactService(segmProvider);
+            
+            VipsProvider vipsProvider = new VipsProvider();
+            serviceManager.addArtifactService(vipsProvider);
+            
+            BCSProvider bcsProvider = new BCSProvider();
+            serviceManager.addArtifactService(bcsProvider);
+            
+            //use a default in-memory repository
+            serviceManager.setArtifactRepository(new DefaultArtifactRepository());
+        }
+        return serviceManager;
     }
     
 }

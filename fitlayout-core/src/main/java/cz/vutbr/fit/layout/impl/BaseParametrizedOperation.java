@@ -87,8 +87,29 @@ public abstract class BaseParametrizedOperation extends BaseService implements P
             }
             else
             {
-                m = getClass().getMethod(sname, String.class);
-                m.invoke(this, value.toString());
+                try {
+                    m = getClass().getMethod(sname, String.class);
+                    m.invoke(this, value.toString());
+                    return true;
+                } catch (NoSuchMethodException e) {
+                }
+                //no string version found, try the int
+                try {
+                    int n = Integer.parseInt(value.toString());
+                    m = getClass().getMethod(sname, int.class);
+                    m.invoke(this, n);
+                    return true;
+                } catch (NumberFormatException e) {
+                } catch (NoSuchMethodException e) {
+                }
+                //try the float version
+                try {
+                    float n = Float.parseFloat(value.toString());
+                    m = getClass().getMethod(sname, float.class);
+                    m.invoke(this, n);
+                    return true;
+                } catch (NumberFormatException e) {
+                }
             }
             return true;
             

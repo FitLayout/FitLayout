@@ -77,6 +77,10 @@ public class CSSBoxTreeBuilder extends BaseBoxTreeBuilder
     /** Replace the images with their {@code alt} text */
     protected boolean replaceImagesWithAlt;
     
+    /** Acquire images? */
+    private boolean acquireImages;
+    
+    /** Inlcude screen shots? */
     private boolean includeScreenshot;
     
     private float zoom;
@@ -103,7 +107,17 @@ public class CSSBoxTreeBuilder extends BaseBoxTreeBuilder
         this.zoom = zoom;
     }
     
-    public boolean isIncludeScreenshot()
+    public boolean getAcquireImages()
+    {
+        return acquireImages;
+    }
+
+    public void setAcquireImages(boolean acquireImages)
+    {
+        this.acquireImages = acquireImages;
+    }
+
+    public boolean getIncludeScreenshot()
     {
         return includeScreenshot;
     }
@@ -268,8 +282,8 @@ public class CSSBoxTreeBuilder extends BaseBoxTreeBuilder
             
             Engine engine = new GraphicsEngine(da.getRoot(), da, src.getURL());
             engine.setAutoMediaUpdate(false);
-            engine.getConfig().setLoadImages(false);
-            engine.getConfig().setLoadBackgroundImages(false);
+            engine.getConfig().setLoadImages(acquireImages);
+            engine.getConfig().setLoadBackgroundImages(acquireImages);
             engine.getConfig().setLoadFonts(false);
             engine.getConfig().setReplaceImagesWithAlt(replaceImagesWithAlt);
             defineLogicalFonts(engine.getConfig());

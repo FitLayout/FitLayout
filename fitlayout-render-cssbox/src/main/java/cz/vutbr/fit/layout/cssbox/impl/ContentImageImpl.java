@@ -5,8 +5,14 @@
  */
 package cz.vutbr.fit.layout.cssbox.impl;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URL;
 
+import javax.imageio.ImageIO;
+
+import org.fit.cssbox.awt.BitmapImage;
 import org.fit.cssbox.layout.ReplacedImage;
 
 import cz.vutbr.fit.layout.model.ContentImage;
@@ -47,7 +53,24 @@ public class ContentImageImpl implements ContentImage
     @Override
     public byte[] getPngData()
     {
-        // TODO
+        if (image != null)
+        {
+            org.fit.cssbox.layout.ContentImage img = image.getImage();
+            if (img != null && img instanceof BitmapImage)
+            {
+                BufferedImage bimg = ((BitmapImage) img).getBufferedImage();
+                if (bimg != null)
+                {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    try
+                    {
+                        ImageIO.write(bimg, "png", baos);
+                        return baos.toByteArray();
+                    } catch (IOException e) {
+                    }
+                }
+            }
+        }
         return null;
     }
 

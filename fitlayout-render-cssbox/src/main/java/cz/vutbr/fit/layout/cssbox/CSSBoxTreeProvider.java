@@ -38,6 +38,7 @@ public class CSSBoxTreeProvider extends BaseArtifactService
     private int width;
     private int height;
     private float zoom;
+    private boolean acquireImages; 
     private boolean includeScreenshot;
     private boolean replaceImagesWithAlt; //not published as a parameter now
     
@@ -49,15 +50,17 @@ public class CSSBoxTreeProvider extends BaseArtifactService
         width = 1200;
         height = 800;
         zoom = 1.0f;
+        acquireImages = false;
         includeScreenshot = true;
     }
     
-    public CSSBoxTreeProvider(URL url, int width, int height, float zoom, boolean includeScreenshot)
+    public CSSBoxTreeProvider(URL url, int width, int height, float zoom, boolean acquireImages, boolean includeScreenshot)
     {
         this.urlstring = url.toString();
         this.width = width;
         this.height = height;
         this.zoom = zoom;
+        this.acquireImages = acquireImages;
         this.includeScreenshot = includeScreenshot;
     }
 
@@ -86,8 +89,9 @@ public class CSSBoxTreeProvider extends BaseArtifactService
         ret.add(new ParameterString("url", 0, 64));
         ret.add(new ParameterInt("width", 10, 9999));
         ret.add(new ParameterInt("height", 10, 9999));
-        ret.add(new ParameterFloat("zoom", -5.0f, 5.0f));
+        ret.add(new ParameterBoolean("acquireImages"));
         ret.add(new ParameterBoolean("includeScreenshot"));
+        ret.add(new ParameterFloat("zoom", -5.0f, 5.0f));
         return ret;
     }
     
@@ -131,7 +135,17 @@ public class CSSBoxTreeProvider extends BaseArtifactService
         this.zoom = zoom;
     }
 
-    public boolean isIncludeScreenshot()
+    public boolean getAcquireImages()
+    {
+        return acquireImages;
+    }
+
+    public void setAcquireImages(boolean acquireImages)
+    {
+        this.acquireImages = acquireImages;
+    }
+
+    public boolean getIncludeScreenshot()
     {
         return includeScreenshot;
     }
@@ -177,6 +191,7 @@ public class CSSBoxTreeProvider extends BaseArtifactService
     {
         builder = new CSSBoxTreeBuilder(new Dimension(width, height), false, true, replaceImagesWithAlt);
         builder.setZoom(zoom);
+        builder.setAcquireImages(acquireImages);
         builder.setIncludeScreenshot(includeScreenshot);
         builder.parse(urlstring);
         PageImpl page = (PageImpl) builder.getPage();

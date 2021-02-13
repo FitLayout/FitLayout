@@ -5,8 +5,12 @@
  */
 package cz.vutbr.fit.layout.tools;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import cz.vutbr.fit.layout.api.ServiceManager;
@@ -28,6 +32,8 @@ import picocli.CommandLine.Command;
 @Command(name = "fitlayout", subcommands = {Renderer.class, Segmentator.class})
 public class Cli
 {
+    private static final String CONFIG_FILE = "config.properties";
+
     private Page page;
     private AreaTree areaTree;
     private ServiceManager serviceManager;
@@ -100,6 +106,21 @@ public class Cli
         }
         return ret;
     }
+
+    private static void loadConfigFile()
+    {
+        try (InputStream input = new FileInputStream(CONFIG_FILE)) 
+        {
+            Properties p = new Properties();
+            p.load(input);
+            for (String name : p.stringPropertyNames())
+            {
+                String value = p.getProperty(name);
+                System.setProperty(name, value);
+            }
+        } catch (IOException e) {
+        }
+    }
     
     /**
      * @param args
@@ -122,6 +143,9 @@ public class Cli
         //split command line to individual commands
         Set<String> cnames = cmd.getSubcommands().keySet();
         List<List<String>> subcommands = splitArgsByCommands(args, cnames);
+
+        //load config file if present
+        loadConfigFile();
         
         //execute the individual command lines
         for (List<String> subcl : subcommands)

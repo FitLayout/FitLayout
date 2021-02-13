@@ -21,18 +21,12 @@ import cz.vutbr.fit.layout.api.ArtifactService;
 import cz.vutbr.fit.layout.api.ParametrizedOperation;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.api.ServiceManager;
-import cz.vutbr.fit.layout.bcs.BCSProvider;
-import cz.vutbr.fit.layout.cssbox.CSSBoxTreeProvider;
-import cz.vutbr.fit.layout.impl.DefaultArtifactRepository;
 import cz.vutbr.fit.layout.io.HTMLOutputOperator;
 import cz.vutbr.fit.layout.io.XMLBoxOutput;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
-import cz.vutbr.fit.layout.puppeteer.PuppeteerTreeProvider;
 import cz.vutbr.fit.layout.rdf.BoxModelBuilder;
 import cz.vutbr.fit.layout.rdf.Serialization;
-import cz.vutbr.fit.layout.segm.Provider;
-import cz.vutbr.fit.layout.vips.VipsProvider;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -42,8 +36,8 @@ import picocli.CommandLine.Parameters;
  * 
  * @author burgetr
  */
-@Command(name = "render", sortOptions = false, abbreviateSynopsis = true)
-public class Renderer implements Callable<Integer>
+@Command(name = "RENDER", sortOptions = false, abbreviateSynopsis = true)
+public class Renderer extends CliCommand implements Callable<Integer>
 {
     public enum Backend { cssbox, puppeteer };
     public enum Format { xml, turtle, html };
@@ -60,29 +54,31 @@ public class Renderer implements Callable<Integer>
     @Option(order = 3, names = {"-b", "--backend"}, paramLabel = "backend_name", description = "The backend to use: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
     protected Backend backend = Backend.cssbox;
     
-    @Option(order = 4, names = {"-f", "--format"}, paramLabel = "format", description = "Output format: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
-    protected Format format = Format.xml;
-    
-    @Option(order = 5, names = {"--ropts"}, paramLabel = "KEY=VALUE", split = "\\,", splitSynopsisLabel = ",", description = "Additional rendering backend options")
+    @Option(order = 4, names = {"-O", "--options"}, paramLabel = "KEY=VALUE", split = "\\,", splitSynopsisLabel = ",", description = "Additional rendering backend options")
     protected Map<String, String> ropts;
 
+    @Option(order = 5, names = {"-o", "--output-file"}, paramLabel = "path", description = "output file path")
+    protected File outfile;
+
+    @Option(order = 6, names = {"-f", "--format"}, paramLabel = "format", description = "Output format: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
+    protected Format format = Format.xml;
+    
     @Parameters(arity = "1", index = "0", description = "Input page URL")
     protected URL url;
 
-    @Parameters(arity = "1", index = "1", description = "Output file path")
-    protected File outfile;
-
-    protected ServiceManager serviceManager;
-    
     @Override
     public Integer call() throws Exception
     {
         try {
             Page page = render(url, backend, width, height, ropts);
-            
+            getCli().setPage(page);
             System.out.println("  Created: " + page);
-            writeOutput(page, outfile, format);
-            System.out.println("Written to " + outfile);
+            
+            if (outfile != null)
+            {
+                writeOutput(page, outfile, format);
+                System.out.println("Written to " + outfile);
+            }
             
             return 0;
             
@@ -99,10 +95,6 @@ public class Renderer implements Callable<Integer>
         return 1;
     }
 
-    public void invoke(String[] args)
-    {
-    }
-    
     /**
      * Renders a page using the given backend and returns the page structure.
      * @param url
@@ -124,7 +116,7 @@ public class Renderer implements Callable<Integer>
                 break;
         }
         
-        ParametrizedOperation op = getServiceManager().findParmetrizedService(serviceId);
+        ParametrizedOperation op = getCli().getServiceManager().findParmetrizedService(serviceId);
         System.out.println("Rendering: " + op);
         if (op != null)
         {
@@ -187,37 +179,6 @@ public class Renderer implements Callable<Integer>
         HTMLOutputOperator html = new HTMLOutputOperator();
         html.dumpTo(page, out);
         out.close();
-    }
-    
-    /**
-     * Creates a basic service manager and repository for generating the artifacr IRIs
-     * @return the service manager
-     */
-    protected ServiceManager getServiceManager()
-    {
-        if (serviceManager == null)
-        {
-            serviceManager = ServiceManager.create();
-            //initialize the services
-            CSSBoxTreeProvider cssboxProvider = new CSSBoxTreeProvider();
-            serviceManager.addArtifactService(cssboxProvider);
-            
-            PuppeteerTreeProvider puppeteerProvider = new PuppeteerTreeProvider();
-            serviceManager.addArtifactService(puppeteerProvider);
-            
-            Provider segmProvider = new Provider();
-            serviceManager.addArtifactService(segmProvider);
-            
-            VipsProvider vipsProvider = new VipsProvider();
-            serviceManager.addArtifactService(vipsProvider);
-            
-            BCSProvider bcsProvider = new BCSProvider();
-            serviceManager.addArtifactService(bcsProvider);
-            
-            //use a default in-memory repository
-            serviceManager.setArtifactRepository(new DefaultArtifactRepository());
-        }
-        return serviceManager;
     }
     
 }

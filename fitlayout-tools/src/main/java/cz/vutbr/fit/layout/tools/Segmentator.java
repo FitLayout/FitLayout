@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.eclipse.rdf4j.model.Model;
 
@@ -25,6 +26,7 @@ import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.rdf.AreaModelBuilder;
 import cz.vutbr.fit.layout.rdf.Serialization;
+import cz.vutbr.fit.layout.tools.Renderer.Format;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -33,29 +35,45 @@ import picocli.CommandLine.Option;
  * 
  * @author burgetr
  */
-@Command(name = "segment")
-public class Segmentator extends Renderer
+@Command(name = "SEGMENT", sortOptions = false, abbreviateSynopsis = true)
+public class Segmentator extends CliCommand implements Callable<Integer>
 {
     public enum Method { vips, bcs };
     
-    @Option(order = 10, names = {"-m", "--method"}, description = "Segmentation method: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
+    @Option(order = 100, names = {"-h", "--help"}, usageHelp = true, description = "print help")
+    protected boolean help;
+    
+    @Option(order = 1, names = {"-m", "--method"}, description = "Segmentation method: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
     protected Method method = Method.vips;
     
-    @Option(order = 11, names = {"--sopts"}, paramLabel = "KEY=VALUE", split = "\\,", splitSynopsisLabel = ",", description = "Segmentation method options")
+    @Option(order = 2, names = {"-O", "--options"}, paramLabel = "KEY=VALUE", split = "\\,", splitSynopsisLabel = ",", description = "Segmentation method options")
     protected Map<String, String> sopts;
 
+    @Option(order = 3, names = {"-o", "--output-file"}, paramLabel = "path", description = "output file path")
+    protected File outfile;
+
+    @Option(order = 4, names = {"-f", "--format"}, paramLabel = "format", description = "Output format: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
+    protected Format format = Format.xml;
+    
     @Override
     public Integer call() throws Exception
     {
         try {
-            Page page = render(url, backend, width, height, ropts);
-            System.out.println("  Created: " + page);
+            Page page = getCli().getPage();
+            if (page == null) {
+                System.err.println("Nothing to segment. The 'RENDER' command must be used before segmentation.");
+                return 1;
+            }
             
             AreaTree atree = segment(page, method, sopts);
+            getCli().setAreaTree(atree);
             System.out.println("  Created: " + atree);
             
-            writeOutput(atree, page, outfile, format);
-            System.out.println("Written to " + outfile);
+            if (outfile != null)
+            {
+                writeOutput(atree, page, outfile, format);
+                System.out.println("Written to " + outfile);
+            }
             
             return 0;
             
@@ -83,7 +101,7 @@ public class Segmentator extends Renderer
                 break;
         }
         
-        ParametrizedOperation op = getServiceManager().findParmetrizedService(serviceId);
+        ParametrizedOperation op = getCli().getServiceManager().findParmetrizedService(serviceId);
         System.out.println("Segmentation: " + op);
         if (op != null)
         {

@@ -9,6 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import cz.vutbr.fit.layout.api.ServiceManager;
+import cz.vutbr.fit.layout.bcs.BCSProvider;
+import cz.vutbr.fit.layout.cssbox.CSSBoxTreeProvider;
+import cz.vutbr.fit.layout.impl.DefaultArtifactRepository;
+import cz.vutbr.fit.layout.model.AreaTree;
+import cz.vutbr.fit.layout.model.Page;
+import cz.vutbr.fit.layout.puppeteer.PuppeteerTreeProvider;
+import cz.vutbr.fit.layout.segm.Provider;
+import cz.vutbr.fit.layout.vips.VipsProvider;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
@@ -19,6 +28,61 @@ import picocli.CommandLine.Command;
 @Command(name = "fitlayout", subcommands = {Renderer.class, Segmentator.class})
 public class Cli
 {
+    private Page page;
+    private AreaTree areaTree;
+    private ServiceManager serviceManager;
+    
+    
+    public Page getPage()
+    {
+        return page;
+    }
+
+    public void setPage(Page page)
+    {
+        this.page = page;
+    }
+
+    public AreaTree getAreaTree()
+    {
+        return areaTree;
+    }
+
+    public void setAreaTree(AreaTree areaTree)
+    {
+        this.areaTree = areaTree;
+    }
+
+    /**
+     * Creates a basic service manager and repository for generating the artifacr IRIs
+     * @return the service manager
+     */
+    protected ServiceManager getServiceManager()
+    {
+        if (serviceManager == null)
+        {
+            serviceManager = ServiceManager.create();
+            //initialize the services
+            CSSBoxTreeProvider cssboxProvider = new CSSBoxTreeProvider();
+            serviceManager.addArtifactService(cssboxProvider);
+            
+            PuppeteerTreeProvider puppeteerProvider = new PuppeteerTreeProvider();
+            serviceManager.addArtifactService(puppeteerProvider);
+            
+            Provider segmProvider = new Provider();
+            serviceManager.addArtifactService(segmProvider);
+            
+            VipsProvider vipsProvider = new VipsProvider();
+            serviceManager.addArtifactService(vipsProvider);
+            
+            BCSProvider bcsProvider = new BCSProvider();
+            serviceManager.addArtifactService(bcsProvider);
+            
+            //use a default in-memory repository
+            serviceManager.setArtifactRepository(new DefaultArtifactRepository());
+        }
+        return serviceManager;
+    }
 
     private static List<List<String>> splitArgsByCommands(String[] args, Set<String> cnames)
     {
@@ -42,10 +106,18 @@ public class Cli
      */
     public static void main(String[] args)
     {
-        CommandLine cmd = new CommandLine(new Cli());
+        Cli cli = new Cli();
+        
+        CommandLine cmd = new CommandLine(cli);
         cmd.setUsageHelpWidth(90);
         cmd.setUsageHelpLongOptionsMaxWidth(40);
-        System.out.println(cmd.getCommandSpec().userObject());
+        //System.out.println(cmd.getCommandSpec().userObject());
+        
+        //init subcommands
+        for (CommandLine sub : cmd.getSubcommands().values())
+        {
+            ((CliCommand) sub.getCommandSpec().userObject()).setCli(cli);
+        }
         
         //split command line to individual commands
         Set<String> cnames = cmd.getSubcommands().keySet();

@@ -53,6 +53,21 @@ public class RDFArtifactRepository implements ArtifactRepository
         initDefaultModelBuilders();
     }
 
+    public static RDFArtifactRepository createMemory(String path)
+    {
+        return new RDFArtifactRepository(RDFStorage.createMemory(path));
+    }
+    
+    public static RDFArtifactRepository createNative(String path)
+    {
+        return new RDFArtifactRepository(RDFStorage.createNative(path));
+    }
+    
+    public static RDFArtifactRepository createHTTP(String serverUrl, String repositoryId)
+    {
+        return new RDFArtifactRepository(RDFStorage.createHTTP(serverUrl, repositoryId));
+    }
+    
     @Override
     public void disconnect()
     {

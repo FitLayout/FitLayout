@@ -61,7 +61,7 @@ public class Segmentator extends CliCommand implements Callable<Integer>
         try {
             Page page = getCli().getPage();
             if (page == null) {
-                System.err.println("Nothing to segment. The 'RENDER' command must be used before segmentation.");
+                errNoPage("segmentation");
                 return 1;
             }
             

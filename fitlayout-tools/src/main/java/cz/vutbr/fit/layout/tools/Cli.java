@@ -29,7 +29,13 @@ import picocli.CommandLine.Command;
  * 
  * @author burgetr
  */
-@Command(name = "fitlayout", subcommands = {Renderer.class, Segmentator.class})
+@Command(name = "fitlayout", 
+    subcommands = {Renderer.class,
+                   Segmentator.class,
+                   UseRepository.class,
+                   ListArtifacts.class,
+                   LoadArtifact.class,
+                   StoreArtifact.class})
 public class Cli
 {
     private static final String CONFIG_FILE = "config.properties";

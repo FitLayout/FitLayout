@@ -22,7 +22,7 @@ import picocli.CommandLine.Parameters;
 @Command(name = "STORE", sortOptions = false, abbreviateSynopsis = true)
 public class StoreArtifact extends CliCommand implements Callable<Integer>
 {
-    @Parameters(arity = "1", index = "0", description = "Repository type: ${COMPLETION-CANDIDATES}")
+    @Parameters(arity = "1", index = "0", description = "Artifact type: ${COMPLETION-CANDIDATES}")
     protected ArtifactType artifactType;
     
     @Override
@@ -40,13 +40,19 @@ public class StoreArtifact extends CliCommand implements Callable<Integer>
             {
                 case page:
                     if (getCli().getPage() != null)
+                    {
                         repo.addArtifact(getCli().getPage());
+                        System.out.println("Stored: " + getCli().getPage());
+                    }
                     else
                         errNoPage("STORE");
                     break;
                 case areatree:
                     if (getCli().getAreaTree() != null)
+                    {
                         repo.addArtifact(getCli().getAreaTree());
+                        System.out.println("Stored: " + getCli().getAreaTree());
+                    }
                     else
                         errNoAreaTree("STORE");
                     break;

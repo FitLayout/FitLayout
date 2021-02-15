@@ -30,12 +30,12 @@ public class CliCommand
     
     protected void errNoPage(String op)
     {
-        printError("No page to work with. The 'RENDER' or 'LOAD' command must be used before " + op + " .");
+        printError("No page to work with. The 'RENDER' or 'LOAD' command must be used before " + op + ".");
     }
 
     protected void errNoAreaTree(String op)
     {
-        printError("No area tree to work with. The 'SEGMENT' or 'LOAD' command must be used before " + op + " .");
+        printError("No area tree to work with. The 'SEGMENT' or 'LOAD' command must be used before " + op + ".");
     }
 
     protected void errNoRepo()

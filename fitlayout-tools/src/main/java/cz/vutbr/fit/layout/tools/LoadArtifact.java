@@ -26,7 +26,7 @@ public class LoadArtifact extends CliCommand implements Callable<Integer>
 {
     public enum ArtifactType { page, areatree };
     
-    @Parameters(arity = "1", index = "0", description = "Repository type: ${COMPLETION-CANDIDATES}")
+    @Parameters(arity = "1", index = "0", description = "Artifact type: ${COMPLETION-CANDIDATES}")
     protected ArtifactType artifactType;
     
     @Parameters(arity = "1", index = "1", paramLabel = "iri", description = "Artifact IRI")
@@ -49,10 +49,12 @@ public class LoadArtifact extends CliCommand implements Callable<Integer>
             {
                 case page:
                     Page page = (Page) ((RDFArtifactRepository) repo).getArtifact(iri);
+                    System.out.println("Loaded: " + page);
                     getCli().setPage(page);
                     break;
                 case areatree:
                     AreaTree atree = (AreaTree) ((RDFArtifactRepository) repo).getArtifact(iri);
+                    System.out.println("Loaded: " + atree);
                     getCli().setAreaTree(atree);
                     break;
             }

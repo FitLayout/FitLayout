@@ -18,6 +18,7 @@ import cz.vutbr.fit.layout.bcs.BCSProvider;
 import cz.vutbr.fit.layout.cssbox.CSSBoxTreeProvider;
 import cz.vutbr.fit.layout.impl.DefaultArtifactRepository;
 import cz.vutbr.fit.layout.model.AreaTree;
+import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.puppeteer.PuppeteerTreeProvider;
 import cz.vutbr.fit.layout.segm.Provider;
@@ -35,13 +36,15 @@ import picocli.CommandLine.Command;
                    UseRepository.class,
                    ListArtifacts.class,
                    LoadArtifact.class,
-                   StoreArtifact.class})
+                   StoreArtifact.class,
+                   Export.class})
 public class Cli
 {
     private static final String CONFIG_FILE = "config.properties";
 
     private Page page;
     private AreaTree areaTree;
+    private Artifact lastArtifact;
     private ServiceManager serviceManager;
     
     
@@ -53,6 +56,7 @@ public class Cli
     public void setPage(Page page)
     {
         this.page = page;
+        this.lastArtifact = page;
     }
 
     public AreaTree getAreaTree()
@@ -63,8 +67,18 @@ public class Cli
     public void setAreaTree(AreaTree areaTree)
     {
         this.areaTree = areaTree;
+        this.lastArtifact = areaTree;
     }
 
+    /**
+     * Gets the last created artifact.
+     * @return
+     */
+    public Artifact getLastArtifact()
+    {
+        return lastArtifact;
+    }
+    
     /**
      * Creates a basic service manager and repository for generating the artifacr IRIs
      * @return the service manager

@@ -1,12 +1,14 @@
 package cz.vutbr.fit.layout.rdf;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
+import org.eclipse.rdf4j.IsolationLevels;
+import org.eclipse.rdf4j.RDF4JException;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Model;
@@ -14,30 +16,23 @@ import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
-import org.eclipse.rdf4j.query.GraphQuery;
-import org.eclipse.rdf4j.query.GraphQueryResult;
-import org.eclipse.rdf4j.query.MalformedQueryException;
-import org.eclipse.rdf4j.query.QueryEvaluationException;
+import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.QueryLanguage;
-import org.eclipse.rdf4j.query.TupleQuery;
-import org.eclipse.rdf4j.query.TupleQueryResult;
+import org.eclipse.rdf4j.query.QueryResults;
 import org.eclipse.rdf4j.query.Update;
-import org.eclipse.rdf4j.query.UpdateExecutionException;
+import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
-import org.eclipse.rdf4j.repository.RepositoryException;
 import org.eclipse.rdf4j.repository.RepositoryResult;
+import org.eclipse.rdf4j.repository.http.HTTPRepository;
+import org.eclipse.rdf4j.repository.sail.SailRepository;
+import org.eclipse.rdf4j.repository.util.Repositories;
 import org.eclipse.rdf4j.rio.RDFFormat;
-import org.eclipse.rdf4j.rio.RDFParseException;
+import org.eclipse.rdf4j.sail.memory.MemoryStore;
+import org.eclipse.rdf4j.sail.nativerdf.NativeStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import cz.vutbr.fit.layout.rdf.io.RDFConnector;
-import cz.vutbr.fit.layout.rdf.io.RDFConnectorHTTP;
-import cz.vutbr.fit.layout.rdf.io.RDFConnectorMemory;
-import cz.vutbr.fit.layout.rdf.io.RDFConnectorNative;
 
 
 /**
@@ -50,109 +45,115 @@ public class RDFStorage implements Closeable
 {
     private static Logger log = LoggerFactory.getLogger(RDFStorage.class);
     
-	private RDFConnector db;
+	private Repository repo;
 
 	/**
 	 * Use the create functions for creating the instances.
-	 * @throws RepositoryException
 	 */
-	protected RDFStorage(RDFConnector connector) throws RepositoryException
+	protected RDFStorage(Repository repo)
 	{
-	    db = connector;
+	    this.repo = repo;
 	}
 	
 	public static RDFStorage createMemory(String dataDir)
 	{
         log.info("Using memory storage in {}", dataDir);
-	    RDFStorage storage = new RDFStorage(new RDFConnectorMemory(dataDir));
-	    return storage;
+        final Repository repo;
+        if (dataDir != null)
+            repo = new SailRepository(new MemoryStore(new File(dataDir)));
+        else
+            repo = new SailRepository(new MemoryStore());
+	    return new RDFStorage(repo);
 	}
 	
     public static RDFStorage createNative(String dataDir)
     {
         log.info("Using native storage in {}", dataDir);
-        RDFStorage storage = new RDFStorage(new RDFConnectorNative(dataDir));
-        return storage;
+        final Repository repo = new SailRepository(new NativeStore(new File(dataDir)));
+        return new RDFStorage(repo);
     }
     
     public static RDFStorage createHTTP(String serverUrl, String repositoryId)
     {
         log.info("Using HTTP storage in {} : {}", serverUrl, repositoryId);
-        RDFStorage storage = new RDFStorage(new RDFConnectorHTTP(serverUrl, repositoryId));
-        return storage;
+        final Repository repo = new HTTPRepository(serverUrl, repositoryId);
+        return new RDFStorage(repo);
     }
     
+    public Repository getRepository()
+    {
+        return repo;
+    }
+    
+    public RepositoryConnection getConnection()
+    {
+        return repo.getConnection();
+    }
+
     @Override
     public void close()
     {
-        db.close();
+        repo.shutDown();
     }
-
-	/**
-	 * Obtains a connection to the current repository.
-	 * @return the repository connection.
-	 * @throws RepositoryException 
-	 */
-	public RepositoryConnection getConnection() throws RepositoryException 
-	{
-		return db.getConnection();
-	}
 	
-	public void closeConnection() throws RepositoryException
-	{
-	    db.closeConnection();
-	}
-
     //= Low-level repository functions ==============================================================================
-	
+
     /**
-	 * Obtains all statements for the specific subject.
-	 * (gets all triples for specific node)
-	 * 
-	 * @param subject
-	 * @return
-	 * @throws RepositoryException
-	 */
-	public RepositoryResult<Statement> getSubjectStatements(Resource subject) throws RepositoryException 
-	{
-		return getConnection().getStatements(subject, null, null, true);
-	}
-	
-	/**
-	 * Obtains all statements in a given context.
-	 * 
-	 * @param context the context IRI
-	 * @return
-	 * @throws RepositoryException
-	 */
-	public RepositoryResult<Statement> getContextStatements(Resource context) throws RepositoryException
-	{
-	    return getConnection().getStatements(null, null, null, context);
-	}
-	
+     * Obtains the value of the given predicate for the given subject.
+     * @param subject the subject resource
+     * @param predicate the predicate IRI
+     * @return the resulting Value or {@code null} when there is no corresponding triplet available.
+     * @throws StorageException
+     */
+    public Value getPropertyValue(Resource subject, IRI predicate) throws StorageException
+    {
+        Value ret = null;
+        try (RepositoryConnection con = repo.getConnection()) {
+            RepositoryResult<Statement> result = con.getStatements(subject, predicate, null, true);
+            try {
+                if (result.hasNext())
+                    ret = result.next().getObject();
+            }
+            finally {
+                result.close();
+            }
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+        return ret;
+    }
+    
+    /**
+     * Obtains a model for the specific subject.
+     * @param subject
+     * @return
+     * @throws StorageException
+     */
+    public Model getSubjectModel(Resource subject) throws StorageException 
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            final RepositoryResult<Statement> result = con.getStatements(subject, null, null, true);
+            return QueryResults.asModel(result);
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+    
     /**
      * Obtains a model containing all statements in a given context.
      * 
      * @param context the context IRI
      * @return
-     * @throws RepositoryException
+     * @throws StorageException
      */
-    public Model getContextModel(Resource context) throws RepositoryException
+    public Model getContextModel(Resource context) throws StorageException
     {
-        return createModel(getContextStatements(context));
-    }
-    
-    /**
-     * Obtains all statements in a given contexts.
-     * 
-     * @param contexts the context IRIs
-     * @return
-     * @throws RepositoryException
-     */
-    public RepositoryResult<Statement> getContextStatements(Collection<Resource> contexts) throws RepositoryException
-    {
-        final Resource[] res = contexts.toArray(new Resource[contexts.size()]);
-        return getConnection().getStatements(null, null, null, res);
+        try (RepositoryConnection con = repo.getConnection()) {
+            final RepositoryResult<Statement> result = con.getStatements(null, null, null, context);
+            return QueryResults.asModel(result);
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
     }
     
     /**
@@ -160,233 +161,134 @@ public class RDFStorage implements Closeable
      * 
      * @param contexts the context IRIs
      * @return
-     * @throws RepositoryException
+     * @throws StorageException
      */
-    public Model getContextModel(Collection<Resource> contexts) throws RepositoryException
+    public Model getContextModel(Collection<Resource> contexts) throws StorageException
     {
-        return createModel(getContextStatements(contexts));
+        try (RepositoryConnection con = repo.getConnection()) {
+            final Resource[] res = contexts.toArray(new Resource[contexts.size()]);
+            final RepositoryResult<Statement> result = con.getStatements(null, null, null, res);
+            return QueryResults.asModel(result);
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
     }
     
-	/**
-	 * Obtains the value of the given predicate for the given subject.
-	 * @param subject the subject resource
-	 * @param predicate the predicate IRI
-	 * @return the resulting Value or {@code null} when there is no corresponding triplet available.
-	 * @throws RepositoryException
-	 */
-	public Value getPropertyValue(Resource subject, IRI predicate) throws RepositoryException
-	{
-	    RepositoryResult<Statement> result = getConnection().getStatements(subject, predicate, null, true);
-	    if (result.hasNext())
-	        return result.next().getObject();
-	    else
-	        return null;
-	}
-	
-	/**
-	 * Obtains a model for the specific subject.
-	 * @param subject
-	 * @return
-	 * @throws RepositoryException 
-	 */
-	public Model getSubjectModel(Resource subject) throws RepositoryException 
-	{
-	    RepositoryResult<Statement> result = getSubjectStatements(subject); 
-		Model ret = createModel(result);
-		result.close();
-		closeConnection();
-		return ret;
-	}
-
     /**
-     * Obtains a model for the specific subjects.
-     * @param subjects
-     * @return
-     * @throws RepositoryException 
+     * Executes an internal (safe) SPARQL graph query.
+     * @param query the SPARQL query
+     * @return a the resulting model
+     * @throws StorageException
      */
-    public Model getSubjectModel(Collection<IRI> subjects) throws RepositoryException 
+    public Model executeSafeQuery(String query) throws StorageException
     {
-        Model model = new LinkedHashModel();
-        for (Resource subject : subjects)
-        {
-            RepositoryResult<Statement> result = getSubjectStatements(subject);
-            while (result.hasNext())
-                model.add(result.next());
-            result.close();
+        try {
+            return Repositories.graphQuery(repo, query, r -> QueryResults.asModel(r));
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
         }
-        closeConnection();
-        return model;
     }
     
-	/**
-	 * Executes a SPARQL query on the databse
-	 * @param query the SPARQL query
-	 * @return
-	 * @throws QueryEvaluationException
-	 * @throws MalformedQueryException 
-	 * @throws RepositoryException 
-	 */
-	public TupleQueryResult executeQuery(String query) throws QueryEvaluationException, RepositoryException, MalformedQueryException
-	{
-		org.eclipse.rdf4j.query.TupleQuery tq = getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query);
-		return tq.evaluate();
-	}
-	
-	/**
-	 * Clears the entire RDF repository.
-	 */
-	public void clear() throws RepositoryException
-	{
-	    getConnection().clear();
-	    closeConnection();
-	}
-	
-	/**
-	 * Clears a given context from the repository.
-	 * @param context the context IRI to be cleared
-	 */
-	public void clear(IRI context) throws RepositoryException
-	{
-	    getConnection().clear(context);
-	    closeConnection();
-	}
-
-	public void execSparqlUpdate(String query) throws RepositoryException, MalformedQueryException, UpdateExecutionException 
-	{
-        Update upd = getConnection().prepareUpdate(QueryLanguage.SPARQL, query);
-        upd.execute();
-        closeConnection();
-	}
-	
-    public void importTurtle(String query) throws RDFParseException, RepositoryException, IOException 
-    {
-        getConnection().add(new StringReader(query), "http://fitlayout.github.io/ontology/render.owl#", RDFFormat.TURTLE);
-        closeConnection();
-    }
-
-    public void importXML(String query) throws RDFParseException, RepositoryException, IOException 
-    {
-        getConnection().add(new StringReader(query), "http://fitlayout.github.io/ontology/render.owl#", RDFFormat.RDFXML);
-        closeConnection();
-    }
-	
-	/**
-	 * Executes a SPARQL query where the query syntax is safe (should not fail)
-	 * @param query
-	 * @return
-	 * @throws RepositoryException
-	 */
-	public Model executeSafeQuery(String query) throws RepositoryException
-	{
-        try
-        {
-            GraphQuery pgq = getConnection().prepareGraphQuery(QueryLanguage.SPARQL, query);
-            GraphQueryResult gqr = pgq.evaluate();
-            Model ret = createModel(gqr);
-            gqr.close();
-            closeConnection();
-            return ret;
-        } catch (MalformedQueryException e) {
-            e.printStackTrace();
-        } catch (QueryEvaluationException e) {
-            e.printStackTrace();
-        }
-        return new LinkedHashModel(); //this should not happen
-	}
-	
     /**
-     * Executes an internal (safe) tuple query
+     * Executes an internal (safe) tuple query.
      * @param query
-     * @return a TupleQueryResult object representing the result
-     * @throws RepositoryException
+     * @return a list of binding sets object representing the result
+     * @throws StorageException
      */
-	public TupleQueryResult executeSafeTupleQuery(String query) throws RepositoryException
+    public List<BindingSet> executeSafeTupleQuery(String query) throws StorageException
     {
-        try
-        {
-            TupleQuery pgq = getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query);
-            TupleQueryResult gqr = pgq.evaluate();
-            return gqr;
-        } catch (MalformedQueryException e) {
-            e.printStackTrace();
-        } catch (QueryEvaluationException e) {
-            e.printStackTrace();
+        try {
+            return Repositories.tupleQuery(repo, query, r -> QueryResults.asList(r));
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
         }
-        return null; //this should not happen
     }
     
-	/**
-	 * Creates a Model from the RepositoryResult
-	 * @param result
-	 * @return
-	 * @throws RepositoryException 
-	 */
-	private Model createModel(RepositoryResult<Statement> result) throws RepositoryException 
-	{
-		Model model = new LinkedHashModel();
-		while (result.hasNext())
-			model.add(result.next());
-		return model;
-	}
-
     /**
-     * Creates a model from a GraphQueryResult
-     * @param result
-     * @return
-     * @throws QueryEvaluationException 
+     * Inserts a new graph to the database.
+     * @param graph
+     * @throws StorageException 
      */
-    private Model createModel(GraphQueryResult result) throws QueryEvaluationException 
+    public void insertGraph(Model graph) throws StorageException
     {
-        Model model = new LinkedHashModel();
-        while (result.hasNext())
-            model.add(result.next());
-        return model;
-    }
-
-    /**
-     * Create a set of subjects in a repository result.
-     * @param result
-     * @return
-     * @throws RepositoryException
-     */
-    public Set<IRI> getSubjectsFromResult(RepositoryResult<Statement> result) throws RepositoryException 
-    {
-        Set<IRI> output = new HashSet<IRI>();
-        while (result.hasNext()) 
-        {
-            Resource uri = result.next().getSubject();
-            if (uri instanceof IRI)
-                output.add((IRI) uri);
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.begin();
+            con.add(graph);
+            con.commit();
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
         }
-        return output;
     }
-    
-	/**
-	 * Inserts a new graph to the database.
-	 * @param graph
-	 * @throws RepositoryException 
-	 */
-    public void insertGraph(Model graph) throws RepositoryException
-	{
-        getConnection().begin();
-		getConnection().add(graph);
-		getConnection().commit();
-		closeConnection();
-	}
 
     /**
      * Inserts a new graph to the database.
      * @param graph
      * @param contextIri the context to be used for the inserted statements
-     * @throws RepositoryException 
+     * @throws StorageException 
      */
-    public void insertGraph(Model graph, IRI contextIri) throws RepositoryException
+    public void insertGraph(Model graph, IRI contextIri) throws StorageException
     {
-        getConnection().begin();
-        getConnection().add(graph, contextIri);
-        getConnection().commit();
-        closeConnection();
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.begin();
+            con.add(graph, contextIri);
+            con.commit();
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
     }
+
+    /**
+     * Clears the entire RDF repository.
+     */
+    public void clear() throws StorageException
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.clear();
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+
+    /**
+     * Clears the entire RDF repository.
+     */
+    public void clear(IRI context) throws StorageException
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.clear(context);
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+
+    public void execSparqlUpdate(String query) throws StorageException 
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            Update upd = con.prepareUpdate(QueryLanguage.SPARQL, query);
+            upd.execute();
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    public void importTurtle(String query) throws StorageException, IOException
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.add(new StringReader(query), "http://fitlayout.github.io/ontology/render.owl#", RDFFormat.TURTLE);
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+
+    public void importXML(String query) throws StorageException, IOException 
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.add(new StringReader(query), "http://fitlayout.github.io/ontology/render.owl#", RDFFormat.RDFXML);
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+
     
     //= Sequences ==================================================================
     
@@ -394,51 +296,61 @@ public class RDFStorage implements Closeable
      * Obtains the last assigned value of a sequence with the given name.
      * @param name the sequence name
      * @return the last assigned value or 0 when the sequence does not exist.
-     * @throws RepositoryException 
+     * @throws StorageException 
      */
-    public long getLastSequenceValue(String name) throws RepositoryException
+    public long getLastSequenceValue(String name) throws StorageException
     {
-        IRI sequence = RESOURCE.createSequenceURI(name);
-        RepositoryResult<Statement> result = getConnection().getStatements(sequence, RDF.VALUE, null, false);
-        if (result.hasNext())
-        {
-            Value val = result.next().getObject();
-            result.close();
-            closeConnection();
-            if (val instanceof Literal)
-                return ((Literal) val).longValue();
-            else
-                return 0;
+        long ret = 0;
+        try (RepositoryConnection con = repo.getConnection()) {
+            IRI sequence = RESOURCE.createSequenceURI(name);
+            RepositoryResult<Statement> result = con.getStatements(sequence, RDF.VALUE, null, false);
+            try {
+                if (result.hasNext())
+                {
+                    Value val = result.next().getObject();
+                    if (val instanceof Literal)
+                        ret = ((Literal) val).longValue();
+                }
+            }
+            finally {
+                result.close();
+            }
         }
-        else
-        {
-            result.close();
-            closeConnection();
-            return 0;
+        catch (RDF4JException e) {
+            throw new StorageException(e);
         }
+        return ret;
     }
     
-    public long getNextSequenceValue(String name) throws RepositoryException
+    public long getNextSequenceValue(String name) throws StorageException
     {
-        getConnection().begin(); //TODO should be IsolationLevels.SERIALIZABLE but not supported by Sesame 2.7
-        IRI sequence = RESOURCE.createSequenceURI(name);
-        RepositoryResult<Statement> result = getConnection().getStatements(sequence, RDF.VALUE, null, false); 
-        long val = 0;
-        if (result.hasNext())
-        {
-            Statement statement = result.next();
-            Value vval = statement.getObject();
-            if (vval instanceof Literal)
-                val = ((Literal) vval).longValue();
-            getConnection().remove(statement);
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.begin(IsolationLevels.SERIALIZABLE); //TODO is this supported everywhere?
+            IRI sequence = RESOURCE.createSequenceURI(name);
+            long val = 0;
+            RepositoryResult<Statement> result = con.getStatements(sequence, RDF.VALUE, null, false);
+            try {
+                if (result.hasNext())
+                {
+                    Statement statement = result.next();
+                    Value vval = statement.getObject();
+                    if (vval instanceof Literal)
+                        val = ((Literal) vval).longValue();
+                    con.remove(statement);
+                }
+            }
+            finally {
+                result.close();
+            }
+            val++;
+            ValueFactory vf = SimpleValueFactory.getInstance();
+            con.add(sequence, RDF.VALUE, vf.createLiteral(val));
+            con.commit();
+            return val;
         }
-        result.close();
-        val++;
-        ValueFactory vf = SimpleValueFactory.getInstance();
-        getConnection().add(sequence, RDF.VALUE, vf.createLiteral(val));
-        getConnection().commit();
-        closeConnection();
-        return val;
+        catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
     }
     
 }

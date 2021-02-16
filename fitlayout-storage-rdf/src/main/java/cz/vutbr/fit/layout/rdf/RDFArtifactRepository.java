@@ -11,15 +11,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.rdf4j.RDF4JException;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.query.Binding;
 import org.eclipse.rdf4j.query.BindingSet;
-import org.eclipse.rdf4j.query.QueryEvaluationException;
-import org.eclipse.rdf4j.query.TupleQueryResult;
-import org.eclipse.rdf4j.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,31 +86,29 @@ public class RDFArtifactRepository implements ArtifactRepository
     //Artifact functions =============================================================
     
     @Override
-    public Collection<IRI> getArtifactIRIs() throws RepositoryException
+    public Collection<IRI> getArtifactIRIs() throws StorageException
     {
-        final String query = iriDecoder.declarePrefixes()
-                + "SELECT DISTINCT ?pg "
-                + "WHERE {"
-                + "  ?pg rdf:type ?type . "
-                + "  ?type rdfs:subClassOf fl:Artifact . "
-                + "  OPTIONAL { ?pg fl:createdOn ?time } "
-                + "} ORDER BY ?time";
-        
-        log.debug("QUERY: {}", query);
-        TupleQueryResult data = storage.executeSafeTupleQuery(query);
-        List<IRI> ret = new ArrayList<IRI>();
-        try
-        {
-            while (data.hasNext())
+        try {
+            final String query = iriDecoder.declarePrefixes()
+                    + "SELECT DISTINCT ?pg "
+                    + "WHERE {"
+                    + "  ?pg rdf:type ?type . "
+                    + "  ?type rdfs:subClassOf fl:Artifact . "
+                    + "  OPTIONAL { ?pg fl:createdOn ?time } "
+                    + "} ORDER BY ?time";
+            
+            log.debug("QUERY: {}", query);
+            List<BindingSet> data = storage.executeSafeTupleQuery(query);
+            List<IRI> ret = new ArrayList<>(data.size());
+            for (BindingSet binding : data)
             {
-                BindingSet binding = data.next();
                 Binding b = binding.getBinding("pg");
                 ret.add((IRI) b.getValue());
             }
-        } catch (QueryEvaluationException e) {
-            e.printStackTrace();
+            return ret;
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
         }
-        return ret;
     }
     
     @Override

@@ -71,6 +71,16 @@ public class Graphics2DDisplay implements OutputDisplay
         recursivelyDrawBoxes(page.getRoot());
     }
 
+    @Override
+    public void drawPage(Page page, boolean bitmap)
+    {
+        setupGraphics();
+        if (bitmap)
+            drawScreenShot(page.getPngImage());
+        else
+            recursivelyDrawBoxes(page.getRoot());
+    }
+
     private void recursivelyDrawBoxes(Box root)
     {
         drawBox(root);
@@ -198,6 +208,17 @@ public class Graphics2DDisplay implements OutputDisplay
         }
     }
 
+    private void drawScreenShot(byte[] data)
+    {
+        if (data != null)
+        {
+            try {
+                final BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
+                g.drawImage(image, 0, 0, null);
+            } catch (IOException e) {
+            }
+        }
+    }
     
     //=================================================================================
 

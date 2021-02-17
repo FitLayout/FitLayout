@@ -14,7 +14,7 @@
 	
 	<artifactId>fitlayout-io</artifactId>
 	
-	<name>FitLayout - I/O</name>
+	<name>FitLayout I/O</name>
 	<description>
 		FitLayout - Input/output implementations
 	</description>

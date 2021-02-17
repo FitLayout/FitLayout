@@ -33,6 +33,13 @@ public interface OutputDisplay
     public void drawPage(Page page);
 
     /**
+     * Draws the complete page by drawing all the boxes or a bitmap screenshot.
+     * @param page The page to draw.
+     * @param bitmap Use bitmap page screen shot if available.
+     */
+    public void drawPage(Page page, boolean bitmap);
+
+    /**
      * Draws the box contents on the page depending on the box type. This does not automatically
      * draw the child boxes.
      * @param box The box do draw.

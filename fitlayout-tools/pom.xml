@@ -49,7 +49,7 @@
 									<mainClass>cz.vutbr.fit.layout.tools.Cli</mainClass>
 								</transformer>
 							</transformers>
-							<finalName>Segmentator</finalName>
+							<finalName>FitLayout</finalName>
 						</configuration>
 					</execution>
 				</executions>

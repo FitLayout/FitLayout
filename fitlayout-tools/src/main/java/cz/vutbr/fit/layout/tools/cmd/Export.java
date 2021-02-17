@@ -14,10 +14,13 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.rdf4j.model.Model;
 
+import cz.vutbr.fit.layout.api.OutputDisplay;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.io.HTMLOutputOperator;
+import cz.vutbr.fit.layout.io.ImageOutputDisplay;
 import cz.vutbr.fit.layout.io.XMLBoxOutput;
 import cz.vutbr.fit.layout.io.XMLOutputOperator;
+import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
@@ -101,6 +104,8 @@ public class Export extends CliCommand implements Callable<Integer>
             case html:
                 outputHTML(page, outfile);
                 break;
+            case png:
+                outputPNG(page, outfile);
         }
     }
     
@@ -131,6 +136,16 @@ public class Export extends CliCommand implements Callable<Integer>
         out.close();
     }
 
+    public void outputPNG(Page page, File outfile) throws IOException
+    {
+        ImageOutputDisplay disp = new ImageOutputDisplay(page.getWidth(), page.getHeight());
+        if (page.getPngImage() != null)
+            disp.drawPage(page, true);
+        else
+            disp.drawPage(page, false);
+        disp.saveTo(outfile.getAbsolutePath());
+    }
+    
     //=========================================================================================
 
     public void writeOutput(AreaTree atree, Page page, File outfile, Format format) throws IOException
@@ -145,6 +160,9 @@ public class Export extends CliCommand implements Callable<Integer>
                 break;
             case html:
                 outputHTML(atree, page, outfile);
+                break;
+            case png:
+                outputPNG(atree, page, outfile);
                 break;
         }
     }
@@ -173,6 +191,25 @@ public class Export extends CliCommand implements Callable<Integer>
         HTMLOutputOperator html = new HTMLOutputOperator();
         html.dumpTo(atree, page, out);
         out.close();
+    }
+
+    public void outputPNG(AreaTree atree, Page page, File outfile) throws IOException
+    {
+        ImageOutputDisplay disp = new ImageOutputDisplay(page.getWidth(), page.getHeight());
+        if (page.getPngImage() != null)
+            disp.drawPage(page, true);
+        else
+            disp.drawPage(page, false);
+        showAreas(disp, atree.getRoot(), null);
+        disp.saveTo(outfile.getAbsolutePath());
+    }
+
+    private void showAreas(OutputDisplay disp, Area root, String nameSubstring)
+    {
+        if (nameSubstring == null || root.toString().contains(nameSubstring))
+            disp.drawExtent(root);
+        for (int i = 0; i < root.getChildCount(); i++)
+            showAreas(disp, root.getChildAt(i), nameSubstring);
     }
 
 }

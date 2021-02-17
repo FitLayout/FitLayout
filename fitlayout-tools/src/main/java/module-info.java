@@ -13,6 +13,7 @@ module cz.vutbr.fit.layout.tools
     
     exports cz.vutbr.fit.layout.tools;
     opens cz.vutbr.fit.layout.tools;
+    opens cz.vutbr.fit.layout.tools.cmd;
     
     requires rdf4j.onejar;
     requires info.picocli;

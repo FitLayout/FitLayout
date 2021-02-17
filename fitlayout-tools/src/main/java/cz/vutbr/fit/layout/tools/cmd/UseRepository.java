@@ -3,13 +3,14 @@
  *
  * Created on 15. 2. 2021, 10:54:07 by burgetr
  */
-package cz.vutbr.fit.layout.tools;
+package cz.vutbr.fit.layout.tools.cmd;
 
 import java.util.concurrent.Callable;
 
 import org.eclipse.rdf4j.repository.RepositoryException;
 
 import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
+import cz.vutbr.fit.layout.tools.CliCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 

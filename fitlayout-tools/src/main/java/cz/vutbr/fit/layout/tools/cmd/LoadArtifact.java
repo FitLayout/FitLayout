@@ -3,7 +3,7 @@
  *
  * Created on 15. 2. 2021, 11:32:23 by burgetr
  */
-package cz.vutbr.fit.layout.tools;
+package cz.vutbr.fit.layout.tools.cmd;
 
 import java.util.concurrent.Callable;
 
@@ -14,6 +14,7 @@ import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
+import cz.vutbr.fit.layout.tools.CliCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 

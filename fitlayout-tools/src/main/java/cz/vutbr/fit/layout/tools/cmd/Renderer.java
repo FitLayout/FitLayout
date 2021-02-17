@@ -3,7 +3,7 @@
  *
  * Created on 7. 2. 2021, 9:10:22 by burgetr
  */
-package cz.vutbr.fit.layout.tools;
+package cz.vutbr.fit.layout.tools.cmd;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,6 +27,7 @@ import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.rdf.BoxModelBuilder;
 import cz.vutbr.fit.layout.rdf.Serialization;
+import cz.vutbr.fit.layout.tools.CliCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;

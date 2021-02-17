@@ -22,6 +22,13 @@ import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.puppeteer.PuppeteerTreeProvider;
 import cz.vutbr.fit.layout.segm.Provider;
+import cz.vutbr.fit.layout.tools.cmd.Export;
+import cz.vutbr.fit.layout.tools.cmd.ListArtifacts;
+import cz.vutbr.fit.layout.tools.cmd.LoadArtifact;
+import cz.vutbr.fit.layout.tools.cmd.Renderer;
+import cz.vutbr.fit.layout.tools.cmd.Segmentator;
+import cz.vutbr.fit.layout.tools.cmd.StoreArtifact;
+import cz.vutbr.fit.layout.tools.cmd.UseRepository;
 import cz.vutbr.fit.layout.vips.VipsProvider;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -83,7 +90,7 @@ public class Cli
      * Creates a basic service manager and repository for generating the artifacr IRIs
      * @return the service manager
      */
-    protected ServiceManager getServiceManager()
+    public ServiceManager getServiceManager()
     {
         if (serviceManager == null)
         {

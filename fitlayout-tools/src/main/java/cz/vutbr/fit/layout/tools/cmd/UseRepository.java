@@ -21,9 +21,9 @@ import picocli.CommandLine.Parameters;
 @Command(name = "USE", sortOptions = false, abbreviateSynopsis = true)
 public class UseRepository extends CliCommand implements Callable<Integer>
 {
-    private static final String KEY_REPOSITORY = "rdf.repository";
-    private static final String KEY_SERVER = "rdf.server";
-    private static final String KEY_PATH = "rdf.path";
+    private static final String KEY_REPOSITORY = "fitlayout.rdf.repository";
+    private static final String KEY_SERVER = "fitlayout.rdf.server";
+    private static final String KEY_PATH = "fitlayout.rdf.path";
 
     enum RepositoryType { local, http };
     

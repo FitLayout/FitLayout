@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <rdf:RDF xmlns="http://fitlayout.github.io/ontology/render.owl#"
      xml:base="http://fitlayout.github.io/ontology/render.owl"
-     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:box="http://fitlayout.github.io/ontology/render.owl#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
-     xmlns:box="http://fitlayout.github.io/ontology/render.owl#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
     <owl:Ontology rdf:about="http://fitlayout.github.io/ontology/render.owl#"/>
     
@@ -25,8 +25,10 @@
     <!-- http://fitlayout.github.io/ontology/render.owl#belongsTo -->
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#belongsTo">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/render.owl#Page"/>
+        <rdfs:comment>Assigns an owning page to a rectangle</rdfs:comment>
     </owl:ObjectProperty>
     
 
@@ -34,6 +36,7 @@
     <!-- http://fitlayout.github.io/ontology/render.owl#containsImage -->
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#containsImage">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/render.owl#Image"/>
     </owl:ObjectProperty>
@@ -43,6 +46,7 @@
     <!-- http://fitlayout.github.io/ontology/render.owl#containsObject -->
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#containsObject">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/render.owl#ContentObject"/>
     </owl:ObjectProperty>
@@ -52,6 +56,7 @@
     <!-- http://fitlayout.github.io/ontology/render.owl#hasAttribute -->
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#hasAttribute">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
     </owl:ObjectProperty>
     
@@ -61,6 +66,7 @@
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#hasBottomBorder">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/render.owl#Border"/>
     </owl:ObjectProperty>
@@ -71,6 +77,7 @@
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#hasLeftBorder">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/render.owl#Border"/>
     </owl:ObjectProperty>
@@ -81,6 +88,7 @@
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#hasRightBorder">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/render.owl#Border"/>
     </owl:ObjectProperty>
@@ -91,6 +99,7 @@
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#hasTopBorder">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/render.owl#Border"/>
     </owl:ObjectProperty>
@@ -128,6 +137,16 @@
     
 
 
+    <!-- http://fitlayout.github.io/ontology/render.owl#backgroundImageData -->
+
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#backgroundImageData">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://fitlayout.github.io/ontology/render.owl#backgroundImagePosition -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#backgroundImagePosition">
@@ -151,6 +170,7 @@
     <!-- http://fitlayout.github.io/ontology/render.owl#borderColor -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#borderColor">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Border"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>
@@ -160,6 +180,7 @@
     <!-- http://fitlayout.github.io/ontology/render.owl#borderStyle -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#borderStyle">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Border"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>
@@ -169,6 +190,7 @@
     <!-- http://fitlayout.github.io/ontology/render.owl#borderWidth -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#borderWidth">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Border"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
     </owl:DatatypeProperty>
@@ -185,9 +207,65 @@
     
 
 
+    <!-- http://fitlayout.github.io/ontology/render.owl#contentHeight -->
+
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#contentHeight">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <rdfs:comment>The height of the content bounds of a box. The content bounds correspond to the box border bounds as provided by the box source (renderer).</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/render.owl#contentWidth -->
+
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#contentWidth">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <rdfs:comment>The width of the content bounds of a box. The content bounds correspond to the box border bounds as provided by the box source (renderer).</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/render.owl#contentX -->
+
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#contentX">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <rdfs:comment>The X coordinate of the content bounds of a box. The content bounds correspond to the box border bounds as provided by the box source (renderer).</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/render.owl#contentY -->
+
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#contentY">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <rdfs:comment>The Y coordinate of the content bounds of a box. The content bounds correspond to the box border bounds as provided by the box source (renderer).</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/render.owl#displayType -->
+
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#displayType">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>The display type of a box that corresponds to the CSS &apos;display&apos; property (&apos;inline&apos;, &apos;block&apos;, etc.)</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://fitlayout.github.io/ontology/render.owl#documentOrder -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#documentOrder">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
         <rdfs:comment>The order of a rectangle within its page</rdfs:comment>
@@ -258,6 +336,7 @@
     <!-- http://fitlayout.github.io/ontology/render.owl#hasTitle -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#hasTitle">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Page"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
         <rdfs:comment>Page title</rdfs:comment>
@@ -272,6 +351,7 @@
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Page"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <rdfs:comment>Effective height of a rectangle.</rdfs:comment>
     </owl:DatatypeProperty>
     
 
@@ -279,7 +359,18 @@
     <!-- http://fitlayout.github.io/ontology/render.owl#htmlTagName -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#htmlTagName">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/render.owl#imageData -->
+
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#imageData">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Image"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>
     
@@ -296,18 +387,10 @@
     
 
 
-    <!-- http://fitlayout.github.io/ontology/render.owl#launchDatetime -->
-
-    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#launchDatetime">
-        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Launch"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTimeStamp"/>
-    </owl:DatatypeProperty>
-    
-
-
     <!-- http://fitlayout.github.io/ontology/render.owl#lineThrough -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#lineThrough">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
     </owl:DatatypeProperty>
@@ -324,12 +407,24 @@
     
 
 
+    <!-- http://fitlayout.github.io/ontology/render.owl#pngImage -->
+
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#pngImage">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Page"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>PNG image data representing the whole page (screen shot)</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://fitlayout.github.io/ontology/render.owl#positionX -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#positionX">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <rdfs:comment>Effective X coordinate of a rectangle.</rdfs:comment>
     </owl:DatatypeProperty>
     
 
@@ -340,6 +435,7 @@
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <rdfs:comment>Effective Y coordinate of a rectangle.</rdfs:comment>
     </owl:DatatypeProperty>
     
 
@@ -357,6 +453,7 @@
     <!-- http://fitlayout.github.io/ontology/render.owl#underline -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#underline">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
     </owl:DatatypeProperty>
@@ -366,8 +463,10 @@
     <!-- http://fitlayout.github.io/ontology/render.owl#visualHeight -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#visualHeight">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <rdfs:comment>The height of the visual bounds of a box.</rdfs:comment>
     </owl:DatatypeProperty>
     
 
@@ -375,8 +474,10 @@
     <!-- http://fitlayout.github.io/ontology/render.owl#visualWidth -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#visualWidth">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <rdfs:comment>The width of the visual bounds of a box.</rdfs:comment>
     </owl:DatatypeProperty>
     
 
@@ -384,8 +485,10 @@
     <!-- http://fitlayout.github.io/ontology/render.owl#visualX -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#visualX">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <rdfs:comment>The X coordinate of the visual bounds of a box.</rdfs:comment>
     </owl:DatatypeProperty>
     
 
@@ -393,8 +496,10 @@
     <!-- http://fitlayout.github.io/ontology/render.owl#visualY -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#visualY">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <rdfs:comment>The Y coordinate of the visual bounds of a box.</rdfs:comment>
     </owl:DatatypeProperty>
     
 
@@ -406,6 +511,7 @@
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Page"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <rdfs:comment>Effective width of a rectangle.</rdfs:comment>
     </owl:DatatypeProperty>
     
 
@@ -496,12 +602,6 @@
     
 
 
-    <!-- http://fitlayout.github.io/ontology/render.owl#Launch -->
-
-    <owl:Class rdf:about="http://fitlayout.github.io/ontology/render.owl#Launch"/>
-    
-
-
     <!-- http://fitlayout.github.io/ontology/render.owl#Page -->
 
     <owl:Class rdf:about="http://fitlayout.github.io/ontology/render.owl#Page"/>
@@ -515,5 +615,5 @@
 
 
 
-<!-- Generated by the OWL API (version 4.2.5.20160517-0735) https://github.com/owlcs/owlapi -->
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
 

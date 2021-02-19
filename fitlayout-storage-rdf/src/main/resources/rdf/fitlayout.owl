@@ -35,6 +35,16 @@
     
 
 
+    <!-- http://fitlayout.github.io/ontology/fitlayout.owl#hasParentArtifact -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/fitlayout.owl#hasParentArtifact">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
+        <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
+        <rdfs:comment>Assigns a parent artifact to another artifact.</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -49,17 +59,30 @@
     <!-- http://fitlayout.github.io/ontology/fitlayout.owl#createdOn -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/fitlayout.owl#createdOn">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#PageSet"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:comment>Creation date/time for an artifact or page set</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://fitlayout.github.io/ontology/fitlayout.owl#hasName -->
+    <!-- http://fitlayout.github.io/ontology/fitlayout.owl#creator -->
 
-    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/fitlayout.owl#hasName">
-        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#PageSet"/>
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/fitlayout.owl#creator">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>An identification of the service that created an artifact.</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/fitlayout.owl#creatorParams -->
+
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/fitlayout.owl#creatorParams">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>Parametres of the service used for creating an artifact.</rdfs:comment>
     </owl:DatatypeProperty>
     
 

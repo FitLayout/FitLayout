@@ -5,18 +5,15 @@
  */
 package cz.vutbr.fit.layout.rdf.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.Collection;
 
-import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.repository.RepositoryException;
 import org.eclipse.rdf4j.rio.RDFParseException;
 import org.junit.Test;
 
 import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
-import cz.vutbr.fit.layout.rdf.RDFStorage;
 
 /**
  * 
@@ -24,28 +21,19 @@ import cz.vutbr.fit.layout.rdf.RDFStorage;
  */
 public class ConnectionTest
 {
-    private static String[] owls = new String[] {"render.owl", "segmentation.owl", "fitlayout.owl", "mapping.owl"};
-    
 
+    /**
+     * Tries to initialize the repository metadata for an in-memory repository.
+     * @throws RDFParseException
+     * @throws RepositoryException
+     * @throws IOException
+     */
     @Test
     public void checkStorageConnection() throws RDFParseException, RepositoryException, IOException
     {
-        RDFStorage storage = RDFStorage.createMemory(null);
-        
-        //load the ontologies
-        for (String owl : owls)
-        {
-            String owlFile = Utils.loadResource("/rdf/" + owl);
-            storage.importXML(owlFile);
-        }
-        
-        //load testing artifacts
-        RDFArtifactRepository artRepo = new RDFArtifactRepository(storage);
-        String page = Utils.loadResource("/rdf/page.ttl");
-        storage.importTurtle(page);
-        Collection<IRI> pages = artRepo.getArtifactIRIs();
-        
-        assertEquals("One page has been loaded", 1, pages.size());
+        RDFArtifactRepository repo = RDFArtifactRepository.createMemory(null);
+        repo.initMetadata();
+        assertTrue("One page has been loaded", repo.isInitialized());
     }
     
 }

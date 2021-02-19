@@ -10,11 +10,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import org.eclipse.rdf4j.RDF4JException;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.query.Binding;
 import org.eclipse.rdf4j.query.BindingSet;
@@ -36,6 +38,9 @@ public class RDFArtifactRepository implements ArtifactRepository
 {
     private static Logger log = LoggerFactory.getLogger(RDFArtifactRepository.class);
     
+    /** Required OWL resources containing the storage metadata */
+    private static String[] owls = new String[] {"render.owl", "segmentation.owl", "fitlayout.owl", "mapping.owl"};
+    
     private RDFStorage storage;
     private RDFIRIDecoder iriDecoder;
     private Map<IRI, ModelBuilder> modelBuilders;
@@ -49,6 +54,7 @@ public class RDFArtifactRepository implements ArtifactRepository
         modelBuilders = new HashMap<>();
         modelLoaders = new HashMap<>();
         initDefaultModelBuilders();
+        init();
     }
 
     public static RDFArtifactRepository createMemory(String path)
@@ -83,6 +89,63 @@ public class RDFArtifactRepository implements ArtifactRepository
         return iriDecoder;
     }
 
+    //Init and health check ==========================================================
+    
+    /**
+     * Checks the repository status and initializes the metadata when necessary
+     */
+    public void init()
+    {
+        if (!isInitialized())
+        {
+            if (System.getProperty("fitlayout.rdf.disableAutoInit") == null)
+            {
+                initMetadata();
+                if (!isInitialized())
+                    log.error("Repository init failed");
+            }
+        }
+    }
+    
+    /**
+     * Checks whether the storage has been initialized - it seems to contain the appropriate
+     * metadata
+     * @return {@code true} when the repository is ready to use
+     */
+    public boolean isInitialized()
+    {
+        final Value val = getStorage().getPropertyValue(BOX.Page, RDF.TYPE);
+        return (val != null);
+    }
+    
+    /**
+     * Initializes the repository metadata using the default OWL resource files.
+     * @return {@code true} when the repository was initialized sucessfully.
+     */
+    public boolean initMetadata()
+    {
+        log.info("Initializing repository metadata");
+        try {
+            for (String owl : owls)
+            {
+                String owlFile = loadResource("/rdf/" + owl);
+                getStorage().importXML(owlFile);
+            }
+        } catch (Exception e) {
+            log.error("Could import metadata: {}", e);
+            return false;
+        }
+        return isInitialized();
+    }
+    
+    private static String loadResource(String filePath)
+    {
+        try (Scanner scanner = new Scanner(RDFArtifactRepository.class.getResourceAsStream(filePath), "UTF-8")) {
+            scanner.useDelimiter("\\A");
+            return scanner.next();
+        }
+    }
+    
     //Artifact functions =============================================================
     
     @Override

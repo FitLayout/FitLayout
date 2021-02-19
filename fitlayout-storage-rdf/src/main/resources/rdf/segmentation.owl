@@ -26,6 +26,7 @@
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#belongsTo -->
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#belongsTo">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree"/>
     </owl:ObjectProperty>
@@ -53,6 +54,7 @@
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasAreaTree -->
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasAreaTree">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalAreaTree"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree"/>
     </owl:ObjectProperty>
@@ -62,6 +64,7 @@
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasSourcePage -->
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasSourcePage">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/render.owl#Page"/>
     </owl:ObjectProperty>
@@ -81,6 +84,7 @@
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#isChildOf -->
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#isChildOf">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
     </owl:ObjectProperty>
@@ -90,6 +94,7 @@
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#isSubordinateTo -->
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#isSubordinateTo">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea"/>
     </owl:ObjectProperty>
@@ -107,9 +112,21 @@
     
 
 
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasContentLength -->
+
+    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasContentLength">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <rdfs:comment>The number of content elements used to compute the style statistics such as average font weight.</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasName -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasName">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Tag"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>
@@ -119,6 +136,7 @@
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasText -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasText">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>
@@ -128,6 +146,7 @@
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasType -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasType">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Tag"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>
@@ -137,6 +156,7 @@
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#support -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#support">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
     </owl:DatatypeProperty>
     
@@ -145,6 +165,7 @@
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#tagSupport -->
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#tagSupport">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
     </owl:DatatypeProperty>
     

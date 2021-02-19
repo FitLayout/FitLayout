@@ -5,28 +5,17 @@
  */
 package cz.vutbr.fit.layout.tools.cmd;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.eclipse.rdf4j.model.Model;
-
 import cz.vutbr.fit.layout.api.ArtifactService;
 import cz.vutbr.fit.layout.api.ParametrizedOperation;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.api.ServiceManager;
-import cz.vutbr.fit.layout.io.HTMLOutputOperator;
-import cz.vutbr.fit.layout.io.XMLBoxOutput;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
-import cz.vutbr.fit.layout.rdf.BoxModelBuilder;
-import cz.vutbr.fit.layout.rdf.Serialization;
 import cz.vutbr.fit.layout.tools.CliCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -42,7 +31,6 @@ import picocli.CommandLine.Parameters;
 public class Renderer extends CliCommand implements Callable<Integer>
 {
     public enum Backend { cssbox, puppeteer };
-    public enum Format { xml, turtle, html };
     
     @Option(order = 100, names = {"-h", "--help"}, usageHelp = true, description = "print help")
     protected boolean help;
@@ -59,12 +47,6 @@ public class Renderer extends CliCommand implements Callable<Integer>
     @Option(order = 4, names = {"-O", "--options"}, paramLabel = "KEY=VALUE", split = "\\,", splitSynopsisLabel = ",", description = "Additional rendering backend options")
     protected Map<String, String> ropts;
 
-    @Option(order = 5, names = {"-o", "--output-file"}, paramLabel = "path", description = "output file path")
-    protected File outfile;
-
-    @Option(order = 6, names = {"-f", "--format"}, paramLabel = "format", description = "Output format: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
-    protected Format format = Format.xml;
-    
     @Parameters(arity = "1", index = "0", description = "Input page URL")
     protected URL url;
 
@@ -76,22 +58,12 @@ public class Renderer extends CliCommand implements Callable<Integer>
             getCli().setPage(page);
             System.out.println("  Created: " + page);
             
-            if (outfile != null)
-            {
-                writeOutput(page, outfile, format);
-                System.out.println("Written to " + outfile);
-            }
-            
             return 0;
             
         } catch (IllegalArgumentException e) {
             System.err.println("Error: " + e.getMessage());
-        } catch (MalformedURLException e) {
-            System.err.println("Invalid url: " + e.getMessage());
         } catch (ServiceException e) {
             System.err.println("Rendering failed: " + e.getMessage());
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
         }
         
         return 1;
@@ -138,49 +110,6 @@ public class Renderer extends CliCommand implements Callable<Integer>
         {
             return null;
         }
-    }
-    
-    public void writeOutput(Page page, File outfile, Format format) throws IOException
-    {
-        switch (format)
-        {
-            case turtle:
-                outputRDF(page, outfile, Serialization.TURTLE);
-                break;
-            case xml:
-                outputXML(page, outfile);
-                break;
-            case html:
-                outputHTML(page, outfile);
-                break;
-        }
-    }
-    
-    public void outputRDF(Page page, File outfile, String mimeType) throws IOException
-    {
-        BoxModelBuilder builder = new BoxModelBuilder();
-        Model graph = builder.createGraph(page);
-        FileOutputStream os = new FileOutputStream(outfile);
-        Serialization.modelToStream(graph, os, mimeType);
-        os.close();
-    }
-    
-    public void outputXML(Page page, File outfile) throws IOException
-    {
-        FileOutputStream os = new FileOutputStream(outfile);
-        PrintWriter out = new PrintWriter(os);
-        XMLBoxOutput xml = new XMLBoxOutput(true);
-        xml.dumpTo(page, out);
-        out.close();
-    }
-    
-    public void outputHTML(Page page, File outfile) throws IOException
-    {
-        FileOutputStream os = new FileOutputStream(outfile);
-        PrintWriter out = new PrintWriter(os);
-        HTMLOutputOperator html = new HTMLOutputOperator();
-        html.dumpTo(page, out);
-        out.close();
     }
     
 }

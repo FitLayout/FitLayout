@@ -5,29 +5,18 @@
  */
 package cz.vutbr.fit.layout.tools.cmd;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
-
-import org.eclipse.rdf4j.model.Model;
 
 import cz.vutbr.fit.layout.api.ArtifactService;
 import cz.vutbr.fit.layout.api.ParametrizedOperation;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.api.ServiceManager;
-import cz.vutbr.fit.layout.io.HTMLOutputOperator;
-import cz.vutbr.fit.layout.io.XMLOutputOperator;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
-import cz.vutbr.fit.layout.rdf.AreaModelBuilder;
-import cz.vutbr.fit.layout.rdf.Serialization;
 import cz.vutbr.fit.layout.tools.CliCommand;
-import cz.vutbr.fit.layout.tools.cmd.Renderer.Format;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -51,12 +40,6 @@ public class Segmentator extends CliCommand implements Callable<Integer>
     @Option(order = 2, names = {"-O", "--options"}, paramLabel = "KEY=VALUE", split = "\\,", splitSynopsisLabel = ",", description = "Segmentation method options")
     protected Map<String, String> sopts;
 
-    @Option(order = 3, names = {"-o", "--output-file"}, paramLabel = "path", description = "output file path")
-    protected File outfile;
-
-    @Option(order = 4, names = {"-f", "--format"}, paramLabel = "format", description = "Output format: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
-    protected Format format = Format.xml;
-    
     @Override
     public Integer call() throws Exception
     {
@@ -71,20 +54,12 @@ public class Segmentator extends CliCommand implements Callable<Integer>
             getCli().setAreaTree(atree);
             System.out.println("  Created: " + atree);
             
-            if (outfile != null)
-            {
-                writeOutput(atree, page, outfile, format);
-                System.out.println("Written to " + outfile);
-            }
-            
             return 0;
             
         } catch (IllegalArgumentException e) {
             System.err.println("Error: " + e.getMessage());
         } catch (ServiceException e) {
             System.err.println("Rendering failed: " + e.getMessage());
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
         }
         
         return 1;
@@ -121,46 +96,6 @@ public class Segmentator extends CliCommand implements Callable<Integer>
         {
             return null;
         }
-    }
-    
-    public void writeOutput(AreaTree atree, Page page, File outfile, Format format) throws IOException
-    {
-        switch (format)
-        {
-            case turtle:
-                outputRDF(atree, outfile, Serialization.TURTLE);
-                break;
-            case xml:
-                outputXML(atree, outfile);
-                break;
-            case html:
-                outputHTML(atree, page, outfile);
-                break;
-        }
-    }
-    
-    public void outputRDF(AreaTree atree, File outfile, String mimeType) throws IOException
-    {
-        AreaModelBuilder builder = new AreaModelBuilder();
-        Model graph = builder.createGraph(atree);
-        FileOutputStream os = new FileOutputStream(outfile);
-        Serialization.modelToStream(graph, os, mimeType);
-        os.close();
-    }
-    
-    public void outputXML(AreaTree atree, File outfile) throws IOException
-    {
-        XMLOutputOperator out = new XMLOutputOperator(outfile.getAbsolutePath(), true);
-        out.apply(atree);
-    }
-    
-    public void outputHTML(AreaTree atree, Page page, File outfile) throws IOException
-    {
-        FileOutputStream os = new FileOutputStream(outfile);
-        PrintWriter out = new PrintWriter(os);
-        HTMLOutputOperator html = new HTMLOutputOperator();
-        html.dumpTo(atree, page, out);
-        out.close();
     }
     
 }

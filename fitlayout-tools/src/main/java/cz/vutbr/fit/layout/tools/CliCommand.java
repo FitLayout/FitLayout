@@ -28,6 +28,11 @@ public class CliCommand
         System.err.println(err);
     }
     
+    protected void errNoArtifact(String op)
+    {
+        printError("No artifact to work with. The 'RENDER' or 'LOAD' command must be used before " + op + ".");
+    }
+
     protected void errNoPage(String op)
     {
         printError("No page to work with. The 'RENDER' or 'LOAD' command must be used before " + op + ".");

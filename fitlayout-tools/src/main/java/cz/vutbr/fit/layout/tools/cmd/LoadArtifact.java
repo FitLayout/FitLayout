@@ -12,6 +12,7 @@ import org.eclipse.rdf4j.repository.RepositoryException;
 
 import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.model.AreaTree;
+import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
 import cz.vutbr.fit.layout.tools.CliCommand;
@@ -23,15 +24,11 @@ import picocli.CommandLine.Parameters;
  * @author burgetr
  */
 @Command(name = "LOAD", sortOptions = false, abbreviateSynopsis = true,
-    description = "Loads an artifact from a repository")
+    description = "Loads an artifact from the repository",
+    footer = "The repository must be previously opened using the USE command")
 public class LoadArtifact extends CliCommand implements Callable<Integer>
 {
-    public enum ArtifactType { page, areatree };
-    
-    @Parameters(arity = "1", index = "0", description = "Artifact type: ${COMPLETION-CANDIDATES}")
-    protected ArtifactType artifactType;
-    
-    @Parameters(arity = "1", index = "1", paramLabel = "iri", description = "Artifact IRI")
+    @Parameters(arity = "1", index = "0", paramLabel = "iri", description = "Artifact IRI")
     protected String artifactIri;
 
     @Override
@@ -45,20 +42,30 @@ public class LoadArtifact extends CliCommand implements Callable<Integer>
                 return 2;
             }
             
-            IRI iri = repo.getIriDecoder().decodeIri(artifactIri);
-            
-            switch (artifactType)
+            final IRI iri = repo.getIriDecoder().decodeIri(artifactIri);
+            Artifact art = repo.getArtifact(iri);
+            if (art != null)
             {
-                case page:
-                    Page page = (Page) ((RDFArtifactRepository) repo).getArtifact(iri);
-                    System.out.println("Loaded: " + page);
-                    getCli().setPage(page);
-                    break;
-                case areatree:
-                    AreaTree atree = (AreaTree) ((RDFArtifactRepository) repo).getArtifact(iri);
-                    System.out.println("Loaded: " + atree);
-                    getCli().setAreaTree(atree);
-                    break;
+                if (art instanceof Page)
+                {
+                    System.out.println("Loaded page: " + art);
+                    getCli().setPage((Page) art);
+                }
+                else if (art instanceof AreaTree)
+                {
+                    System.out.println("Loaded area tree: " + art);
+                    getCli().setAreaTree((AreaTree) art);
+                }
+                else
+                {
+                    System.err.println("Unknwon artifact type");
+                    return 1;
+                }
+            }
+            else
+            {
+                System.err.println("Couldn't load artifact " + iri);
+                return 1;
             }
             
             return 0;

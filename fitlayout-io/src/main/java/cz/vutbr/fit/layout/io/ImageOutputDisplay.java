@@ -8,6 +8,7 @@ package cz.vutbr.fit.layout.io;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
 
@@ -30,8 +31,13 @@ public class ImageOutputDisplay extends Graphics2DDisplay
     public void saveTo(String path) throws IOException
     {
         FileOutputStream os = new FileOutputStream(path);
-        ImageIO.write(image, "png", os);
+        saveTo(os);
         os.close();
+    }
+    
+    public void saveTo(OutputStream os) throws IOException
+    {
+        ImageIO.write(image, "png", os);
     }
     
 }

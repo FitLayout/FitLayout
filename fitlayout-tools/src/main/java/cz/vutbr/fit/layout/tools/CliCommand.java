@@ -30,7 +30,7 @@ public class CliCommand
     
     protected void errNoArtifact(String op)
     {
-        printError("No artifact to work with. The 'RENDER' or 'LOAD' command must be used before " + op + ".");
+        printError("No artifact to work with. The 'RENDER', 'SEGMENT' or 'LOAD' command must be used before " + op + ".");
     }
 
     protected void errNoPage(String op)

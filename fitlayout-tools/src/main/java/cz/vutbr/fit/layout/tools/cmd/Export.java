@@ -5,9 +5,11 @@
  */
 package cz.vutbr.fit.layout.tools.cmd;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.util.concurrent.Callable;
@@ -44,7 +46,7 @@ public class Export extends CliCommand implements Callable<Integer>
     @Option(order = 100, names = {"-h", "--help"}, usageHelp = true, description = "print help")
     protected boolean help;
     
-    @Option(order = 1, names = {"-o", "--output-file"}, paramLabel = "path", required = true, description = "output file path")
+    @Option(order = 1, names = {"-o", "--output-file"}, paramLabel = "path", description = "output file path")
     protected File outfile;
 
     @Option(order = 2, names = {"-f", "--format"}, paramLabel = "format", description = "Output format: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
@@ -58,22 +60,30 @@ public class Export extends CliCommand implements Callable<Integer>
             
             if (a == null)
             {
-                System.err.println("Nothing to export.");
+                errNoArtifact("EXPORT");
                 return 1;
             }
             
             System.out.println("Exporting " + a);
+            final OutputStream os;
+            if (outfile == null)
+                os = new BufferedOutputStream(System.out);
+            else
+                os = new FileOutputStream(outfile);
+            
             if (a instanceof Page)
             {
-                writeOutput((Page) a, outfile, format);
+                writeOutput((Page) a, os, format);
                 System.out.println("  Written to " + outfile);
             }
             else if (a instanceof AreaTree)
             {
                 Page page = getCli().getPage();
-                writeOutput((AreaTree) a, page, outfile, format);
+                writeOutput((AreaTree) a, page, os, format);
                 System.out.println("  Written to " + outfile);
             }
+            
+            os.close();
             
             return 0;
             
@@ -92,109 +102,106 @@ public class Export extends CliCommand implements Callable<Integer>
    
     //=========================================================================================
     
-    public void writeOutput(Page page, File outfile, Format format) throws IOException
+    public void writeOutput(Page page, OutputStream os, Format format) throws IOException
     {
         switch (format)
         {
             case turtle:
-                outputRDF(page, outfile, Serialization.TURTLE);
+                outputRDF(page, os, Serialization.TURTLE);
                 break;
             case xml:
-                outputXML(page, outfile);
+                outputXML(page, os);
                 break;
             case html:
-                outputHTML(page, outfile);
+                outputHTML(page, os);
                 break;
             case png:
-                outputPNG(page, outfile);
+                outputPNG(page, os);
         }
     }
     
-    public void outputRDF(Page page, File outfile, String mimeType) throws IOException
+    public void outputRDF(Page page, OutputStream os, String mimeType) throws IOException
     {
         BoxModelBuilder builder = new BoxModelBuilder();
         Model graph = builder.createGraph(page);
-        FileOutputStream os = new FileOutputStream(outfile);
         Serialization.modelToStream(graph, os, mimeType);
         os.close();
     }
     
-    public void outputXML(Page page, File outfile) throws IOException
+    public void outputXML(Page page, OutputStream os) throws IOException
     {
-        FileOutputStream os = new FileOutputStream(outfile);
         PrintWriter out = new PrintWriter(os);
         XMLBoxOutput xml = new XMLBoxOutput(true);
         xml.dumpTo(page, out);
         out.close();
     }
     
-    public void outputHTML(Page page, File outfile) throws IOException
+    public void outputHTML(Page page, OutputStream os) throws IOException
     {
-        FileOutputStream os = new FileOutputStream(outfile);
         PrintWriter out = new PrintWriter(os);
         HTMLOutputOperator html = new HTMLOutputOperator();
         html.dumpTo(page, out);
         out.close();
     }
 
-    public void outputPNG(Page page, File outfile) throws IOException
+    public void outputPNG(Page page, OutputStream os) throws IOException
     {
         ImageOutputDisplay disp = new ImageOutputDisplay(page.getWidth(), page.getHeight());
         if (page.getPngImage() != null)
             disp.drawPage(page, true);
         else
             disp.drawPage(page, false);
-        disp.saveTo(outfile.getAbsolutePath());
+        disp.saveTo(os);
     }
     
     //=========================================================================================
 
-    public void writeOutput(AreaTree atree, Page page, File outfile, Format format) throws IOException
+    public void writeOutput(AreaTree atree, Page page, OutputStream os, Format format) throws IOException
     {
         switch (format)
         {
             case turtle:
-                outputRDF(atree, outfile, Serialization.TURTLE);
+                outputRDF(atree, os, Serialization.TURTLE);
                 break;
             case xml:
-                outputXML(atree, outfile);
+                outputXML(atree, os);
                 break;
             case html:
-                outputHTML(atree, page, outfile);
+                outputHTML(atree, page, os);
                 break;
             case png:
-                outputPNG(atree, page, outfile);
+                outputPNG(atree, page, os);
                 break;
         }
     }
     
-    public void outputRDF(AreaTree atree, File outfile, String mimeType) throws IOException
+    public void outputRDF(AreaTree atree, OutputStream os, String mimeType) throws IOException
     {
         AreaModelBuilder builder = new AreaModelBuilder();
         Model graph = builder.createGraph(atree);
-        FileOutputStream os = new FileOutputStream(outfile);
         Serialization.modelToStream(graph, os, mimeType);
         os.close();
     }
     
-    public void outputXML(AreaTree atree, File outfile) throws IOException
+    public void outputXML(AreaTree atree, OutputStream os) throws IOException
     {
-        XMLOutputOperator out = new XMLOutputOperator(outfile.getAbsolutePath(), true);
-        out.apply(atree);
+        XMLOutputOperator out = new XMLOutputOperator(null, true);
+        PrintWriter writer = new PrintWriter(os);
+        out.dumpTo(atree, writer);
+        writer.close();
     }
     
-    public void outputHTML(AreaTree atree, Page page, File outfile) throws IOException
+    public void outputHTML(AreaTree atree, Page page, OutputStream os) throws IOException
     {
         if (page == null)
             throw new IllegalArgumentException("HTML export requires a page available (use RENDER or LOAD).");
-        FileOutputStream os = new FileOutputStream(outfile);
         PrintWriter out = new PrintWriter(os);
         HTMLOutputOperator html = new HTMLOutputOperator();
         html.dumpTo(atree, page, out);
         out.close();
     }
 
-    public void outputPNG(AreaTree atree, Page page, File outfile) throws IOException
+    public void outputPNG(AreaTree atree, Page page, OutputStream os) throws IOException
     {
         ImageOutputDisplay disp = new ImageOutputDisplay(page.getWidth(), page.getHeight());
         if (page.getPngImage() != null)
@@ -202,7 +209,7 @@ public class Export extends CliCommand implements Callable<Integer>
         else
             disp.drawPage(page, false);
         showAreas(disp, atree.getRoot(), null);
-        disp.saveTo(outfile.getAbsolutePath());
+        disp.saveTo(os);
     }
 
     private void showAreas(OutputDisplay disp, Area root, String nameSubstring)

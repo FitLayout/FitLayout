@@ -20,7 +20,8 @@ import picocli.CommandLine.Parameters;
  * 
  * @author burgetr
  */
-@Command(name = "STORE", sortOptions = false, abbreviateSynopsis = true)
+@Command(name = "STORE", sortOptions = false, abbreviateSynopsis = true,
+    description = "Stores an artifact to a repository")
 public class StoreArtifact extends CliCommand implements Callable<Integer>
 {
     @Parameters(arity = "1", index = "0", description = "Artifact type: ${COMPLETION-CANDIDATES}")

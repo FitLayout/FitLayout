@@ -22,7 +22,8 @@ import picocli.CommandLine.Parameters;
  * 
  * @author burgetr
  */
-@Command(name = "LOAD", sortOptions = false, abbreviateSynopsis = true)
+@Command(name = "LOAD", sortOptions = false, abbreviateSynopsis = true,
+    description = "Loads an artifact from a repository")
 public class LoadArtifact extends CliCommand implements Callable<Integer>
 {
     public enum ArtifactType { page, areatree };

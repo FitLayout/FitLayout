@@ -35,7 +35,8 @@ import picocli.CommandLine.Option;
  * 
  * @author burgetr
  */
-@Command(name = "EXPORT", sortOptions = false, abbreviateSynopsis = true, description = "Exports the last created artifact")
+@Command(name = "EXPORT", sortOptions = false, abbreviateSynopsis = true, 
+    description = "Exports the last created artifact (page or area tree)")
 public class Export extends CliCommand implements Callable<Integer>
 {
     public enum Format { xml, turtle, html, png };

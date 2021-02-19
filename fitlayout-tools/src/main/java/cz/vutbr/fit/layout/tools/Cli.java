@@ -40,11 +40,11 @@ import picocli.CommandLine.Command;
 @Command(name = "fitlayout", 
     subcommands = {Renderer.class,
                    Segmentator.class,
+                   Export.class,
                    UseRepository.class,
                    ListArtifacts.class,
                    LoadArtifact.class,
-                   StoreArtifact.class,
-                   Export.class})
+                   StoreArtifact.class})
 public class Cli
 {
     private static final String CONFIG_FILE = "config.properties";

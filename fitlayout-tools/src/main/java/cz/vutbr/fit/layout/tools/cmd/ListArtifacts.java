@@ -20,7 +20,8 @@ import picocli.CommandLine.Command;
  * 
  * @author burgetr
  */
-@Command(name = "LIST", sortOptions = false, abbreviateSynopsis = true)
+@Command(name = "LIST", sortOptions = false, abbreviateSynopsis = true,
+    description = "Lists the repository contents")
 public class ListArtifacts extends CliCommand implements Callable<Integer>
 {
     

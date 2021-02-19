@@ -36,7 +36,8 @@ import picocli.CommandLine.Option;
  * 
  * @author burgetr
  */
-@Command(name = "SEGMENT", sortOptions = false, abbreviateSynopsis = true)
+@Command(name = "SEGMENT", sortOptions = false, abbreviateSynopsis = true,
+    description = "Performs segmentation on a page")
 public class Segmentator extends CliCommand implements Callable<Integer>
 {
     public enum Method { vips, bcs };

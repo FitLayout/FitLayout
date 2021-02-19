@@ -18,7 +18,8 @@ import picocli.CommandLine.Parameters;
  * 
  * @author burgetr
  */
-@Command(name = "USE", sortOptions = false, abbreviateSynopsis = true)
+@Command(name = "USE", sortOptions = false, abbreviateSynopsis = true,
+    description = "Opens a repository for loading or storing artifacts")
 public class UseRepository extends CliCommand implements Callable<Integer>
 {
     private static final String KEY_REPOSITORY = "fitlayout.rdf.repository";

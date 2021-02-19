@@ -37,7 +37,8 @@ import picocli.CommandLine.Parameters;
  * 
  * @author burgetr
  */
-@Command(name = "RENDER", sortOptions = false, abbreviateSynopsis = true)
+@Command(name = "RENDER", sortOptions = false, abbreviateSynopsis = true,
+    description = "Renders a page")
 public class Renderer extends CliCommand implements Callable<Integer>
 {
     public enum Backend { cssbox, puppeteer };

@@ -44,7 +44,8 @@ import picocli.CommandLine.Command;
                    UseRepository.class,
                    ListArtifacts.class,
                    LoadArtifact.class,
-                   StoreArtifact.class})
+                   StoreArtifact.class},
+    footer = "Use COMMAND -h for getting usage information on the individual commands.")
 public class Cli
 {
     private static final String CONFIG_FILE = "config.properties";
@@ -159,7 +160,6 @@ public class Cli
         CommandLine cmd = new CommandLine(cli);
         cmd.setUsageHelpWidth(90);
         cmd.setUsageHelpLongOptionsMaxWidth(40);
-        //System.out.println(cmd.getCommandSpec().userObject());
         
         //init subcommands
         for (CommandLine sub : cmd.getSubcommands().values())

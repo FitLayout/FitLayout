@@ -14,9 +14,9 @@
 	
 	<artifactId>fitlayout-console</artifactId>
 	
-	<name>FitLayout - Console</name>
+	<name>FitLayout JavaScript Console</name>
 	<description>
-		FitLayout - Task execution tools
+		FitLayout - JavaScript console
 	</description>
 	<url>https://github.com/FitLayout/FitLayout</url>
 

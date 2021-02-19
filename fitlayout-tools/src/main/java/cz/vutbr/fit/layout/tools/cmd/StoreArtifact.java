@@ -40,7 +40,7 @@ public class StoreArtifact extends CliCommand implements Callable<Integer>
             if (art != null)
             {
                 repo.addArtifact(art);
-                System.out.println("Stored: " + art);
+                System.err.println("Stored: " + art);
             }
             else
                 errNoArtifact("STORE");

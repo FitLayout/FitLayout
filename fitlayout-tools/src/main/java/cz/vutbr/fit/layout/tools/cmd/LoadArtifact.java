@@ -48,12 +48,12 @@ public class LoadArtifact extends CliCommand implements Callable<Integer>
             {
                 if (art instanceof Page)
                 {
-                    System.out.println("Loaded page: " + art);
+                    System.err.println("Loaded page: " + art);
                     getCli().setPage((Page) art);
                 }
                 else if (art instanceof AreaTree)
                 {
-                    System.out.println("Loaded area tree: " + art);
+                    System.err.println("Loaded area tree: " + art);
                     getCli().setAreaTree((AreaTree) art);
                 }
                 else

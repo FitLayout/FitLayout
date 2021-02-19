@@ -41,7 +41,6 @@ public class ListArtifacts extends CliCommand implements Callable<Integer>
             IRIDecoder dec = repo.getIriDecoder();
             
             Collection<Artifact> iris = repo.getArtifactInfo();
-            System.out.println("Artifacts:");
             for (Artifact a : iris)
                 System.out.printf("%s\t%s\n", a.getIri(), dec.encodeIri(a.getArtifactType()));
             

@@ -52,7 +52,7 @@ public class Segmentator extends CliCommand implements Callable<Integer>
             
             AreaTree atree = segment(page, method, sopts);
             getCli().setAreaTree(atree);
-            System.out.println("  Created: " + atree);
+            System.err.println("  Created: " + atree);
             
             return 0;
             
@@ -79,7 +79,7 @@ public class Segmentator extends CliCommand implements Callable<Integer>
         }
         
         ParametrizedOperation op = getCli().getServiceManager().findParmetrizedService(serviceId);
-        System.out.println("Segmentation: " + op);
+        System.err.println("Segmentation: " + op);
         if (op != null)
         {
             if (sopts != null)
@@ -88,7 +88,7 @@ public class Segmentator extends CliCommand implements Callable<Integer>
                 ServiceManager.setServiceParams(op, sparams);
             }
             
-            System.out.println("  Params: " + op.getParamString());
+            System.err.println("  Params: " + op.getParamString());
             Artifact atree = ((ArtifactService) op).process(page);
             return (AreaTree) atree;
         }

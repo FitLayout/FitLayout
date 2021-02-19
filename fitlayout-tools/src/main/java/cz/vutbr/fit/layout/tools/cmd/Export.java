@@ -64,7 +64,7 @@ public class Export extends CliCommand implements Callable<Integer>
                 return 1;
             }
             
-            System.out.println("Exporting " + a);
+            System.err.println("Exporting " + a);
             final OutputStream os;
             if (outfile == null)
                 os = new BufferedOutputStream(System.out);
@@ -74,13 +74,15 @@ public class Export extends CliCommand implements Callable<Integer>
             if (a instanceof Page)
             {
                 writeOutput((Page) a, os, format);
-                System.out.println("  Written to " + outfile);
+                if (outfile != null)
+                    System.err.println("  Written to " + outfile);
             }
             else if (a instanceof AreaTree)
             {
                 Page page = getCli().getPage();
                 writeOutput((AreaTree) a, page, os, format);
-                System.out.println("  Written to " + outfile);
+                if (outfile != null)
+                    System.err.println("  Written to " + outfile);
             }
             
             os.close();

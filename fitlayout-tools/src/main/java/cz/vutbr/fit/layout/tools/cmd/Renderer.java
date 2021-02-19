@@ -56,7 +56,7 @@ public class Renderer extends CliCommand implements Callable<Integer>
         try {
             Page page = render(url, backend, width, height, ropts);
             getCli().setPage(page);
-            System.out.println("  Created: " + page);
+            System.err.println("  Created: " + page);
             
             return 0;
             
@@ -91,7 +91,7 @@ public class Renderer extends CliCommand implements Callable<Integer>
         }
         
         ParametrizedOperation op = getCli().getServiceManager().findParmetrizedService(serviceId);
-        System.out.println("Rendering: " + op);
+        System.err.println("Rendering: " + op);
         if (op != null)
         {
             Map<String, Object> sparams = new HashMap<>();
@@ -101,7 +101,7 @@ public class Renderer extends CliCommand implements Callable<Integer>
             if (params != null)
                 sparams.putAll(params);
             ServiceManager.setServiceParams(op, sparams);
-            System.out.println("  Params: " + op.getParamString());
+            System.err.println("  Params: " + op.getParamString());
             
             Artifact page = ((ArtifactService) op).process(null);
             return (Page) page;

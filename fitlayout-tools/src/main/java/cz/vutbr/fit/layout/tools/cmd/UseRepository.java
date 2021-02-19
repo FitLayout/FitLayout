@@ -64,7 +64,7 @@ public class UseRepository extends CliCommand implements Callable<Integer>
                     throw new IllegalArgumentException(KEY_PATH + " system property is not set. Check your repository configuration.");
                 String path = configPath.replace("$HOME", System.getProperty("user.home"));
                 storage = RDFArtifactRepository.createNative(path);
-                System.out.println("Using rdf4j native storage in " + path);
+                System.err.println("Using rdf4j native storage in " + path);
                 break;
             case http:
                 if (configServer == null)
@@ -72,7 +72,7 @@ public class UseRepository extends CliCommand implements Callable<Integer>
                 if (configRepository == null)
                     throw new IllegalArgumentException(KEY_REPOSITORY + " system property is not set. Check your repository configuration.");
                 storage = RDFArtifactRepository.createHTTP(configServer, configRepository);
-                System.out.println("Using rdf4j remote HTTP storage on " + configServer + " / " + configRepository);
+                System.err.println("Using rdf4j remote HTTP storage on " + configServer + " / " + configRepository);
                 break;
         }
         return storage;

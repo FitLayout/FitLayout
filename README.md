@@ -69,7 +69,7 @@ Render a page using the puppeteer backend and export the model to a XML file:
 ```
 ./fitlayout.sh \
     RENDER -b puppeteer http://cssbox.sf.net \
-	EXPORT -f xml
+    EXPORT -f xml
 ```
 
 Render a page using the puppeteer backend, perform segmenation using VIPS and export to a XML file:
@@ -77,8 +77,8 @@ Render a page using the puppeteer backend, perform segmenation using VIPS and ex
 ```
 ./fitlayout.sh \
     RENDER -b puppeteer http://cssbox.sf.net \
-	SEGMENT -m vips -O pDoC=9 \
-	EXPORT -f xml
+    SEGMENT -m vips -O pDoC=9 \
+    EXPORT -f xml
 ```
 
 Render a page using the cssbox backend, store a screenshot, perform segmentation using BCS, store a screenshot of the segmented page, export areas in RDF/turtle.
@@ -86,10 +86,10 @@ Render a page using the cssbox backend, store a screenshot, perform segmentation
 ```
 ./fitlayout.sh \
     RENDER -b cssbox http://cssbox.sf.net \
-	EXPORT -f png -o /tmp/page.png \
-	SEGMENT -m bcs \
-	EXPORT -f png -o /tmp/segments.png \
-	EXPORT -f turtle
+    EXPORT -f png -o /tmp/page.png \
+    SEGMENT -m bcs \
+    EXPORT -f png -o /tmp/segments.png \
+    EXPORT -f turtle
 ```
 
 See the [Command-line Interface](https://github.com/FitLayout/FitLayout/wiki/Command-line-Interface) wiki page for more examples including the usage of the built-in RDF storage.

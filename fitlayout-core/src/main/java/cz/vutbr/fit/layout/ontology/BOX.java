@@ -339,6 +339,8 @@ public class BOX {
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#Page}.
+	 * <p>
+	 * A tree of boxes representing a rendered page.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#Page">Page</a>
 	 */
@@ -372,11 +374,13 @@ public class BOX {
 	public static final IRI positionY;
 
 	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#Rectangle}.
+	 * {@code http://fitlayout.github.io/ontology/render.owl#RectArea}.
+	 * <p>
+	 * A rectangular area in the page with bounds assigned.
 	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#Rectangle">Rectangle</a>
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#RectArea">RectArea</a>
 	 */
-	public static final IRI Rectangle;
+	public static final IRI RectArea;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#sourceUrl}.
@@ -486,7 +490,7 @@ public class BOX {
 		pngImage = factory.createIRI(BOX.NAMESPACE, "pngImage");
 		positionX = factory.createIRI(BOX.NAMESPACE, "positionX");
 		positionY = factory.createIRI(BOX.NAMESPACE, "positionY");
-		Rectangle = factory.createIRI(BOX.NAMESPACE, "Rectangle");
+		RectArea = factory.createIRI(BOX.NAMESPACE, "RectArea");
 		sourceUrl = factory.createIRI(BOX.NAMESPACE, "sourceUrl");
 		underline = factory.createIRI(BOX.NAMESPACE, "underline");
 		visualHeight = factory.createIRI(BOX.NAMESPACE, "visualHeight");

@@ -41,7 +41,7 @@ import picocli.CommandLine.Option;
     description = "Exports the last created artifact (page or area tree)")
 public class Export extends CliCommand implements Callable<Integer>
 {
-    public enum Format { xml, turtle, html, png };
+    public enum Format { xml, turtle, html, png, pngi };
 
     @Option(order = 100, names = {"-h", "--help"}, usageHelp = true, description = "print help")
     protected boolean help;
@@ -49,7 +49,8 @@ public class Export extends CliCommand implements Callable<Integer>
     @Option(order = 1, names = {"-o", "--output-file"}, paramLabel = "path", description = "output file path")
     protected File outfile;
 
-    @Option(order = 2, names = {"-f", "--format"}, paramLabel = "format", description = "Output format: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE})")
+    @Option(order = 2, names = {"-f", "--format"}, paramLabel = "format",
+            description = "Output format: ${COMPLETION-CANDIDATES} (${DEFAULT-VALUE}). png uses a screenshot provided by the renderer (if available), pngi draws the internal page representation.")
     protected Format format = Format.xml;
     
     @Override
@@ -119,6 +120,8 @@ public class Export extends CliCommand implements Callable<Integer>
                 break;
             case png:
                 outputPNG(page, os);
+            case pngi:
+                outputPNGi(page, os);
         }
     }
     
@@ -156,6 +159,13 @@ public class Export extends CliCommand implements Callable<Integer>
         disp.saveTo(os);
     }
     
+    public void outputPNGi(Page page, OutputStream os) throws IOException
+    {
+        ImageOutputDisplay disp = new ImageOutputDisplay(page.getWidth(), page.getHeight());
+        disp.drawPage(page, false);
+        disp.saveTo(os);
+    }
+    
     //=========================================================================================
 
     public void writeOutput(AreaTree atree, Page page, OutputStream os, Format format) throws IOException
@@ -173,6 +183,9 @@ public class Export extends CliCommand implements Callable<Integer>
                 break;
             case png:
                 outputPNG(atree, page, os);
+                break;
+            case pngi:
+                outputPNGi(atree, page, os);
                 break;
         }
     }
@@ -210,6 +223,14 @@ public class Export extends CliCommand implements Callable<Integer>
             disp.drawPage(page, true);
         else
             disp.drawPage(page, false);
+        showAreas(disp, atree.getRoot(), null);
+        disp.saveTo(os);
+    }
+
+    public void outputPNGi(AreaTree atree, Page page, OutputStream os) throws IOException
+    {
+        ImageOutputDisplay disp = new ImageOutputDisplay(page.getWidth(), page.getHeight());
+        disp.drawPage(page, false);
         showAreas(disp, atree.getRoot(), null);
         disp.saveTo(os);
     }

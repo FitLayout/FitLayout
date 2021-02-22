@@ -46,6 +46,16 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
 {
     private static Logger log = LoggerFactory.getLogger(AreaModelLoader.class);
 
+    private static final String[] dataObjectProperties = new String[] { 
+            "box:hasTopBorder",
+            "box:hasBottomBorder",
+            "box:hasLeftBorder",
+            "box:hasRightBorder",
+            "box:hasAttribute",
+            "box:bounds",
+            "segm:hasTag",
+            "segm:tagSupport"
+    };
     
     public AreaModelLoader()
     {
@@ -342,8 +352,9 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
         final String query = artifactRepo.getIriDecoder().declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
                 + "?a rdf:type segm:Area . "
-                + "?a ?q ?s . "
-                + "?a segm:belongsTo <" + areaTreeIri.stringValue() + "> }";
+                + "?a segm:belongsTo <" + areaTreeIri.stringValue() + "> . "
+                + getDataPropertyUnion()
+                + "}";
         return artifactRepo.getStorage().executeSafeQuery(query);
     }
     
@@ -369,4 +380,17 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
         RDFPage page = (RDFPage) repo.getArtifact(pageIri);
         return page;
     }
+    
+    private String getDataPropertyUnion()
+    {
+        StringBuilder ret = new StringBuilder();
+        for (String p : dataObjectProperties)
+        {
+            if (ret.length() > 0)
+                ret.append(" UNION ");
+            ret.append("{?b ").append(p).append(" ?s}");
+        }
+        return ret.toString();
+    }
+
 }

@@ -12,6 +12,7 @@
     <owl:Ontology rdf:about="http://fitlayout.github.io/ontology/fitlayout.owl#">
         <owl:imports rdf:resource="http://fitlayout.github.io/ontology/render.owl#"/>
         <rdfs:comment>FITLayout system types and properties</rdfs:comment>
+        <owl:versionInfo>1.0.0</owl:versionInfo>
     </owl:Ontology>
     
 

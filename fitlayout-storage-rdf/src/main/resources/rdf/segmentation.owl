@@ -8,7 +8,9 @@
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:segm="http://fitlayout.github.io/ontology/segmentation.owl#">
-    <owl:Ontology rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#"/>
+    <owl:Ontology rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#">
+        <owl:imports rdf:resource="http://fitlayout.github.io/ontology/render.owl#"/>
+    </owl:Ontology>
     
 
 
@@ -182,6 +184,12 @@
     
 
 
+    <!-- http://fitlayout.github.io/ontology/fitlayout.owl#Artifact -->
+
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
+    
+
+
     <!-- http://fitlayout.github.io/ontology/render.owl#Box -->
 
     <owl:Class rdf:about="http://fitlayout.github.io/ontology/render.owl#Box"/>
@@ -194,16 +202,16 @@
     
 
 
-    <!-- http://fitlayout.github.io/ontology/render.owl#Rectangle -->
+    <!-- http://fitlayout.github.io/ontology/render.owl#RectArea -->
 
-    <owl:Class rdf:about="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/render.owl#RectArea"/>
     
 
 
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#Area -->
 
     <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#Area">
-        <rdfs:subClassOf rdf:resource="http://fitlayout.github.io/ontology/render.owl#Rectangle"/>
+        <rdfs:subClassOf rdf:resource="http://fitlayout.github.io/ontology/render.owl#RectArea"/>
     </owl:Class>
     
 
@@ -211,6 +219,7 @@
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#AreaTree -->
 
     <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree">
+        <rdfs:subClassOf rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
         <rdfs:comment>A tree of visual areas created from a rendered page by page segmentation.</rdfs:comment>
     </owl:Class>
     

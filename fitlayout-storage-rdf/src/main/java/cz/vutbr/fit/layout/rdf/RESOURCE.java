@@ -53,15 +53,21 @@ public class RESOURCE
         return factory.createIRI(pageUri.toString() + '#' + box.getId());
     }
     
+    public static IRI createBoundsURI(IRI boxUri, String type)
+    {
+        final String localName = boxUri.getLocalName() + "-rect-" + type;
+        return factory.createIRI(boxUri.getNamespace(), localName);
+    }
+    
     public static IRI createBorderURI(IRI boxUri, String side)
     {
-        String localName = boxUri.getLocalName() + "B" + side;
+        final String localName = boxUri.getLocalName() + "B" + side;
         return factory.createIRI(boxUri.getNamespace(), localName);
     }
     
     public static IRI createAttributeURI(IRI boxUri, String name)
     {
-        String localName = boxUri.getLocalName() + "-attr-" + name;
+        final String localName = boxUri.getLocalName() + "-attr-" + name;
         return factory.createIRI(boxUri.getNamespace(), localName);
     }
     

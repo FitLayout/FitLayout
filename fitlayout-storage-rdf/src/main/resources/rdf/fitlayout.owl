@@ -10,6 +10,7 @@
      xmlns:segm="http://fitlayout.github.io/ontology/segmentation.owl#"
      xmlns:layout="http://fitlayout.github.io/ontology/fitlayout.owl#">
     <owl:Ontology rdf:about="http://fitlayout.github.io/ontology/fitlayout.owl#">
+        <owl:imports rdf:resource="http://fitlayout.github.io/ontology/render.owl#"/>
         <rdfs:comment>FITLayout system types and properties</rdfs:comment>
     </owl:Ontology>
     
@@ -110,30 +111,6 @@
 
     <owl:Class rdf:about="http://fitlayout.github.io/ontology/fitlayout.owl#PageSet">
         <rdfs:comment>A set of pages processed together.</rdfs:comment>
-    </owl:Class>
-    
-
-
-    <!-- http://fitlayout.github.io/ontology/render.owl#Page -->
-
-    <owl:Class rdf:about="http://fitlayout.github.io/ontology/render.owl#Page">
-        <rdfs:subClassOf rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
-    </owl:Class>
-    
-
-
-    <!-- http://fitlayout.github.io/ontology/segmentation.owl#AreaTree -->
-
-    <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree">
-        <rdfs:subClassOf rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
-    </owl:Class>
-    
-
-
-    <!-- http://fitlayout.github.io/ontology/segmentation.owl#LogicalAreaTree -->
-
-    <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#LogicalAreaTree">
-        <rdfs:subClassOf rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
     </owl:Class>
 </rdf:RDF>
 

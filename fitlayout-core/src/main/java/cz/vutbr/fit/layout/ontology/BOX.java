@@ -82,6 +82,24 @@ public class BOX {
 	public static final IRI borderWidth;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#Bounds}.
+	 * <p>
+	 * Rectangular bounds specified by its coordinates, width and height.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#Bounds">Bounds</a>
+	 */
+	public static final IRI Bounds;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#bounds}.
+	 * <p>
+	 * Assigns logical rectangular bounds to an area.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#bounds">bounds</a>
+	 */
+	public static final IRI bounds;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#Box}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#Box">Box</a>
@@ -117,6 +135,17 @@ public class BOX {
 	public static final IRI containsObject;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#contentBounds}.
+	 * <p>
+	 * Assigns rectangular content bounds to a box. The content bounds
+	 * correspond to the box border bounds as provided by the box source
+	 * (renderer).
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#contentBounds">contentBounds</a>
+	 */
+	public static final IRI contentBounds;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#ContentBox}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#ContentBox">ContentBox</a>
@@ -124,55 +153,11 @@ public class BOX {
 	public static final IRI ContentBox;
 
 	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#contentHeight}.
-	 * <p>
-	 * The height of the content bounds of a box. The content bounds
-	 * correspond to the box border bounds as provided by the box source
-	 * (renderer).
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#contentHeight">contentHeight</a>
-	 */
-	public static final IRI contentHeight;
-
-	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#ContentObject}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#ContentObject">ContentObject</a>
 	 */
 	public static final IRI ContentObject;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#contentWidth}.
-	 * <p>
-	 * The width of the content bounds of a box. The content bounds
-	 * correspond to the box border bounds as provided by the box source
-	 * (renderer).
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#contentWidth">contentWidth</a>
-	 */
-	public static final IRI contentWidth;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#contentX}.
-	 * <p>
-	 * The X coordinate of the content bounds of a box. The content bounds
-	 * correspond to the box border bounds as provided by the box source
-	 * (renderer).
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#contentX">contentX</a>
-	 */
-	public static final IRI contentX;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#contentY}.
-	 * <p>
-	 * The Y coordinate of the content bounds of a box. The content bounds
-	 * correspond to the box border bounds as provided by the box source
-	 * (renderer).
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#contentY">contentY</a>
-	 */
-	public static final IRI contentY;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#displayType}.
@@ -397,40 +382,15 @@ public class BOX {
 	public static final IRI underline;
 
 	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#visualHeight}.
+	 * {@code http://fitlayout.github.io/ontology/render.owl#visualBounds}.
 	 * <p>
-	 * The height of the visual bounds of a box.
+	 * Assigns visual rectangular bounds to a box. Visual bounds correspond
+	 * to the minimal rectangle that encloses visible contents inside the
+	 * box.
 	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#visualHeight">visualHeight</a>
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#visualBounds">visualBounds</a>
 	 */
-	public static final IRI visualHeight;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#visualWidth}.
-	 * <p>
-	 * The width of the visual bounds of a box.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#visualWidth">visualWidth</a>
-	 */
-	public static final IRI visualWidth;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#visualX}.
-	 * <p>
-	 * The X coordinate of the visual bounds of a box.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#visualX">visualX</a>
-	 */
-	public static final IRI visualX;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#visualY}.
-	 * <p>
-	 * The Y coordinate of the visual bounds of a box.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#visualY">visualY</a>
-	 */
-	public static final IRI visualY;
+	public static final IRI visualBounds;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#width}.
@@ -453,17 +413,16 @@ public class BOX {
 		borderColor = factory.createIRI(BOX.NAMESPACE, "borderColor");
 		borderStyle = factory.createIRI(BOX.NAMESPACE, "borderStyle");
 		borderWidth = factory.createIRI(BOX.NAMESPACE, "borderWidth");
+		Bounds = factory.createIRI(BOX.NAMESPACE, "Bounds");
+		bounds = factory.createIRI(BOX.NAMESPACE, "bounds");
 		Box = factory.createIRI(BOX.NAMESPACE, "Box");
 		color = factory.createIRI(BOX.NAMESPACE, "color");
 		ContainerBox = factory.createIRI(BOX.NAMESPACE, "ContainerBox");
 		containsImage = factory.createIRI(BOX.NAMESPACE, "containsImage");
 		containsObject = factory.createIRI(BOX.NAMESPACE, "containsObject");
+		contentBounds = factory.createIRI(BOX.NAMESPACE, "contentBounds");
 		ContentBox = factory.createIRI(BOX.NAMESPACE, "ContentBox");
-		contentHeight = factory.createIRI(BOX.NAMESPACE, "contentHeight");
 		ContentObject = factory.createIRI(BOX.NAMESPACE, "ContentObject");
-		contentWidth = factory.createIRI(BOX.NAMESPACE, "contentWidth");
-		contentX = factory.createIRI(BOX.NAMESPACE, "contentX");
-		contentY = factory.createIRI(BOX.NAMESPACE, "contentY");
 		displayType = factory.createIRI(BOX.NAMESPACE, "displayType");
 		documentOrder = factory.createIRI(BOX.NAMESPACE, "documentOrder");
 		fontFamily = factory.createIRI(BOX.NAMESPACE, "fontFamily");
@@ -493,10 +452,7 @@ public class BOX {
 		RectArea = factory.createIRI(BOX.NAMESPACE, "RectArea");
 		sourceUrl = factory.createIRI(BOX.NAMESPACE, "sourceUrl");
 		underline = factory.createIRI(BOX.NAMESPACE, "underline");
-		visualHeight = factory.createIRI(BOX.NAMESPACE, "visualHeight");
-		visualWidth = factory.createIRI(BOX.NAMESPACE, "visualWidth");
-		visualX = factory.createIRI(BOX.NAMESPACE, "visualX");
-		visualY = factory.createIRI(BOX.NAMESPACE, "visualY");
+		visualBounds = factory.createIRI(BOX.NAMESPACE, "visualBounds");
 		width = factory.createIRI(BOX.NAMESPACE, "width");
 	}
 

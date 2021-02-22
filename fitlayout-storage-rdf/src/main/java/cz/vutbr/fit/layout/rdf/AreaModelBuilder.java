@@ -18,7 +18,6 @@ import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Box;
-import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.SEGM;
@@ -95,14 +94,10 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
         if (area.getParent() != null)
             graph.add(individual, SEGM.isChildOf, RESOURCE.createAreaURI(areaTreeNode, area.getParent()));
         
-		// appends geometry
-		Rectangular rec = area.getBounds();
-		graph.add(individual, BOX.height, vf.createLiteral(rec.getHeight()));
-		graph.add(individual, BOX.width, vf.createLiteral(rec.getWidth()));
-		graph.add(individual, BOX.positionX, vf.createLiteral(rec.getX1()));
-		graph.add(individual, BOX.positionY, vf.createLiteral(rec.getY1()));
+		// append the geometry
+        insertBounds(individual, BOX.bounds, "b", area.getBounds(), graph);
 
-		// appends tags
+		// append tags
 		if (area.getTags().size() > 0) 
 		{
 			Map<Tag, Float> tags = area.getTags();

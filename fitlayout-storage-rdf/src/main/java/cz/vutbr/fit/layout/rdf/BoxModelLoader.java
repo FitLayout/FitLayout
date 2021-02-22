@@ -43,6 +43,16 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
 {
     private static Logger log = LoggerFactory.getLogger(BoxModelLoader.class);
     
+    private static final String[] dataObjectProperties = new String[] { 
+            "box:hasTopBorder",
+            "box:hasBottomBorder",
+            "box:hasLeftBorder",
+            "box:hasRightBorder",
+            "box:hasAttribute",
+            "box:bounds",
+            "box:visualBounds",
+            "box:contentBounds"
+    };
 
     public BoxModelLoader()
     {
@@ -77,11 +87,10 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             
             //load the models
             Model boxTreeModel = getBoxModelForPage(artifactRepo, pageIri);
-            Model borderModel = getBorderModelForPage(artifactRepo, pageIri);
-            Model attributeModel = getAttributeModelForPage(artifactRepo, pageIri);
+            Model dataModel = getBoxDataModelForPage(artifactRepo, pageIri);
             //create the box tree
             Map<IRI, RDFBox> boxes = new LinkedHashMap<IRI, RDFBox>();
-            RDFBox root = constructBoxTree(artifactRepo.getStorage(), boxTreeModel, borderModel, attributeModel, pageIri, boxes); 
+            RDFBox root = constructBoxTree(artifactRepo.getStorage(), boxTreeModel, dataModel, pageIri, boxes); 
             page.setRoot(root);
             page.setBoxIris(boxes);
             if (page.getWidth() == -1 && page.getHeight() == -1) //when the page width and height was not set
@@ -104,7 +113,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
      * @return the root box or {@code null} if the provided model does not have a tree structure
      * @throws RepositoryException
      */
-    private RDFBox constructBoxTree(RDFStorage storage, Model boxTreeModel, Model borderModel, Model attributeModel,
+    private RDFBox constructBoxTree(RDFStorage storage, Model boxTreeModel, Model dataModel,
             IRI pageIri, Map<IRI, RDFBox> boxes) throws RepositoryException
     {
         //find all boxes
@@ -112,7 +121,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
         {
             if (res instanceof IRI)
             {
-                RDFBox box = createBoxFromModel(storage, boxTreeModel, borderModel, attributeModel, pageIri, (IRI) res);
+                RDFBox box = createBoxFromModel(storage, boxTreeModel, dataModel, pageIri, (IRI) res);
                 boxes.put((IRI) res, box);
             }
         }
@@ -140,16 +149,14 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
         }
     }
     
-    private RDFBox createBoxFromModel(RDFStorage storage, Model boxTreeModel, Model borderModel, Model attributeModel, 
+    private RDFBox createBoxFromModel(RDFStorage storage, Model boxTreeModel, Model dataModel, 
             IRI pageIri, IRI boxIri) throws RepositoryException
     {
         RDFBox box = new RDFBox(boxIri);
         box.setTagName("");
         box.setType(Box.Type.ELEMENT);
         box.setDisplayType(Box.DisplayType.BLOCK);
-        int x = 0, y = 0, width = 0, height = 0;
-        int cx = 0, cy = 0, cwidth = 0, cheight = 0;
-        int vx = 0, vy = 0, vwidth = 0, vheight = 0;
+        
         RDFTextStyle style = new RDFTextStyle();
         
         for (Statement st : boxTreeModel.filter(boxIri, null, null))
@@ -221,7 +228,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    Border border = createBorder(borderModel, (IRI) value);
+                    Border border = createBorder(dataModel, (IRI) value);
                     box.setBorderStyle(Side.BOTTOM, border);
                 }
             }
@@ -229,7 +236,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    Border border = createBorder(borderModel, (IRI) value);
+                    Border border = createBorder(dataModel, (IRI) value);
                     box.setBorderStyle(Side.LEFT, border);
                 }
             }
@@ -237,7 +244,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    Border border = createBorder(borderModel, (IRI) value);
+                    Border border = createBorder(dataModel, (IRI) value);
                     box.setBorderStyle(Side.RIGHT, border);
                 }
             }
@@ -245,7 +252,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    Border border = createBorder(borderModel, (IRI) value);
+                    Border border = createBorder(dataModel, (IRI) value);
                     box.setBorderStyle(Side.TOP, border);
                 }
             }
@@ -293,65 +300,32 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                     box.setContentObject(obj);
                 }
             }
-            else if (BOX.height.equals(pred)) 
+            else if (BOX.bounds.equals(pred))
             {
-                if (value instanceof Literal)
-                    height = ((Literal) value).intValue();
+                if (value instanceof IRI)
+                {
+                    final Rectangular rect = createBounds(dataModel, (IRI) value);
+                    if (rect != null)
+                        box.setBounds(rect);
+                }
             }
-            else if (BOX.width.equals(pred)) 
+            else if (BOX.visualBounds.equals(pred))
             {
-                if (value instanceof Literal)
-                    width = ((Literal) value).intValue();
+                if (value instanceof IRI)
+                {
+                    final Rectangular rect = createBounds(dataModel, (IRI) value);
+                    if (rect != null)
+                        box.setVisualBounds(rect);
+                }
             }
-            else if (BOX.positionX.equals(pred)) 
+            else if (BOX.contentBounds.equals(pred))
             {
-                if (value instanceof Literal)
-                    x = ((Literal) value).intValue();
-            }   
-            else if (BOX.positionY.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    y = ((Literal) value).intValue();
-            }
-            else if (BOX.contentHeight.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    cheight = ((Literal) value).intValue();
-            }
-            else if (BOX.contentWidth.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    cwidth = ((Literal) value).intValue();
-            }
-            else if (BOX.contentX.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    cx = ((Literal) value).intValue();
-            }   
-            else if (BOX.contentY.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    cy = ((Literal) value).intValue();
-            }
-            else if (BOX.visualHeight.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    vheight = ((Literal) value).intValue();
-            }
-            else if (BOX.visualWidth.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    vwidth = ((Literal) value).intValue();
-            }
-            else if (BOX.visualX.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    vx = ((Literal) value).intValue();
-            }   
-            else if (BOX.visualY.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    vy = ((Literal) value).intValue();
+                if (value instanceof IRI)
+                {
+                    final Rectangular rect = createBounds(dataModel, (IRI) value);
+                    if (rect != null)
+                        box.setContentBounds(rect);
+                }
             }
             else if (BOX.htmlTagName.equals(pred)) 
             {
@@ -367,7 +341,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    Map.Entry<String, String> attr = createAttribute(attributeModel, (IRI) value);
+                    Map.Entry<String, String> attr = createAttribute(dataModel, (IRI) value);
                     if (attr != null)
                         box.setAttribute(attr.getKey(), attr.getValue());
                 }
@@ -375,18 +349,15 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
         }
         style.contentLength = box.getText().length();
         box.setTextStyle(style.toTextStyle());
-        box.setBounds(new Rectangular(x, y, x + width - 1, y + height - 1));
-        box.setContentBounds(new Rectangular(cx, cy, cx + cwidth - 1, cy + cheight - 1));
-        box.setVisualBounds(new Rectangular(vx, vy, vx + vwidth - 1, vy + vheight - 1));
         
         return box;
     }
 
     /**
      * Gets page box model from the unique page ID.
-     * @param storage 
-     * @param pageIri
-     * @return
+     * @param artifactRepo the repository to query 
+     * @param pageIri the page IRI
+     * @return The creayed model
      * @throws RepositoryException 
      */
     private Model getBoxModelForPage(RDFArtifactRepository artifactRepo, IRI pageIri) throws RepositoryException
@@ -399,38 +370,36 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                 + " ORDER BY ?ord";
         return artifactRepo.getStorage().executeSafeQuery(query);
     }
-    
+
     /**
-     * Gets page box model from the unique page ID.
-     * @param storage 
-     * @param pageIri
-     * @return
+     * Gets the model of additional object properties of the boxes. It contains the data about the
+     * bounds, borders, attributes and other object properties.
+     * @param artifactRepo the repository to query 
+     * @param pageIri the page IRI
+     * @return The created model
      * @throws RepositoryException 
      */
-    private Model getBorderModelForPage(RDFArtifactRepository artifactRepo, IRI pageIri) throws RepositoryException
+    private Model getBoxDataModelForPage(RDFArtifactRepository artifactRepo, IRI pageIri) throws RepositoryException
     {
         final String query = artifactRepo.getIriDecoder().declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o . "
                 + "?b rdf:type box:Box . " 
                 + "?b box:belongsTo <" + pageIri.toString() + "> . "
-                + "{?b box:hasTopBorder ?s} UNION {?b box:hasRightBorder ?s} UNION {?b box:hasBottomBorder ?s} UNION {?b box:hasLeftBorder ?s}}";
+                + getDataPropertyUnion()
+                + "}";
         return artifactRepo.getStorage().executeSafeQuery(query);
     }
     
-    /**
-     * Gets page attribute model from the unique page ID.
-     * @param storage 
-     * @param pageIri
-     * @return
-     * @throws RepositoryException 
-     */
-    private Model getAttributeModelForPage(RDFArtifactRepository artifactRepo, IRI pageIri) throws RepositoryException
+    private String getDataPropertyUnion()
     {
-        final String query = artifactRepo.getIriDecoder().declarePrefixes()
-                + "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o . "
-                + "?b rdf:type box:Box . " 
-                + "?b box:belongsTo <" + pageIri.toString() + "> . "
-                + "?b box:hasAttribute ?s}";
-        return artifactRepo.getStorage().executeSafeQuery(query);
+        StringBuilder ret = new StringBuilder();
+        for (String p : dataObjectProperties)
+        {
+            if (ret.length() > 0)
+                ret.append(" UNION ");
+            ret.append("{?b ").append(p).append(" ?s}");
+        }
+        return ret.toString();
     }
+    
 }

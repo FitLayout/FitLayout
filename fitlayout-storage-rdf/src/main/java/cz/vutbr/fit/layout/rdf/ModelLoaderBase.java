@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.model.Border;
+import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.TextStyle;
 import cz.vutbr.fit.layout.ontology.BOX;
 
@@ -94,6 +95,43 @@ public abstract class ModelLoaderBase
         }
         if (name != null && avalue != null)
             return new AbstractMap.SimpleEntry<String, String>(name, avalue);
+        else
+            return null;
+    }
+    
+    protected Rectangular createBounds(Model model, IRI iri)
+    {
+        Integer x = null;
+        Integer y = null;
+        Integer width = null;
+        Integer height = null;
+        for (Statement st : model.filter(iri, null, null))
+        {
+            final IRI pred = st.getPredicate();
+            final Value value = st.getObject();
+            if (BOX.positionX.equals(pred))
+            {
+                if (value instanceof Literal)
+                    x = ((Literal) value).intValue();
+            }
+            else if (BOX.positionY.equals(pred))
+            {
+                if (value instanceof Literal)
+                    y = ((Literal) value).intValue();
+            }
+            else if (BOX.width.equals(pred))
+            {
+                if (value instanceof Literal)
+                    width = ((Literal) value).intValue();
+            }
+            else if (BOX.height.equals(pred))
+            {
+                if (value instanceof Literal)
+                    height = ((Literal) value).intValue();
+            }
+        }        
+        if (x != null && y != null && width != null && height != null)
+            return new Rectangular(x, y, x + width - 1, y + height - 1);
         else
             return null;
     }

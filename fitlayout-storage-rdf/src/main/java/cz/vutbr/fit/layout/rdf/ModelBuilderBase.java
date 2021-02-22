@@ -13,6 +13,8 @@ import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 
 import cz.vutbr.fit.layout.model.Artifact;
+import cz.vutbr.fit.layout.model.Rectangular;
+import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.FL;
 
 /**
@@ -45,6 +47,19 @@ public class ModelBuilderBase
             graph.add(node, FL.creator, vf.createLiteral(a.getCreator()));
         if (a.getCreatorParams() != null)
             graph.add(node, FL.creatorParams, vf.createLiteral(a.getCreatorParams()));
+    }
+    
+    public IRI insertBounds(IRI boxIri, IRI property, String type, Rectangular bounds, Model graph)
+    {
+        final ValueFactory vf = SimpleValueFactory.getInstance();
+        
+        final IRI iri = RESOURCE.createBoundsURI(boxIri, type);
+        graph.add(boxIri, property, iri);
+        graph.add(iri, BOX.positionX, vf.createLiteral(bounds.getX1()));
+        graph.add(iri, BOX.positionY, vf.createLiteral(bounds.getY1()));
+        graph.add(iri, BOX.width, vf.createLiteral(bounds.getWidth()));
+        graph.add(iri, BOX.height, vf.createLiteral(bounds.getHeight()));
+        return iri;
     }
     
 }

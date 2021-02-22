@@ -72,12 +72,10 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             atreeInfo.applyToAreaTree(atree);
             //load the models
             Model areaModel = getAreaModelForAreaTree(artifactRepo, areaTreeIri);
-            Model borderModel = getBorderModelForAreaTree(artifactRepo, areaTreeIri);
-            Model tagModel = getTagModelForAreaTree(artifactRepo, areaTreeIri);
-            Model tagSupportModel = getTagSupportModelForAreaTree(artifactRepo, areaTreeIri);
+            Model dataModel = getAreaDataModelForAreaTree(artifactRepo, areaTreeIri);
             //construct the tree
             Map<IRI, RDFArea> areaUris = new LinkedHashMap<IRI, RDFArea>();
-            RDFArea root = constructVisualAreaTree(artifactRepo, atree, areaModel, borderModel, tagModel, tagSupportModel, areaTreeIri, areaUris);
+            RDFArea root = constructVisualAreaTree(artifactRepo, atree, areaModel, dataModel, areaTreeIri, areaUris);
             recursiveUpdateTopologies(root);
             atree.setRoot(root);
             atree.setAreaIris(areaUris);
@@ -88,7 +86,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
     }
     
     private RDFArea constructVisualAreaTree(RDFArtifactRepository artifactRepo, RDFAreaTree atree,
-            Model areaModel, Model borderModel, Model tagModel, Model tagSupportModel,
+            Model areaModel, Model dataModel,
             IRI areaTreeIri, Map<IRI, RDFArea> areas) throws RepositoryException
     {
         //find all areas
@@ -96,7 +94,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
         {
             if (res instanceof IRI)
             {
-                RDFArea area = createAreaFromModel(artifactRepo, areaModel, borderModel, tagModel, tagSupportModel, areaTreeIri, (IRI) res);
+                RDFArea area = createAreaFromModel(artifactRepo, areaModel, dataModel, areaTreeIri, (IRI) res);
                 area.setAreaTree(atree);
                 areas.put((IRI) res, area);
             }
@@ -125,11 +123,10 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
         }
     }
     
-    private RDFArea createAreaFromModel(RDFArtifactRepository artifactRepo, Model areaModel, Model borderModel, Model tagModel, Model tagSupportModel,
+    private RDFArea createAreaFromModel(RDFArtifactRepository artifactRepo, Model areaModel, Model dataModel,
             IRI areaTreeIri, IRI uri) throws RepositoryException
     {
         RDFArea area = new RDFArea(new Rectangular(), uri);
-        int x = 0, y = 0, width = 0, height = 0;
         Map<IRI, Float> tagSupport = new HashMap<IRI, Float>(); //tagUri->support
         RDFTextStyle style = new RDFTextStyle();
         
@@ -189,7 +186,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    Border border = createBorder(borderModel, (IRI) value);
+                    Border border = createBorder(dataModel, (IRI) value);
                     area.setBorderStyle(Side.BOTTOM, border);
                 }
             }
@@ -197,7 +194,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    Border border = createBorder(borderModel, (IRI) value);
+                    Border border = createBorder(dataModel, (IRI) value);
                     area.setBorderStyle(Side.LEFT, border);
                 }
             }
@@ -205,7 +202,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    Border border = createBorder(borderModel, (IRI) value);
+                    Border border = createBorder(dataModel, (IRI) value);
                     area.setBorderStyle(Side.RIGHT, border);
                 }
             }
@@ -213,29 +210,18 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    Border border = createBorder(borderModel, (IRI) value);
+                    Border border = createBorder(dataModel, (IRI) value);
                     area.setBorderStyle(Side.TOP, border);
                 }
             }
-            else if (BOX.height.equals(pred)) 
+            else if (BOX.bounds.equals(pred))
             {
-                if (value instanceof Literal)
-                    height = ((Literal) value).intValue();
-            }
-            else if (BOX.width.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    width = ((Literal) value).intValue();
-            }
-            else if (BOX.positionX.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    x = ((Literal) value).intValue();
-            }   
-            else if (BOX.positionY.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    y = ((Literal) value).intValue();
+                if (value instanceof IRI)
+                {
+                    final Rectangular rect = createBounds(dataModel, (IRI) value);
+                    if (rect != null)
+                        area.setBounds(rect);
+                }
             }
             else if (SEGM.containsBox.equals(pred))
             {
@@ -261,7 +247,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                 {
                     if (!tagSupport.containsKey(value))
                     {
-                        Tag tag = createTag(tagModel, (IRI) value);
+                        Tag tag = createTag(dataModel, (IRI) value);
                         if (tag != null)
                             area.addTag(tag, 1.0f); //spport is unkwnown (yet)
                     }
@@ -274,7 +260,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                     IRI tsUri = (IRI) value;
                     IRI tagUri = null;
                     Float support = null;
-                    for (Statement sst : tagSupportModel.filter(tsUri, null, null))
+                    for (Statement sst : dataModel.filter(tsUri, null, null))
                     {
                         if (SEGM.hasTag.equals(sst.getPredicate()) && sst.getObject() instanceof IRI)
                             tagUri = (IRI) sst.getObject();
@@ -283,7 +269,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                     }
                     if (tagUri != null && support != null)
                     {
-                        Tag tag = createTag(tagModel, (IRI) value);
+                        Tag tag = createTag(dataModel, (IRI) value);
                         if (tag != null)
                             area.addTag(tag, support);
                     }
@@ -291,7 +277,6 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             }
         }
         area.setTextStyle(style.toTextStyle());
-        area.setBounds(new Rectangular(x, y, x + width - 1, y + height - 1));
         area.sortBoxes();
         
         return area;
@@ -328,7 +313,8 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
     
     /**
      * Obtains the model of visual areas for the given area tree.
-     * @param areaTreeIri
+     * @param artifactRepo the repository to query 
+     * @param areaTreeIri the area tree IRI
      * @return A Model containing the triplets for all the visual areas contained in the given area tree.
      * @throws RepositoryException 
      */
@@ -344,49 +330,19 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
     }
     
     /**
-     * Gets page border information for the given area tree.
-     * @param areaTreeIri
-     * @return
+     * Gets the model of additional object properties of the areas. It contains the data about the
+     * bounds, borders, tags and other object properties.
+     * @param artifactRepo the repository to query 
+     * @param areaTreeIri the area tree IRI
+     * @return The created model
      * @throws RepositoryException 
      */
-    private Model getBorderModelForAreaTree(RDFArtifactRepository artifactRepo, IRI areaTreeIri) throws RepositoryException
-    {
-        final String query = artifactRepo.getIriDecoder().declarePrefixes()
-                + "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o . "
-                + "?b rdf:type segm:Area . " 
-                + "?b segm:belongsTo <" + areaTreeIri.toString() + "> . "
-                + "{?b box:hasTopBorder ?s} UNION {?b box:hasRightBorder ?s} UNION {?b box:hasBottomBorder ?s} UNION {?b box:hasLeftBorder ?s}}";
-        return artifactRepo.getStorage().executeSafeQuery(query);
-    }
-    
-    /**
-     * Obtains the model of visual areas for the given area tree.
-     * @param areaTreeIri
-     * @return A Model containing the triplets for all tags of the visual areas contained in the given area tree.
-     * @throws RepositoryException 
-     */
-    private Model getTagModelForAreaTree(RDFArtifactRepository artifactRepo, IRI areaTreeIri) throws RepositoryException
+    private Model getAreaDataModelForAreaTree(RDFArtifactRepository artifactRepo, IRI areaTreeIri) throws RepositoryException
     {
         final String query = artifactRepo.getIriDecoder().declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
                 + "?a rdf:type segm:Area . "
-                + "?a segm:hasTag ?s . "
-                + "?a segm:belongsTo <" + areaTreeIri.stringValue() + "> }";
-        return artifactRepo.getStorage().executeSafeQuery(query);
-    }
-    
-    /**
-     * Obtains the model of visual areas for the given area tree.
-     * @param areaTreeIri
-     * @return A Model containing the triplets for all tags of the visual areas contained in the given area tree.
-     * @throws RepositoryException 
-     */
-    private Model getTagSupportModelForAreaTree(RDFArtifactRepository artifactRepo, IRI areaTreeIri) throws RepositoryException
-    {
-        final String query = artifactRepo.getIriDecoder().declarePrefixes()
-                + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
-                + "?a rdf:type segm:Area . "
-                + "?a segm:tagSupport ?s . "
+                + "?a ?q ?s . "
                 + "?a segm:belongsTo <" + areaTreeIri.stringValue() + "> }";
         return artifactRepo.getStorage().executeSafeQuery(query);
     }

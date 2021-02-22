@@ -21,7 +21,6 @@ import cz.vutbr.fit.layout.model.Box.Type;
 import cz.vutbr.fit.layout.model.ContentImage;
 import cz.vutbr.fit.layout.model.ContentObject;
 import cz.vutbr.fit.layout.model.Page;
-import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.ontology.BOX;
 
 /**
@@ -118,22 +117,10 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		}
 		
 		// store the positions and sizes of the element
-        final Rectangular bounds = box.getContentBounds();
-        graph.add(individual, BOX.height, vf.createLiteral(bounds.getHeight()));
-        graph.add(individual, BOX.width, vf.createLiteral(bounds.getWidth()));
-        graph.add(individual, BOX.positionX, vf.createLiteral(bounds.getX1()));
-        graph.add(individual, BOX.positionY, vf.createLiteral(bounds.getY1()));
-        final Rectangular content = box.getContentBounds();
-		graph.add(individual, BOX.contentHeight, vf.createLiteral(content.getHeight()));
-		graph.add(individual, BOX.contentWidth, vf.createLiteral(content.getWidth()));
-		graph.add(individual, BOX.contentX, vf.createLiteral(content.getX1()));
-		graph.add(individual, BOX.contentY, vf.createLiteral(content.getY1()));
-		final Rectangular visual = box.getVisualBounds();
-        graph.add(individual, BOX.visualHeight, vf.createLiteral(visual.getHeight()));
-        graph.add(individual, BOX.visualWidth, vf.createLiteral(visual.getWidth()));
-        graph.add(individual, BOX.visualX, vf.createLiteral(visual.getX1()));
-        graph.add(individual, BOX.visualY, vf.createLiteral(visual.getY1()));
-
+		insertBounds(individual, BOX.bounds, "b", box.getBounds(), graph);
+        insertBounds(individual, BOX.visualBounds, "v", box.getVisualBounds(), graph);
+        insertBounds(individual, BOX.contentBounds, "c", box.getContentBounds(), graph);
+		
 		if (box.getBackgroundColor() != null)
 		{
             graph.add(individual, BOX.backgroundColor, vf.createLiteral(Serialization.colorString(box.getBackgroundColor())));

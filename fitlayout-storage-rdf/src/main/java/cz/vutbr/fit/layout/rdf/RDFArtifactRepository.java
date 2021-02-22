@@ -17,6 +17,8 @@ import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.query.Binding;
 import org.eclipse.rdf4j.query.BindingSet;
@@ -128,8 +130,10 @@ public class RDFArtifactRepository implements ArtifactRepository
         try {
             for (String owl : owls)
             {
+                final ValueFactory vf = SimpleValueFactory.getInstance();
+                final IRI context = vf.createIRI("file://resources/rdf/" + owl);
                 String owlFile = loadResource("/rdf/" + owl);
-                getStorage().importXML(owlFile);
+                getStorage().importXML(owlFile, context);
             }
         } catch (Exception e) {
             log.error("Could import metadata: {}", e);

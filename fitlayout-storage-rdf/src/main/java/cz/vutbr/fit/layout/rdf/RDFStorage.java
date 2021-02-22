@@ -280,6 +280,15 @@ public class RDFStorage implements Closeable
         }
     }
 
+    public void importTurtle(String query, IRI context) throws StorageException, IOException
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.add(new StringReader(query), "http://fitlayout.github.io/ontology/render.owl#", RDFFormat.TURTLE, context);
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+
     public void importXML(String query) throws StorageException, IOException 
     {
         try (RepositoryConnection con = repo.getConnection()) {
@@ -289,6 +298,14 @@ public class RDFStorage implements Closeable
         }
     }
 
+    public void importXML(String query, IRI context) throws StorageException, IOException 
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.add(new StringReader(query), "http://fitlayout.github.io/ontology/render.owl#", RDFFormat.RDFXML, context);
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
     
     //= Sequences ==================================================================
     

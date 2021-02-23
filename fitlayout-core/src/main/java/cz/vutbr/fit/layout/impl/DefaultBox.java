@@ -64,7 +64,7 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
         contentBounds = (src.getContentBounds() == null) ? null : new Rectangular(src.getContentBounds());
         visualBounds = (src.getVisualBounds() == null) ? null : new Rectangular(src.getVisualBounds());
         sourceNodeId = src.getSourceNodeId();
-        tagName = new String(src.getTagName());
+        tagName = (src.getTagName() == null) ? null : new String(src.getTagName());
         if (src.getAttributes() != null)
             attributes = new HashMap<String, String>(src.getAttributes());
         type = src.getType();

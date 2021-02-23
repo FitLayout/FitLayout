@@ -136,12 +136,6 @@ public class BoxNode extends DefaultBox
             return false;
     }
     
-    @Override
-    protected void childrenChanged()
-    {
-        recomputeTextStyle();
-    }
-
     //===================================================================================
 
     /**
@@ -324,7 +318,8 @@ public class BoxNode extends DefaultBox
 
     //==================================================================================
     
-    private void recomputeTextStyle()
+    @Override
+    protected void recomputeTextStyle()
     {
         TextStyle textStyle = getTextStyle();
         if (textStyle == null)

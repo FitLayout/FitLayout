@@ -60,6 +60,11 @@ public interface GenericTreeNode<T extends GenericTreeNode<T>>
     public int getLeafCount();
     
     /**
+     * Signals that some children have been added or removed or their state changed.
+     */
+    public void childrenChanged();
+    
+    /**
      * Sets a user-defined attribute for the tree node. This allows to assign multiple
      * attributes identified by their names.
      * @param name the attribute name

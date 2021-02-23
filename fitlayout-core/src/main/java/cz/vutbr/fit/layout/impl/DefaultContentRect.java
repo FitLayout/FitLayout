@@ -35,6 +35,8 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
     private boolean backgroundSeparated;
 
     private TextStyle textStyle;
+    /** whether the text style is accurate (true) or it needs to be recomputed (false) */
+    private boolean textStyleComputed = false; 
     
     private Border topBorder;
     private Border bottomBorder;
@@ -135,9 +137,23 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
     @Override
     public TextStyle getTextStyle()
     {
+        if (!textStyleComputed)
+        {
+            textStyleComputed = true;
+            recomputeTextStyle();
+        }
         return textStyle;
     }
 
+    /**
+     * Recomputes the text style after the style of some children has changed.
+     */
+    protected void recomputeTextStyle()
+    {
+        //This should be overriden by specific child classes that know
+        //how to recompute their text style
+    }
+    
     public void setTextStyle(TextStyle textStyle)
     {
         this.textStyle = textStyle;
@@ -320,4 +336,14 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
         nextid = 1;
     }
     
+    @Override
+    public void childrenChanged()
+    {
+        // force recomputing the text style
+        textStyleComputed = false; 
+        // propagate the change to parents
+        if (getParent() != null)
+            getParent().childrenChanged();
+    }
+
 }

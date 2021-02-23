@@ -331,12 +331,6 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
     }
 
     @Override
-    protected void childrenChanged()
-    {
-        recomputeTextStyle();
-    }
-    
-    @Override
     public String toString()
     {
         StringBuilder ret = new StringBuilder();
@@ -402,10 +396,12 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
         }
     }
     
-    private void recomputeTextStyle()
+    @Override
+    protected void recomputeTextStyle()
     {
         if (!isLeaf())
         {
+            getTextStyle().reset();
             for (Box box : getChildren())
             {
                 getTextStyle().updateAverages(box.getTextStyle());

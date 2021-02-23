@@ -255,7 +255,7 @@ public class DefaultTreeNode<T extends GenericTreeNode<T>> implements GenericTre
      * This method is called after some child nodes have been added or removed.
      * Subclasses may override this method in order to update their own internal structures.
      */
-    protected void childrenChanged()
+    public void childrenChanged()
     {
         //do nothing by default
     }

@@ -33,7 +33,7 @@ public class ConnectionTest
     {
         RDFArtifactRepository repo = RDFArtifactRepository.createMemory(null);
         repo.initMetadata();
-        assertTrue("One page has been loaded", repo.isInitialized());
+        assertTrue("Repository is correctly initialized", repo.isInitialized());
     }
     
 }

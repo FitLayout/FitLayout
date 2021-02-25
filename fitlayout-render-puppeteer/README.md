@@ -17,6 +17,10 @@ The FitLayout [docker images](https://github.com/FitLayout/docker-images) contai
 
 Artifact service ID: `FitLayout.Puppeteer`
 
+Consumes: *no input*
+
+Produces: [Page](http://fitlayout.github.io/api/latest/cz.vutbr.fit.layout.core/cz/vutbr/fit/layout/model/Page.html)
+
 Options:
 - `url=<string>` - source page URL
 - `width=<int>` - viewport width used for rendering

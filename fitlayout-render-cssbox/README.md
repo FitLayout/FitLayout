@@ -14,7 +14,7 @@ Artifact service ID: `FitLayout.CSSBox`
 
 Consumes: *no input*
 
-Produces: [Page]()
+Produces: [Page](http://fitlayout.github.io/api/latest/cz.vutbr.fit.layout.core/cz/vutbr/fit/layout/model/Page.html)
 
 Options:
 - `url=<string>` - source page URL

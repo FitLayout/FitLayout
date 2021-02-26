@@ -16,3 +16,16 @@ The input of the algorithm is a *visual box tree* which is a post-processed *box
 3. Area tree post-processing using area tree operators. The segmentation itself is implemented by the [SuperAreaOperator](https://github.com/FitLayout/FitLayout/blob/main/fitlayout-segm-base/src/main/java/cz/vutbr/fit/layout/segm/op/SuperAreaOperator.java).
 
 The module also implements a number of [generally applicable area tree operators](https://github.com/FitLayout/FitLayout/tree/main/fitlayout-segm-base/src/main/java/cz/vutbr/fit/layout/segm/op) that can be re-used for further area tree analysis such as [line detection](https://github.com/FitLayout/FitLayout/blob/main/fitlayout-segm-base/src/main/java/cz/vutbr/fit/layout/segm/op/FindLineOperator.java) or [detection of style-consistent leaf areas](https://github.com/FitLayout/FitLayout/blob/main/fitlayout-segm-base/src/main/java/cz/vutbr/fit/layout/segm/op/HomogeneousLeafOperator.java).
+
+## Services and parameters
+
+Artifact service ID: `FitLayout.Grouping`
+
+Consumes: [Page](http://fitlayout.github.io/api/latest/cz.vutbr.fit.layout.core/cz/vutbr/fit/layout/model/Page.html)
+
+Produces: [AreaTree](http://fitlayout.github.io/api/latest/cz.vutbr.fit.layout.core/cz/vutbr/fit/layout/model/AreaTree.html)
+
+Options:
+- `preserveAuxAreas=<boolean>` - preserve auxiliary boxes with no visual representation
+
+The options may be specified via the [command line](https://github.com/FitLayout/FitLayout/wiki/Command-line-Interface#render) or when invoking the service via the Java API or the REST API.

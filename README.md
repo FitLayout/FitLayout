@@ -15,8 +15,13 @@ FitLayout/2 is an extensible Java framework for web document rendering, modeling
 - **RDF-based storage** for storing the rendered pages, segmentation results and other *artifacts* in a common storage. The rendered pages and the segmentation results are described using the [prepared ontologies](https://github.com/FitLayout/FitLayout.github.io/tree/main/ontology) and may be stored in a common storage or shared. This allows to analyze the rendered pages repeatedly with no need to re-render them. Moreover, this allows easy annotation of any part of the pages with different metadata and querying the page contents using SPARQL.
 - **Infrastructure** that puts everything together. It allows automation of the web document analysis process and invocation of the individual steps.
 
+# Documentation
+
+[Detailed documentation](https://github.com/FitLayout/FitLayout/wiki) is available from the project Wiki.
 
 # Installation
+
+## Docker Images
 
 For using FitLayout as it is for web page rendering, segmenation and storage, the easiest way is to use the available [docker images](https://github.com/FitLayout/docker-images).
 

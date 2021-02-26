@@ -28,4 +28,4 @@ Produces: [AreaTree](http://fitlayout.github.io/api/latest/cz.vutbr.fit.layout.c
 Options:
 - `preserveAuxAreas=<boolean>` - preserve auxiliary boxes with no visual representation
 
-The options may be specified via the [command line](https://github.com/FitLayout/FitLayout/wiki/Command-line-Interface#render) or when invoking the service via the Java API or the REST API.
+The options may be specified via the [command line](https://github.com/FitLayout/FitLayout/wiki/Command-line-Interface#segment) or when invoking the service via the Java API or the REST API.

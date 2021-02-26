@@ -22,4 +22,4 @@ Produces: [AreaTree](http://fitlayout.github.io/api/latest/cz.vutbr.fit.layout.c
 Options:
 - `threshold=<float>` - clustering threshold (CT), default 0.3
 
-The options may be specified via the [command line](https://github.com/FitLayout/FitLayout/wiki/Command-line-Interface#render) or when invoking the service via the Java API or the REST API.
+The options may be specified via the [command line](https://github.com/FitLayout/FitLayout/wiki/Command-line-Interface#segment) or when invoking the service via the Java API or the REST API.

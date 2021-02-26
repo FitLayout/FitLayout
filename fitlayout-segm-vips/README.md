@@ -24,4 +24,4 @@ Produces: [AreaTree](http://fitlayout.github.io/api/latest/cz.vutbr.fit.layout.c
 Options:
 - `pDoC=<int>` - predefined degree of coherence (1 - 11), default 10
 
-The options may be specified via the [command line](https://github.com/FitLayout/FitLayout/wiki/Command-line-Interface#render) or when invoking the service via the Java API or the REST API.
+The options may be specified via the [command line](https://github.com/FitLayout/FitLayout/wiki/Command-line-Interface#segment) or when invoking the service via the Java API or the REST API.

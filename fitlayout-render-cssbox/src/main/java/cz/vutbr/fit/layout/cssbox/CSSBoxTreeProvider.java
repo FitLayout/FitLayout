@@ -180,6 +180,9 @@ public class CSSBoxTreeProvider extends BaseArtifactService
     @Override
     public Artifact process(Artifact input) throws ServiceException
     {
+        if (urlstring == null || urlstring.isBlank())
+            throw new ServiceException("No URL provided");
+        
         try {
             return getPage();
         } catch (Exception e) {

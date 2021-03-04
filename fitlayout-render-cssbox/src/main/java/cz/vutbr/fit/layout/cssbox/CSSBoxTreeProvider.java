@@ -182,7 +182,7 @@ public class CSSBoxTreeProvider extends BaseArtifactService
     {
         try {
             return getPage();
-        } catch (IOException | SAXException e) {
+        } catch (Exception e) {
             throw new ServiceException(e);
         }
     }

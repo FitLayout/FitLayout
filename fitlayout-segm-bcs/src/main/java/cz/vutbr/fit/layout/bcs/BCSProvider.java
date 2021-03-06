@@ -83,7 +83,10 @@ public class BCSProvider extends BaseArtifactService
     @Override
     public Artifact process(Artifact input) throws ServiceException
     {
-        return createAreaTree((Page) input);
+        if (input != null && input instanceof Page)
+            return createAreaTree((Page) input);
+        else
+            throw new ServiceException("Source artifact not specified or not a page");
     }
 
     public float getThreshold()

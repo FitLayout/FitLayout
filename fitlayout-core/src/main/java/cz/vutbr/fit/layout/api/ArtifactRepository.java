@@ -55,7 +55,7 @@ public interface ArtifactRepository
     public IRI createArtifactIri(Artifact artifact);
     
     /**
-     * Removes an artifact from the repository.
+     * Removes an artifact and all its derived artifacts from the repository.
      * @param artifactIri the artifact IRI
      */
     public void removeArtifact(IRI artifactIri);

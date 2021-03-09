@@ -32,7 +32,7 @@ import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.SEGM;
 
 /**
- * Implementation of an ArtifactRepository on top of a RDFStorage.
+ * Implementation of an ArtifactRepository on top of an RDFStorage.
  * 
  * @author burgetr
  */
@@ -250,7 +250,25 @@ public class RDFArtifactRepository implements ArtifactRepository
     @Override
     public void removeArtifact(IRI artifactIri)
     {
+        //clear the derived artifacts
+        List<Artifact> derived = new ArrayList<>();
+        findDerivedArtifacts(artifactIri, getArtifactInfo(), derived);
+        for (Artifact a : derived)
+            storage.clear(a.getIri());
+        //clear the artifact itself
         storage.clear(artifactIri);
+    }
+    
+    private void findDerivedArtifacts(IRI artifactIri, Collection<Artifact> artifacts, List<Artifact> dest)
+    {
+        for (Artifact a : artifacts)
+        {
+            if (a.getParentIri() == artifactIri)
+            {
+                findDerivedArtifacts(a.getIri(), artifacts, dest);
+                dest.add(a);
+            }
+        }
     }
 
     @Override

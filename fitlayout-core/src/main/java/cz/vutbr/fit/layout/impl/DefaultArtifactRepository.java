@@ -5,8 +5,10 @@
  */
 package cz.vutbr.fit.layout.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -86,7 +88,23 @@ public class DefaultArtifactRepository implements ArtifactRepository
     @Override
     public void removeArtifact(IRI artifactIri)
     {
+        List<Artifact> derived = new ArrayList<>();
+        findDerivedArtifacts(artifactIri, derived);
+        for (Artifact a : derived)
+            repo.remove(a.getIri());
         repo.remove(artifactIri);
+    }
+    
+    private void findDerivedArtifacts(IRI artifactIri, List<Artifact> dest)
+    {
+        for (Artifact a : repo.values())
+        {
+            if (a.getParentIri() == artifactIri)
+            {
+                findDerivedArtifacts(a.getIri(), dest);
+                dest.add(a);
+            }
+        }
     }
 
     @Override

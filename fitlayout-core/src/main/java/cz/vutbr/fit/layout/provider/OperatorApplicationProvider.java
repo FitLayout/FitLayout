@@ -27,7 +27,7 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  * a new area tree.
  * @author burgetr
  */
-public class OperatorApplicationProvider extends  BaseArtifactService
+public class OperatorApplicationProvider extends BaseArtifactService
 {
     private static Logger log = LoggerFactory.getLogger(OperatorApplicationProvider.class);
     
@@ -113,7 +113,11 @@ public class OperatorApplicationProvider extends  BaseArtifactService
     @Override
     public Artifact process(Artifact input) throws ServiceException
     {
-        return createAreaTree((AreaTree) input);
+        if (input != null && input instanceof AreaTree)
+            return createAreaTree((AreaTree) input);
+        else
+            throw new ServiceException("Source artifact not provider or not an area tree");
+        
     }
 
     //===================================================================================

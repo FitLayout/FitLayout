@@ -21,7 +21,7 @@ import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.puppeteer.PuppeteerTreeProvider;
-import cz.vutbr.fit.layout.segm.Provider;
+import cz.vutbr.fit.layout.segm.BasicSegmProvider;
 import cz.vutbr.fit.layout.tools.cmd.Export;
 import cz.vutbr.fit.layout.tools.cmd.ListArtifacts;
 import cz.vutbr.fit.layout.tools.cmd.LoadArtifact;
@@ -103,7 +103,7 @@ public class Cli
             PuppeteerTreeProvider puppeteerProvider = new PuppeteerTreeProvider();
             serviceManager.addArtifactService(puppeteerProvider);
             
-            Provider segmProvider = new Provider();
+            BasicSegmProvider segmProvider = new BasicSegmProvider();
             serviceManager.addArtifactService(segmProvider);
             
             VipsProvider vipsProvider = new VipsProvider();

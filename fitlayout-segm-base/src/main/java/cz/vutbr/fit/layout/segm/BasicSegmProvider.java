@@ -26,18 +26,18 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  * 
  * @author burgetr
  */
-public class Provider extends BaseArtifactService
+public class BasicSegmProvider extends BaseArtifactService
 {
     /** Preserve the auxiliary areas that have no visual impact */
     private boolean preserveAuxAreas;
     
     
-    public Provider()
+    public BasicSegmProvider()
     {
         this.preserveAuxAreas = false;
     }
     
-    public Provider(boolean presereAuxAreas)
+    public BasicSegmProvider(boolean presereAuxAreas)
     {
         this.preserveAuxAreas = presereAuxAreas;
     }

@@ -126,7 +126,7 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
         super.childrenChanged();
         //update the topologies and style statistics when some child areas are added or removed
         invalidateTopology();
-        recomputeTextStyle();
+        //recomputeTextStyle(); //has been invalidated, will be recomputed later
     }
 
     /**

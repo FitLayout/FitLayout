@@ -83,9 +83,13 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             //load the models
             Model areaModel = getAreaModelForAreaTree(artifactRepo, areaTreeIri);
             Model dataModel = getAreaDataModelForAreaTree(artifactRepo, areaTreeIri);
+            //load the source page
+            RDFPage sourcePage = null;
+            if (pageIri != null)
+                sourcePage = getSourcePage(pageIri, artifactRepo);
             //construct the tree
             Map<IRI, RDFArea> areaUris = new LinkedHashMap<IRI, RDFArea>();
-            RDFArea root = constructVisualAreaTree(artifactRepo, atree, areaModel, dataModel, areaTreeIri, areaUris);
+            RDFArea root = constructVisualAreaTree(artifactRepo, sourcePage, atree, areaModel, dataModel, areaTreeIri, pageIri, areaUris);
             recursiveUpdateTopologies(root);
             atree.setRoot(root);
             atree.setAreaIris(areaUris);
@@ -95,16 +99,16 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             return null;
     }
     
-    private RDFArea constructVisualAreaTree(RDFArtifactRepository artifactRepo, RDFAreaTree atree,
+    private RDFArea constructVisualAreaTree(RDFArtifactRepository artifactRepo, RDFPage sourcePage, RDFAreaTree atree,
             Model areaModel, Model dataModel,
-            IRI areaTreeIri, Map<IRI, RDFArea> areas) throws RepositoryException
+            IRI areaTreeIri, IRI sourcePageIri, Map<IRI, RDFArea> areas) throws RepositoryException
     {
         //find all areas
         for (Resource res : areaModel.subjects())
         {
             if (res instanceof IRI)
             {
-                RDFArea area = createAreaFromModel(artifactRepo, areaModel, dataModel, areaTreeIri, (IRI) res);
+                RDFArea area = createAreaFromModel(artifactRepo, sourcePage, areaModel, dataModel, areaTreeIri, (IRI) res);
                 area.setAreaTree(atree);
                 areas.put((IRI) res, area);
             }
@@ -133,14 +137,12 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
         }
     }
     
-    private RDFArea createAreaFromModel(RDFArtifactRepository artifactRepo, Model areaModel, Model dataModel,
+    private RDFArea createAreaFromModel(RDFArtifactRepository artifactRepo, RDFPage sourcePage, Model areaModel, Model dataModel,
             IRI areaTreeIri, IRI uri) throws RepositoryException
     {
         RDFArea area = new RDFArea(new Rectangular(), uri);
         Map<IRI, Float> tagSupport = new HashMap<IRI, Float>(); //tagUri->support
         RDFTextStyle style = new RDFTextStyle();
-        
-        RDFPage sourcePage = null;
         
         for (Statement st : areaModel.filter(uri, null, null))
         {
@@ -237,12 +239,6 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof IRI)
                 {
-                    if (sourcePage == null)
-                    {
-                        IRI pageIri = getSourcePageIri(areaModel, areaTreeIri);
-                        if (pageIri != null)
-                            sourcePage = getSourcePage(pageIri, artifactRepo);
-                    }
                     if (sourcePage != null)
                     {
                         RDFBox box = sourcePage.findBoxByIri((IRI) value);

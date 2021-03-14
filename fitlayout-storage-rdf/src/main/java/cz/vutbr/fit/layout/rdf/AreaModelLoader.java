@@ -89,7 +89,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                 sourcePage = getSourcePage(pageIri, artifactRepo);
             //construct the tree
             Map<IRI, RDFArea> areaUris = new LinkedHashMap<IRI, RDFArea>();
-            RDFArea root = constructVisualAreaTree(artifactRepo, sourcePage, atree, areaModel, dataModel, areaTreeIri, pageIri, areaUris);
+            RDFArea root = constructVisualAreaTree(artifactRepo, sourcePage, atree, areaModel, dataModel, areaTreeIri, areaUris);
             recursiveUpdateTopologies(root);
             atree.setRoot(root);
             atree.setAreaIris(areaUris);
@@ -101,7 +101,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
     
     private RDFArea constructVisualAreaTree(RDFArtifactRepository artifactRepo, RDFPage sourcePage, RDFAreaTree atree,
             Model areaModel, Model dataModel,
-            IRI areaTreeIri, IRI sourcePageIri, Map<IRI, RDFArea> areas) throws RepositoryException
+            IRI areaTreeIri, Map<IRI, RDFArea> areas) throws RepositoryException
     {
         //find all areas
         for (Resource res : areaModel.subjects())

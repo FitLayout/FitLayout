@@ -384,7 +384,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
         {
             if (ret.length() > 0)
                 ret.append(" UNION ");
-            ret.append("{?b ").append(p).append(" ?s}");
+            ret.append("{?a ").append(p).append(" ?s}");
         }
         return ret.toString();
     }

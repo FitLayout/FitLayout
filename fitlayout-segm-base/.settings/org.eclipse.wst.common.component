@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="FitLayout-segm-base">
+        
+    <wb-module deploy-name="fitlayout-segm-base">
+                
         <wb-resource deploy-path="/" source-path="/src/main/java"/>
+            
     </wb-module>
+    
 </project-modules>

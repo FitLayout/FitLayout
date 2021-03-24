@@ -29,6 +29,8 @@ public class Serialization
     public static final String JSONLD = "application/ld+json";
     public static final String TURTLE = "text/turtle";
     
+    public static final String SPARQL_QUERY = "application/sparql-query";
+    
     
     public static String colorString(Color color)
     {

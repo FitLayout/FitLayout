@@ -140,6 +140,27 @@ public class RDFStorage implements Closeable
     }
     
     /**
+     * Determines the type of the subject as determined by the corresponding rdf:type predicate (if present)
+     * @param subject the subject IRI
+     * @return the type IRI or {@code null} when the type is not defined
+     * @throws StorageException
+     */
+    public IRI getSubjectType(Resource subject) throws StorageException 
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            final RepositoryResult<Statement> result = con.getStatements(subject, RDF.TYPE, null, true);
+            for (Statement st : result)
+            {
+                if (st.getObject() instanceof IRI)
+                    return (IRI) st.getObject(); 
+            }
+            return null; //no type statement found
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    /**
      * Obtains a model containing all statements in a given context.
      * 
      * @param context the context IRI

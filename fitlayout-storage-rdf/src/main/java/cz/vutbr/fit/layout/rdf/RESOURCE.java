@@ -50,7 +50,7 @@ public class RESOURCE
     
     public static IRI createBoxURI(IRI pageUri, Box box)
     {
-        return factory.createIRI(pageUri.toString() + '#' + box.getId());
+        return factory.createIRI(pageUri.toString() + "#b" + box.getId());
     }
     
     public static IRI createBoundsURI(IRI boxUri, String type)

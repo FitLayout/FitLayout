@@ -54,8 +54,9 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             "box:contentBounds"
     };
 
-    public BoxModelLoader()
+    public BoxModelLoader(IRIFactory iriFactory)
     {
+        super(iriFactory);
     }
 
     @Override
@@ -153,6 +154,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             IRI pageIri, IRI boxIri) throws RepositoryException
     {
         RDFBox box = new RDFBox(boxIri);
+        box.setId(getIriFactory().decodeBoxId(boxIri));
         box.setTagName("");
         box.setType(Box.Type.ELEMENT);
         box.setDisplayType(Box.DisplayType.BLOCK);

@@ -63,6 +63,21 @@ public class DefaultIRIFactory implements IRIFactory
     }
     
     @Override
+    public int decodeBoxId(IRI boxIri)
+    {
+        final String localName = boxIri.getLocalName();
+        //skip a prefix until a number is found
+        int ofs = 0;
+        while (ofs < localName.length() && !Character.isDigit(localName.charAt(ofs)))
+            ofs++;
+        //convert the number to Id
+        if (ofs < localName.length())
+            return Integer.parseInt(localName.substring(ofs));
+        else
+            return -1;
+    }
+
+    @Override
     public IRI createBoundsURI(IRI boxUri, String type)
     {
         final String localName = boxUri.getLocalName() + "-rect-" + type;
@@ -89,6 +104,13 @@ public class DefaultIRIFactory implements IRIFactory
         return factory.createIRI(areaTreeNode.toString() + "#a" + area.getId());
     }
     
+    @Override
+    public int decodeAreaId(IRI areaIri)
+    {
+        // the decoding mechanism is the same for boxes and areas
+        return decodeBoxId(areaIri);
+    }
+
     @Override
     public IRI createLogicalAreaURI(IRI areaTreeNode, int cnt) 
     {

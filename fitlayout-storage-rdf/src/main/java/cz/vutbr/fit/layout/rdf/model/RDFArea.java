@@ -38,7 +38,6 @@ public class RDFArea extends DefaultArea implements RDFResource
     public void setIri(IRI uri)
     {
         this.iri = uri;
-        setId(Integer.parseInt(uri.getLocalName().substring(1))); //skip 'a' prefix
     }
 
     public int getDocumentOrder()

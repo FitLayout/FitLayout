@@ -33,7 +33,6 @@ public class RDFBox extends DefaultBox implements RDFResource
     public void setIri(IRI uri)
     {
         this.iri = uri;
-        setId(Integer.parseInt(uri.getLocalName()));
     }
 
 }

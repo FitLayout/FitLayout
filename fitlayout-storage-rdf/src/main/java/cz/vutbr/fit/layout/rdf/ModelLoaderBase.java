@@ -27,10 +27,15 @@ import cz.vutbr.fit.layout.ontology.BOX;
  * Model loader base.
  * @author burgetr
  */
-public abstract class ModelLoaderBase
+public abstract class ModelLoaderBase extends ModelTransformer
 {
     private static Logger log = LoggerFactory.getLogger(ModelLoaderBase.class);
     
+    public ModelLoaderBase(IRIFactory iriFactory)
+    {
+        super(iriFactory);
+    }
+
     protected IRI getPredicateIriValue(Model model, IRI subject, IRI predicate)
     {
         Iterable<Statement> typeStatements = model.getStatements(subject, predicate, null);

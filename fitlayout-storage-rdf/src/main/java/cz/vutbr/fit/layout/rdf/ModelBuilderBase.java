@@ -22,32 +22,12 @@ import cz.vutbr.fit.layout.ontology.FL;
  * 
  * @author burgetr
  */
-public class ModelBuilderBase
+public class ModelBuilderBase extends ModelTransformer
 {
-    private IRIFactory iriFactory;
-    
     
     public ModelBuilderBase(IRIFactory iriFactory)
     {
-        this.iriFactory = iriFactory;
-    }
-
-    /**
-     * Gets the IRI factory used for creating the IRIs when building a RDF graph.
-     * @param iriFactory
-     */
-    public IRIFactory getIriFactory()
-    {
-        return iriFactory;
-    }
-
-    /**
-     * Configures the IRI factory used for creating the IRIs when building a RDF graph.
-     * @param iriFactory
-     */
-    public void setIriFactory(IRIFactory iriFactory)
-    {
-        this.iriFactory = iriFactory;
+        super(iriFactory);
     }
 
     /**

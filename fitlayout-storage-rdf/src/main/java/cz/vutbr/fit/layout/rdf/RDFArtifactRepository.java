@@ -55,8 +55,6 @@ public class RDFArtifactRepository implements ArtifactRepository
         this.storage = storage;
         iriFactory = new DefaultIRIFactory();
         iriDecoder = new RDFIRIDecoder();
-        modelBuilders = new HashMap<>();
-        modelLoaders = new HashMap<>();
         initDefaultModelBuilders();
         init();
     }
@@ -318,11 +316,13 @@ public class RDFArtifactRepository implements ArtifactRepository
 
     protected void initDefaultModelBuilders()
     {
+        modelBuilders = new HashMap<>();
+        modelLoaders = new HashMap<>();
         addModelBuilder(BOX.Page, new BoxModelBuilder(iriFactory));
         addModelBuilder(SEGM.AreaTree, new AreaModelBuilder(iriFactory));
         addModelBuilder(SEGM.LogicalAreaTree, new LogicalAreaModelBuilder(iriFactory));
-        addModelLoader(BOX.Page, new BoxModelLoader());
-        addModelLoader(SEGM.AreaTree, new AreaModelLoader());
+        addModelLoader(BOX.Page, new BoxModelLoader(iriFactory));
+        addModelLoader(SEGM.AreaTree, new AreaModelLoader(iriFactory));
         addModelLoader(SEGM.LogicalAreaTree, new LogicalAreaModelLoader());
     }
     

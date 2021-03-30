@@ -57,10 +57,11 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             "segm:tagSupport"
     };
     
-    public AreaModelLoader()
+    public AreaModelLoader(IRIFactory iriFactory)
     {
+        super(iriFactory);
     }
-    
+
     @Override
     public Artifact loadArtifact(IRI artifactIri, RDFArtifactRepository artifactRepo)
             throws RepositoryException
@@ -141,6 +142,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             IRI areaTreeIri, IRI uri) throws RepositoryException
     {
         RDFArea area = new RDFArea(new Rectangular(), uri);
+        area.setId(getIriFactory().decodeAreaId(uri));
         Map<IRI, Float> tagSupport = new HashMap<IRI, Float>(); //tagUri->support
         RDFTextStyle style = new RDFTextStyle();
         

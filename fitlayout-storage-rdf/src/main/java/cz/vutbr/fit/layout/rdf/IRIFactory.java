@@ -45,6 +45,13 @@ public interface IRIFactory
     public IRI createBoxURI(IRI pageUri, Box box);
 
     /**
+     * Decodes a box ID from its IRI
+     * @param boxIri
+     * @return
+     */
+    public int decodeBoxId(IRI boxIri);
+    
+    /**
      * Creates a bouds rectange IRI
      * @param boxUri the corresponding box IRI
      * @param type bounds type used to distinguish different recatngles assigned to a single box (e.g. "v" for visual)
@@ -76,6 +83,13 @@ public interface IRIFactory
      */
     public IRI createAreaURI(IRI areaTreeUri, Area area);
 
+    /**
+     * Decodes an area ID from its IRI
+     * @param areaIri
+     * @return
+     */
+    public int decodeAreaId(IRI areaIri);
+    
     /**
      * Creates a logical area IRI.
      * @param areaTreeUri the uri of the owning logical tree.

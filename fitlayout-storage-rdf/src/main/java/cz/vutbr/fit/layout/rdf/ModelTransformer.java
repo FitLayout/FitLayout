@@ -14,16 +14,25 @@ public class ModelTransformer
 {
     private IRIFactory iriFactory;
     
-    public ModelTransformer()
+    
+    public ModelTransformer(IRIFactory iriFactory)
     {
-        iriFactory = new DefaultIRIFactory();
+        this.iriFactory = iriFactory;
     }
 
+    /**
+     * Gets the IRI factory used for creating the IRIs when building a RDF graph.
+     * @param iriFactory
+     */
     public IRIFactory getIriFactory()
     {
         return iriFactory;
     }
 
+    /**
+     * Configures the IRI factory used for creating the IRIs when building a RDF graph.
+     * @param iriFactory
+     */
     public void setIriFactory(IRIFactory iriFactory)
     {
         this.iriFactory = iriFactory;

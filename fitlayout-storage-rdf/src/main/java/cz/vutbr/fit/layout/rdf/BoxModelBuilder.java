@@ -33,8 +33,9 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 {
 	private ValueFactory vf;
 	
-	public BoxModelBuilder() 
+	public BoxModelBuilder(IRIFactory iriFactory) 
 	{
+        super(iriFactory);
         vf = SimpleValueFactory.getInstance();
 	}
 	
@@ -89,7 +90,7 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 	private void insertBox(Box box, IRI pageNode, Model graph) 
 	{
 		// add BOX individual into graph
-		final IRI individual = RESOURCE.createBoxURI(pageNode, box);
+		final IRI individual = getIriFactory().createBoxURI(pageNode, box);
 		graph.add(individual, RDF.TYPE, BOX.Box);
 		graph.add(individual, BOX.documentOrder, vf.createLiteral(box.getOrder()));
 
@@ -98,7 +99,7 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		
 		//parent
 		if (box.getParent() != null)
-		    graph.add(individual, BOX.isChildOf, RESOURCE.createBoxURI(pageNode, box.getParent()));
+		    graph.add(individual, BOX.isChildOf, getIriFactory().createBoxURI(pageNode, box.getParent()));
 
 		//tag properties
 		if (box.getTagName() != null)
@@ -192,7 +193,7 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 	
 	private IRI insertBorder(Border border, IRI boxUri, String side, Model graph)
 	{
-	    IRI uri = RESOURCE.createBorderURI(boxUri, side);
+	    IRI uri = getIriFactory().createBorderURI(boxUri, side);
 	    graph.add(uri, RDF.TYPE, BOX.Border);
 	    graph.add(uri, BOX.borderWidth, vf.createLiteral(border.getWidth()));
 	    graph.add(uri, BOX.borderStyle, vf.createLiteral(border.getStyle().toString()));
@@ -202,7 +203,7 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 	
 	private IRI insertAttribute(IRI boxUri, String name, String value, Model graph)
 	{
-	    IRI uri = RESOURCE.createAttributeURI(boxUri, name);
+	    IRI uri = getIriFactory().createAttributeURI(boxUri, name);
 	    graph.add(uri, RDFS.LABEL, vf.createLiteral(name));
 	    graph.add(uri, RDF.VALUE, vf.createLiteral(value));
 	    return uri;

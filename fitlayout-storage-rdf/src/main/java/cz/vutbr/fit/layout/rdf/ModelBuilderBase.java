@@ -24,6 +24,31 @@ import cz.vutbr.fit.layout.ontology.FL;
  */
 public class ModelBuilderBase
 {
+    private IRIFactory iriFactory;
+    
+    
+    public ModelBuilderBase(IRIFactory iriFactory)
+    {
+        this.iriFactory = iriFactory;
+    }
+
+    /**
+     * Gets the IRI factory used for creating the IRIs when building a RDF graph.
+     * @param iriFactory
+     */
+    public IRIFactory getIriFactory()
+    {
+        return iriFactory;
+    }
+
+    /**
+     * Configures the IRI factory used for creating the IRIs when building a RDF graph.
+     * @param iriFactory
+     */
+    public void setIriFactory(IRIFactory iriFactory)
+    {
+        this.iriFactory = iriFactory;
+    }
 
     /**
      * Stores the common information about an artifact to a model.
@@ -53,7 +78,7 @@ public class ModelBuilderBase
     {
         final ValueFactory vf = SimpleValueFactory.getInstance();
         
-        final IRI iri = RESOURCE.createBoundsURI(boxIri, type);
+        final IRI iri = getIriFactory().createBoundsURI(boxIri, type);
         graph.add(boxIri, property, iri);
         graph.add(iri, BOX.positionX, vf.createLiteral(bounds.getX1()));
         graph.add(iri, BOX.positionY, vf.createLiteral(bounds.getY1()));

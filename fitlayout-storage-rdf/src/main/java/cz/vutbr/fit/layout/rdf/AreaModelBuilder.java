@@ -34,8 +34,9 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
 	
 	private int next_order;
 
-	public AreaModelBuilder()
+	public AreaModelBuilder(IRIFactory iriFactory)
 	{
+	    super(iriFactory);
         vf = SimpleValueFactory.getInstance();
 	}
 
@@ -84,7 +85,7 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
 	 */
 	private void addArea(Area area, IRI areaTreeNode, IRI pageNode, Set<Tag> usedTags, Model graph) 
 	{
-		final IRI individual = RESOURCE.createAreaURI(areaTreeNode, area);
+		final IRI individual = getIriFactory().createAreaURI(areaTreeNode, area);
 		graph.add(individual, RDF.TYPE, SEGM.Area);
 		if (area instanceof DefaultArea && ((DefaultArea) area).getName() != null)
 		    graph.add(individual, RDFS.LABEL, vf.createLiteral(((DefaultArea) area).getName()));
@@ -92,7 +93,7 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
         graph.add(individual, SEGM.belongsTo, areaTreeNode);
 
         if (area.getParent() != null)
-            graph.add(individual, SEGM.isChildOf, RESOURCE.createAreaURI(areaTreeNode, area.getParent()));
+            graph.add(individual, SEGM.isChildOf, getIriFactory().createAreaURI(areaTreeNode, area.getParent()));
         
 		// append the geometry
         insertBounds(individual, BOX.bounds, "b", area.getBounds(), graph);
@@ -107,9 +108,9 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
 				if (support != null && support > 0.0f)
 				{
 				    usedTags.add(t);
-				    final IRI tagUri = RESOURCE.createTagURI(t);
+				    final IRI tagUri = getIriFactory().createTagURI(t);
 				    graph.add(individual, SEGM.hasTag, tagUri);
-				    final IRI supUri = RESOURCE.createTagSupportURI(individual, t);
+				    final IRI supUri = getIriFactory().createTagSupportURI(individual, t);
 				    graph.add(individual, SEGM.tagSupport, supUri);
 				    graph.add(supUri, SEGM.support, vf.createLiteral(support));
 				    graph.add(supUri, SEGM.hasTag, tagUri);
@@ -133,7 +134,7 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
         //dump boxes
         for (Box box : area.getBoxes())
         {
-            IRI boxUri = RESOURCE.createBoxURI(pageNode, box);
+            IRI boxUri = getIriFactory().createBoxURI(pageNode, box);
             graph.add(individual, SEGM.containsBox, boxUri);
         }
 	}
@@ -142,7 +143,7 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
     {
         for (Tag t : usedTags)
         {
-            IRI tagUri = RESOURCE.createTagURI(t);
+            IRI tagUri = getIriFactory().createTagURI(t);
             graph.add(tagUri, SEGM.hasType, vf.createLiteral(t.getType()));
             graph.add(tagUri, SEGM.hasName, vf.createLiteral(t.getValue()));
         }

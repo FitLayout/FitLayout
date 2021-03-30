@@ -332,16 +332,15 @@ public class RDFStorage implements Closeable
     
     /**
      * Obtains the last assigned value of a sequence with the given name.
-     * @param name the sequence name
+     * @param sequenceIri the sequence IRI
      * @return the last assigned value or 0 when the sequence does not exist.
      * @throws StorageException 
      */
-    public long getLastSequenceValue(String name) throws StorageException
+    public long getLastSequenceValue(IRI sequenceIri) throws StorageException
     {
         long ret = 0;
         try (RepositoryConnection con = repo.getConnection()) {
-            IRI sequence = RESOURCE.createSequenceURI(name);
-            RepositoryResult<Statement> result = con.getStatements(sequence, RDF.VALUE, null, false);
+            RepositoryResult<Statement> result = con.getStatements(sequenceIri, RDF.VALUE, null, false);
             try {
                 if (result.hasNext())
                 {
@@ -360,13 +359,12 @@ public class RDFStorage implements Closeable
         return ret;
     }
     
-    public long getNextSequenceValue(String name) throws StorageException
+    public long getNextSequenceValue(IRI sequenceIri) throws StorageException
     {
         try (RepositoryConnection con = repo.getConnection()) {
             con.begin(IsolationLevels.SERIALIZABLE); //TODO is this supported everywhere?
-            IRI sequence = RESOURCE.createSequenceURI(name);
             long val = 0;
-            RepositoryResult<Statement> result = con.getStatements(sequence, RDF.VALUE, null, false);
+            RepositoryResult<Statement> result = con.getStatements(sequenceIri, RDF.VALUE, null, false);
             try {
                 if (result.hasNext())
                 {
@@ -382,7 +380,7 @@ public class RDFStorage implements Closeable
             }
             val++;
             ValueFactory vf = SimpleValueFactory.getInstance();
-            con.add(sequence, RDF.VALUE, vf.createLiteral(val));
+            con.add(sequenceIri, RDF.VALUE, vf.createLiteral(val));
             con.commit();
             return val;
         }

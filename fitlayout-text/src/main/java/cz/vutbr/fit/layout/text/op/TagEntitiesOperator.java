@@ -19,7 +19,10 @@ import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.text.tag.Tagger;
 import cz.vutbr.fit.layout.text.tag.TreeTagger;
+import cz.vutbr.fit.layout.text.taggers.DateTagger;
+import cz.vutbr.fit.layout.text.taggers.LocationsTagger;
 import cz.vutbr.fit.layout.text.taggers.PersonsTagger;
+import cz.vutbr.fit.layout.text.taggers.TimeTagger;
 
 
 /**
@@ -92,7 +95,10 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
         //availableTaggers = getServiceManager().loadServicesByType(Tagger.class);
         //usedTaggers = new ArrayList<Tagger>(availableTaggers.values());
         usedTaggers = new ArrayList<>();
+        usedTaggers.add(new DateTagger());
+        usedTaggers.add(new TimeTagger());
         usedTaggers.add(new PersonsTagger());
+        usedTaggers.add(new LocationsTagger());
     }
     
     //==============================================================================

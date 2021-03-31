@@ -6,6 +6,7 @@ module cz.vutbr.fit.layout.text
     
     requires transitive cz.vutbr.fit.layout.core;
     requires stanford.corenlp;
+    requires natty;
     
     exports cz.vutbr.fit.layout.text.op;
     exports cz.vutbr.fit.layout.text.tag;

@@ -19,6 +19,7 @@ import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.text.tag.Tagger;
 import cz.vutbr.fit.layout.text.tag.TreeTagger;
+import cz.vutbr.fit.layout.text.taggers.PersonsTagger;
 
 
 /**
@@ -34,7 +35,6 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
     
     public TagEntitiesOperator()
     {
-        initTaggers();
     }
     
     @Override
@@ -89,8 +89,10 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
     
     protected void initTaggers()
     {
-        availableTaggers = getServiceManager().loadServicesByType(Tagger.class);
-        usedTaggers = new ArrayList<Tagger>(availableTaggers.values());
+        //availableTaggers = getServiceManager().loadServicesByType(Tagger.class);
+        //usedTaggers = new ArrayList<Tagger>(availableTaggers.values());
+        usedTaggers = new ArrayList<>();
+        usedTaggers.add(new PersonsTagger());
     }
     
     //==============================================================================
@@ -104,6 +106,7 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
     @Override
     public void apply(AreaTree atree, Area root)
     {
+        initTaggers();
         tagger = new TreeTagger(root);
         for (Tagger t : usedTaggers)
             tagger.addTagger(t);

@@ -24,7 +24,7 @@ public abstract class NERTagger extends BaseTagger
 {
     private static Logger log = LoggerFactory.getLogger(NERTagger.class);
     
-    private static final String CLASSIFIER_PATH = "/3class.gz";
+    private static final String CLASSIFIER_PATH = "/english.all.3class.distsim.crf.ser.gz";
     
     private static AbstractSequenceClassifier<?> sharedClassifier;
 

@@ -17,6 +17,15 @@ public class BOX {
 	public static final String PREFIX = "box";
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#Attribute}.
+	 * <p>
+	 * An HTML attribute assigned to a box.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#Attribute">Attribute</a>
+	 */
+	public static final IRI Attribute;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#backgroundColor}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#backgroundColor">backgroundColor</a>
@@ -382,6 +391,15 @@ public class BOX {
 	public static final IRI underline;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#visible}.
+	 * <p>
+	 * Defines the box visibility
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#visible">visible</a>
+	 */
+	public static final IRI visible;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#visualBounds}.
 	 * <p>
 	 * Assigns visual rectangular bounds to a box. Visual bounds correspond
@@ -404,6 +422,7 @@ public class BOX {
 	static {
 		ValueFactory factory = SimpleValueFactory.getInstance();
 
+		Attribute = factory.createIRI(BOX.NAMESPACE, "Attribute");
 		backgroundColor = factory.createIRI(BOX.NAMESPACE, "backgroundColor");
 		backgroundImageData = factory.createIRI(BOX.NAMESPACE, "backgroundImageData");
 		backgroundImagePosition = factory.createIRI(BOX.NAMESPACE, "backgroundImagePosition");
@@ -452,6 +471,7 @@ public class BOX {
 		RectArea = factory.createIRI(BOX.NAMESPACE, "RectArea");
 		sourceUrl = factory.createIRI(BOX.NAMESPACE, "sourceUrl");
 		underline = factory.createIRI(BOX.NAMESPACE, "underline");
+		visible = factory.createIRI(BOX.NAMESPACE, "visible");
 		visualBounds = factory.createIRI(BOX.NAMESPACE, "visualBounds");
 		width = factory.createIRI(BOX.NAMESPACE, "width");
 	}

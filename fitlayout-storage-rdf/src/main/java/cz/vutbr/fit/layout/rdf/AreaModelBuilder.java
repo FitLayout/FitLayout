@@ -134,7 +134,7 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
         //dump boxes
         for (Box box : area.getBoxes())
         {
-            IRI boxUri = getIriFactory().createBoxURI(pageNode, box);
+            final IRI boxUri = getBoxIri(pageNode, box);
             graph.add(individual, SEGM.containsBox, boxUri);
         }
 	}

@@ -20,7 +20,6 @@ import cz.vutbr.fit.layout.model.LogicalArea;
 import cz.vutbr.fit.layout.model.LogicalAreaTree;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.SEGM;
-import cz.vutbr.fit.layout.rdf.model.RDFArea;
 
 /**
  * TODO check the belongsTo relations and the assignment ot the LogicalAreaTree artifact
@@ -89,11 +88,7 @@ public class LogicalAreaModelBuilder extends ModelBuilderBase implements ModelBu
             graph.add(individual, SEGM.hasTag, getIriFactory().createTagURI(area.getMainTag()));
         for (Area a : area.getAreas())
         {
-            IRI areaUri;
-            if (a instanceof RDFArea)
-                areaUri = ((RDFArea) a).getIri();
-            else
-                areaUri = getIriFactory().createAreaURI(areaTreeNode, a);
+            IRI areaUri = getAreaIri(areaTreeNode, a);
             graph.add(individual, SEGM.containsArea, areaUri);
         }
         return individual;

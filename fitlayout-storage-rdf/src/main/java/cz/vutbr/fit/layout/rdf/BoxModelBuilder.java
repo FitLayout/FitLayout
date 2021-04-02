@@ -93,6 +93,7 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		final IRI individual = getIriFactory().createBoxURI(pageNode, box);
 		graph.add(individual, RDF.TYPE, BOX.Box);
 		graph.add(individual, BOX.documentOrder, vf.createLiteral(box.getOrder()));
+        graph.add(individual, BOX.visible, vf.createLiteral(box.isVisible()));
 
 		// pin to page node
 		graph.add(individual, BOX.belongsTo, pageNode);

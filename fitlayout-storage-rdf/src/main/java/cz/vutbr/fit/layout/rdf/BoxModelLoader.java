@@ -171,6 +171,11 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                 if (value instanceof Literal)
                     box.setOrder(((Literal) value).intValue());
             }
+            else if (BOX.visible.equals(pred)) 
+            {
+                if (value instanceof Literal)
+                    box.setVisible(((Literal) value).booleanValue());
+            }
             else if (BOX.backgroundColor.equals(pred)) 
             {
                 String bgColor = value.stringValue();

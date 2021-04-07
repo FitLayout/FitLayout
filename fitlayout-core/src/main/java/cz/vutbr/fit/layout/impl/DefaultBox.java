@@ -19,7 +19,7 @@ import cz.vutbr.fit.layout.model.Rectangular;
  *  
  * @author burgetr
  */
-public class DefaultBox extends DefaultContentRect<Box> implements Box
+public class DefaultBox extends DefaultTreeContentRect<Box> implements Box
 {
     private int order;
     

@@ -8,7 +8,7 @@ package cz.vutbr.fit.layout.model;
 import org.eclipse.rdf4j.model.IRI;
 
 /**
- * A generic rectangular content within a page
+ * A generic rectangular content within a page.
  * 
  * @author burgetr
  */

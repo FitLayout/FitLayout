@@ -30,7 +30,7 @@ import cz.vutbr.fit.layout.model.Box.Type;
  * 
  * @author burgetr
  */
-public class DefaultArea extends DefaultContentRect<Area> implements Area
+public class DefaultArea extends DefaultTreeContentRect<Area> implements Area
 {
     /** Area name to be displayed to the users */
     private String name;

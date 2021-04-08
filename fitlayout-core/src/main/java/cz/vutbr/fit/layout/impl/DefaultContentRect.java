@@ -9,6 +9,7 @@ import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Color;
+import cz.vutbr.fit.layout.model.ContentLine;
 import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.TextStyle;
@@ -38,6 +39,9 @@ public class DefaultContentRect implements ContentRect
     private Border bottomBorder;
     private Border leftBorder;
     private Border rightBorder;
+    
+    /** The content line the area belongs to */
+    private ContentLine line;
 
     
     public DefaultContentRect(int id)
@@ -150,6 +154,18 @@ public class DefaultContentRect implements ContentRect
     public void setTextStyle(TextStyle textStyle)
     {
         this.textStyle = textStyle;
+    }
+
+    @Override
+    public ContentLine getLine()
+    {
+        return line;
+    }
+
+    @Override
+    public void setLine(ContentLine line)
+    {
+        this.line = line;
     }
 
     @Override

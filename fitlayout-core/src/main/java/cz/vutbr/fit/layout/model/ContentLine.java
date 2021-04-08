@@ -13,7 +13,7 @@ import java.util.List;
  * 
  * @author burgetr
  */
-public interface ContentLine extends List<Area>
+public interface ContentLine extends List<ContentRect>
 {
 
     /**
@@ -21,13 +21,13 @@ public interface ContentLine extends List<Area>
      * @param area the given area
      * @return the preceding area or {@code null} if {@code area} is the first area in the line.
      */
-    public Area getAreaBefore(Area area);
+    public ContentRect getAreaBefore(ContentRect area);
     
     /**
      * Finds the area that follows the given area on the line.
      * @param area the given area
      * @return the following area or {@code null} if {@code area} is the last area in the line.
      */
-    public Area getAreaAfter(Area area);
+    public ContentRect getAreaAfter(ContentRect area);
     
 }

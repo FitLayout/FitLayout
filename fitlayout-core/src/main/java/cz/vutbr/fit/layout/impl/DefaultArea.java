@@ -20,7 +20,6 @@ import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
-import cz.vutbr.fit.layout.model.ContentLine;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.Box.Type;
@@ -41,9 +40,6 @@ public class DefaultArea extends DefaultTreeContentRect<Area> implements Area
     /** The topology assigned to the area */
     private AreaTopology topology;
     
-    /** The content line the area belongs to */
-    private ContentLine line;
-
     /** The visual boxes that form this area. */
     private List<Box> boxes;
     
@@ -178,18 +174,6 @@ public class DefaultArea extends DefaultTreeContentRect<Area> implements Area
     public void setLevel(int level)
     {
         this.level = level;
-    }
-
-    @Override
-    public ContentLine getLine()
-    {
-        return line;
-    }
-
-    @Override
-    public void setLine(ContentLine line)
-    {
-        this.line = line;
     }
 
     @Override
@@ -397,7 +381,7 @@ public class DefaultArea extends DefaultTreeContentRect<Area> implements Area
     @Override
     public void addTag(Tag tag, float support)
     {
-        Float oldsupport = tags.get(tag);
+        final Float oldsupport = tags.get(tag);
         if (oldsupport == null || oldsupport < support)
             tags.put(tag, support);
     }

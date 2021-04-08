@@ -115,18 +115,6 @@ public interface Area extends ContentRect, GenericTreeNode<Area>, Taggable
     public Rectangular getGridPosition();
     
     /**
-     * Returns the content line the area belongs to.
-     * @return The content line or {@code null} when the area does not belong to any line
-     */
-    public ContentLine getLine();
-    
-    /**
-     * Assigns the content line to the area.
-     * @param line the content line to be assigned.
-     */
-    public void setLine(ContentLine line);
-    
-    /**
      * Updates the topologies of the child areas. This should be called when
      * some nodes have been inserted, removed or changed in this area.
      */

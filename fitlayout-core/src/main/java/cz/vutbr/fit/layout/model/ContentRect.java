@@ -64,6 +64,18 @@ public interface ContentRect extends Rect
      */
     public TextStyle getTextStyle();
     
+    /**
+     * Returns the content line the area belongs to.
+     * @return The content line or {@code null} when the area does not belong to any line
+     */
+    public ContentLine getLine();
+    
+    /**
+     * Assigns the content line to the area.
+     * @param line the content line to be assigned.
+     */
+    public void setLine(ContentLine line);
+    
     //=================================================================================================
     // Borders
     //=================================================================================================

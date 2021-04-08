@@ -15,8 +15,8 @@ import java.util.Map;
 import java.util.Set;
 
 import cz.vutbr.fit.layout.api.OutputDisplay;
-import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTopology;
+import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
@@ -26,18 +26,18 @@ import cz.vutbr.fit.layout.model.Rectangular;
  */
 public class AreaListGridTopology implements AreaTopology
 {
-    private List<Area> areas;
+    private List<ContentRect> areas;
     private Rectangular abspos;
-    private Map<Area, Rectangular> positions;
-    private Map<Coords, Set<Area>> index;
+    private Map<ContentRect, Rectangular> positions;
+    private Map<Coords, Set<ContentRect>> index;
     private AreaGrid grid;
     
-    public AreaListGridTopology(List<Area> areas)
+    public AreaListGridTopology(List<ContentRect> areas)
     {
         this(areas, true);
     }
     
-    public AreaListGridTopology(List<Area> areas, boolean doInit)
+    public AreaListGridTopology(List<ContentRect> areas, boolean doInit)
     {
         this.areas = areas;
         //create the grid if required
@@ -46,12 +46,12 @@ public class AreaListGridTopology implements AreaTopology
     }
 
     @Override
-    public List<Area> getAreas()
+    public List<ContentRect> getAreas()
     {
         return areas;
     }
 
-    public void setAreas(List<Area> areas)
+    public void setAreas(List<ContentRect> areas)
     {
         this.areas = areas;
     }
@@ -75,27 +75,27 @@ public class AreaListGridTopology implements AreaTopology
     }
 
     @Override
-    public Rectangular getPosition(Area area)
+    public Rectangular getPosition(ContentRect area)
     {
         return positions.get(area);
     }
 
     @Override
-    public void setPosition(Area area, Rectangular gp)
+    public void setPosition(ContentRect area, Rectangular gp)
     {
         positions.put(area, gp);
     }
 
     @Override
-    public Map<Area, Rectangular> getPositionMap()
+    public Map<ContentRect, Rectangular> getPositionMap()
     {
         return positions;
     }
 
     @Override
-    public Area findAreaAt(int x, int y)
+    public ContentRect findAreaAt(int x, int y)
     {
-        final Set<Area> areas = index.get(new Coords(x, y));
+        final Set<ContentRect> areas = index.get(new Coords(x, y));
         if (areas != null && !areas.isEmpty())
             return areas.iterator().next();
         else
@@ -103,17 +103,17 @@ public class AreaListGridTopology implements AreaTopology
     }
 
     @Override
-    public Collection<Area> findAllAreasAt(int x, int y)
+    public Collection<ContentRect> findAllAreasAt(int x, int y)
     {
-        final Set<Area> areas = index.get(new Coords(x, y));
+        final Set<ContentRect> areas = index.get(new Coords(x, y));
         return (areas == null) ? Collections.emptyList() : areas;
     }
 
     @Override
-    public Collection<Area> findAllAreasIntersecting(Rectangular r)
+    public Collection<ContentRect> findAllAreasIntersecting(Rectangular r)
     {
-        Collection<Area> ret = new ArrayList<>();
-        for (Map.Entry<Area, Rectangular> entry : positions.entrySet())
+        Collection<ContentRect> ret = new ArrayList<>();
+        for (Map.Entry<ContentRect, Rectangular> entry : positions.entrySet())
         {
             if (entry.getValue().intersects(r))
                 ret.add(entry.getKey());
@@ -159,13 +159,13 @@ public class AreaListGridTopology implements AreaTopology
         abspos = computeAreaBounds();
         //default positions for all the areas
         positions = new HashMap<>(areas.size());
-        for (Area a : areas)
+        for (ContentRect a : areas)
             positions.put(a, new Rectangular());
         //re-create the grid
         grid = new AreaGrid(abspos, areas, this);
         //build the index
         index = new HashMap<>(positions.size());
-        for (Map.Entry<Area, Rectangular> entry : positions.entrySet())
+        for (Map.Entry<ContentRect, Rectangular> entry : positions.entrySet())
             addToIndex(entry.getKey(), entry.getValue());
     }
 
@@ -199,7 +199,7 @@ public class AreaListGridTopology implements AreaTopology
     protected Rectangular computeAreaBounds()
     {
         Rectangular ret = null;
-        for (Area a : areas)
+        for (ContentRect a : areas)
         {
             if (ret == null)
                 ret = new Rectangular(a.getBounds());
@@ -209,14 +209,14 @@ public class AreaListGridTopology implements AreaTopology
         return ret;
     }
     
-    private void addToIndex(Area a, Rectangular gp)
+    private void addToIndex(ContentRect a, Rectangular gp)
     {
         for (int x = gp.getX1(); x <= gp.getX2(); x++)
         {
             for (int y = gp.getY1(); y <= gp.getY2(); y++)
             {
                 final Coords c = new Coords(x, y);
-                Set<Area> careas = index.get(c);
+                Set<ContentRect> careas = index.get(c);
                 if (careas == null)
                 {
                     careas = new HashSet<>();

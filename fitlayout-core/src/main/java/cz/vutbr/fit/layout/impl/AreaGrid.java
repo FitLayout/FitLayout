@@ -8,8 +8,9 @@ package cz.vutbr.fit.layout.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import cz.vutbr.fit.layout.model.Area;
+import cz.vutbr.fit.layout.api.AreaUtils;
 import cz.vutbr.fit.layout.model.AreaTopology;
+import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
@@ -45,7 +46,7 @@ public class AreaGrid
     private Rectangular abspos;
     
     /** The list of areas laid out in this grid */
-    private List<Area> areas;
+    private List<ContentRect> areas;
     
     /** The target topology where the computed positions will be set */
     private AreaTopology target;
@@ -60,7 +61,7 @@ public class AreaGrid
     public AreaGrid(DefaultArea area, AreaTopology targetTopology)
     {
         abspos = area.getBounds();
-        areas = area.getChildren();
+        areas = AreaUtils.getChildrenAsContentRects(area);
         target = targetTopology;
         calculateColumns();
         calculateRows();
@@ -72,7 +73,7 @@ public class AreaGrid
      * @param areas the areas to be laid out in the grid.
      * @param targetTopology the area topology where the computed grid positions will be set
      */
-    public AreaGrid(Rectangular position, List<Area> areas, AreaTopology targetTopology)
+    public AreaGrid(Rectangular position, List<ContentRect> areas, AreaTopology targetTopology)
     {
         this.abspos = position;
         this.areas = areas;
@@ -288,7 +289,7 @@ public class AreaGrid
         //create the sorted list of points
         GridPoint points[] = new GridPoint[areas.size() * 2];
         int pi = 0;
-        for (Area area : areas)
+        for (ContentRect area : areas)
         {
             points[pi] = new GridPoint(area.getX1(), area, true);
             points[pi+1] = new GridPoint(area.getX2() + 1, area, false);
@@ -355,7 +356,7 @@ public class AreaGrid
         //create the sorted list of points
         GridPoint points[] = new GridPoint[areas.size() * 2];
         int pi = 0;
-        for (Area area : areas)
+        for (ContentRect area : areas)
         {
             points[pi] = new GridPoint(area.getY1(), area, true);
             points[pi+1] = new GridPoint(area.getY2() + 1, area, false);
@@ -415,10 +416,10 @@ public class AreaGrid
 class GridPoint implements Comparable<GridPoint>
 {
     public int value;       //the point position
-    public Area area;       //the corresponding visual area
+    public ContentRect area;       //the corresponding visual area
     public boolean begin;   //is it the begining or the end of the node?
     
-    public GridPoint(int value, Area area, boolean begin)
+    public GridPoint(int value, ContentRect area, boolean begin)
     {
         this.value = value;
         this.area = area;

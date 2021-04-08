@@ -18,6 +18,9 @@ public class SEGM {
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#Area}.
+	 * <p>
+	 * A visual area within the page. The areas can be nested an together
+	 * they form an AreaTree.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#Area">Area</a>
 	 */
@@ -39,6 +42,15 @@ public class SEGM {
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#belongsTo">belongsTo</a>
 	 */
 	public static final IRI belongsTo;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#ChunkSet}.
+	 * <p>
+	 * A set of text chunks extreacted from a source page.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#ChunkSet">ChunkSet</a>
+	 */
+	public static final IRI ChunkSet;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#containsArea}.
@@ -163,12 +175,23 @@ public class SEGM {
 	 */
 	public static final IRI tagSupport;
 
+	/**
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#TextChunk}.
+	 * <p>
+	 * A connected piece of a document text that forms a rectangular area in
+	 * the page.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#TextChunk">TextChunk</a>
+	 */
+	public static final IRI TextChunk;
+
 	static {
 		ValueFactory factory = SimpleValueFactory.getInstance();
 
 		Area = factory.createIRI(SEGM.NAMESPACE, "Area");
 		AreaTree = factory.createIRI(SEGM.NAMESPACE, "AreaTree");
 		belongsTo = factory.createIRI(SEGM.NAMESPACE, "belongsTo");
+		ChunkSet = factory.createIRI(SEGM.NAMESPACE, "ChunkSet");
 		containsArea = factory.createIRI(SEGM.NAMESPACE, "containsArea");
 		containsBox = factory.createIRI(SEGM.NAMESPACE, "containsBox");
 		hasAreaTree = factory.createIRI(SEGM.NAMESPACE, "hasAreaTree");
@@ -185,6 +208,7 @@ public class SEGM {
 		support = factory.createIRI(SEGM.NAMESPACE, "support");
 		Tag = factory.createIRI(SEGM.NAMESPACE, "Tag");
 		tagSupport = factory.createIRI(SEGM.NAMESPACE, "tagSupport");
+		TextChunk = factory.createIRI(SEGM.NAMESPACE, "TextChunk");
 	}
 
 	private SEGM() {

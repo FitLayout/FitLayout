@@ -31,7 +31,6 @@ public class ServiceManager
     
     private Map<String, ArtifactService> artifactServices;
     private Map<String, AreaTreeOperator> operators;
-    private Map<String, PageStorage> pageStorages;
     
     /** All the parametrized services */
     private Map<String, ParametrizedOperation> parametrizedServices;
@@ -67,7 +66,6 @@ public class ServiceManager
         //load services of standard types
         artifactServices = loadServicesByType(ArtifactService.class);
         operators = loadServicesByType(AreaTreeOperator.class);
-        pageStorages = loadServicesByType(PageStorage.class);
         //load the remaining script objects - this should be the last step
         loadScriptObjects();
     }
@@ -92,7 +90,6 @@ public class ServiceManager
         //empty service lists
         artifactServices = new HashMap<>();
         operators = new HashMap<>();
-        pageStorages = new HashMap<>();
         //load the remaining script objects - this should be the last step
         loadScriptObjects();
     }
@@ -172,15 +169,6 @@ public class ServiceManager
     public Map<String, ScriptObject> findScriptObjects()
     {
         return scriptObjects;
-    }
-
-    /**
-     * Discovers all the PageStorage service implementations.
-     * @return A map that assigns the service {@code id} to the appropriate implementation.
-     */
-    public Map<String, PageStorage> findPageStorages()
-    {
-        return pageStorages;
     }
 
     /**

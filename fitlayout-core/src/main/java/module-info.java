@@ -12,7 +12,6 @@ module cz.vutbr.fit.layout.core
     
     uses cz.vutbr.fit.layout.api.ArtifactService;
     uses cz.vutbr.fit.layout.api.AreaTreeOperator;
-    uses cz.vutbr.fit.layout.api.PageStorage;
     uses cz.vutbr.fit.layout.api.ScriptObject;
     
     provides cz.vutbr.fit.layout.api.ArtifactService with

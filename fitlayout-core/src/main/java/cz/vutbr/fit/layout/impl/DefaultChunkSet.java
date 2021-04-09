@@ -6,6 +6,7 @@
 package cz.vutbr.fit.layout.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -28,6 +29,13 @@ public class DefaultChunkSet extends BaseArtifact implements ChunkSet
     private Set<TextChunk> chunks;
     private AreaTopology topology;
     
+
+    public DefaultChunkSet(IRI parentIri)
+    {
+        super(parentIri);
+        setPageIri(parentIri);
+        setTextChunks(new HashSet<>());
+    }
 
     public DefaultChunkSet(IRI parentIri, Set<TextChunk> chunks)
     {
@@ -58,17 +66,35 @@ public class DefaultChunkSet extends BaseArtifact implements ChunkSet
         return chunks;
     }
 
-    protected void setTextChunks(Set<TextChunk> chunks)
+    public void setTextChunks(Set<TextChunk> chunks)
+    {
+        this.chunks = chunks;
+        invalidateTopology();
+    }
+
+    public void addTextChunk(TextChunk chunk)
+    {
+        chunks.add(chunk);
+        invalidateTopology();
+    }
+    
+    public void invalidateTopology()
+    {
+        topology = null;
+    }
+    
+    public void updateTopology()
     {
         final List<ContentRect> rects = new ArrayList<>(chunks.size());
         rects.addAll(chunks);
         topology = new AreaListGridTopology(rects);
-
     }
-
+    
     @Override
     public AreaTopology getTopology()
     {
+        if (topology == null)
+            updateTopology();
         return topology;
     }
     

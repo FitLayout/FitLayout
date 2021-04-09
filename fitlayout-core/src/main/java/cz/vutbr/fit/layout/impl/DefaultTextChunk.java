@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 import cz.vutbr.fit.layout.model.Area;
-import cz.vutbr.fit.layout.model.AreaTopology;
 import cz.vutbr.fit.layout.model.Box;
+import cz.vutbr.fit.layout.model.ChunkSet;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
@@ -26,10 +26,10 @@ import cz.vutbr.fit.layout.model.TextStyle;
  */
 public class DefaultTextChunk extends DefaultContentRect implements TextChunk
 {
+    private ChunkSet chunkSet;
     private String text;
     private Area sourceArea;
     private Box sourceBox;
-    private AreaTopology layerTopology;
     private Color effectiveBackgroundColor;
     private String name;
     
@@ -47,6 +47,17 @@ public class DefaultTextChunk extends DefaultContentRect implements TextChunk
         setBounds(r);
         //addBox(sourceBox); //the box is used for computing the text color of the area (e.g. in AreaStyle)
         copyStyle(sourceArea);
+    }
+
+    @Override
+    public ChunkSet getChunkSet()
+    {
+        return chunkSet;
+    }
+
+    public void setChunkSet(ChunkSet chunkSet)
+    {
+        this.chunkSet = chunkSet;
     }
 
     public void setText(String text)
@@ -84,18 +95,6 @@ public class DefaultTextChunk extends DefaultContentRect implements TextChunk
         return sourceBox;
     }
     
-    @Override
-    public AreaTopology getLayerTopology()
-    {
-        return layerTopology;
-    }
-
-    @Override
-    public void setLayerTopology(AreaTopology layerTopology)
-    {
-        this.layerTopology = layerTopology;
-    }
-
     @Override
     public Color getEffectiveBackgroundColor()
     {

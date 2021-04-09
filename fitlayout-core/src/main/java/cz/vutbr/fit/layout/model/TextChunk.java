@@ -15,6 +15,12 @@ public interface TextChunk extends ContentRect, Taggable
 {
     
     /**
+     * Gets the chunk set the chunk belongs to.
+     * @return the chunk set or {@code null} when the chunk does not belong to any set.
+     */
+    public ChunkSet getChunkSet();
+    
+    /**
      * Gets the complete text of the chunk.
      * @return the text chunk.
      */
@@ -44,18 +50,6 @@ public interface TextChunk extends ContentRect, Taggable
      */
     public Box getSourceBox();
     
-    /**
-     * Gets the topology of all chunks.
-     * @return The topology
-     */
-    public AreaTopology getLayerTopology();
-
-    /**
-     * Sets the topology of all chunks.
-     * @param layerTopology
-     */
-    public void setLayerTopology(AreaTopology layerTopology);
-
     /**
      * Gets the efficient background color of the chunk.
      * @return the background color or {@code nul} when transparent.

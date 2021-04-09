@@ -90,8 +90,6 @@ public class ServiceManager
         //empty service lists
         artifactServices = new HashMap<>();
         operators = new HashMap<>();
-        //load the remaining script objects - this should be the last step
-        loadScriptObjects();
     }
     
     /**

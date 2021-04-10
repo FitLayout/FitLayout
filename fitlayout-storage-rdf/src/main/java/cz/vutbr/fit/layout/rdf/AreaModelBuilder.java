@@ -13,7 +13,6 @@ import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 
-import cz.vutbr.fit.layout.impl.DefaultArea;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
@@ -87,8 +86,8 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
 	{
 		final IRI individual = getIriFactory().createAreaURI(areaTreeNode, area);
 		graph.add(individual, RDF.TYPE, SEGM.Area);
-		if (area instanceof DefaultArea && ((DefaultArea) area).getName() != null)
-		    graph.add(individual, RDFS.LABEL, vf.createLiteral(((DefaultArea) area).getName()));
+		if (area.getName() != null)
+		    graph.add(individual, RDFS.LABEL, vf.createLiteral(area.getName()));
 		graph.add(individual, BOX.documentOrder, vf.createLiteral(next_order++));
         graph.add(individual, SEGM.belongsTo, areaTreeNode);
 

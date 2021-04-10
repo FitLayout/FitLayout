@@ -15,7 +15,6 @@ import cz.vutbr.fit.layout.api.AreaTreeOperator;
 import cz.vutbr.fit.layout.api.ParametrizedOperation;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
-import cz.vutbr.fit.layout.impl.DefaultArea;
 import cz.vutbr.fit.layout.impl.DefaultAreaTree;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
@@ -126,8 +125,8 @@ public class OperatorApplicationProvider extends BaseArtifactService
     {
         // make a deep copy of the tree
         DefaultAreaTree ret = new DefaultAreaTree(input);
-        Area root = new DefaultArea(input.getRoot());
-        recursiveCopyChildren(root, input.getRoot());
+        Area root = ret.createArea(input.getRoot());
+        recursiveCopyChildren(ret, root, input.getRoot());
         ret.setParentIri(input.getIri()); //the new tree is the child artifact of the original tree
         ret.setLabel(getId());
         ret.setCreator(getId());
@@ -142,13 +141,13 @@ public class OperatorApplicationProvider extends BaseArtifactService
         return ret;
     }
     
-    private void recursiveCopyChildren(Area destArea, Area srcArea)
+    private void recursiveCopyChildren(AreaTree atree, Area destArea, Area srcArea)
     {
         for (Area src : srcArea.getChildren())
         {
-            Area dest = new DefaultArea(src);
+            Area dest = atree.createArea(src);
             destArea.appendChild(dest);
-            recursiveCopyChildren(dest, src);
+            recursiveCopyChildren(atree, dest, src);
         }
     }
     

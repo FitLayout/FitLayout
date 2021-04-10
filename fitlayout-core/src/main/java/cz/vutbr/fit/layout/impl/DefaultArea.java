@@ -88,11 +88,6 @@ public class DefaultArea extends DefaultTreeContentRect<Area> implements Area
         level = src.getLevel();
     }
     
-    public DefaultArea(int x1, int y1, int x2, int y2)
-    {
-        this(new Rectangular(x1, y1, x2, y2));
-    }
-    
     public DefaultArea(Box box)
     {
         this(box.getBounds());
@@ -532,7 +527,7 @@ public class DefaultArea extends DefaultTreeContentRect<Area> implements Area
             Rectangular abspos = getTopology().toPixelPosition(gp);
             abspos.move(getX1(), getY1());
             //create the new area
-            DefaultArea area = new DefaultArea(abspos);
+            Area area = getAreaTree().createArea(abspos);
             area.setName(name);
             int index = getIndex(selected.get(0));
             insertChild(area, index);

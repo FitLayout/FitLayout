@@ -25,8 +25,6 @@ import cz.vutbr.fit.layout.model.Border.Style;
  */
 public class DefaultTreeContentRect<T extends GenericTreeNode<T>> extends DefaultTreeNode<T> implements ContentRect
 {
-    private static int nextid = 1;
-    
     private int id;
     private IRI pageIri;
     private Rectangular bounds;
@@ -50,7 +48,6 @@ public class DefaultTreeContentRect<T extends GenericTreeNode<T>> extends Defaul
     public DefaultTreeContentRect(Class<T> myType)
     {
         super(myType);
-        id = nextid++;
         bounds = new Rectangular();
         textStyle = new TextStyle();
         topBorder = new Border();
@@ -62,7 +59,6 @@ public class DefaultTreeContentRect<T extends GenericTreeNode<T>> extends Defaul
     public DefaultTreeContentRect(Class<T> myType, ContentRect src)
     {
         super(myType);
-        id = nextid++;
         pageIri = src.getPageIri();
         bounds = new Rectangular(src.getBounds());
         backgroundColor = (src.getBackgroundColor() == null) ? null : 
@@ -346,11 +342,6 @@ public class DefaultTreeContentRect<T extends GenericTreeNode<T>> extends Defaul
         return true;
     }
 
-    public static void resetId()
-    {
-        nextid = 1;
-    }
-    
     @Override
     public void childrenChanged()
     {

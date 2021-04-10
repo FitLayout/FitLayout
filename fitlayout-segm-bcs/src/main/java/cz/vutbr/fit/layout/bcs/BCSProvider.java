@@ -19,9 +19,9 @@ import cz.vutbr.fit.layout.bcs.impl.AreaProcessor2;
 import cz.vutbr.fit.layout.bcs.impl.ImageOutput;
 import cz.vutbr.fit.layout.bcs.impl.PageArea;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
-import cz.vutbr.fit.layout.impl.DefaultArea;
 import cz.vutbr.fit.layout.impl.DefaultAreaTree;
 import cz.vutbr.fit.layout.impl.ParameterFloat;
+import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
@@ -121,11 +121,7 @@ public class BCSProvider extends BaseArtifactService
         List<PageArea> groups = h.extractGroups(h.getAreas());
         List<PageArea> ungrouped = h.getUngrouped();
         List<PageArea> all = unifyAreas(groups, ungrouped);
-        
-        DefaultArea root = new DefaultArea(new Rectangular(0, 0, page.getWidth() - 1, page.getHeight() - 1));
-        root.setName("root");
-        appendGroups(root, all);
-        
+
         //create the resulting area "tree"
         DefaultAreaTree atree = new DefaultAreaTree(page.getIri());
         atree.setParentIri(page.getIri());
@@ -134,7 +130,14 @@ public class BCSProvider extends BaseArtifactService
         atree.setLabel(getId());
         atree.setCreator(getId());
         atree.setCreatorParams(getParamString());
+
+        //create an artificial root area
+        Area root = atree.createArea(new Rectangular(0, 0, page.getWidth() - 1, page.getHeight() - 1));
+        root.setName("root");
         atree.setRoot(root);
+        
+        //append the groups as the child nodes of the tree
+        appendGroups(atree, root, all);
         
         return atree;
     }
@@ -158,12 +161,12 @@ public class BCSProvider extends BaseArtifactService
     }
     
     
-    private void appendGroups(DefaultArea root, List<PageArea> groups)
+    private void appendGroups(AreaTree atree, Area root, List<PageArea> groups)
     {
         for (PageArea pa : groups)
         {
-            Rectangular pos = new Rectangular(pa.getLeft(), pa.getTop(), pa.getRight(), pa.getBottom());
-            DefaultArea child = new DefaultArea(pos); 
+            final Rectangular pos = new Rectangular(pa.getLeft(), pa.getTop(), pa.getRight(), pa.getBottom());
+            final Area child = atree.createArea(pos); 
             root.appendChild(child);
         }
     }

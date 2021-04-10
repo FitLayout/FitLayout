@@ -115,7 +115,7 @@ public class VipsProvider extends BaseArtifactService
         vips.startSegmentation(page);
         // build the tree
         VipsTreeBuilder builder = vips.getTreeBuilder();
-        Area root = builder.buildAreaTree(vips.getVisualStructure());
+        Area root = builder.buildAreaTree(atree, vips.getVisualStructure());
         atree.setRoot(root);
 
         return atree; 

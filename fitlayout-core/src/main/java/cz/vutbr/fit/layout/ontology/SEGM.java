@@ -44,6 +44,13 @@ public class SEGM {
 	public static final IRI belongsTo;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#belongsToChunkSet}.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#belongsToChunkSet">belongsToChunkSet</a>
+	 */
+	public static final IRI belongsToChunkSet;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#ChunkSet}.
 	 * <p>
 	 * A set of text chunks extreacted from a source page.
@@ -89,6 +96,20 @@ public class SEGM {
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasName">hasName</a>
 	 */
 	public static final IRI hasName;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasSourceArea}.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasSourceArea">hasSourceArea</a>
+	 */
+	public static final IRI hasSourceArea;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasSourceBox}.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasSourceBox">hasSourceBox</a>
+	 */
+	public static final IRI hasSourceBox;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasSourcePage}.
@@ -191,12 +212,15 @@ public class SEGM {
 		Area = factory.createIRI(SEGM.NAMESPACE, "Area");
 		AreaTree = factory.createIRI(SEGM.NAMESPACE, "AreaTree");
 		belongsTo = factory.createIRI(SEGM.NAMESPACE, "belongsTo");
+		belongsToChunkSet = factory.createIRI(SEGM.NAMESPACE, "belongsToChunkSet");
 		ChunkSet = factory.createIRI(SEGM.NAMESPACE, "ChunkSet");
 		containsArea = factory.createIRI(SEGM.NAMESPACE, "containsArea");
 		containsBox = factory.createIRI(SEGM.NAMESPACE, "containsBox");
 		hasAreaTree = factory.createIRI(SEGM.NAMESPACE, "hasAreaTree");
 		hasContentLength = factory.createIRI(SEGM.NAMESPACE, "hasContentLength");
 		hasName = factory.createIRI(SEGM.NAMESPACE, "hasName");
+		hasSourceArea = factory.createIRI(SEGM.NAMESPACE, "hasSourceArea");
+		hasSourceBox = factory.createIRI(SEGM.NAMESPACE, "hasSourceBox");
 		hasSourcePage = factory.createIRI(SEGM.NAMESPACE, "hasSourcePage");
 		hasTag = factory.createIRI(SEGM.NAMESPACE, "hasTag");
 		hasText = factory.createIRI(SEGM.NAMESPACE, "hasText");

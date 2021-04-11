@@ -321,9 +321,11 @@ public class RDFArtifactRepository implements ArtifactRepository
         addModelBuilder(BOX.Page, new BoxModelBuilder(iriFactory));
         addModelBuilder(SEGM.AreaTree, new AreaModelBuilder(iriFactory));
         addModelBuilder(SEGM.LogicalAreaTree, new LogicalAreaModelBuilder(iriFactory));
+        addModelBuilder(SEGM.ChunkSet, new ChunkSetModelBuilder(iriFactory));
         addModelLoader(BOX.Page, new BoxModelLoader(iriFactory));
         addModelLoader(SEGM.AreaTree, new AreaModelLoader(iriFactory));
-        addModelLoader(SEGM.LogicalAreaTree, new LogicalAreaModelLoader());
+        addModelLoader(SEGM.LogicalAreaTree, new LogicalAreaModelLoader(iriFactory));
+        addModelLoader(SEGM.ChunkSet, new ChunkSetModelLoader(iriFactory));
     }
     
     public void addModelBuilder(IRI artifactType, ModelBuilder builder)

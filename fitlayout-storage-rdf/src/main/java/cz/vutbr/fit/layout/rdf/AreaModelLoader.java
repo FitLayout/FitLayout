@@ -22,7 +22,6 @@ import org.eclipse.rdf4j.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Artifact;
@@ -354,29 +353,6 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                 + getDataPropertyUnion()
                 + "}";
         return artifactRepo.getStorage().executeSafeQuery(query);
-    }
-    
-    /**
-     * Finds the source page IRI in the page model
-     * @param model The page model
-     * @param areaTreeIri area tree IRI
-     * @return the source page IRI or {@code null} when not defined
-     */
-    private IRI getSourcePageIri(Model model, IRI areaTreeIri)
-    {
-        return getPredicateIriValue(model, areaTreeIri, SEGM.hasSourcePage);
-    }
-    
-    /**
-     * Loads the source page artifact of the area tree.
-     * @param pageIri the source page IRI
-     * @param repo the repository used for loading the page artifact.
-     * @return the page artifact or {@code null} when not specified or not found
-     */
-    private RDFPage getSourcePage(IRI pageIri, ArtifactRepository repo)
-    {
-        RDFPage page = (RDFPage) repo.getArtifact(pageIri);
-        return page;
     }
     
     private String getDataPropertyUnion()

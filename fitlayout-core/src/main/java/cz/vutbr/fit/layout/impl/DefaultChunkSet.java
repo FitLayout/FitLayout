@@ -12,9 +12,12 @@ import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
 
+import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTopology;
+import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.ChunkSet;
 import cz.vutbr.fit.layout.model.ContentRect;
+import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.TextChunk;
 import cz.vutbr.fit.layout.ontology.SEGM;
 
@@ -25,7 +28,9 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  */
 public class DefaultChunkSet extends BaseArtifact implements ChunkSet
 {
-    private IRI pageIri;
+    private int idcnt = 1;
+    
+    private IRI areaTreeIri;
     private Set<TextChunk> chunks;
     private AreaTopology topology;
     
@@ -33,14 +38,14 @@ public class DefaultChunkSet extends BaseArtifact implements ChunkSet
     public DefaultChunkSet(IRI parentIri)
     {
         super(parentIri);
-        setPageIri(parentIri);
+        setAreaTreeIri(parentIri);
         setTextChunks(new HashSet<>());
     }
 
     public DefaultChunkSet(IRI parentIri, Set<TextChunk> chunks)
     {
         super(parentIri);
-        setPageIri(parentIri);
+        setAreaTreeIri(parentIri);
         setTextChunks(chunks);
     }
 
@@ -50,14 +55,15 @@ public class DefaultChunkSet extends BaseArtifact implements ChunkSet
         return SEGM.ChunkSet;
     }
 
-    public IRI getPageIri()
+    @Override
+    public IRI getAreaTreeIri()
     {
-        return pageIri;
+        return areaTreeIri;
     }
 
-    public void setPageIri(IRI pageIri)
+    public void setAreaTreeIri(IRI pageIri)
     {
-        this.pageIri = pageIri;
+        this.areaTreeIri = pageIri;
     }
 
     @Override
@@ -98,4 +104,22 @@ public class DefaultChunkSet extends BaseArtifact implements ChunkSet
         return topology;
     }
     
+    protected int getNextAreaId()
+    {
+        return idcnt++;
+    }
+    
+    public void setNextAreaId(int nextId)
+    {
+        idcnt = nextId;
+    }
+
+    @Override
+    public TextChunk createTextChunk(Rectangular r, Area sourceArea, Box sourceBox)
+    {
+        final DefaultTextChunk chunk = new DefaultTextChunk(r, sourceArea, sourceBox);
+        chunk.setId(getNextAreaId());
+        return chunk;
+    }
+
 }

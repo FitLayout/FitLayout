@@ -37,9 +37,15 @@ public class DefaultTextChunk extends DefaultContentRect implements TextChunk
     private Map<Tag, Float> tags;
 
 
-    public DefaultTextChunk(int id, Rectangular r, Area sourceArea, Box sourceBox)
+    public DefaultTextChunk()
     {
-        super(id);
+        text = "";
+        name = "<chunk>";
+        setBounds(new Rectangular());
+    }
+    
+    public DefaultTextChunk(Rectangular r, Area sourceArea, Box sourceBox)
+    {
         text = "";
         name = "<chunk>";
         this.sourceArea = sourceArea;
@@ -89,12 +95,23 @@ public class DefaultTextChunk extends DefaultContentRect implements TextChunk
         return sourceArea;
     }
 
+    public void setSourceArea(Area sourceArea)
+    {
+        this.sourceArea = sourceArea;
+        copyStyle(sourceArea);
+    }
+
     @Override
     public Box getSourceBox()
     {
         return sourceBox;
     }
     
+    public void setSourceBox(Box sourceBox)
+    {
+        this.sourceBox = sourceBox;
+    }
+
     @Override
     public Color getEffectiveBackgroundColor()
     {

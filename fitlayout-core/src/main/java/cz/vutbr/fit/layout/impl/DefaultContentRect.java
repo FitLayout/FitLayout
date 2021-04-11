@@ -44,9 +44,8 @@ public class DefaultContentRect implements ContentRect
     private ContentLine line;
 
     
-    public DefaultContentRect(int id)
+    public DefaultContentRect()
     {
-        this.id = id;
         bounds = new Rectangular();
         textStyle = new TextStyle();
         topBorder = new Border();

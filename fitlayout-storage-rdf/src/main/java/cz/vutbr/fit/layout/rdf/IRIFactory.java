@@ -11,6 +11,7 @@ import org.eclipse.rdf4j.model.IRI;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Tag;
+import cz.vutbr.fit.layout.model.TextChunk;
 
 public interface IRIFactory
 {
@@ -112,6 +113,21 @@ public interface IRIFactory
      * @return
      */
     public IRI createTagURI(Tag tag);
+
+    /**
+     * Creates a text chunk IRI.
+     * @param chunkSetUri the IRI of the owning chunk set
+     * @param chunk the text chunk itself
+     * @return the created IRI
+     */
+    public IRI createTextChunkURI(IRI chunkSetUri, TextChunk chunk);
+    
+    /**
+     * Decodes a text chunk id from its IRI.
+     * @param textChunkIri
+     * @return
+     */
+    public int decodeTextChunkId(IRI textChunkIri);
 
     /**
      * Creates a sequence IRI from its name.

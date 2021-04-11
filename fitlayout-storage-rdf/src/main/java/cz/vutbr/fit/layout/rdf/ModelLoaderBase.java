@@ -12,10 +12,14 @@ import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.TextStyle;
 import cz.vutbr.fit.layout.ontology.BOX;
+import cz.vutbr.fit.layout.ontology.SEGM;
+import cz.vutbr.fit.layout.rdf.model.RDFAreaTree;
+import cz.vutbr.fit.layout.rdf.model.RDFPage;
 
 /**
  * ModelLoader.java
@@ -139,6 +143,52 @@ public abstract class ModelLoaderBase extends ModelTransformer
             return new Rectangular(x, y, x + width - 1, y + height - 1);
         else
             return null;
+    }
+    
+    /**
+     * Finds the source page IRI in the page model
+     * @param model The page model
+     * @param areaTreeIri area tree IRI
+     * @return the source page IRI or {@code null} when not defined
+     */
+    protected IRI getSourcePageIri(Model model, IRI areaTreeIri)
+    {
+        return getPredicateIriValue(model, areaTreeIri, SEGM.hasSourcePage);
+    }
+    
+    /**
+     * Loads the source page artifact of the area tree.
+     * @param pageIri the source page IRI
+     * @param repo the repository used for loading the page artifact.
+     * @return the page artifact or {@code null} when not specified or not found
+     */
+    protected RDFPage getSourcePage(IRI pageIri, ArtifactRepository repo)
+    {
+        RDFPage page = (RDFPage) repo.getArtifact(pageIri);
+        return page;
+    }
+    
+    /**
+     * Finds the source page IRI in the page model
+     * @param model The page model
+     * @param logicalTreeIri logical area tree IRI
+     * @return the source page IRI or {@code null} when not defined
+     */
+    protected IRI getSourceAreaTreeIri(Model model, IRI logicalTreeIri)
+    {
+        return getPredicateIriValue(model, logicalTreeIri, SEGM.hasAreaTree);
+    }
+    
+    /**
+     * Loads the source page artifact of the area tree.
+     * @param pageIri the source page IRI
+     * @param repo the repository used for loading the page artifact.
+     * @return the page artifact or {@code null} when not specified or not found
+     */
+    protected RDFAreaTree getSourceAreaTree(IRI areaTreeIri, ArtifactRepository repo)
+    {
+        RDFAreaTree atree = (RDFAreaTree) repo.getArtifact(areaTreeIri);
+        return atree;
     }
     
     protected static class RDFTextStyle

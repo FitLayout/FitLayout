@@ -16,7 +16,6 @@ import cz.vutbr.fit.layout.impl.DefaultBox;
 public class RDFBox extends DefaultBox implements RDFResource
 {
     protected IRI iri;
-    protected int documentOrder;
 
     public RDFBox(IRI uri)
     {

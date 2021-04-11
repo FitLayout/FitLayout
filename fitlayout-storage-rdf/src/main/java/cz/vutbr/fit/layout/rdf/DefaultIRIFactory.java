@@ -13,6 +13,7 @@ import org.unbescape.uri.UriEscape;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Tag;
+import cz.vutbr.fit.layout.model.TextChunk;
 
 /**
  * A default FitLayout IRI factory.
@@ -134,6 +135,19 @@ public class DefaultIRIFactory implements IRIFactory
         return tag.getType().replaceAll("\\.", "-") + "--" + tag.getValue();
     }
     
+    @Override
+    public IRI createTextChunkURI(IRI chunkSetUri, TextChunk chunk)
+    {
+        return factory.createIRI(chunkSetUri.toString() + "#c" + chunk.getId());
+    }
+    
+    @Override
+    public int decodeTextChunkId(IRI textChunkIri)
+    {
+        // the decoding mechanism is the same for boxes and areas
+        return decodeBoxId(textChunkIri);
+    }
+
     /**
      * Creates a sequence IRI from its name.
      * @param name the name of the sequence (alphabetical characters only)

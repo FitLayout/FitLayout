@@ -251,7 +251,8 @@ public class PresentationBasedChunksSource extends ChunksSource
         //determine the substring bounds
         Rectangular r = boxText.getSubstringBounds(occ.getPosition(), occ.getPosition() + occ.getLength());
         //create the chunk area
-        DefaultTextChunk newChunk = new DefaultTextChunk(idcnt++, r, a, boxText.getBoxForPosition(occ.getPosition()));
+        DefaultTextChunk newChunk = new DefaultTextChunk(r, a, boxText.getBoxForPosition(occ.getPosition()));
+        newChunk.setId(idcnt++);
         newChunk.setText(occ.getText());
         if (present)
         {

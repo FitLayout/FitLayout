@@ -134,7 +134,8 @@ public class TaggedChunksSource extends ChunksSource
     private TextChunk createSubstringChunk(Area a, Box box, TextTag tag, String occ, int pos)
     {
         Rectangular r = box.getSubstringBounds(pos, pos + occ.length());
-        DefaultTextChunk newChunk = new DefaultTextChunk(idcnt++, r, a, box);
+        DefaultTextChunk newChunk = new DefaultTextChunk(r, a, box);
+        newChunk.setId(idcnt++);
         newChunk.setText(occ);
         if (tag != null)
         {

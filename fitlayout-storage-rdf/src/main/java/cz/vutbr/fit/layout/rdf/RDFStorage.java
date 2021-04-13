@@ -226,6 +226,56 @@ public class RDFStorage implements Closeable
     }
     
     /**
+     * Adds a new quadruple to the storage.
+     * @param subj
+     * @param pred
+     * @param obj
+     * @param context
+     */
+    public void add(IRI subj, IRI pred, IRI obj, IRI context)
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.begin();
+            con.add(subj, pred, obj, context);
+            con.commit();
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    /**
+     * Adds a new data quadruple to the storage.
+     * @param subj
+     * @param pred
+     * @param value
+     * @param context
+     */
+    public void addValue(IRI subj, IRI pred, Object value, IRI context)
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            final ValueFactory vf = SimpleValueFactory.getInstance();
+            final Value val;
+            if (value instanceof Integer)
+                val = vf.createLiteral((int) value);
+            else if (value instanceof Long)
+                val = vf.createLiteral((long) value);
+            else if (value instanceof Float)
+                val = vf.createLiteral((float) value);
+            else if (value instanceof Double)
+                val = vf.createLiteral((double) value);
+            else if (value instanceof Boolean)
+                val = vf.createLiteral((boolean) value);
+            else
+                val = vf.createLiteral(value.toString());
+            con.begin();
+            con.add(subj, pred, val, context);
+            con.commit();
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    /**
      * Inserts a new graph to the database.
      * @param graph
      * @throws StorageException 

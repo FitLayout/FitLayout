@@ -55,6 +55,11 @@ public class RDFStorage implements Closeable
 	    this.repo = repo;
 	}
 	
+	public static RDFStorage create(Repository repo)
+	{
+	    return new RDFStorage(repo);
+	}
+	
 	public static RDFStorage createMemory(String dataDir)
 	{
         log.info("Using memory storage in {}", dataDir);

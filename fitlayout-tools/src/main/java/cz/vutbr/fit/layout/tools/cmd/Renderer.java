@@ -5,7 +5,6 @@
  */
 package cz.vutbr.fit.layout.tools.cmd;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -48,7 +47,7 @@ public class Renderer extends CliCommand implements Callable<Integer>
     protected Map<String, String> ropts;
 
     @Parameters(arity = "1", index = "0", description = "Input page URL")
-    protected URL url;
+    protected String url;
 
     @Override
     public Integer call() throws Exception
@@ -77,7 +76,7 @@ public class Renderer extends CliCommand implements Callable<Integer>
      * @param height
      * @return The created page.
      */
-    public Page render(URL url, Backend backend, int width, int height, Map<String, String> params)
+    public Page render(String url, Backend backend, int width, int height, Map<String, String> params)
     {
         String serviceId = "";
         switch (backend)
@@ -95,7 +94,7 @@ public class Renderer extends CliCommand implements Callable<Integer>
         if (op != null)
         {
             Map<String, Object> sparams = new HashMap<>();
-            sparams.put("url", url.toString());
+            sparams.put("url", url);
             sparams.put("width", width);
             sparams.put("height", height);
             if (params != null)

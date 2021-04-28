@@ -2,7 +2,6 @@ package cz.vutbr.fit.layout.rdf;
 
 import java.util.Base64;
 import java.util.Map;
-import java.util.UUID;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
@@ -33,6 +32,7 @@ import cz.vutbr.fit.layout.rdf.model.RDFContentImage;
 public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 {
 	private ValueFactory vf;
+	private int objIdCnt; // content object ID counter
 	
 	public BoxModelBuilder(IRIFactory iriFactory) 
 	{
@@ -50,7 +50,8 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 	{
         String baseUrl = page.getSourceURL().toString();
 	    
-	    Model graph = new LinkedHashModel(); // it holds whole model
+	    Model graph = new LinkedHashModel();
+	    objIdCnt = 1;
 		
 		// store basic page data
 		addArtifactData(graph, page);
@@ -130,9 +131,8 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		}
 		if (box.getBackgroundImagePng() != null)
 		{
-	        UUID uuid = UUID.randomUUID();
-	        IRI objuri = vf.createIRI("urn:uuid:" + uuid.toString());
-	        RDFContentImage image = new RDFContentImage(objuri);
+	        final IRI objuri = getIriFactory().createContentObjectURI(pageNode, objIdCnt++);
+	        final RDFContentImage image = new RDFContentImage(objuri);
 	        image.setPngData(box.getBackgroundImagePng());
 	        insertImage(graph, image, objuri);
 		    graph.add(individual, BOX.hasBackgroundImage, objuri);
@@ -145,10 +145,8 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		}
 		else if (box.getType() == Type.REPLACED_CONTENT)
 		{
-		    ContentObject obj = box.getContentObject();
-            //IRI objuri = null;//(new UUID()).evaluate(vf); //TODO
-		    UUID uuid = UUID.randomUUID(); //TODO check duplicates
-            IRI objuri = vf.createIRI("urn:uuid:" + uuid.toString());
+		    final ContentObject obj = box.getContentObject();
+            final IRI objuri = getIriFactory().createContentObjectURI(pageNode, objIdCnt++);
             if (obj instanceof ContentImage)
             {
                 insertImage(graph, (ContentImage) obj, objuri);

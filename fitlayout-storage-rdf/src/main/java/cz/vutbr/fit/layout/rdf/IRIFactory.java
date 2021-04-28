@@ -77,6 +77,14 @@ public interface IRIFactory
     public IRI createAttributeURI(IRI boxUri, String name);
 
     /**
+     * Create an IRI of a content object (including images)
+     * @param pageUri the source page IRI
+     * @param seq object sequence number within the page
+     * @return
+     */
+    public IRI createContentObjectURI(IRI pageUri, int seq);
+    
+    /**
      * Creates a visual area IRI.
      * @param areaTreeUri the uri of the owning area tree.
      * @param area the area to create the IRI for

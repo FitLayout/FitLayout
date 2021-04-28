@@ -100,6 +100,12 @@ public class DefaultIRIFactory implements IRIFactory
     }
     
     @Override
+    public IRI createContentObjectURI(IRI pageUri, int seq)
+    {
+        return factory.createIRI(pageUri.toString() + "#o" + seq);
+    }
+
+    @Override
     public IRI createAreaURI(IRI areaTreeNode, Area area) 
     {
         return factory.createIRI(areaTreeNode.toString() + "#a" + area.getId());

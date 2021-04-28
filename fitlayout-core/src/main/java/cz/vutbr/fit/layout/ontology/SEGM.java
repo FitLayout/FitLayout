@@ -5,6 +5,10 @@ import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 /**
+ * Document Visual Area Ontology.
+ * <p>
+ * Document visual area (segmentation) ontology..
+ * <p>
  * Namespace SEGM.
  * Prefix: {@code <http://fitlayout.github.io/ontology/segmentation.owl#>}
  */

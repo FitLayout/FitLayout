@@ -5,7 +5,9 @@ import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 /**
- * FITLayout system types and properties.
+ * FitLayout Core Ontology.
+ * <p>
+ * FITLayout shared types and properties..
  * <p>
  * Namespace FL.
  * Prefix: {@code <http://fitlayout.github.io/ontology/fitlayout.owl#>}
@@ -26,13 +28,6 @@ public class FL {
 	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact">Artifact</a>
 	 */
 	public static final IRI Artifact;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#containsPage}.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#containsPage">containsPage</a>
-	 */
-	public static final IRI containsPage;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#createdOn}.
@@ -70,25 +65,14 @@ public class FL {
 	 */
 	public static final IRI hasParentArtifact;
 
-	/**
-	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#PageSet}.
-	 * <p>
-	 * A set of pages processed together.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#PageSet">PageSet</a>
-	 */
-	public static final IRI PageSet;
-
 	static {
 		ValueFactory factory = SimpleValueFactory.getInstance();
 
 		Artifact = factory.createIRI(FL.NAMESPACE, "Artifact");
-		containsPage = factory.createIRI(FL.NAMESPACE, "containsPage");
 		createdOn = factory.createIRI(FL.NAMESPACE, "createdOn");
 		creator = factory.createIRI(FL.NAMESPACE, "creator");
 		creatorParams = factory.createIRI(FL.NAMESPACE, "creatorParams");
 		hasParentArtifact = factory.createIRI(FL.NAMESPACE, "hasParentArtifact");
-		PageSet = factory.createIRI(FL.NAMESPACE, "PageSet");
 	}
 
 	private FL() {

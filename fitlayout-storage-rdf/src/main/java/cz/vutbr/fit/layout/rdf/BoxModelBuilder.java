@@ -22,6 +22,7 @@ import cz.vutbr.fit.layout.model.ContentImage;
 import cz.vutbr.fit.layout.model.ContentObject;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.ontology.BOX;
+import cz.vutbr.fit.layout.rdf.model.RDFContentImage;
 
 /**
  * Implements an RDF graph construction from a page box model. 
@@ -129,7 +130,12 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		}
 		if (box.getBackgroundImagePng() != null)
 		{
-		    graph.add(individual, BOX.backgroundImageData, vf.createLiteral(Base64.getEncoder().encodeToString(box.getBackgroundImagePng())));
+	        UUID uuid = UUID.randomUUID();
+	        IRI objuri = vf.createIRI("urn:uuid:" + uuid.toString());
+	        RDFContentImage image = new RDFContentImage(objuri);
+	        image.setPngData(box.getBackgroundImagePng());
+	        insertImage(graph, image, objuri);
+		    graph.add(individual, BOX.hasBackgroundImage, objuri);
 		}
 
 		// add text content into element
@@ -145,14 +151,8 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
             IRI objuri = vf.createIRI("urn:uuid:" + uuid.toString());
             if (obj instanceof ContentImage)
             {
-                graph.add(objuri, RDF.TYPE, BOX.Image);
-                java.net.URL url = ((ContentImage) obj).getUrl();
-                if (url != null)
-                    graph.add(objuri, BOX.imageUrl, vf.createLiteral(url.toString()));
-                byte[] imageData = ((ContentImage) obj).getPngData();
-                if (imageData != null)
-                    graph.add(objuri, BOX.imageData, vf.createLiteral(Base64.getEncoder().encodeToString(imageData)));
-                graph.add(individual, BOX.containsImage, objuri);
+                insertImage(graph, (ContentImage) obj, objuri);
+                graph.add(individual, BOX.containsObject, objuri);
             }
             else
             {
@@ -191,6 +191,17 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
         }
 
 	}
+
+    private void insertImage(Model graph, ContentImage image, IRI imageIri)
+    {
+        graph.add(imageIri, RDF.TYPE, BOX.Image);
+        final java.net.URL url = image.getUrl();
+        if (url != null)
+            graph.add(imageIri, BOX.imageUrl, vf.createLiteral(url.toString()));
+        final byte[] imageData = image.getPngData();
+        if (imageData != null)
+            graph.add(imageIri, BOX.imageData, vf.createLiteral(Base64.getEncoder().encodeToString(imageData)));
+    }
 	
 	private IRI insertBorder(Border border, IRI boxUri, String side, Model graph)
 	{

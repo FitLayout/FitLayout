@@ -3,6 +3,7 @@ package cz.vutbr.fit.layout.rdf;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.QueryResults;
 import org.eclipse.rdf4j.query.Update;
+import org.eclipse.rdf4j.query.resultio.text.csv.SPARQLResultsCSVWriter;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryResult;
@@ -378,6 +380,15 @@ public class RDFStorage implements Closeable
     {
         try (RepositoryConnection con = repo.getConnection()) {
             con.add(new StringReader(query), "http://fitlayout.github.io/ontology/render.owl#", RDFFormat.RDFXML, context);
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    public void queryExportCSV(String queryString, OutputStream ostream) throws StorageException 
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.prepareTupleQuery(queryString).evaluate(new SPARQLResultsCSVWriter(ostream));
         } catch (RDF4JException e) {
             throw new StorageException(e);
         }

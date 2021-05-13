@@ -16,7 +16,6 @@ import cz.vutbr.fit.layout.impl.DefaultBox;
 public class RDFBox extends DefaultBox implements RDFResource
 {
     protected IRI iri;
-    protected int documentOrder;
 
     public RDFBox(IRI uri)
     {
@@ -33,7 +32,6 @@ public class RDFBox extends DefaultBox implements RDFResource
     public void setIri(IRI uri)
     {
         this.iri = uri;
-        setId(Integer.parseInt(uri.getLocalName()));
     }
 
 }

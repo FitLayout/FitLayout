@@ -119,7 +119,7 @@ public class SortByLinesOperator extends SortByPositionOperator
             //try to find some node at the right in the given distance
             for (int y = ny1; y <= ny2; y++)
             {
-                Area neigh = t.findAreaAt(nx2 + dist, y);
+                Area neigh = (Area) t.findAreaAt(nx2 + dist, y);
                 if (neigh != null && candidates.contains(neigh)) //something found
                 {
                     //the maximal Y difference to consider other areas to be on the same line
@@ -142,7 +142,7 @@ public class SortByLinesOperator extends SortByPositionOperator
             //try to find some node at the right in the given distance
             for (int y = ny1; y <= ny2; y++)
             {
-                Area neigh = t.findAreaAt(nx1 - dist, y);
+                Area neigh = (Area) t.findAreaAt(nx1 - dist, y);
                 if (neigh != null && candidates.contains(neigh)) //something found
                 {
                     //the maximal Y difference to consider other areas to be on the same line

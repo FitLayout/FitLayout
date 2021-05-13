@@ -67,4 +67,17 @@ public interface Page extends Artifact
      */
     public List<Box> getBoxesInRegion(Rectangular r);
     
+    /**
+     * Creates a new empty box wihtin this page.
+     * @return the new box
+     */
+    public Box createBox();
+    
+    /**
+     * Creates a new box within this page by copying an existing one.
+     * @param src the source box to copy
+     * @return the new box
+     */
+    public Box createBox(Box src);
+    
 }

@@ -25,6 +25,7 @@ import cz.vutbr.fit.layout.segm.BasicSegmProvider;
 import cz.vutbr.fit.layout.tools.cmd.Export;
 import cz.vutbr.fit.layout.tools.cmd.ListArtifacts;
 import cz.vutbr.fit.layout.tools.cmd.LoadArtifact;
+import cz.vutbr.fit.layout.tools.cmd.Query;
 import cz.vutbr.fit.layout.tools.cmd.Renderer;
 import cz.vutbr.fit.layout.tools.cmd.Segmentator;
 import cz.vutbr.fit.layout.tools.cmd.StoreArtifact;
@@ -44,7 +45,8 @@ import picocli.CommandLine.Command;
                    UseRepository.class,
                    ListArtifacts.class,
                    LoadArtifact.class,
-                   StoreArtifact.class},
+                   StoreArtifact.class,
+                   Query.class},
     footer = "Use COMMAND -h for getting usage information on the individual commands.")
 public class Cli
 {

@@ -28,6 +28,7 @@ import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.rdf.AreaModelBuilder;
 import cz.vutbr.fit.layout.rdf.BoxModelBuilder;
+import cz.vutbr.fit.layout.rdf.DefaultIRIFactory;
 import cz.vutbr.fit.layout.rdf.Serialization;
 import cz.vutbr.fit.layout.tools.CliCommand;
 import picocli.CommandLine.Command;
@@ -127,7 +128,7 @@ public class Export extends CliCommand implements Callable<Integer>
     
     public void outputRDF(Page page, OutputStream os, String mimeType) throws IOException
     {
-        BoxModelBuilder builder = new BoxModelBuilder();
+        BoxModelBuilder builder = new BoxModelBuilder(new DefaultIRIFactory());
         Model graph = builder.createGraph(page);
         Serialization.modelToStream(graph, os, mimeType);
         os.close();
@@ -192,7 +193,7 @@ public class Export extends CliCommand implements Callable<Integer>
     
     public void outputRDF(AreaTree atree, OutputStream os, String mimeType) throws IOException
     {
-        AreaModelBuilder builder = new AreaModelBuilder();
+        AreaModelBuilder builder = new AreaModelBuilder(new DefaultIRIFactory());
         Model graph = builder.createGraph(atree);
         Serialization.modelToStream(graph, os, mimeType);
         os.close();

@@ -165,7 +165,7 @@ public class FindLineOperator extends BaseOperator
                     //try to find some node at the right in the given distance
                     for (int y = ny1; neigh == null && y <= ny2; y++)
                     {
-                        neigh = t.findAreaAt(nx2 + dist, y);
+                        neigh = (Area) t.findAreaAt(nx2 + dist, y);
                         if (neigh != null) //something found
                         {
                             if (!useConsistentStyle || AreaStyle.hasSameStyle(node, neigh))
@@ -285,7 +285,7 @@ public class FindLineOperator extends BaseOperator
         int gw = t.getTopologyWidth();
         for (int x = gx; x < gx + gw; x++)
         {
-            Area cand = t.findAreaAt(x, y);
+            Area cand = (Area) t.findAreaAt(x, y);
             if (cand != null && cand != except)
                 return false; //something found - cannot expand
         }

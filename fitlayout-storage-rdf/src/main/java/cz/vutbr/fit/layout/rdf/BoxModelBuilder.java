@@ -2,7 +2,6 @@ package cz.vutbr.fit.layout.rdf;
 
 import java.util.Base64;
 import java.util.Map;
-import java.util.UUID;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
@@ -22,6 +21,7 @@ import cz.vutbr.fit.layout.model.ContentImage;
 import cz.vutbr.fit.layout.model.ContentObject;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.ontology.BOX;
+import cz.vutbr.fit.layout.rdf.model.RDFContentImage;
 
 /**
  * Implements an RDF graph construction from a page box model. 
@@ -32,9 +32,11 @@ import cz.vutbr.fit.layout.ontology.BOX;
 public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 {
 	private ValueFactory vf;
+	private int objIdCnt; // content object ID counter
 	
-	public BoxModelBuilder() 
+	public BoxModelBuilder(IRIFactory iriFactory) 
 	{
+        super(iriFactory);
         vf = SimpleValueFactory.getInstance();
 	}
 	
@@ -48,7 +50,8 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 	{
         String baseUrl = page.getSourceURL().toString();
 	    
-	    Model graph = new LinkedHashModel(); // it holds whole model
+	    Model graph = new LinkedHashModel();
+	    objIdCnt = 1;
 		
 		// store basic page data
 		addArtifactData(graph, page);
@@ -89,16 +92,17 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 	private void insertBox(Box box, IRI pageNode, Model graph) 
 	{
 		// add BOX individual into graph
-		final IRI individual = RESOURCE.createBoxURI(pageNode, box);
+		final IRI individual = getIriFactory().createBoxURI(pageNode, box);
 		graph.add(individual, RDF.TYPE, BOX.Box);
 		graph.add(individual, BOX.documentOrder, vf.createLiteral(box.getOrder()));
+        graph.add(individual, BOX.visible, vf.createLiteral(box.isVisible()));
 
 		// pin to page node
 		graph.add(individual, BOX.belongsTo, pageNode);
 		
 		//parent
 		if (box.getParent() != null)
-		    graph.add(individual, BOX.isChildOf, RESOURCE.createBoxURI(pageNode, box.getParent()));
+		    graph.add(individual, BOX.isChildOf, getIriFactory().createBoxURI(pageNode, box.getParent()));
 
 		//tag properties
 		if (box.getTagName() != null)
@@ -127,7 +131,11 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		}
 		if (box.getBackgroundImagePng() != null)
 		{
-		    graph.add(individual, BOX.backgroundImageData, vf.createLiteral(Base64.getEncoder().encodeToString(box.getBackgroundImagePng())));
+	        final IRI objuri = getIriFactory().createContentObjectURI(pageNode, objIdCnt++);
+	        final RDFContentImage image = new RDFContentImage(objuri);
+	        image.setPngData(box.getBackgroundImagePng());
+	        insertImage(graph, image, objuri);
+		    graph.add(individual, BOX.hasBackgroundImage, objuri);
 		}
 
 		// add text content into element
@@ -137,20 +145,12 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		}
 		else if (box.getType() == Type.REPLACED_CONTENT)
 		{
-		    ContentObject obj = box.getContentObject();
-            //IRI objuri = null;//(new UUID()).evaluate(vf); //TODO
-		    UUID uuid = UUID.randomUUID(); //TODO check duplicates
-            IRI objuri = vf.createIRI("urn:uuid:" + uuid.toString());
+		    final ContentObject obj = box.getContentObject();
+            final IRI objuri = getIriFactory().createContentObjectURI(pageNode, objIdCnt++);
             if (obj instanceof ContentImage)
             {
-                graph.add(objuri, RDF.TYPE, BOX.Image);
-                java.net.URL url = ((ContentImage) obj).getUrl();
-                if (url != null)
-                    graph.add(objuri, BOX.imageUrl, vf.createLiteral(url.toString()));
-                byte[] imageData = ((ContentImage) obj).getPngData();
-                if (imageData != null)
-                    graph.add(objuri, BOX.imageData, vf.createLiteral(Base64.getEncoder().encodeToString(imageData)));
-                graph.add(individual, BOX.containsImage, objuri);
+                insertImage(graph, (ContentImage) obj, objuri);
+                graph.add(individual, BOX.containsObject, objuri);
             }
             else
             {
@@ -189,10 +189,21 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
         }
 
 	}
+
+    private void insertImage(Model graph, ContentImage image, IRI imageIri)
+    {
+        graph.add(imageIri, RDF.TYPE, BOX.Image);
+        final java.net.URL url = image.getUrl();
+        if (url != null)
+            graph.add(imageIri, BOX.imageUrl, vf.createLiteral(url.toString()));
+        final byte[] imageData = image.getPngData();
+        if (imageData != null)
+            graph.add(imageIri, BOX.imageData, vf.createLiteral(Base64.getEncoder().encodeToString(imageData)));
+    }
 	
 	private IRI insertBorder(Border border, IRI boxUri, String side, Model graph)
 	{
-	    IRI uri = RESOURCE.createBorderURI(boxUri, side);
+	    IRI uri = getIriFactory().createBorderURI(boxUri, side);
 	    graph.add(uri, RDF.TYPE, BOX.Border);
 	    graph.add(uri, BOX.borderWidth, vf.createLiteral(border.getWidth()));
 	    graph.add(uri, BOX.borderStyle, vf.createLiteral(border.getStyle().toString()));
@@ -202,7 +213,7 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 	
 	private IRI insertAttribute(IRI boxUri, String name, String value, Model graph)
 	{
-	    IRI uri = RESOURCE.createAttributeURI(boxUri, name);
+	    IRI uri = getIriFactory().createAttributeURI(boxUri, name);
 	    graph.add(uri, RDFS.LABEL, vf.createLiteral(name));
 	    graph.add(uri, RDF.VALUE, vf.createLiteral(value));
 	    return uri;

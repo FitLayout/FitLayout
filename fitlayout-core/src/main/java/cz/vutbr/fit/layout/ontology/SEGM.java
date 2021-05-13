@@ -5,6 +5,10 @@ import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 /**
+ * Document Visual Area Ontology.
+ * <p>
+ * Document visual area (segmentation) ontology..
+ * <p>
  * Namespace SEGM.
  * Prefix: {@code <http://fitlayout.github.io/ontology/segmentation.owl#>}
  */
@@ -18,6 +22,9 @@ public class SEGM {
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#Area}.
+	 * <p>
+	 * A visual area within the page. The areas can be nested an together
+	 * they form an AreaTree.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#Area">Area</a>
 	 */
@@ -39,6 +46,22 @@ public class SEGM {
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#belongsTo">belongsTo</a>
 	 */
 	public static final IRI belongsTo;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#belongsToChunkSet}.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#belongsToChunkSet">belongsToChunkSet</a>
+	 */
+	public static final IRI belongsToChunkSet;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#ChunkSet}.
+	 * <p>
+	 * A set of text chunks extreacted from a source page.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#ChunkSet">ChunkSet</a>
+	 */
+	public static final IRI ChunkSet;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#containsArea}.
@@ -77,6 +100,20 @@ public class SEGM {
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasName">hasName</a>
 	 */
 	public static final IRI hasName;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasSourceArea}.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasSourceArea">hasSourceArea</a>
+	 */
+	public static final IRI hasSourceArea;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasSourceBox}.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasSourceBox">hasSourceBox</a>
+	 */
+	public static final IRI hasSourceBox;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasSourcePage}.
@@ -163,17 +200,31 @@ public class SEGM {
 	 */
 	public static final IRI tagSupport;
 
+	/**
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#TextChunk}.
+	 * <p>
+	 * A connected piece of a document text that forms a rectangular area in
+	 * the page.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#TextChunk">TextChunk</a>
+	 */
+	public static final IRI TextChunk;
+
 	static {
 		ValueFactory factory = SimpleValueFactory.getInstance();
 
 		Area = factory.createIRI(SEGM.NAMESPACE, "Area");
 		AreaTree = factory.createIRI(SEGM.NAMESPACE, "AreaTree");
 		belongsTo = factory.createIRI(SEGM.NAMESPACE, "belongsTo");
+		belongsToChunkSet = factory.createIRI(SEGM.NAMESPACE, "belongsToChunkSet");
+		ChunkSet = factory.createIRI(SEGM.NAMESPACE, "ChunkSet");
 		containsArea = factory.createIRI(SEGM.NAMESPACE, "containsArea");
 		containsBox = factory.createIRI(SEGM.NAMESPACE, "containsBox");
 		hasAreaTree = factory.createIRI(SEGM.NAMESPACE, "hasAreaTree");
 		hasContentLength = factory.createIRI(SEGM.NAMESPACE, "hasContentLength");
 		hasName = factory.createIRI(SEGM.NAMESPACE, "hasName");
+		hasSourceArea = factory.createIRI(SEGM.NAMESPACE, "hasSourceArea");
+		hasSourceBox = factory.createIRI(SEGM.NAMESPACE, "hasSourceBox");
 		hasSourcePage = factory.createIRI(SEGM.NAMESPACE, "hasSourcePage");
 		hasTag = factory.createIRI(SEGM.NAMESPACE, "hasTag");
 		hasText = factory.createIRI(SEGM.NAMESPACE, "hasText");
@@ -185,6 +236,7 @@ public class SEGM {
 		support = factory.createIRI(SEGM.NAMESPACE, "support");
 		Tag = factory.createIRI(SEGM.NAMESPACE, "Tag");
 		tagSupport = factory.createIRI(SEGM.NAMESPACE, "tagSupport");
+		TextChunk = factory.createIRI(SEGM.NAMESPACE, "TextChunk");
 	}
 
 	private SEGM() {

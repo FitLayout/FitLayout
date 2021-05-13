@@ -19,7 +19,6 @@ import org.eclipse.rdf4j.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.impl.DefaultLogicalAreaTree;
 import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.model.Area;
@@ -34,10 +33,15 @@ import cz.vutbr.fit.layout.rdf.model.RDFLogicalArea;
  * 
  * @author burgetr
  */
-public class LogicalAreaModelLoader implements ModelLoader
+public class LogicalAreaModelLoader extends ModelLoaderBase implements ModelLoader
 {
     private static Logger log = LoggerFactory.getLogger(LogicalAreaModelLoader.class);
     
+    public LogicalAreaModelLoader(IRIFactory iriFactory)
+    {
+        super(iriFactory);
+        // TODO Auto-generated constructor stub
+    }
     
     @Override
     public Artifact loadArtifact(IRI artifactIri, RDFArtifactRepository artifactRepo) throws RepositoryException
@@ -200,35 +204,6 @@ public class LogicalAreaModelLoader implements ModelLoader
                 + "?a segm:hasTag ?s . "
                 + "?a segm:belongsTo <" + areaTreeIri.stringValue() + "> }";
         return artifactRepo.getStorage().executeSafeQuery(query);
-    }
-
-    /**
-     * Finds the source page IRI in the page model
-     * @param model The page model
-     * @param logicalTreeIri logical area tree IRI
-     * @return the source page IRI or {@code null} when not defined
-     */
-    private IRI getSourceAreaTreeIri(Model model, IRI logicalTreeIri)
-    {
-        Iterable<Statement> typeStatements = model.getStatements(logicalTreeIri, SEGM.hasAreaTree, null);
-        for (Statement st : typeStatements)
-        {
-            if (st.getObject() instanceof IRI)
-                return (IRI) st.getObject();
-        }
-        return null;
-    }
-    
-    /**
-     * Loads the source page artifact of the area tree.
-     * @param pageIri the source page IRI
-     * @param repo the repository used for loading the page artifact.
-     * @return the page artifact or {@code null} when not specified or not found
-     */
-    private RDFAreaTree getSourceAreaTree(IRI areaTreeIri, ArtifactRepository repo)
-    {
-        RDFAreaTree atree = (RDFAreaTree) repo.getArtifact(areaTreeIri);
-        return atree;
     }
 
 }

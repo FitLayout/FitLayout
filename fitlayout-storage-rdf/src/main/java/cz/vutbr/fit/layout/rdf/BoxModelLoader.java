@@ -19,6 +19,7 @@ import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +55,9 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             "box:contentBounds"
     };
 
-    public BoxModelLoader()
+    public BoxModelLoader(IRIFactory iriFactory)
     {
+        super(iriFactory);
     }
 
     @Override
@@ -153,6 +155,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             IRI pageIri, IRI boxIri) throws RepositoryException
     {
         RDFBox box = new RDFBox(boxIri);
+        box.setId(getIriFactory().decodeBoxId(boxIri));
         box.setTagName("");
         box.setType(Box.Type.ELEMENT);
         box.setDisplayType(Box.DisplayType.BLOCK);
@@ -169,25 +172,23 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                 if (value instanceof Literal)
                     box.setOrder(((Literal) value).intValue());
             }
+            else if (BOX.visible.equals(pred)) 
+            {
+                if (value instanceof Literal)
+                    box.setVisible(((Literal) value).booleanValue());
+            }
             else if (BOX.backgroundColor.equals(pred)) 
             {
                 String bgColor = value.stringValue();
                 //bgColor = bgColor.substring(1,bgColor.length());
                 box.setBackgroundColor( Serialization.decodeHexColor( bgColor ) );
             }
-            else if (BOX.backgroundImagePosition.equals(pred)) 
+            else if (BOX.hasBackgroundImage.equals(pred)) 
             {
-            }
-            else if (BOX.backgroundImageUrl.equals(pred)) 
-            {
-            }
-            else if (BOX.backgroundImageData.equals(pred)) 
-            {
-                String dataStr = value.stringValue();
-                try {
-                    box.setBackgroundImagePng(Base64.getDecoder().decode(dataStr));
-                } catch (IllegalArgumentException e) {
-                    box.setBackgroundImagePng(null);
+                if (value instanceof IRI)
+                {
+                    final RDFContentImage image = loadImage(storage, (IRI) value);
+                    box.setBackgroundImagePng(image.getPngData());
                 }
             }
             else if (BOX.color.equals(pred)) 
@@ -263,41 +264,22 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                 box.setDisplayType(null); //text boxes have no display type
                 box.setOwnText(value.stringValue());
             }
-            else if (BOX.containsImage.equals(pred))
-            {
-                box.setType(Type.REPLACED_CONTENT);
-                if (value instanceof IRI)
-                {
-                    RDFContentImage obj = new RDFContentImage((IRI) value);
-                    Value urlVal = storage.getPropertyValue((IRI) value, BOX.imageUrl);
-                    if (urlVal != null && urlVal instanceof Literal)
-                    {
-                        try {
-                            obj.setUrl(((Literal) urlVal).stringValue());
-                        } catch (MalformedURLException e) {
-                            log.error(e.getMessage());
-                        }
-                    }
-                    Value dataVal = storage.getPropertyValue((IRI) value, BOX.imageData);
-                    if (dataVal != null && dataVal instanceof Literal)
-                    {
-                        final String dataStr = dataVal.stringValue();
-                        try {
-                            obj.setPngData(Base64.getDecoder().decode(dataStr));
-                        } catch (IllegalArgumentException e) {
-                            obj.setPngData(null);
-                        }
-                    }
-                    box.setContentObject(obj);
-                }
-            }
             else if (BOX.containsObject.equals(pred))
             {
                 box.setType(Type.REPLACED_CONTENT);
                 if (value instanceof IRI)
                 {
-                    RDFContentObject obj = new RDFContentObject((IRI) value);
-                    box.setContentObject(obj);
+                    final Value valueType = storage.getPropertyValue((IRI) value, RDF.TYPE);
+                    if (BOX.Image.equals(valueType)) // treat images in a special way
+                    {
+                        final RDFContentImage obj = loadImage(storage, (IRI) value);
+                        box.setContentObject(obj);
+                    }
+                    else // other objects than images
+                    {
+                        final RDFContentObject obj = new RDFContentObject((IRI) value);
+                        box.setContentObject(obj);
+                    }
                 }
             }
             else if (BOX.bounds.equals(pred))
@@ -351,6 +333,37 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
         box.setTextStyle(style.toTextStyle());
         
         return box;
+    }
+
+    /**
+     * Loads an Image object from the storage.
+     * @param storage
+     * @param imageIri
+     * @return
+     */
+    private RDFContentImage loadImage(RDFStorage storage, final IRI imageIri)
+    {
+        RDFContentImage obj = new RDFContentImage(imageIri);
+        Value urlVal = storage.getPropertyValue(imageIri, BOX.imageUrl);
+        if (urlVal != null && urlVal instanceof Literal)
+        {
+            try {
+                obj.setUrl(((Literal) urlVal).stringValue());
+            } catch (MalformedURLException e) {
+                log.error(e.getMessage());
+            }
+        }
+        Value dataVal = storage.getPropertyValue(imageIri, BOX.imageData);
+        if (dataVal != null && dataVal instanceof Literal)
+        {
+            final String dataStr = dataVal.stringValue();
+            try {
+                obj.setPngData(Base64.getDecoder().decode(dataStr));
+            } catch (IllegalArgumentException e) {
+                obj.setPngData(null);
+            }
+        }
+        return obj;
     }
 
     /**

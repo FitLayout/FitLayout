@@ -5,6 +5,10 @@ import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 /**
+ * Box Model Ontology.
+ * <p>
+ * FitLayout rendered document (box model) description ontology..
+ * <p>
  * Namespace BOX.
  * Prefix: {@code <http://fitlayout.github.io/ontology/render.owl#>}
  */
@@ -17,32 +21,20 @@ public class BOX {
 	public static final String PREFIX = "box";
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#Attribute}.
+	 * <p>
+	 * An HTML attribute assigned to a box.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#Attribute">Attribute</a>
+	 */
+	public static final IRI Attribute;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#backgroundColor}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#backgroundColor">backgroundColor</a>
 	 */
 	public static final IRI backgroundColor;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#backgroundImageData}.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#backgroundImageData">backgroundImageData</a>
-	 */
-	public static final IRI backgroundImageData;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#backgroundImagePosition}.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#backgroundImagePosition">backgroundImagePosition</a>
-	 */
-	public static final IRI backgroundImagePosition;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#backgroundImageUrl}.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#backgroundImageUrl">backgroundImageUrl</a>
-	 */
-	public static final IRI backgroundImageUrl;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#belongsTo}.
@@ -119,13 +111,6 @@ public class BOX {
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#ContainerBox">ContainerBox</a>
 	 */
 	public static final IRI ContainerBox;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#containsImage}.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#containsImage">containsImage</a>
-	 */
-	public static final IRI containsImage;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#containsObject}.
@@ -219,6 +204,13 @@ public class BOX {
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#hasAttribute">hasAttribute</a>
 	 */
 	public static final IRI hasAttribute;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#hasBackgroundImage}.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#hasBackgroundImage">hasBackgroundImage</a>
+	 */
+	public static final IRI hasBackgroundImage;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#hasBottomBorder}.
@@ -316,13 +308,6 @@ public class BOX {
 	public static final IRI lineThrough;
 
 	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#objectInformation}.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#objectInformation">objectInformation</a>
-	 */
-	public static final IRI objectInformation;
-
-	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#Page}.
 	 * <p>
 	 * A tree of boxes representing a rendered page.
@@ -375,11 +360,30 @@ public class BOX {
 	public static final IRI sourceUrl;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#sourceXPath}.
+	 * <p>
+	 * An XPath expression identifying the source element of the box in the
+	 * source document.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#sourceXPath">sourceXPath</a>
+	 */
+	public static final IRI sourceXPath;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#underline}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#underline">underline</a>
 	 */
 	public static final IRI underline;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#visible}.
+	 * <p>
+	 * Defines the box visibility
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#visible">visible</a>
+	 */
+	public static final IRI visible;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#visualBounds}.
@@ -404,10 +408,8 @@ public class BOX {
 	static {
 		ValueFactory factory = SimpleValueFactory.getInstance();
 
+		Attribute = factory.createIRI(BOX.NAMESPACE, "Attribute");
 		backgroundColor = factory.createIRI(BOX.NAMESPACE, "backgroundColor");
-		backgroundImageData = factory.createIRI(BOX.NAMESPACE, "backgroundImageData");
-		backgroundImagePosition = factory.createIRI(BOX.NAMESPACE, "backgroundImagePosition");
-		backgroundImageUrl = factory.createIRI(BOX.NAMESPACE, "backgroundImageUrl");
 		belongsTo = factory.createIRI(BOX.NAMESPACE, "belongsTo");
 		Border = factory.createIRI(BOX.NAMESPACE, "Border");
 		borderColor = factory.createIRI(BOX.NAMESPACE, "borderColor");
@@ -418,7 +420,6 @@ public class BOX {
 		Box = factory.createIRI(BOX.NAMESPACE, "Box");
 		color = factory.createIRI(BOX.NAMESPACE, "color");
 		ContainerBox = factory.createIRI(BOX.NAMESPACE, "ContainerBox");
-		containsImage = factory.createIRI(BOX.NAMESPACE, "containsImage");
 		containsObject = factory.createIRI(BOX.NAMESPACE, "containsObject");
 		contentBounds = factory.createIRI(BOX.NAMESPACE, "contentBounds");
 		ContentBox = factory.createIRI(BOX.NAMESPACE, "ContentBox");
@@ -431,6 +432,7 @@ public class BOX {
 		fontVariant = factory.createIRI(BOX.NAMESPACE, "fontVariant");
 		fontWeight = factory.createIRI(BOX.NAMESPACE, "fontWeight");
 		hasAttribute = factory.createIRI(BOX.NAMESPACE, "hasAttribute");
+		hasBackgroundImage = factory.createIRI(BOX.NAMESPACE, "hasBackgroundImage");
 		hasBottomBorder = factory.createIRI(BOX.NAMESPACE, "hasBottomBorder");
 		hasLeftBorder = factory.createIRI(BOX.NAMESPACE, "hasLeftBorder");
 		hasRightBorder = factory.createIRI(BOX.NAMESPACE, "hasRightBorder");
@@ -444,14 +446,15 @@ public class BOX {
 		imageUrl = factory.createIRI(BOX.NAMESPACE, "imageUrl");
 		isChildOf = factory.createIRI(BOX.NAMESPACE, "isChildOf");
 		lineThrough = factory.createIRI(BOX.NAMESPACE, "lineThrough");
-		objectInformation = factory.createIRI(BOX.NAMESPACE, "objectInformation");
 		Page = factory.createIRI(BOX.NAMESPACE, "Page");
 		pngImage = factory.createIRI(BOX.NAMESPACE, "pngImage");
 		positionX = factory.createIRI(BOX.NAMESPACE, "positionX");
 		positionY = factory.createIRI(BOX.NAMESPACE, "positionY");
 		RectArea = factory.createIRI(BOX.NAMESPACE, "RectArea");
 		sourceUrl = factory.createIRI(BOX.NAMESPACE, "sourceUrl");
+		sourceXPath = factory.createIRI(BOX.NAMESPACE, "sourceXPath");
 		underline = factory.createIRI(BOX.NAMESPACE, "underline");
+		visible = factory.createIRI(BOX.NAMESPACE, "visible");
 		visualBounds = factory.createIRI(BOX.NAMESPACE, "visualBounds");
 		width = factory.createIRI(BOX.NAMESPACE, "width");
 	}

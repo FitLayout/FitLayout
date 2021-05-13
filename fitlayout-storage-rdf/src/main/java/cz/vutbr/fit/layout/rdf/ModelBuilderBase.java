@@ -22,8 +22,13 @@ import cz.vutbr.fit.layout.ontology.FL;
  * 
  * @author burgetr
  */
-public class ModelBuilderBase
+public class ModelBuilderBase extends ModelTransformer
 {
+    
+    public ModelBuilderBase(IRIFactory iriFactory)
+    {
+        super(iriFactory);
+    }
 
     /**
      * Stores the common information about an artifact to a model.
@@ -53,7 +58,7 @@ public class ModelBuilderBase
     {
         final ValueFactory vf = SimpleValueFactory.getInstance();
         
-        final IRI iri = RESOURCE.createBoundsURI(boxIri, type);
+        final IRI iri = getIriFactory().createBoundsURI(boxIri, type);
         graph.add(boxIri, property, iri);
         graph.add(iri, BOX.positionX, vf.createLiteral(bounds.getX1()));
         graph.add(iri, BOX.positionY, vf.createLiteral(bounds.getY1()));

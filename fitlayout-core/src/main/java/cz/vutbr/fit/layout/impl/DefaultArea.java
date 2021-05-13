@@ -20,7 +20,6 @@ import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
-import cz.vutbr.fit.layout.model.ContentLine;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.Box.Type;
@@ -30,7 +29,7 @@ import cz.vutbr.fit.layout.model.Box.Type;
  * 
  * @author burgetr
  */
-public class DefaultArea extends DefaultContentRect<Area> implements Area
+public class DefaultArea extends DefaultTreeContentRect<Area> implements Area
 {
     /** Area name to be displayed to the users */
     private String name;
@@ -41,9 +40,6 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
     /** The topology assigned to the area */
     private AreaTopology topology;
     
-    /** The content line the area belongs to */
-    private ContentLine line;
-
     /** The visual boxes that form this area. */
     private List<Box> boxes;
     
@@ -90,11 +86,6 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
         vsep = src.isVerticalSeparator();
         hsep = src.isHorizontalSeparator();
         level = src.getLevel();
-    }
-    
-    public DefaultArea(int x1, int y1, int x2, int y2)
-    {
-        this(new Rectangular(x1, y1, x2, y2));
     }
     
     public DefaultArea(Box box)
@@ -178,18 +169,6 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
     public void setLevel(int level)
     {
         this.level = level;
-    }
-
-    @Override
-    public ContentLine getLine()
-    {
-        return line;
-    }
-
-    @Override
-    public void setLine(ContentLine line)
-    {
-        this.line = line;
     }
 
     @Override
@@ -397,7 +376,7 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
     @Override
     public void addTag(Tag tag, float support)
     {
-        Float oldsupport = tags.get(tag);
+        final Float oldsupport = tags.get(tag);
         if (oldsupport == null || oldsupport < support)
             tags.put(tag, support);
     }
@@ -548,7 +527,7 @@ public class DefaultArea extends DefaultContentRect<Area> implements Area
             Rectangular abspos = getTopology().toPixelPosition(gp);
             abspos.move(getX1(), getY1());
             //create the new area
-            DefaultArea area = new DefaultArea(abspos);
+            Area area = getAreaTree().createArea(abspos);
             area.setName(name);
             int index = getIndex(selected.get(0));
             insertChild(area, index);

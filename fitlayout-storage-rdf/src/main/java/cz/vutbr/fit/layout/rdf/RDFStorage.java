@@ -3,6 +3,7 @@ package cz.vutbr.fit.layout.rdf;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.QueryResults;
 import org.eclipse.rdf4j.query.Update;
+import org.eclipse.rdf4j.query.resultio.text.csv.SPARQLResultsCSVWriter;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryResult;
@@ -53,6 +55,11 @@ public class RDFStorage implements Closeable
 	protected RDFStorage(Repository repo)
 	{
 	    this.repo = repo;
+	}
+	
+	public static RDFStorage create(Repository repo)
+	{
+	    return new RDFStorage(repo);
 	}
 	
 	public static RDFStorage createMemory(String dataDir)
@@ -226,6 +233,56 @@ public class RDFStorage implements Closeable
     }
     
     /**
+     * Adds a new quadruple to the storage.
+     * @param subj
+     * @param pred
+     * @param obj
+     * @param context
+     */
+    public void add(IRI subj, IRI pred, IRI obj, IRI context)
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.begin();
+            con.add(subj, pred, obj, context);
+            con.commit();
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    /**
+     * Adds a new data quadruple to the storage.
+     * @param subj
+     * @param pred
+     * @param value
+     * @param context
+     */
+    public void addValue(IRI subj, IRI pred, Object value, IRI context)
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            final ValueFactory vf = SimpleValueFactory.getInstance();
+            final Value val;
+            if (value instanceof Integer)
+                val = vf.createLiteral((int) value);
+            else if (value instanceof Long)
+                val = vf.createLiteral((long) value);
+            else if (value instanceof Float)
+                val = vf.createLiteral((float) value);
+            else if (value instanceof Double)
+                val = vf.createLiteral((double) value);
+            else if (value instanceof Boolean)
+                val = vf.createLiteral((boolean) value);
+            else
+                val = vf.createLiteral(value.toString());
+            con.begin();
+            con.add(subj, pred, val, context);
+            con.commit();
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    /**
      * Inserts a new graph to the database.
      * @param graph
      * @throws StorageException 
@@ -328,20 +385,28 @@ public class RDFStorage implements Closeable
         }
     }
     
+    public void queryExportCSV(String queryString, OutputStream ostream) throws StorageException 
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.prepareTupleQuery(queryString).evaluate(new SPARQLResultsCSVWriter(ostream));
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+    
     //= Sequences ==================================================================
     
     /**
      * Obtains the last assigned value of a sequence with the given name.
-     * @param name the sequence name
+     * @param sequenceIri the sequence IRI
      * @return the last assigned value or 0 when the sequence does not exist.
      * @throws StorageException 
      */
-    public long getLastSequenceValue(String name) throws StorageException
+    public long getLastSequenceValue(IRI sequenceIri) throws StorageException
     {
         long ret = 0;
         try (RepositoryConnection con = repo.getConnection()) {
-            IRI sequence = RESOURCE.createSequenceURI(name);
-            RepositoryResult<Statement> result = con.getStatements(sequence, RDF.VALUE, null, false);
+            RepositoryResult<Statement> result = con.getStatements(sequenceIri, RDF.VALUE, null, false);
             try {
                 if (result.hasNext())
                 {
@@ -360,13 +425,12 @@ public class RDFStorage implements Closeable
         return ret;
     }
     
-    public long getNextSequenceValue(String name) throws StorageException
+    public long getNextSequenceValue(IRI sequenceIri) throws StorageException
     {
         try (RepositoryConnection con = repo.getConnection()) {
             con.begin(IsolationLevels.SERIALIZABLE); //TODO is this supported everywhere?
-            IRI sequence = RESOURCE.createSequenceURI(name);
             long val = 0;
-            RepositoryResult<Statement> result = con.getStatements(sequence, RDF.VALUE, null, false);
+            RepositoryResult<Statement> result = con.getStatements(sequenceIri, RDF.VALUE, null, false);
             try {
                 if (result.hasNext())
                 {
@@ -382,7 +446,7 @@ public class RDFStorage implements Closeable
             }
             val++;
             ValueFactory vf = SimpleValueFactory.getInstance();
-            con.add(sequence, RDF.VALUE, vf.createLiteral(val));
+            con.add(sequenceIri, RDF.VALUE, vf.createLiteral(val));
             con.commit();
             return val;
         }

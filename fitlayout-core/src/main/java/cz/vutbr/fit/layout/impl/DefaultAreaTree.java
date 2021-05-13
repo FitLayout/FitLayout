@@ -23,6 +23,8 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  */
 public class DefaultAreaTree extends BaseArtifact implements AreaTree
 {
+    private int areaIdCnt = 1;
+
     private IRI pageIri;
     private Area root;
 
@@ -170,6 +172,7 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
     public Area createArea(Rectangular r)
     {
         DefaultArea ret = new DefaultArea(r);
+        ret.setId(getNextAreaId());
         ret.setAreaTree(this);
         ret.setPageIri(pageIri);
         return ret;
@@ -179,6 +182,7 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
     public Area createArea(Box box)
     {
         DefaultArea ret = new DefaultArea(box);
+        ret.setId(getNextAreaId());
         ret.setAreaTree(this);
         ret.setPageIri(pageIri);
         return ret;
@@ -188,6 +192,7 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
     public Area createArea(Area other)
     {
         DefaultArea ret = new DefaultArea(other);
+        ret.setId(getNextAreaId());
         ret.setAreaTree(this);
         ret.setPageIri(pageIri);
         return ret;
@@ -197,9 +202,20 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
     public Area createArea(List<Box> boxes)
     {
         DefaultArea ret = new DefaultArea(boxes);
+        ret.setId(getNextAreaId());
         ret.setAreaTree(this);
         ret.setPageIri(pageIri);
         return ret;
+    }
+    
+    protected int getNextAreaId()
+    {
+        return areaIdCnt++;
+    }
+    
+    public void setNextAreaId(int nextId)
+    {
+        areaIdCnt = nextId;
     }
     
 }

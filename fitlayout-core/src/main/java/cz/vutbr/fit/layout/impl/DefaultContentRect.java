@@ -9,24 +9,21 @@ import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Color;
+import cz.vutbr.fit.layout.model.ContentLine;
 import cz.vutbr.fit.layout.model.ContentRect;
-import cz.vutbr.fit.layout.model.GenericTreeNode;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.TextStyle;
 import cz.vutbr.fit.layout.model.Border.Side;
 import cz.vutbr.fit.layout.model.Border.Style;
 
 /**
- * A default ContentRect implementation. This class is usually not used
- * directly; the {@link DefaultBox} and {@link DefaultArea} subclasses
- * should be used instead. 
+ * A default ContentRect implementation which is not used in a tree. See {@link DefaultTreeContentRect} for the
+ * tree node version.
  * 
  * @author burgetr
  */
-public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTreeNode<T> implements ContentRect
+public class DefaultContentRect implements ContentRect
 {
-    private static int nextid = 1;
-    
     private int id;
     private IRI pageIri;
     private Rectangular bounds;
@@ -42,12 +39,13 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
     private Border bottomBorder;
     private Border leftBorder;
     private Border rightBorder;
+    
+    /** The content line the area belongs to */
+    private ContentLine line;
 
     
-    public DefaultContentRect(Class<T> myType)
+    public DefaultContentRect()
     {
-        super(myType);
-        id = nextid++;
         bounds = new Rectangular();
         textStyle = new TextStyle();
         topBorder = new Border();
@@ -56,10 +54,8 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
         rightBorder = new Border();
     }
     
-    public DefaultContentRect(Class<T> myType, ContentRect src)
+    public DefaultContentRect(ContentRect src)
     {
-        super(myType);
-        id = nextid++;
         pageIri = src.getPageIri();
         bounds = new Rectangular(src.getBounds());
         backgroundColor = (src.getBackgroundColor() == null) ? null : 
@@ -157,6 +153,18 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
     public void setTextStyle(TextStyle textStyle)
     {
         this.textStyle = textStyle;
+    }
+
+    @Override
+    public ContentLine getLine()
+    {
+        return line;
+    }
+
+    @Override
+    public void setLine(ContentLine line)
+    {
+        this.line = line;
     }
 
     @Override
@@ -306,11 +314,6 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
     public void move(int xofs, int yofs)
     {
         getBounds().move(xofs, yofs);
-        for (T child : getChildren())
-        {
-            if (child instanceof ContentRect) 
-                ((ContentRect) child).move(xofs, yofs);
-        }
     }
 
     @Override
@@ -325,25 +328,9 @@ public class DefaultContentRect<T extends GenericTreeNode<T>> extends DefaultTre
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
-        @SuppressWarnings("unchecked")
-        DefaultContentRect<T> other = (DefaultContentRect<T>) obj;
+        DefaultContentRect other = (DefaultContentRect) obj;
         if (id != other.id) return false;
         return true;
-    }
-
-    public static void resetId()
-    {
-        nextid = 1;
-    }
-    
-    @Override
-    public void childrenChanged()
-    {
-        // force recomputing the text style
-        textStyleComputed = false; 
-        // propagate the change to parents
-        if (getParent() != null)
-            getParent().childrenChanged();
     }
 
 }

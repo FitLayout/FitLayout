@@ -23,6 +23,8 @@ import cz.vutbr.fit.layout.ontology.BOX;
  */
 public class DefaultPage extends BaseArtifact implements Page
 {
+    private int boxIdCnt = 1;
+    
     protected URL url;
     protected String title;
     protected Box root;
@@ -168,6 +170,27 @@ public class DefaultPage extends BaseArtifact implements Page
         ret += " [" + getIri() + "]";
         
         return ret;
+    }
+
+    @Override
+    public Box createBox()
+    {
+        final DefaultBox ret = new DefaultBox();
+        ret.setId(getNextBoxId());
+        return ret;
+    }
+
+    @Override
+    public Box createBox(Box src)
+    {
+        final DefaultBox ret = new DefaultBox(src);
+        ret.setId(getNextBoxId());
+        return ret;
+    }
+    
+    protected int getNextBoxId()
+    {
+        return boxIdCnt++;
     }
     
 }

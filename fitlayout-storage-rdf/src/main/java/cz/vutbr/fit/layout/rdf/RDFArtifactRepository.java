@@ -44,6 +44,7 @@ public class RDFArtifactRepository implements ArtifactRepository
     private static String[] owls = new String[] {"render.owl", "segmentation.owl", "fitlayout.owl", "mapping.owl"};
     
     private RDFStorage storage;
+    private IRIFactory iriFactory;
     private RDFIRIDecoder iriDecoder;
     private Map<IRI, ModelBuilder> modelBuilders;
     private Map<IRI, ModelLoader> modelLoaders;
@@ -52,9 +53,8 @@ public class RDFArtifactRepository implements ArtifactRepository
     public RDFArtifactRepository(RDFStorage storage)
     {
         this.storage = storage;
+        iriFactory = new DefaultIRIFactory();
         iriDecoder = new RDFIRIDecoder();
-        modelBuilders = new HashMap<>();
-        modelLoaders = new HashMap<>();
         initDefaultModelBuilders();
         init();
     }
@@ -91,6 +91,24 @@ public class RDFArtifactRepository implements ArtifactRepository
         return iriDecoder;
     }
 
+    /**
+     * Gets the IRI factory used for creating the IRIs when building a RDF graph.
+     * @param iriFactory
+     */
+    public IRIFactory getIriFactory()
+    {
+        return iriFactory;
+    }
+
+    /**
+     * Configures the IRI factory used for creating the IRIs when building a RDF graph.
+     * @param iriFactory
+     */
+    public void setIriFactory(IRIFactory iriFactory)
+    {
+        this.iriFactory = iriFactory;
+    }
+    
     //Init and health check ==========================================================
     
     /**
@@ -242,8 +260,8 @@ public class RDFArtifactRepository implements ArtifactRepository
     @Override
     public IRI createArtifactIri(Artifact artifact)
     {
-        long seq = storage.getNextSequenceValue("page");
-        IRI pageUri = RESOURCE.createArtifactIri(seq);
+        long seq = storage.getNextSequenceValue(iriFactory.createSequenceURI("page"));
+        IRI pageUri = iriFactory.createArtifactIri(seq);
         return pageUri;
     }
     
@@ -298,12 +316,16 @@ public class RDFArtifactRepository implements ArtifactRepository
 
     protected void initDefaultModelBuilders()
     {
-        addModelBuilder(BOX.Page, new BoxModelBuilder());
-        addModelBuilder(SEGM.AreaTree, new AreaModelBuilder());
-        addModelBuilder(SEGM.LogicalAreaTree, new LogicalAreaModelBuilder());
-        addModelLoader(BOX.Page, new BoxModelLoader());
-        addModelLoader(SEGM.AreaTree, new AreaModelLoader());
-        addModelLoader(SEGM.LogicalAreaTree, new LogicalAreaModelLoader());
+        modelBuilders = new HashMap<>();
+        modelLoaders = new HashMap<>();
+        addModelBuilder(BOX.Page, new BoxModelBuilder(iriFactory));
+        addModelBuilder(SEGM.AreaTree, new AreaModelBuilder(iriFactory));
+        addModelBuilder(SEGM.LogicalAreaTree, new LogicalAreaModelBuilder(iriFactory));
+        addModelBuilder(SEGM.ChunkSet, new ChunkSetModelBuilder(iriFactory));
+        addModelLoader(BOX.Page, new BoxModelLoader(iriFactory));
+        addModelLoader(SEGM.AreaTree, new AreaModelLoader(iriFactory));
+        addModelLoader(SEGM.LogicalAreaTree, new LogicalAreaModelLoader(iriFactory));
+        addModelLoader(SEGM.ChunkSet, new ChunkSetModelLoader(iriFactory));
     }
     
     public void addModelBuilder(IRI artifactType, ModelBuilder builder)

@@ -24,7 +24,7 @@ public interface AreaTopology
      * Gets the list of areas that are being managed by this topology.
      * @return the list of areas
      */
-    public List<Area> getAreas();
+    public List<ContentRect> getAreas();
     
     /**
      * Obtains the total width of the topology used for placing the child
@@ -51,21 +51,21 @@ public interface AreaTopology
      * @param area The area whose position we want to obtain.
      * @return The area position in this topology or {@code null} when the area position is not described by this topology.
      */
-    public Rectangular getPosition(Area area);
+    public Rectangular getPosition(ContentRect area);
     
     /**
      * Obtains a map assigning a position to each area. Note that the efficiency of this method greatly depends
      * on the topology implementation.
      * @return A map assigning a position to the individual areas. The key set contains all the areas in the topology.
      */
-    public Map<Area, Rectangular> getPositionMap();
+    public Map<ContentRect, Rectangular> getPositionMap();
     
     /**
      * Sets the position of the given area in this topology.
      * @param area The area whose position we want to set.
      * @param gp The new position.
      */
-    public void setPosition(Area area, Rectangular gp);
+    public void setPosition(ContentRect area, Rectangular gp);
     
     /**
      * Finds an area at the specified position in the grid. If there are multiple areas sharing
@@ -75,7 +75,7 @@ public interface AreaTopology
      * @param y the y coordinate of the grid cell  
      * @return the area at the specified position or {@code null} when there is no such area
      */
-    public Area findAreaAt(int x, int y);
+    public ContentRect findAreaAt(int x, int y);
     
     /**
      * Finds all the areas at the specified position in the grid.
@@ -83,14 +83,14 @@ public interface AreaTopology
      * @param y the y coordinate of the grid cell  
      * @return the collection of areas at the specified position or an empty collection when there is no such area
      */
-    public Collection<Area> findAllAreasAt(int x, int y);
+    public Collection<ContentRect> findAllAreasAt(int x, int y);
     
     /**
      * Finds all the areas that intersect with the specified rectangle in the grid.
      * @param r the the rectangle to intersect with
      * @return the collection of areas at the specified position or an empty collection when there is no such area
      */
-    public Collection<Area> findAllAreasIntersecting(Rectangular r);
+    public Collection<ContentRect> findAllAreasIntersecting(Rectangular r);
     
     /**
      * Translates the bounds in the topology to pixel bounds.

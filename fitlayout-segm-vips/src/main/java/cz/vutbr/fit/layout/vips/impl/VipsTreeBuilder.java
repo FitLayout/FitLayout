@@ -5,8 +5,8 @@
  */
 package cz.vutbr.fit.layout.vips.impl;
 
-import cz.vutbr.fit.layout.impl.DefaultArea;
 import cz.vutbr.fit.layout.model.Area;
+import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Box;
 
 /**
@@ -23,15 +23,15 @@ public class VipsTreeBuilder
         this.pDoC = pDoC;
     }
     
-    public Area buildAreaTree(VisualArea vs)
+    public Area buildAreaTree(AreaTree atree, VisualArea vs)
     {
-        Area root = createSubtree(vs);
+        Area root = createSubtree(atree, vs);
         return root;
     }
     
-    private Area createSubtree(VisualArea vs)
+    private Area createSubtree(AreaTree atree, VisualArea vs)
     {
-        DefaultArea ret = createArea(vs);
+        Area ret = createArea(atree, vs);
         if (vs.getChildren().size() == 0)
         {
             for (VisualBlock block : vs.getBlockRoots())
@@ -46,7 +46,7 @@ public class VipsTreeBuilder
             {
                 for (VisualArea child : vs.getChildren())
                 {
-                        Area childArea = createSubtree(child);
+                        Area childArea = createSubtree(atree, child);
                         ret.appendChild(childArea);
                 }
             }
@@ -54,9 +54,9 @@ public class VipsTreeBuilder
         return ret;
     }
     
-    private DefaultArea createArea(VisualArea vs)
+    private Area createArea(AreaTree atree, VisualArea vs)
     {
-        DefaultArea ret = new DefaultArea(vs.getBounds());
+        Area ret = atree.createArea(vs.getBounds());
         ret.setName("VB (" + vs.getDoC() + ")");
         return ret;
     }

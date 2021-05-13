@@ -19,7 +19,7 @@ import cz.vutbr.fit.layout.model.Rectangular;
  *  
  * @author burgetr
  */
-public class DefaultBox extends DefaultContentRect<Box> implements Box
+public class DefaultBox extends DefaultTreeContentRect<Box> implements Box
 {
     private int order;
     
@@ -345,7 +345,12 @@ public class DefaultBox extends DefaultContentRect<Box> implements Box
                     ret.append(" class=").append(getAttribute("class"));
                 ret.append(">");
                 if (type == Type.REPLACED_CONTENT)
-                    ret.append(" [replaced]");
+                {
+                    if (getContentObject() == null)
+                        ret.append(" [replaced]");
+                    else
+                        ret.append(" [replaced:{").append(getContentObject().toString()).append("}]");
+                }
                 break;
             case TEXT_CONTENT:
                 ret.append("Text: ").append(getText());

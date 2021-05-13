@@ -30,6 +30,7 @@ public class PageInfo extends RDFArtifactInfo
         width = height = -1; //-1 means not set
     }
 
+    @Override
     protected void processStatement(Statement st)
     {
         super.processStatement(st);

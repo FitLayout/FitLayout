@@ -55,6 +55,7 @@
 		<module>fitlayout-console</module>
 		<module>fitlayout-io</module>
     <module>fitlayout-segm-bcs</module>
+    <module>fitlayout-text</module>
   </modules>
 
 	<build>

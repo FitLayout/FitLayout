@@ -7,8 +7,10 @@ package cz.vutbr.fit.layout.impl;
 
 import java.util.List;
 
+import cz.vutbr.fit.layout.api.AreaUtils;
 import cz.vutbr.fit.layout.api.OutputDisplay;
 import cz.vutbr.fit.layout.model.Area;
+import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
@@ -23,7 +25,7 @@ public class DefaultGridTopology extends AreaListGridTopology
     
     public DefaultGridTopology(Area area)
     {
-        super(area.getChildren(), false);
+        super(AreaUtils.getChildrenAsContentRects(area), false);
         this.area = area;
         update();
     }
@@ -44,7 +46,7 @@ public class DefaultGridTopology extends AreaListGridTopology
     }
 
     @Override
-    public void setAreas(List<Area> areas)
+    public void setAreas(List<ContentRect> areas)
     {
         if (getAreas() != areas)
             dirty = true;
@@ -52,14 +54,14 @@ public class DefaultGridTopology extends AreaListGridTopology
     }
 
     @Override
-    public Rectangular getPosition(Area area)
+    public Rectangular getPosition(ContentRect area)
     {
         checkDirty();
         return super.getPosition(area);
     }
 
     @Override
-    public Area findAreaAt(int x, int y)
+    public ContentRect findAreaAt(int x, int y)
     {
         checkDirty();
         return super.findAreaAt(x, y);
@@ -89,7 +91,7 @@ public class DefaultGridTopology extends AreaListGridTopology
     @Override
     public void update()
     {
-        setAreas(area.getChildren());
+        setAreas(AreaUtils.getChildrenAsContentRects(area));
         dirty = false;
         super.update();
     }

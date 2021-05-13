@@ -10,13 +10,14 @@ import java.util.Collection;
 
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.ContentLine;
+import cz.vutbr.fit.layout.model.ContentRect;
 
 /**
  * A default ContentLine implementation using a simple ArrayList. This is suitable
  * for shorter lines since the area lookup is always sequentional.
  * @author burgetr
  */
-public class DefaultContentLine extends ArrayList<Area> implements ContentLine 
+public class DefaultContentLine extends ArrayList<ContentRect> implements ContentLine 
 {
     private static final long serialVersionUID = 1L;
 
@@ -38,45 +39,45 @@ public class DefaultContentLine extends ArrayList<Area> implements ContentLine
     }
     
     @Override
-    public Area getAreaBefore(Area area)
+    public ContentRect getAreaBefore(ContentRect area)
     {
         int i = indexOf(area);
         return (i > 0) ? get(i - 1) : null;
     }
 
     @Override
-    public Area getAreaAfter(Area area)
+    public ContentRect getAreaAfter(ContentRect area)
     {
         int i = indexOf(area);
         return (i != -1 && i + 1 < size()) ? get(i + 1) : null;
     }
 
     @Override
-    public boolean add(Area area)
+    public boolean add(ContentRect area)
     {
         area.setLine(this);
         return super.add(area);
     }
 
     @Override
-    public void add(int index, Area area)
+    public void add(int index, ContentRect area)
     {
         area.setLine(this);
         super.add(index, area);
     }
 
     @Override
-    public boolean addAll(Collection<? extends Area> c)
+    public boolean addAll(Collection<? extends ContentRect> c)
     {
-        for (Area a : c)
+        for (ContentRect a : c)
             a.setLine(this);
         return super.addAll(c);
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends Area> c)
+    public boolean addAll(int index, Collection<? extends ContentRect> c)
     {
-        for (Area a : c)
+        for (ContentRect a : c)
             a.setLine(this);
         return super.addAll(index, c);
     }

@@ -159,7 +159,7 @@ public class MultiLineOperator extends BaseOperator
                     //try to find some node below in the given distance
                     for (int x = nx1; neigh == null && x <= nx2; x++)
                     {
-                        neigh = t.findAreaAt(x, ny2 + dist);
+                        neigh = (Area) t.findAreaAt(x, ny2 + dist);
                         if (neigh != null) //something found
                         {
                             if ((!useConsistentStyle || AreaStyle.hasSameStyle(node, neigh))
@@ -272,7 +272,7 @@ public class MultiLineOperator extends BaseOperator
         int gh = t.getTopologyHeight();
         for (int y = gy; y < gy + gh; y++)
         {
-            Area cand = t.findAreaAt(x, y);
+            Area cand = (Area) t.findAreaAt(x, y);
             if (cand != null && cand != except)
                 return false; //something found - cannot expand
         }

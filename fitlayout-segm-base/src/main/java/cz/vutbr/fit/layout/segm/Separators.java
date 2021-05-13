@@ -90,7 +90,7 @@ public class Separators
             int i = gx1;
             while (i <= gx2)
             {
-                Area node = a.getTopology().findAreaAt(i, gy);
+                Area node = (Area) a.getTopology().findAreaAt(i, gy);
                 //System.out.println("Search: " + i + ":" + gy + " = " + node);
                 if (node != null)
                 {
@@ -118,7 +118,7 @@ public class Separators
             int i = gx1;
             while (i <= gx2)
             {
-                Area node = a.getTopology().findAreaAt(i, gy);
+                Area node = (Area) a.getTopology().findAreaAt(i, gy);
                 //System.out.println("Search: " + i + ":" + gy + " = " + node);
                 if (node != null)
                 {
@@ -146,7 +146,7 @@ public class Separators
             int i = gy1;
             while (i <= gy2)
             {
-                Area node = a.getTopology().findAreaAt(gx, i);
+                Area node = (Area) a.getTopology().findAreaAt(gx, i);
                 if (node != null)
                 {
                     ret++;
@@ -173,7 +173,7 @@ public class Separators
             int i = gy1;
             while (i <= gy2)
             {
-                Area node = a.getTopology().findAreaAt(gx, i);
+                Area node = (Area) a.getTopology().findAreaAt(gx, i);
                 if (node != null)
                 {
                     ret++;

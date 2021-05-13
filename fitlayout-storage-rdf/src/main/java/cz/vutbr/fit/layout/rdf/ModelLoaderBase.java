@@ -9,12 +9,15 @@ import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
+import org.eclipse.rdf4j.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.api.ArtifactRepository;
+import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Rectangular;
+import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TextStyle;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.SEGM;
@@ -189,6 +192,48 @@ public abstract class ModelLoaderBase extends ModelTransformer
     {
         RDFAreaTree atree = (RDFAreaTree) repo.getArtifact(areaTreeIri);
         return atree;
+    }
+    
+    /**
+     * Creates a tag from the given tag IRI and the tag data model.
+     * @param tagModel
+     * @param tagIri
+     * @return the created tag or {@code null} when no tag info is found
+     * @throws RepositoryException
+     */
+    protected Tag createTag(Model tagModel, IRI tagIri) throws RepositoryException
+    {
+        String name = null;
+        String type = null;
+        for (Statement st : tagModel.filter(tagIri, null, null))
+        {
+            IRI pred = st.getPredicate();
+            if (SEGM.hasName.equals(pred))
+                name = st.getObject().stringValue();
+            else if (SEGM.hasType.equals(pred))
+                type = st.getObject().stringValue();
+        }
+        if (name != null && type != null)
+            return new DefaultTag(type, name);
+        else
+            return null;
+    }
+    
+    /**
+     * Creates SPAQRL union for the given data properties.
+     * @param dataObjectProperties
+     * @return
+     */
+    protected String getDataPropertyUnion(String[] dataObjectProperties)
+    {
+        StringBuilder ret = new StringBuilder();
+        for (String p : dataObjectProperties)
+        {
+            if (ret.length() > 0)
+                ret.append(" UNION ");
+            ret.append("{?a ").append(p).append(" ?s}");
+        }
+        return ret.toString();
     }
     
     protected static class RDFTextStyle

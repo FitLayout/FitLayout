@@ -22,7 +22,6 @@ import org.eclipse.rdf4j.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Border;
@@ -142,7 +141,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
     {
         RDFArea area = new RDFArea(new Rectangular(), uri);
         area.setId(getIriFactory().decodeAreaId(uri));
-        Map<IRI, Float> tagSupport = new HashMap<IRI, Float>(); //tagUri->support
+        Map<IRI, Float> tagSupport = new HashMap<>(); //tagUri->support
         RDFTextStyle style = new RDFTextStyle();
         
         for (Statement st : areaModel.filter(uri, null, null))
@@ -298,26 +297,6 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
     
     //================================================================================================
     
-    private Tag createTag(Model tagModel, IRI tagIri) throws RepositoryException
-    {
-        String name = null;
-        String type = null;
-        for (Statement st : tagModel.filter(tagIri, null, null))
-        {
-            IRI pred = st.getPredicate();
-            if (SEGM.hasName.equals(pred))
-                name = st.getObject().stringValue();
-            else if (SEGM.hasType.equals(pred))
-                type = st.getObject().stringValue();
-        }
-        if (name != null && type != null)
-            return new DefaultTag(type, name);
-        else
-            return null;
-    }
-    
-    //================================================================================================
-    
     /**
      * Obtains the model of visual areas for the given area tree.
      * @param artifactRepo the repository to query 
@@ -350,21 +329,9 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                 + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
                 + "?a rdf:type segm:Area . "
                 + "?a segm:belongsTo <" + areaTreeIri.stringValue() + "> . "
-                + getDataPropertyUnion()
+                + getDataPropertyUnion(dataObjectProperties)
                 + "}";
         return artifactRepo.getStorage().executeSafeQuery(query);
     }
     
-    private String getDataPropertyUnion()
-    {
-        StringBuilder ret = new StringBuilder();
-        for (String p : dataObjectProperties)
-        {
-            if (ret.length() > 0)
-                ret.append(" UNION ");
-            ret.append("{?a ").append(p).append(" ?s}");
-        }
-        return ret.toString();
-    }
-
 }

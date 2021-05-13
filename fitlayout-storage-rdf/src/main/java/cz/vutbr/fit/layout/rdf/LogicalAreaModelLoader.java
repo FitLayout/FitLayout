@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.impl.DefaultLogicalAreaTree;
-import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.LogicalAreaTree;
@@ -154,24 +153,6 @@ public class LogicalAreaModelLoader extends ModelLoaderBase implements ModelLoad
     }
 
     //================================================================================================
-    
-    private Tag createTag(Model tagModel, IRI tagIri) throws RepositoryException
-    {
-        String name = null;
-        String type = null;
-        for (Statement st : tagModel.filter(tagIri, null, null))
-        {
-            IRI pred = st.getPredicate();
-            if (SEGM.hasName.equals(pred))
-                name = st.getObject().stringValue();
-            else if (SEGM.hasType.equals(pred))
-                type = st.getObject().stringValue();
-        }
-        if (name != null && type != null)
-            return new DefaultTag(type, name);
-        else
-            return null;
-    }
     
     /**
      * Obtains the model of logical areas for the given area tree.

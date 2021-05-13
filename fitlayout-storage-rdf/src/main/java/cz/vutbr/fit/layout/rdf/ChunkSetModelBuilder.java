@@ -5,6 +5,8 @@
  */
 package cz.vutbr.fit.layout.rdf;
 
+import java.util.Map;
+
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
@@ -15,6 +17,7 @@ import org.eclipse.rdf4j.model.vocabulary.RDFS;
 
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.ChunkSet;
+import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TextChunk;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.SEGM;
@@ -86,6 +89,26 @@ public class ChunkSetModelBuilder extends ModelBuilderBase implements ModelBuild
         else
             boxIri = getIriFactory().createBoxURI(chunk.getSourceBox().getPageIri(), chunk.getSourceBox());
         graph.add(ciri, SEGM.hasSourceBox, boxIri);
+        
+        // append tags
+        if (chunk.getTags().size() > 0) 
+        {
+            final Map<Tag, Float> tags = chunk.getTags();
+            for (Tag t : tags.keySet()) 
+            {
+                Float support = tags.get(t);
+                if (support != null && support > 0.0f)
+                {
+                    final IRI tagUri = getIriFactory().createTagURI(t);
+                    graph.add(ciri, SEGM.hasTag, tagUri);
+                    final IRI supUri = getIriFactory().createTagSupportURI(ciri, t);
+                    graph.add(ciri, SEGM.tagSupport, supUri);
+                    graph.add(supUri, SEGM.support, vf.createLiteral(support));
+                    graph.add(supUri, SEGM.hasTag, tagUri);
+                }
+            }
+        }
+
     }
     
 }

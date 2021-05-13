@@ -15,4 +15,6 @@ module cz.vutbr.fit.layout.text
     provides cz.vutbr.fit.layout.api.AreaTreeOperator
         with cz.vutbr.fit.layout.text.op.TagEntitiesOperator;
 
+    provides cz.vutbr.fit.layout.api.ArtifactService
+        with cz.vutbr.fit.layout.text.chunks.TextChunksProvider;
 }

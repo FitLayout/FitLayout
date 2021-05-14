@@ -6,6 +6,7 @@
 package cz.vutbr.fit.layout.impl;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -42,6 +43,7 @@ public class DefaultTextChunk extends DefaultContentRect implements TextChunk
         text = "";
         name = "<chunk>";
         setBounds(new Rectangular());
+        tags = new HashMap<>();
     }
     
     public DefaultTextChunk(Rectangular r, Area sourceArea, Box sourceBox)
@@ -51,6 +53,7 @@ public class DefaultTextChunk extends DefaultContentRect implements TextChunk
         this.sourceArea = sourceArea;
         this.sourceBox = sourceBox;
         setBounds(r);
+        tags = new HashMap<>();
         //addBox(sourceBox); //the box is used for computing the text color of the area (e.g. in AreaStyle)
         copyStyle(sourceArea);
     }

@@ -17,7 +17,7 @@ import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TextChunk;
 import cz.vutbr.fit.layout.text.tag.TagOccurrence;
 import cz.vutbr.fit.layout.text.tag.Tagger;
-import cz.vutbr.fit.layout.text.tag.TextTag;
+import cz.vutbr.fit.layout.text.tag.TaggerConfig;
 
 /**
  * An area list source that creates text chunks by extracting tagged chunks from leaf areas.
@@ -29,13 +29,15 @@ public class TaggedChunksSource extends ChunksSource
     private int idcnt;
     private float minTagSupport;
     private List<TextChunk> chunks;
+    private TaggerConfig tagConfig;
     
     
-    public TaggedChunksSource(Area root, float minTagSupport)
+    public TaggedChunksSource(TaggerConfig tagConfig, Area root, float minTagSupport)
     {
         super(root);
         idcnt = 1;
         this.minTagSupport = minTagSupport;
+        this.tagConfig = tagConfig;
     }
 
     @Override
@@ -58,14 +60,11 @@ public class TaggedChunksSource extends ChunksSource
             {
                 for (Tag t : supportedTags)
                 {
-                    if (t instanceof TextTag)
+                    List<TextChunk> newAreas = createChunksFromTag(root, t);
+                    //System.out.println(root + " : " + t + " : " + newAreas);
+                    for (TextChunk a : newAreas)
                     {
-                        List<TextChunk> newAreas = createChunksFromTag(root, (TextTag) t);
-                        //System.out.println(root + " : " + t + " : " + newAreas);
-                        for (TextChunk a : newAreas)
-                        {
-                            dest.add(a);
-                        }
+                        dest.add(a);
                     }
                 }
             }
@@ -86,10 +85,10 @@ public class TaggedChunksSource extends ChunksSource
         }
     }
 
-    private List<TextChunk> createChunksFromTag(Area a, TextTag t)
+    private List<TextChunk> createChunksFromTag(Area a, Tag t)
     {
         List<TextChunk> ret = new ArrayList<>();
-        Tagger tg = t.getSource();
+        Tagger tg = tagConfig.getTaggerForTag(t);
         for (Box box : a.getBoxes())
         {
             String text = box.getOwnText();
@@ -131,7 +130,7 @@ public class TaggedChunksSource extends ChunksSource
         return ret;
     }
     
-    private TextChunk createSubstringChunk(Area a, Box box, TextTag tag, String occ, int pos)
+    private TextChunk createSubstringChunk(Area a, Box box, Tag tag, String occ, int pos)
     {
         Rectangular r = box.getSubstringBounds(pos, pos + occ.length());
         DefaultTextChunk newChunk = new DefaultTextChunk(r, a, box);

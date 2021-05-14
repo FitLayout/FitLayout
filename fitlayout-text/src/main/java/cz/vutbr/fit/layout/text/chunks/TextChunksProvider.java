@@ -20,6 +20,8 @@ import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.ChunkSet;
 import cz.vutbr.fit.layout.model.TextChunk;
 import cz.vutbr.fit.layout.ontology.SEGM;
+import cz.vutbr.fit.layout.text.tag.FixedTaggerConfig;
+import cz.vutbr.fit.layout.text.tag.TaggerConfig;
 
 /**
  * 
@@ -27,11 +29,28 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  */
 public class TextChunksProvider extends BaseArtifactService
 {
+    private TaggerConfig tagConfig;
 
     public TextChunksProvider()
     {
+        tagConfig = new FixedTaggerConfig();
     }
     
+    public TextChunksProvider(TaggerConfig tagConfig)
+    {
+        this.tagConfig = tagConfig;
+    }
+    
+    public TaggerConfig getTaggerConfig()
+    {
+        return tagConfig;
+    }
+
+    public void setTaggerConfig(TaggerConfig tagConfig)
+    {
+        this.tagConfig = tagConfig;
+    }
+
     @Override
     public String getId()
     {
@@ -82,7 +101,8 @@ public class TextChunksProvider extends BaseArtifactService
     
     private ChunkSet extractChunks(AreaTree atree)
     {
-        ChunksSource csrc = new TaggedChunksSource(atree.getRoot(), 0.1f);
+        ChunksSource csrc = new TaggedChunksSource(tagConfig, atree.getRoot(), 0.1f);
+        
         List<TextChunk> chunks = csrc.getTextChunks();
         ChunkSet ret = new DefaultChunkSet(atree.getIri(), new HashSet<>(chunks));
         return ret;

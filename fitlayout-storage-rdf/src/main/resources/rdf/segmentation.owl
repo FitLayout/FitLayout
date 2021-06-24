@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <rdf:RDF xmlns="http://fitlayout.github.io/ontology/segmentation.owl#"
      xml:base="http://fitlayout.github.io/ontology/segmentation.owl"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
      xmlns:box="http://fitlayout.github.io/ontology/render.owl#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -10,6 +11,11 @@
      xmlns:segm="http://fitlayout.github.io/ontology/segmentation.owl#">
     <owl:Ontology rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#">
         <owl:imports rdf:resource="http://fitlayout.github.io/ontology/render.owl#"/>
+        <dc:creator>Radek Burget</dc:creator>
+        <dc:description>Document visual area (segmentation) ontology.</dc:description>
+        <dc:title>Document Visual Area Ontology</dc:title>
+        <rdfs:comment>Document visual area (segmentation) ontology.</rdfs:comment>
+        <owl:versionInfo>1.0.0</owl:versionInfo>
     </owl:Ontology>
     
 
@@ -31,6 +37,16 @@
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#belongsToChunkSet -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#belongsToChunkSet">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#TextChunk"/>
+        <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#ChunkSet"/>
     </owl:ObjectProperty>
     
 
@@ -57,8 +73,35 @@
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasAreaTree">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalAreaTree"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#ChunkSet"/>
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#LogicalAreaTree"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasSourceArea -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasSourceArea">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#TextChunk"/>
+        <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasSourceBox -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasSourceBox">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#TextChunk"/>
+        <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
     </owl:ObjectProperty>
     
 
@@ -76,8 +119,14 @@
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasTag -->
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasTag">
-        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
-        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Tag"/>
     </owl:ObjectProperty>
     
@@ -139,7 +188,14 @@
 
     <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasText">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea"/>
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#TextChunk"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>
     
@@ -192,13 +248,19 @@
 
     <!-- http://fitlayout.github.io/ontology/render.owl#Box -->
 
-    <owl:Class rdf:about="http://fitlayout.github.io/ontology/render.owl#Box"/>
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/render.owl#Box">
+        <owl:disjointWith rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
+        <owl:disjointWith rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#TextChunk"/>
+    </owl:Class>
     
 
 
     <!-- http://fitlayout.github.io/ontology/render.owl#Page -->
 
-    <owl:Class rdf:about="http://fitlayout.github.io/ontology/render.owl#Page"/>
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/render.owl#Page">
+        <owl:disjointWith rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree"/>
+        <owl:disjointWith rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalAreaTree"/>
+    </owl:Class>
     
 
 
@@ -212,6 +274,8 @@
 
     <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#Area">
         <rdfs:subClassOf rdf:resource="http://fitlayout.github.io/ontology/render.owl#RectArea"/>
+        <owl:disjointWith rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#TextChunk"/>
+        <rdfs:comment>A visual area within the page. The areas can be nested an together they form an AreaTree.</rdfs:comment>
     </owl:Class>
     
 
@@ -220,7 +284,17 @@
 
     <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree">
         <rdfs:subClassOf rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
+        <owl:disjointWith rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalAreaTree"/>
         <rdfs:comment>A tree of visual areas created from a rendered page by page segmentation.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#ChunkSet -->
+
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#ChunkSet">
+        <rdfs:subClassOf rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
+        <rdfs:comment>A set of text chunks extreacted from a source page.</rdfs:comment>
     </owl:Class>
     
 
@@ -236,6 +310,7 @@
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#LogicalAreaTree -->
 
     <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#LogicalAreaTree">
+        <rdfs:subClassOf rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
         <rdfs:comment>A tree of logical areas created from an area tree by some kind of logical structure analysis.</rdfs:comment>
     </owl:Class>
     
@@ -244,6 +319,15 @@
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#Tag -->
 
     <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#Tag"/>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#TextChunk -->
+
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#TextChunk">
+        <rdfs:subClassOf rdf:resource="http://fitlayout.github.io/ontology/render.owl#RectArea"/>
+        <rdfs:comment>A connected piece of a document text that forms a rectangular area in the page.</rdfs:comment>
+    </owl:Class>
 </rdf:RDF>
 
 

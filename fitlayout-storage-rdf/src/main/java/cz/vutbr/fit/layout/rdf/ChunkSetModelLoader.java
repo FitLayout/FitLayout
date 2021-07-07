@@ -124,7 +124,7 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
             final IRI pred = st.getPredicate();
             final Value value = st.getObject();
             
-            if (SEGM.hasText.equals(pred)) 
+            if (SEGM.text.equals(pred)) 
             {
                 chunk.setText(value.stringValue());
             }

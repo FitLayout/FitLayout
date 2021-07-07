@@ -208,9 +208,9 @@ public abstract class ModelLoaderBase extends ModelTransformer
         for (Statement st : tagModel.filter(tagIri, null, null))
         {
             IRI pred = st.getPredicate();
-            if (SEGM.hasName.equals(pred))
+            if (SEGM.name.equals(pred))
                 name = st.getObject().stringValue();
-            else if (SEGM.hasType.equals(pred))
+            else if (SEGM.type.equals(pred))
                 type = st.getObject().stringValue();
         }
         if (name != null && type != null)

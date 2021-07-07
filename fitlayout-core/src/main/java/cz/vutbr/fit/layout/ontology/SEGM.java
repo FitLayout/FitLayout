@@ -78,28 +78,21 @@ public class SEGM {
 	public static final IRI containsBox;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#contentLength}.
+	 * <p>
+	 * The number of content elements used to compute the style statistics
+	 * such as average font weight.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#contentLength">contentLength</a>
+	 */
+	public static final IRI contentLength;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasAreaTree}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasAreaTree">hasAreaTree</a>
 	 */
 	public static final IRI hasAreaTree;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasContentLength}.
-	 * <p>
-	 * The number of content elements used to compute the style statistics
-	 * such as average font weight.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasContentLength">hasContentLength</a>
-	 */
-	public static final IRI hasContentLength;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasName}.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasName">hasName</a>
-	 */
-	public static final IRI hasName;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasSourceArea}.
@@ -128,20 +121,6 @@ public class SEGM {
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasTag">hasTag</a>
 	 */
 	public static final IRI hasTag;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasText}.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasText">hasText</a>
-	 */
-	public static final IRI hasText;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasType}.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasType">hasType</a>
-	 */
-	public static final IRI hasType;
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#isChildOf}.
@@ -180,6 +159,15 @@ public class SEGM {
 	public static final IRI LogicalAreaTree;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#name}.
+	 * <p>
+	 * Assigned area name
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#name">name</a>
+	 */
+	public static final IRI name;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#support}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#support">support</a>
@@ -201,6 +189,13 @@ public class SEGM {
 	public static final IRI tagSupport;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#text}.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#text">text</a>
+	 */
+	public static final IRI text;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#TextChunk}.
 	 * <p>
 	 * A connected piece of a document text that forms a rectangular area in
@@ -209,6 +204,13 @@ public class SEGM {
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#TextChunk">TextChunk</a>
 	 */
 	public static final IRI TextChunk;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#type}.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#type">type</a>
+	 */
+	public static final IRI type;
 
 	static {
 		ValueFactory factory = SimpleValueFactory.getInstance();
@@ -220,23 +222,23 @@ public class SEGM {
 		ChunkSet = factory.createIRI(SEGM.NAMESPACE, "ChunkSet");
 		containsArea = factory.createIRI(SEGM.NAMESPACE, "containsArea");
 		containsBox = factory.createIRI(SEGM.NAMESPACE, "containsBox");
+		contentLength = factory.createIRI(SEGM.NAMESPACE, "contentLength");
 		hasAreaTree = factory.createIRI(SEGM.NAMESPACE, "hasAreaTree");
-		hasContentLength = factory.createIRI(SEGM.NAMESPACE, "hasContentLength");
-		hasName = factory.createIRI(SEGM.NAMESPACE, "hasName");
 		hasSourceArea = factory.createIRI(SEGM.NAMESPACE, "hasSourceArea");
 		hasSourceBox = factory.createIRI(SEGM.NAMESPACE, "hasSourceBox");
 		hasSourcePage = factory.createIRI(SEGM.NAMESPACE, "hasSourcePage");
 		hasTag = factory.createIRI(SEGM.NAMESPACE, "hasTag");
-		hasText = factory.createIRI(SEGM.NAMESPACE, "hasText");
-		hasType = factory.createIRI(SEGM.NAMESPACE, "hasType");
 		isChildOf = factory.createIRI(SEGM.NAMESPACE, "isChildOf");
 		isSubordinateTo = factory.createIRI(SEGM.NAMESPACE, "isSubordinateTo");
 		LogicalArea = factory.createIRI(SEGM.NAMESPACE, "LogicalArea");
 		LogicalAreaTree = factory.createIRI(SEGM.NAMESPACE, "LogicalAreaTree");
+		name = factory.createIRI(SEGM.NAMESPACE, "name");
 		support = factory.createIRI(SEGM.NAMESPACE, "support");
 		Tag = factory.createIRI(SEGM.NAMESPACE, "Tag");
 		tagSupport = factory.createIRI(SEGM.NAMESPACE, "tagSupport");
+		text = factory.createIRI(SEGM.NAMESPACE, "text");
 		TextChunk = factory.createIRI(SEGM.NAMESPACE, "TextChunk");
+		type = factory.createIRI(SEGM.NAMESPACE, "type");
 	}
 
 	private SEGM() {

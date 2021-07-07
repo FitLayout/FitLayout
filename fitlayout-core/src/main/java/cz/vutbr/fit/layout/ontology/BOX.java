@@ -100,6 +100,8 @@ public class BOX {
 
 	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#color}.
+	 * <p>
+	 * Foreground color (#rrggbb)
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#color">color</a>
 	 */
@@ -234,22 +236,6 @@ public class BOX {
 	public static final IRI hasRightBorder;
 
 	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#hasText}.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#hasText">hasText</a>
-	 */
-	public static final IRI hasText;
-
-	/**
-	 * {@code http://fitlayout.github.io/ontology/render.owl#hasTitle}.
-	 * <p>
-	 * Page title
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#hasTitle">hasTitle</a>
-	 */
-	public static final IRI hasTitle;
-
-	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#hasTopBorder}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#hasTopBorder">hasTopBorder</a>
@@ -370,6 +356,22 @@ public class BOX {
 	public static final IRI sourceXPath;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#text}.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#text">text</a>
+	 */
+	public static final IRI text;
+
+	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#title}.
+	 * <p>
+	 * Page title
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#title">title</a>
+	 */
+	public static final IRI title;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#underline}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#underline">underline</a>
@@ -436,8 +438,6 @@ public class BOX {
 		hasBottomBorder = factory.createIRI(BOX.NAMESPACE, "hasBottomBorder");
 		hasLeftBorder = factory.createIRI(BOX.NAMESPACE, "hasLeftBorder");
 		hasRightBorder = factory.createIRI(BOX.NAMESPACE, "hasRightBorder");
-		hasText = factory.createIRI(BOX.NAMESPACE, "hasText");
-		hasTitle = factory.createIRI(BOX.NAMESPACE, "hasTitle");
 		hasTopBorder = factory.createIRI(BOX.NAMESPACE, "hasTopBorder");
 		height = factory.createIRI(BOX.NAMESPACE, "height");
 		htmlTagName = factory.createIRI(BOX.NAMESPACE, "htmlTagName");
@@ -453,6 +453,8 @@ public class BOX {
 		RectArea = factory.createIRI(BOX.NAMESPACE, "RectArea");
 		sourceUrl = factory.createIRI(BOX.NAMESPACE, "sourceUrl");
 		sourceXPath = factory.createIRI(BOX.NAMESPACE, "sourceXPath");
+		text = factory.createIRI(BOX.NAMESPACE, "text");
+		title = factory.createIRI(BOX.NAMESPACE, "title");
 		underline = factory.createIRI(BOX.NAMESPACE, "underline");
 		visible = factory.createIRI(BOX.NAMESPACE, "visible");
 		visualBounds = factory.createIRI(BOX.NAMESPACE, "visualBounds");

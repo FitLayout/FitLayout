@@ -59,7 +59,7 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
         graph.add(pageNode, BOX.height, vf.createLiteral(page.getHeight()));
 		graph.add(pageNode, BOX.sourceUrl, vf.createLiteral(baseUrl));
 		if (page.getTitle() != null)
-		    graph.add(pageNode, BOX.hasTitle, vf.createLiteral(page.getTitle()));
+		    graph.add(pageNode, BOX.title, vf.createLiteral(page.getTitle()));
 		if (page.getPngImage() != null)
 		    graph.add(pageNode, BOX.pngImage, vf.createLiteral(Base64.getEncoder().encodeToString(page.getPngImage())));
 
@@ -141,7 +141,7 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		// add text content into element
 		if (box.getType() == Type.TEXT_CONTENT) 
 		{
-			graph.add(individual, BOX.hasText, vf.createLiteral(box.getText()));
+			graph.add(individual, BOX.text, vf.createLiteral(box.getText()));
 		}
 		else if (box.getType() == Type.REPLACED_CONTENT)
 		{

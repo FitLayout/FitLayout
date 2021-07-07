@@ -128,7 +128,7 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
         graph.add(individual, BOX.fontStyle, vf.createLiteral(area.getTextStyle().getFontStyle()));
         graph.add(individual, BOX.underline, vf.createLiteral(area.getTextStyle().getUnderline()));
         graph.add(individual, BOX.lineThrough, vf.createLiteral(area.getTextStyle().getLineThrough()));
-        graph.add(individual, SEGM.hasContentLength, vf.createLiteral(area.getTextStyle().getContentLength()));
+        graph.add(individual, SEGM.contentLength, vf.createLiteral(area.getTextStyle().getContentLength()));
         
         //dump boxes
         for (Box box : area.getBoxes())
@@ -143,8 +143,8 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
         for (Tag t : usedTags)
         {
             IRI tagUri = getIriFactory().createTagURI(t);
-            graph.add(tagUri, SEGM.hasType, vf.createLiteral(t.getType()));
-            graph.add(tagUri, SEGM.hasName, vf.createLiteral(t.getValue()));
+            graph.add(tagUri, SEGM.type, vf.createLiteral(t.getType()));
+            graph.add(tagUri, SEGM.name, vf.createLiteral(t.getValue()));
         }
     }
     

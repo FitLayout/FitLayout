@@ -257,7 +257,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                     box.setBorderStyle(Side.TOP, border);
                 }
             }
-            else if (BOX.hasText.equals(pred)) 
+            else if (BOX.text.equals(pred)) 
             {
                 if (box.getType() != Type.REPLACED_CONTENT) //once it is a replaced box, do not change it back to text box
                     box.setType(Type.TEXT_CONTENT);

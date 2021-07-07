@@ -69,7 +69,7 @@ public class ChunkSetModelBuilder extends ModelBuilderBase implements ModelBuild
         if (chunk.getName() != null)
             graph.add(ciri, RDFS.LABEL, vf.createLiteral(chunk.getName()));
         graph.add(ciri, SEGM.belongsToChunkSet, csetIri);
-        graph.add(ciri, SEGM.hasText, vf.createLiteral(chunk.getText()));
+        graph.add(ciri, SEGM.text, vf.createLiteral(chunk.getText()));
         
         if (chunk.getEffectiveBackgroundColor() != null)
         {

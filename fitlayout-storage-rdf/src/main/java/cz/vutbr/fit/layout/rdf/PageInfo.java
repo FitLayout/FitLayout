@@ -35,7 +35,7 @@ public class PageInfo extends RDFArtifactInfo
     {
         super.processStatement(st);
         
-        if (st.getPredicate().equals(BOX.hasTitle))
+        if (st.getPredicate().equals(BOX.title))
         {
             title = st.getObject().stringValue();
         }

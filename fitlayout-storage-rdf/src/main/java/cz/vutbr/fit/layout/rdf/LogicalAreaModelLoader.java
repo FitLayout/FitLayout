@@ -114,7 +114,7 @@ public class LogicalAreaModelLoader extends ModelLoaderBase implements ModelLoad
             final IRI pred = st.getPredicate();
             final Value value = st.getObject();
             
-            if (SEGM.hasText.equals(pred)) 
+            if (SEGM.text.equals(pred)) 
             {
                 area.setText(value.stringValue());
             }

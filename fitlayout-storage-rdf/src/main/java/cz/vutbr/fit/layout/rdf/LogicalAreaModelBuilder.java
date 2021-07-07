@@ -81,7 +81,7 @@ public class LogicalAreaModelBuilder extends ModelBuilderBase implements ModelBu
         graph.add(individual, RDF.TYPE, SEGM.LogicalArea);
         graph.add(individual, BOX.documentOrder, vf.createLiteral(next_order++));
         graph.add(individual, SEGM.belongsTo, areaTreeNode);
-        graph.add(individual, SEGM.hasText, vf.createLiteral(area.getText()));
+        graph.add(individual, SEGM.text, vf.createLiteral(area.getText()));
         if (parent != null)
             graph.add(individual, SEGM.isSubordinateTo, parent);
         if (area.getMainTag() != null)

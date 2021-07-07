@@ -189,7 +189,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                 if (value instanceof Literal)
                     style.fontWeight = ((Literal) value).floatValue();
             }
-            else if (SEGM.hasContentLength.equals(pred)) 
+            else if (SEGM.contentLength.equals(pred)) 
             {
                 if (value instanceof Literal)
                     style.contentLength = ((Literal) value).intValue();

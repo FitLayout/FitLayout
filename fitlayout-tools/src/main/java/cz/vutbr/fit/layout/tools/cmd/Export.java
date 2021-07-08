@@ -10,19 +10,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.util.concurrent.Callable;
 
 import org.eclipse.rdf4j.model.Model;
 
-import cz.vutbr.fit.layout.api.OutputDisplay;
 import cz.vutbr.fit.layout.api.ServiceException;
-import cz.vutbr.fit.layout.io.HTMLOutputOperator;
-import cz.vutbr.fit.layout.io.ImageOutputDisplay;
-import cz.vutbr.fit.layout.io.XMLBoxOutput;
-import cz.vutbr.fit.layout.io.XMLOutputOperator;
-import cz.vutbr.fit.layout.model.Area;
+import cz.vutbr.fit.layout.io.ArtifactStreamOutput;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
@@ -114,15 +108,15 @@ public class Export extends CliCommand implements Callable<Integer>
                 outputRDF(page, os, Serialization.TURTLE);
                 break;
             case xml:
-                outputXML(page, os);
+                ArtifactStreamOutput.outputXML(page, os);
                 break;
             case html:
-                outputHTML(page, os);
+                ArtifactStreamOutput.outputHTML(page, os);
                 break;
             case png:
-                outputPNG(page, os);
+                ArtifactStreamOutput.outputPNG(page, os);
             case pngi:
-                outputPNGi(page, os);
+                ArtifactStreamOutput.outputPNGi(page, os);
         }
     }
     
@@ -132,39 +126,6 @@ public class Export extends CliCommand implements Callable<Integer>
         Model graph = builder.createGraph(page);
         Serialization.modelToStream(graph, os, mimeType);
         os.close();
-    }
-    
-    public void outputXML(Page page, OutputStream os) throws IOException
-    {
-        PrintWriter out = new PrintWriter(os);
-        XMLBoxOutput xml = new XMLBoxOutput(true);
-        xml.dumpTo(page, out);
-        out.close();
-    }
-    
-    public void outputHTML(Page page, OutputStream os) throws IOException
-    {
-        PrintWriter out = new PrintWriter(os);
-        HTMLOutputOperator html = new HTMLOutputOperator();
-        html.dumpTo(page, out);
-        out.close();
-    }
-
-    public void outputPNG(Page page, OutputStream os) throws IOException
-    {
-        ImageOutputDisplay disp = new ImageOutputDisplay(page.getWidth(), page.getHeight());
-        if (page.getPngImage() != null)
-            disp.drawPage(page, true);
-        else
-            disp.drawPage(page, false);
-        disp.saveTo(os);
-    }
-    
-    public void outputPNGi(Page page, OutputStream os) throws IOException
-    {
-        ImageOutputDisplay disp = new ImageOutputDisplay(page.getWidth(), page.getHeight());
-        disp.drawPage(page, false);
-        disp.saveTo(os);
     }
     
     //=========================================================================================
@@ -177,16 +138,16 @@ public class Export extends CliCommand implements Callable<Integer>
                 outputRDF(atree, os, Serialization.TURTLE);
                 break;
             case xml:
-                outputXML(atree, os);
+                ArtifactStreamOutput.outputXML(atree, os);
                 break;
             case html:
-                outputHTML(atree, page, os);
+                ArtifactStreamOutput.outputHTML(atree, page, os);
                 break;
             case png:
-                outputPNG(atree, page, os);
+                ArtifactStreamOutput.outputPNG(atree, page, os);
                 break;
             case pngi:
-                outputPNGi(atree, page, os);
+                ArtifactStreamOutput.outputPNGi(atree, page, os);
                 break;
         }
     }
@@ -199,49 +160,4 @@ public class Export extends CliCommand implements Callable<Integer>
         os.close();
     }
     
-    public void outputXML(AreaTree atree, OutputStream os) throws IOException
-    {
-        XMLOutputOperator out = new XMLOutputOperator(null, true);
-        PrintWriter writer = new PrintWriter(os);
-        out.dumpTo(atree, writer);
-        writer.close();
-    }
-    
-    public void outputHTML(AreaTree atree, Page page, OutputStream os) throws IOException
-    {
-        if (page == null)
-            throw new IllegalArgumentException("HTML export requires a page available (use RENDER or LOAD).");
-        PrintWriter out = new PrintWriter(os);
-        HTMLOutputOperator html = new HTMLOutputOperator();
-        html.dumpTo(atree, page, out);
-        out.close();
-    }
-
-    public void outputPNG(AreaTree atree, Page page, OutputStream os) throws IOException
-    {
-        ImageOutputDisplay disp = new ImageOutputDisplay(page.getWidth(), page.getHeight());
-        if (page.getPngImage() != null)
-            disp.drawPage(page, true);
-        else
-            disp.drawPage(page, false);
-        showAreas(disp, atree.getRoot(), null);
-        disp.saveTo(os);
-    }
-
-    public void outputPNGi(AreaTree atree, Page page, OutputStream os) throws IOException
-    {
-        ImageOutputDisplay disp = new ImageOutputDisplay(page.getWidth(), page.getHeight());
-        disp.drawPage(page, false);
-        showAreas(disp, atree.getRoot(), null);
-        disp.saveTo(os);
-    }
-
-    private void showAreas(OutputDisplay disp, Area root, String nameSubstring)
-    {
-        if (nameSubstring == null || root.toString().contains(nameSubstring))
-            disp.drawExtent(root);
-        for (int i = 0; i < root.getChildCount(); i++)
-            showAreas(disp, root.getChildAt(i), nameSubstring);
-    }
-
 }

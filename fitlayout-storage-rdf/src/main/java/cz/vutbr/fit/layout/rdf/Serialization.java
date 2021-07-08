@@ -28,6 +28,7 @@ public class Serialization
 {
     public static final String JSONLD = "application/ld+json";
     public static final String TURTLE = "text/turtle";
+    public static final String RDFXML = "application/rdf+xml";
     
     public static final String SPARQL_QUERY = "application/sparql-query";
     
@@ -102,6 +103,15 @@ public class Serialization
         return writer;
     }
     
+    public static RDFWriter createRioWriterXML(OutputStream os) throws RDFHandlerException
+    {
+        RDFWriter writer = Rio.createWriter(RDFFormat.RDFXML, os);
+        writer.startRDF();
+        configureNamespaces(writer);
+        writer.getWriterConfig().set(BasicWriterSettings.PRETTY_PRINT, true);
+        return writer;
+    }
+    
     public static void modelToStream(Model model, OutputStream os, String mimeType)
     {
         RDFWriter rdfw;
@@ -109,6 +119,9 @@ public class Serialization
         {
             case TURTLE:
                 rdfw = createRioWriterTurtle(os);
+                break;
+            case RDFXML:
+                rdfw = createRioWriterXML(os);
                 break;
             default:
                 rdfw = createRioWriterJsonLD(os);

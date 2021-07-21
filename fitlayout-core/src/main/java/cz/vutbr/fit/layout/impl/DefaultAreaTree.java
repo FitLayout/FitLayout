@@ -58,6 +58,7 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
         super(src.getParentIri());
         setPageIri(src.getPageIri());
         root = src.getRoot();
+        updateNextAreaId();
     }
     
     @Override
@@ -86,6 +87,7 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
     public void setRoot(Area root)
     {
         this.root = root;
+        updateNextAreaId();
     }
 
     @Override
@@ -216,6 +218,23 @@ public class DefaultAreaTree extends BaseArtifact implements AreaTree
     public void setNextAreaId(int nextId)
     {
         areaIdCnt = nextId;
+    }
+    
+    public void updateNextAreaId()
+    {
+        setNextAreaId(getMaxAreaId(root) + 1);
+    }
+    
+    public int getMaxAreaId(Area root)
+    {
+        int max = root.getId();
+        for (Area child : root.getChildren())
+        {
+            int sub = getMaxAreaId(child);
+            if (sub > max)
+                max = sub;
+        }
+        return max;
     }
     
 }

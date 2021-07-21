@@ -80,6 +80,7 @@ public class PageBoxTreeBuilder extends BaseBoxTreeBuilder
     private Box createBoxTree(Box root, Box treeRoot, List<Box> target)
     {
         final DefaultBox ret = new DefaultBox(root);
+        ret.setId(ret.getOrder()); //use the order as ID for the visual tree boxes
         target.add(ret);
         // hadle the root node of the whole tree
         if (treeRoot == null)

@@ -57,6 +57,12 @@ public class OperatorWrapperProvider extends BaseArtifactService
     }
 
     @Override
+    public String getCategory()
+    {
+        return operator.getCategory();
+    }
+
+    @Override
     public List<Parameter> defineParams()
     {
         return operator.getParams();

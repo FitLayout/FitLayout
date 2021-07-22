@@ -16,6 +16,13 @@ public abstract class BaseArtifactService extends BaseParametrizedOperation impl
 {
     
     @Override
+    public String getCategory()
+    {
+        // the category is not specified by default 
+        return null;
+    }
+
+    @Override
     public String toString()
     {
         return getName() + " (" + getId() + ")";

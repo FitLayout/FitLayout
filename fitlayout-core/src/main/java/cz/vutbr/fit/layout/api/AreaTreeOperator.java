@@ -16,12 +16,6 @@ public interface AreaTreeOperator extends Service, ParametrizedOperation
 {
     
     /**
-     * Returns the operator category that allows to group similar operators in the GUI.
-     * @return The category name
-     */
-    public String getCategory();
-    
-    /**
      * Applies the operation to the given tree.
      * @param atree the area tree to be modified.
      */

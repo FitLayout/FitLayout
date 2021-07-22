@@ -29,6 +29,12 @@ public interface Service
     public String getDescription();
     
     /**
+     * A category that allows to group similar services.
+     * @return Category name or {@code null} when no category is assigned.
+     */
+    public String getCategory();
+    
+    /**
      * Assigns a service manager to the service. This is typically called by the service manager
      * itself during the service initialization.
      * @param manager The service manager to be set.

@@ -61,7 +61,7 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
     @Override
     public String getCategory()
     {
-        return "classification";
+        return "Classification";
     }
 
     /**

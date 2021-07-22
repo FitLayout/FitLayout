@@ -50,13 +50,13 @@ public class SortByPositionOperator extends BaseOperator
     @Override
     public String getDescription()
     {
-        return "Sorts the visual areas by their position (x,y coordinates)";
+        return "Sorts the visual areas by their position (x,y coordinates).";
     }
 
     @Override
     public String getCategory()
     {
-        return "sorting";
+        return "Sorting";
     }
 
     @Override

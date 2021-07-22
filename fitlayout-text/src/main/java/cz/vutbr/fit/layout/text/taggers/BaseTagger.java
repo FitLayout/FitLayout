@@ -20,5 +20,12 @@ public abstract class BaseTagger extends BaseParametrizedOperation implements Ta
     {
         return getId();
     }
+
+    @Override
+    public String getCategory()
+    {
+        // we don't use categories for taggers at the moment
+        return null;
+    }
     
 }

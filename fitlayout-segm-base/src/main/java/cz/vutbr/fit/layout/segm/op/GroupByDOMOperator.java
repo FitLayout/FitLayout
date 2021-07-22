@@ -36,7 +36,7 @@ public class GroupByDOMOperator extends SuperAreaOperator
     @Override
     public String getDescription()
     {
-        return "..."; //TODO
+        return "Creates groups of areas that share the same source DOM node.";
     }
     
     @Override

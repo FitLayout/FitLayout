@@ -42,7 +42,7 @@ public class SortByLinesOperator extends SortByPositionOperator
     @Override
     public String getDescription()
     {
-        return "Sorts the visual areas roughly according to the text lines detected in the file";
+        return "Sorts the visual areas roughly according to the text lines detected in the file.";
     }
 
     @Override

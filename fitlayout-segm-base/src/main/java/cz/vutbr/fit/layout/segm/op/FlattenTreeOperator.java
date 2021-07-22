@@ -40,13 +40,13 @@ public class FlattenTreeOperator extends BaseOperator
     @Override
     public String getDescription()
     {
-        return "This operator flattens the tree: only the root area and the leaf areas are preserved";
+        return "Flattens the tree: only the root area and the leaf areas are preserved.";
     }
 
     @Override
     public String getCategory()
     {
-        return "restructure";
+        return "Restructure";
     }
 
     //==============================================================================

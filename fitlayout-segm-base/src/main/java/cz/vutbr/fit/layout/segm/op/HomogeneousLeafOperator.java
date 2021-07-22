@@ -36,7 +36,8 @@ public class HomogeneousLeafOperator extends SuperAreaOperator
     @Override
     public String getDescription()
     {
-        return "..."; //TODO
+        return "Detects sequences of leaf areas with a consistent style that are not visually separated"
+                + " from each other and groups them to new areas.";
     }
     
     @Override

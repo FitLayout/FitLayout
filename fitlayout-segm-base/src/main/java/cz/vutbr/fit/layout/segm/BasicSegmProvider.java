@@ -45,19 +45,20 @@ public class BasicSegmProvider extends BaseArtifactService
     @Override
     public String getId()
     {
-        return "FitLayout.Grouping";
+        return "FitLayout.BasicAreas";
     }
 
     @Override
     public String getName()
     {
-        return "FitLayout grouping segmentation algorithm";
+        return "Simple area tree construction";
     }
 
     @Override
     public String getDescription()
     {
-        return "A configurable bottom-up segmentation algorithm";
+        return "Creates a basic area tree by simply taking all visually separated boxes and creating"
+                + " visual areas from them.";
     }
 
     @Override

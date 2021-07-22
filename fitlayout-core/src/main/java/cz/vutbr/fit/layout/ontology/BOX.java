@@ -37,6 +37,16 @@ public class BOX {
 	public static final IRI backgroundColor;
 
 	/**
+	 * {@code http://fitlayout.github.io/ontology/render.owl#backgroundSeparated}.
+	 * <p>
+	 * Indicates whether the rectangle is separated from it parent rectangle
+	 * by background color or image.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#backgroundSeparated">backgroundSeparated</a>
+	 */
+	public static final IRI backgroundSeparated;
+
+	/**
 	 * {@code http://fitlayout.github.io/ontology/render.owl#belongsTo}.
 	 * <p>
 	 * Assigns an owning page to a rectangle
@@ -412,6 +422,7 @@ public class BOX {
 
 		Attribute = factory.createIRI(BOX.NAMESPACE, "Attribute");
 		backgroundColor = factory.createIRI(BOX.NAMESPACE, "backgroundColor");
+		backgroundSeparated = factory.createIRI(BOX.NAMESPACE, "backgroundSeparated");
 		belongsTo = factory.createIRI(BOX.NAMESPACE, "belongsTo");
 		Border = factory.createIRI(BOX.NAMESPACE, "Border");
 		borderColor = factory.createIRI(BOX.NAMESPACE, "borderColor");

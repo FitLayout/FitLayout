@@ -191,6 +191,11 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                     box.setBackgroundImagePng(image.getPngData());
                 }
             }
+            else if (BOX.backgroundSeparated.equals(pred))
+            {
+                if (value instanceof Literal)
+                    box.setBackgroundSeparated(((Literal) value).booleanValue());
+            }
             else if (BOX.color.equals(pred)) 
             {
                 box.setColor(Serialization.decodeHexColor(value.stringValue()));

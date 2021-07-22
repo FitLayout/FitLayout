@@ -137,6 +137,7 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 	        insertImage(graph, image, objuri);
 		    graph.add(individual, BOX.hasBackgroundImage, objuri);
 		}
+		graph.add(individual, BOX.backgroundSeparated, vf.createLiteral(box.isBackgroundSeparated()));
 
 		// add text content into element
 		if (box.getType() == Type.TEXT_CONTENT) 

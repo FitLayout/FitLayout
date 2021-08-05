@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Box;
+import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TextChunk;
 import cz.vutbr.fit.layout.ontology.BOX;
@@ -154,6 +155,15 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
                     else
                         log.error("hasSourceBox points to a non-existent box {}", value.toString());
                 }                
+            }
+            else if (BOX.bounds.equals(pred))
+            {
+                if (value instanceof IRI)
+                {
+                    final Rectangular rect = createBounds(dataModel, (IRI) value);
+                    if (rect != null)
+                        chunk.setBounds(rect);
+                }
             }
             else if (SEGM.hasTag.equals(pred))
             {

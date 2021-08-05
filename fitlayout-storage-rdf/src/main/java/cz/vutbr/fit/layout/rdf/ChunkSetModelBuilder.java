@@ -90,6 +90,9 @@ public class ChunkSetModelBuilder extends ModelBuilderBase implements ModelBuild
             boxIri = getIriFactory().createBoxURI(chunk.getSourceBox().getPageIri(), chunk.getSourceBox());
         graph.add(ciri, SEGM.hasSourceBox, boxIri);
         
+        // append the geometry
+        insertBounds(ciri, BOX.bounds, "b", chunk.getBounds(), graph);
+        
         // append tags
         if (chunk.getTags().size() > 0) 
         {

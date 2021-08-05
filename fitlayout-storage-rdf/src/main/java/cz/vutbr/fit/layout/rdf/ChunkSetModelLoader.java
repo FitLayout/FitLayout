@@ -129,6 +129,11 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 chunk.setText(value.stringValue());
             }
+            else if (BOX.documentOrder.equals(pred))
+            {
+                if (value instanceof Literal)
+                    chunk.setDocumentOrder(((Literal) value).intValue());
+            }
             else if (BOX.backgroundColor.equals(pred))
             {
                 final String bgColor = value.stringValue();

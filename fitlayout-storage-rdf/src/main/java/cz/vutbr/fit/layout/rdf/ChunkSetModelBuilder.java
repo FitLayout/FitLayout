@@ -31,6 +31,7 @@ import cz.vutbr.fit.layout.rdf.model.RDFBox;
 public class ChunkSetModelBuilder extends ModelBuilderBase implements ModelBuilder
 {
     private ValueFactory vf;
+    private int next_order;
 
     public ChunkSetModelBuilder(IRIFactory iriFactory)
     {
@@ -53,6 +54,7 @@ public class ChunkSetModelBuilder extends ModelBuilderBase implements ModelBuild
         
         addArtifactData(graph, cset);
         graph.add(csetIri, SEGM.hasAreaTree, areaTreeNode);
+        next_order = 0;
         
         for (TextChunk chunk : cset.getTextChunks())
         {
@@ -68,6 +70,7 @@ public class ChunkSetModelBuilder extends ModelBuilderBase implements ModelBuild
         graph.add(ciri, RDF.TYPE, SEGM.TextChunk);
         if (chunk.getName() != null)
             graph.add(ciri, RDFS.LABEL, vf.createLiteral(chunk.getName()));
+        graph.add(ciri, BOX.documentOrder, vf.createLiteral(next_order++));
         graph.add(ciri, SEGM.belongsToChunkSet, csetIri);
         graph.add(ciri, SEGM.text, vf.createLiteral(chunk.getText()));
         

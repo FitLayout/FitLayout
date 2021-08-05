@@ -19,6 +19,7 @@ import cz.vutbr.fit.layout.model.Rectangular;
 public class RDFTextChunk extends DefaultTextChunk implements RDFResource
 {
     protected IRI iri;
+    protected int documentOrder;
 
     public RDFTextChunk(IRI uri)
     {
@@ -43,4 +44,14 @@ public class RDFTextChunk extends DefaultTextChunk implements RDFResource
         this.iri = uri;
     }
 
+    public int getDocumentOrder()
+    {
+        return documentOrder;
+    }
+
+    public void setDocumentOrder(int documentOrder)
+    {
+        this.documentOrder = documentOrder;
+    }
+    
 }

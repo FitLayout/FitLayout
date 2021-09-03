@@ -170,12 +170,20 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
      */
     private InputFile invokeRenderer(URL url) throws IOException, InterruptedException
     {
-        String rendererPath = System.getProperty("fitlayout.puppeteer.backend");
+        String rendererPath = System.getProperty("fitlayout.puppeteer.backend"); //puppeteer backend project path
         if (rendererPath == null)
             throw new IOException("Puppeteer backend path is not configured. Set the fitlayout.puppeteer.backend to point to the backend installation");
         log.debug("Invoking puppeteer backend in {}", rendererPath);
         
+        String workdir = System.getProperty("fitlayout.puppeteer.workdir"); //chromium working directory for storing profiles
+        if (workdir != null)
+            log.debug("Using chromium work directory {}", workdir);
+        
+        String wrapper = System.getProperty("fitlayout.puppeteer.wrapper"); //wrapper to run the command in (e.g. xvfb-run)
+        
         List<String> cmds = new ArrayList<>();
+        if (wrapper != null)
+            cmds.add(wrapper);
         cmds.add("node");
         cmds.add("index.js");
         cmds.add("-W" + String.valueOf(width));
@@ -185,7 +193,11 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
             cmds.add("-I"); //acquire images
         if (includeScreenshot)
             cmds.add("-s"); //include screenshot
+        if (workdir != null)
+            cmds.add("-d'" + workdir + "'");
         cmds.add(url.toString());
+        if (wrapper != null)
+            cmds.add("-N"); //when the wrapper is used, we don't use the headless mode
         
         ProcessBuilder pb = new ProcessBuilder(cmds);
         pb.directory(new File(rendererPath));

@@ -72,7 +72,7 @@ public class TextChunksProvider extends BaseArtifactService
     @Override
     public List<Parameter> defineParams()
     {
-        List<Parameter> ret = new ArrayList<>(6);
+        List<Parameter> ret = new ArrayList<>(1);
         return ret;
     }
 
@@ -94,7 +94,7 @@ public class TextChunksProvider extends BaseArtifactService
         if (input != null && input instanceof AreaTree)
             return extractChunks((AreaTree) input);
         else
-            throw new ServiceException("Source artifact not specified or not a page");
+            throw new ServiceException("Source artifact not specified or not an area tree");
     }
     
     //==================================================================================

@@ -8,6 +8,8 @@ package cz.vutbr.fit.layout.text.tag;
 import java.util.HashMap;
 import java.util.Map;
 
+import cz.vutbr.fit.layout.api.Tagger;
+import cz.vutbr.fit.layout.api.TaggerConfig;
 import cz.vutbr.fit.layout.model.Tag;
 
 /**

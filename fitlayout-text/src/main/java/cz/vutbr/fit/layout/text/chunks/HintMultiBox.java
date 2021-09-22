@@ -18,8 +18,8 @@ import cz.vutbr.fit.layout.model.ContentLine;
 import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
+import cz.vutbr.fit.layout.model.TagOccurrence;
 import cz.vutbr.fit.layout.model.TextChunk;
-import cz.vutbr.fit.layout.text.tag.TagOccurrence;
 
 /**
  * This hint has the same meaning as {@link HintWholeBox} but it also considers multiple subsequent boxes. 

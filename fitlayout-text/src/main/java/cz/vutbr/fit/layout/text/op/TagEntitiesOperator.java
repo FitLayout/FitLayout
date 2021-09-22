@@ -15,10 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.api.ScriptObject;
+import cz.vutbr.fit.layout.api.Tagger;
 import cz.vutbr.fit.layout.impl.BaseOperator;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
-import cz.vutbr.fit.layout.text.tag.Tagger;
 import cz.vutbr.fit.layout.text.tag.TreeTagger;
 
 

@@ -8,6 +8,7 @@ package cz.vutbr.fit.layout.text.tag;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.vutbr.fit.layout.api.Tagger;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Tag;
 

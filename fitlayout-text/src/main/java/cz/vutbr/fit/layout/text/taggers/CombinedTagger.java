@@ -10,9 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import cz.vutbr.fit.layout.api.Tagger;
 import cz.vutbr.fit.layout.model.Area;
-import cz.vutbr.fit.layout.text.tag.TagOccurrence;
-import cz.vutbr.fit.layout.text.tag.Tagger;
+import cz.vutbr.fit.layout.model.TagOccurrence;
 
 
 /**

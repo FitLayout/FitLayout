@@ -13,6 +13,7 @@ import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
+import cz.vutbr.fit.layout.api.TaggerConfig;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.impl.DefaultChunkSet;
 import cz.vutbr.fit.layout.model.AreaTree;
@@ -21,7 +22,6 @@ import cz.vutbr.fit.layout.model.ChunkSet;
 import cz.vutbr.fit.layout.model.TextChunk;
 import cz.vutbr.fit.layout.ontology.SEGM;
 import cz.vutbr.fit.layout.text.tag.FixedTaggerConfig;
-import cz.vutbr.fit.layout.text.tag.TaggerConfig;
 
 /**
  * 

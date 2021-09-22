@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cz.vutbr.fit.layout.model.Tag;
-import cz.vutbr.fit.layout.text.tag.TagOccurrence;
+import cz.vutbr.fit.layout.model.TagOccurrence;
 
 /**
  * This hint tries to improve the recall of the tag occurrence discovery by applying

@@ -5,8 +5,8 @@
  */
 package cz.vutbr.fit.layout.text.taggers;
 
+import cz.vutbr.fit.layout.api.Tagger;
 import cz.vutbr.fit.layout.impl.BaseParametrizedOperation;
-import cz.vutbr.fit.layout.text.tag.Tagger;
 
 /**
  * A base implementation of a tagger with no parametres.

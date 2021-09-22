@@ -3,7 +3,7 @@
  *
  * Created on 13. 5. 2021, 21:02:46 by burgetr
  */
-package cz.vutbr.fit.layout.text.tag;
+package cz.vutbr.fit.layout.api;
 
 import java.util.Map;
 

@@ -15,14 +15,14 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.vutbr.fit.layout.api.Tagger;
 import cz.vutbr.fit.layout.impl.DefaultTextChunk;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
+import cz.vutbr.fit.layout.model.TagOccurrence;
 import cz.vutbr.fit.layout.model.TextChunk;
-import cz.vutbr.fit.layout.text.tag.TagOccurrence;
-import cz.vutbr.fit.layout.text.tag.Tagger;
 import cz.vutbr.fit.layout.text.tag.TextTag;
 
 /**

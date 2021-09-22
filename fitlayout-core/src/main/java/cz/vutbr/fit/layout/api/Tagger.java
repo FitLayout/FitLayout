@@ -3,14 +3,13 @@
  *
  * Created on 11.11.2011, 11:22:29 by burgetr
  */
-package cz.vutbr.fit.layout.text.tag;
+package cz.vutbr.fit.layout.api;
 
 import java.util.List;
 
-import cz.vutbr.fit.layout.api.ParametrizedOperation;
-import cz.vutbr.fit.layout.api.Service;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Tag;
+import cz.vutbr.fit.layout.model.TagOccurrence;
 
 
 /**
@@ -25,7 +24,7 @@ public interface Tagger extends Service, ParametrizedOperation
      * Obtains the tag that this tagger assigns to the areas.
      * @return the tag string
      */
-    public TextTag getTag();
+    public Tag getTag();
 
     /**
      * Checks whether the area may be tagged with the tag. This method does not actually assign the tag to the area.

@@ -18,7 +18,7 @@ import com.joestelmach.natty.Parser;
 
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Tag;
-import cz.vutbr.fit.layout.text.tag.TagOccurrence;
+import cz.vutbr.fit.layout.model.TagOccurrence;
 import cz.vutbr.fit.layout.text.tag.TextTag;
 
 /**

@@ -13,7 +13,7 @@ import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Tag;
-import cz.vutbr.fit.layout.text.tag.TagOccurrence;
+import cz.vutbr.fit.layout.model.TagOccurrence;
 import cz.vutbr.fit.layout.text.tag.TextTag;
 import edu.stanford.nlp.util.Triple;
 

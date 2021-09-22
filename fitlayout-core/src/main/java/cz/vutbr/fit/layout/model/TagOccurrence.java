@@ -3,7 +3,7 @@
  *
  * Created on 30. 10. 2018, 16:17:23 by burgetr
  */
-package cz.vutbr.fit.layout.text.tag;
+package cz.vutbr.fit.layout.model;
 
 /**
  * An occurrence of a taggable substring in a text string.

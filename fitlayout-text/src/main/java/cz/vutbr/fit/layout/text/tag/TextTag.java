@@ -5,6 +5,7 @@
  */
 package cz.vutbr.fit.layout.text.tag;
 
+import cz.vutbr.fit.layout.api.Tagger;
 import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.model.Area;
 

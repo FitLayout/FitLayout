@@ -12,8 +12,8 @@ import cz.vutbr.fit.layout.impl.DefaultContentLine;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.ContentLine;
 import cz.vutbr.fit.layout.model.Tag;
+import cz.vutbr.fit.layout.model.TagOccurrence;
 import cz.vutbr.fit.layout.model.TextChunk;
-import cz.vutbr.fit.layout.text.tag.TagOccurrence;
 
 /**
  * A hint that forces using the whole source box for the corresponding chunk even if only part

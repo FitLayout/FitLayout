@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Set;
 
 import cz.vutbr.fit.layout.model.Area;
+import cz.vutbr.fit.layout.model.TagOccurrence;
 import cz.vutbr.fit.layout.model.TextChunk;
-import cz.vutbr.fit.layout.text.tag.TagOccurrence;
 
 
 /**

@@ -42,7 +42,7 @@
 		<repository>
 		  <id>jsi.sourceforge.net</id>
 		  <name>sourceforge jsi repository</name>
-		  <url>http://sourceforge.net/projects/jsi/files/m2_repo</url>
+		  <url>https://sourceforge.net/projects/jsi/files/m2_repo</url>
 		</repository>
     </repositories>
 

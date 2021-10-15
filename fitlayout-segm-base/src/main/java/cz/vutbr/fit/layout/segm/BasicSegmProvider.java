@@ -77,7 +77,12 @@ public class BasicSegmProvider extends BaseArtifactService
     public Artifact process(Artifact input) throws ServiceException
     {
         if (input != null && input instanceof Page)
-            return createAreaTree((Page) input);
+        {
+            AreaTree atree = createAreaTree((Page) input);
+            IRI atreeIri = getServiceManager().getArtifactRepository().createArtifactIri(atree);
+            atree.setIri(atreeIri);
+            return atree;
+        }
         else
             throw new ServiceException("Source artifact not specified or not a page");
     }
@@ -87,8 +92,6 @@ public class BasicSegmProvider extends BaseArtifactService
         SegmentationAreaTree atree = new SegmentationAreaTree(page, preserveAuxAreas);
         atree.findBasicAreas();
         atree.setParentIri(page.getIri());
-        IRI atreeIri = getServiceManager().getArtifactRepository().createArtifactIri(page);
-        atree.setIri(atreeIri);
         atree.setLabel(getId());
         atree.setCreator(getId());
         atree.setCreatorParams(getParamString());

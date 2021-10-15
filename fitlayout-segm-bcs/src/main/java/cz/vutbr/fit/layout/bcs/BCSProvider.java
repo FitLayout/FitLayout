@@ -84,7 +84,12 @@ public class BCSProvider extends BaseArtifactService
     public Artifact process(Artifact input) throws ServiceException
     {
         if (input != null && input instanceof Page)
-            return createAreaTree((Page) input);
+        {
+            AreaTree atree = createAreaTree((Page) input);
+            IRI atreeIri = getServiceManager().getArtifactRepository().createArtifactIri(atree);
+            atree.setIri(atreeIri);
+            return atree;
+        }
         else
             throw new ServiceException("Source artifact not specified or not a page");
     }
@@ -101,7 +106,7 @@ public class BCSProvider extends BaseArtifactService
 
     //==============================================================================
     
-    private AreaTree createAreaTree(Page page)
+    public AreaTree createAreaTree(Page page)
     {
         AreaCreator c = new AreaCreator(page.getWidth(), page.getHeight());
         List<PageArea> areas = c.getAreas(page.getRoot());
@@ -125,8 +130,6 @@ public class BCSProvider extends BaseArtifactService
         //create the resulting area "tree"
         DefaultAreaTree atree = new DefaultAreaTree(page.getIri());
         atree.setParentIri(page.getIri());
-        IRI atreeIri = getServiceManager().getArtifactRepository().createArtifactIri(page);
-        atree.setIri(atreeIri);
         atree.setLabel(getId());
         atree.setCreator(getId());
         atree.setCreatorParams(getParamString());

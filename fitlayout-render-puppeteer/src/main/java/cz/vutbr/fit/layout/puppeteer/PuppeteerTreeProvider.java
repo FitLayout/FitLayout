@@ -50,6 +50,16 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         includeScreenshot = true;
     }
     
+    public PuppeteerTreeProvider(URL url, int width, int height)
+    {
+        this.urlstring = url.toString();
+        this.width = width;
+        this.height = height;
+        this.persist = 1;
+        this.acquireImages = false;
+        this.includeScreenshot = true;
+    }
+    
     public PuppeteerTreeProvider(URL url, int width, int height, int persist, boolean acquireImages, boolean includeScreenshot)
     {
         this.urlstring = url.toString();
@@ -180,7 +190,10 @@ public class PuppeteerTreeProvider extends BaseArtifactService
             throw new ServiceException("No URL provided");
         
         try {
-            return getPage();
+            final Page page = getPage();
+            final IRI pageIri = getServiceManager().getArtifactRepository().createArtifactIri(page);
+            page.setIri(pageIri);
+            return page;
         } catch (IOException e) {
             throw new ServiceException(e);
         } catch (InterruptedException e) {
@@ -198,8 +211,6 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         PageImpl page = (PageImpl) builder.getPage();
         page.setCreator(getId());
         page.setCreatorParams(getParamString());
-        IRI pageIri = getServiceManager().getArtifactRepository().createArtifactIri(page);
-        page.setIri(pageIri);
         return page;
     }
 

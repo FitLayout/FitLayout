@@ -54,6 +54,16 @@ public class CSSBoxTreeProvider extends BaseArtifactService
         includeScreenshot = true;
     }
     
+    public CSSBoxTreeProvider(URL url, int width, int height)
+    {
+        this.urlstring = url.toString();
+        this.width = width;
+        this.height = height;
+        this.zoom = 1.0f;
+        this.acquireImages = false;
+        this.includeScreenshot = true;
+    }
+    
     public CSSBoxTreeProvider(URL url, int width, int height, float zoom, boolean acquireImages, boolean includeScreenshot)
     {
         this.urlstring = url.toString();
@@ -184,7 +194,10 @@ public class CSSBoxTreeProvider extends BaseArtifactService
             throw new ServiceException("No URL provided");
         
         try {
-            return getPage();
+            final Page page = getPage();
+            final IRI pageIri = getServiceManager().getArtifactRepository().createArtifactIri(page);
+            page.setIri(pageIri);
+            return page;
         } catch (Exception e) {
             throw new ServiceException(e);
         }
@@ -200,8 +213,6 @@ public class CSSBoxTreeProvider extends BaseArtifactService
         PageImpl page = (PageImpl) builder.getPage();
         page.setCreator(getId());
         page.setCreatorParams(getParamString());
-        IRI pageIri = getServiceManager().getArtifactRepository().createArtifactIri(page);
-        page.setIri(pageIri);
         return page;
     }
     

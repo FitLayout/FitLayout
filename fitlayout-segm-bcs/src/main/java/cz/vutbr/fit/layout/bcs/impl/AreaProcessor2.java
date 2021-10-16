@@ -306,7 +306,7 @@ public class AreaProcessor2
             }
         }
         this.time.toggle();
-        System.out.println(this.time.getTotal()/1000000 + " ms");
+        //System.out.println(this.time.getTotal()/1000000 + " ms");
     }
 
     private boolean growGroup(PageArea group, ArrayList<Integer> matches, ArrayList<PageArea> mergeCandidates)

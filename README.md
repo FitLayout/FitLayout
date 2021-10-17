@@ -27,18 +27,15 @@ For using FitLayout as it is for web page rendering, segmenation and storage, th
 
 ## Compilation from Source
 
-FitLayout may be compiled using maven. It requires a non-standard rdf4j dependency which is provided in the `lib` folder. The following steps should be sufficient for compiling:
+FitLayout may be compiled using maven:
 
 ```bash
 git clone https://github.com/FitLayout/FitLayout.git
 cd FitLayout
-cd lib
-./install.sh
-cd ..
 mvn -DskipTests clean package install
 ```
 
-After this, all the maven artifacts should have been installed and moreover a runnable CLI tool should be available under `fitlayout-tools/target/FitLayout.jar`.
+After this, all the maven artifacts should have been installed and additionally, a runnable CLI tool should be available under `fitlayout-tools/target/FitLayout.jar`.
 
 Note that for using the Chromium-based (puppeteer) renderer, the backend must be installed separately (see  [fitlayout-puppeteer](https://github.com/FitLayout/fitlayout-puppeteer)).
 

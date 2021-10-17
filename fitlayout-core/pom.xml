@@ -46,7 +46,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.rdf4j</groupId>
-			<artifactId>rdf4j-onejar</artifactId>
+			<artifactId>rdf4j-model</artifactId> <!-- IRI is used in our API -->
 		</dependency>
 	</dependencies>
 

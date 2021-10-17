@@ -56,6 +56,7 @@
 		<module>fitlayout-io</module>
 		<module>fitlayout-segm-bcs</module>
 		<module>fitlayout-text</module>
+		<module>all</module>
 		<!-- for maven Central deployment it is important that bom is the last module -->
 		<module>bom</module>
 	</modules>

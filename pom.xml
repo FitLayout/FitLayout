@@ -36,7 +36,7 @@
 		<url>https://github.com/FitLayout/FitLayout</url>
 		<connection>scm:git:git@github.com:FitLayout/FitLayout.git</connection>
 		<developerConnection>scm:git:git@github.com:FitLayout/FitLayout.git</developerConnection>
-		<tag>fitlayout-2.0.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<properties>

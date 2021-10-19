@@ -31,32 +31,40 @@
 			</resource>
 		</resources>
 		<plugins>
-			<plugin>
-				<!-- merges the service descriptions in META-INF/services -->
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.3</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<transformers>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>cz.vutbr.fit.layout.console.Console</mainClass>
-								</transformer>
-							</transformers>
-							<finalName>FitLayoutConsole</finalName>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-    	</plugins>
-		
+		</plugins>
 	</build>
+	
+	<profiles>
+		<profile>
+			<id>assembly</id>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- merges the service descriptions in META-INF/services -->
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<transformers>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+										<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+											<mainClass>cz.vutbr.fit.layout.console.Console</mainClass>
+										</transformer>
+									</transformers>
+									<finalName>FitLayoutConsole</finalName>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<dependencies>
 		<dependency>
@@ -83,12 +91,6 @@
 		<dependency>
 			<groupId>cz.vutbr.fit.layout</groupId>
 			<artifactId>fitlayout-storage-rdf</artifactId>
-			<!-- <exclusions>
-				<exclusion>
-					<artifactId>slf4j-log4j12</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-			</exclusions>-->
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -101,7 +103,7 @@
 		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline</artifactId>
-			<version>3.9.0</version>
+			<version>3.20.0</version>
 		</dependency>		
 	</dependencies>
 

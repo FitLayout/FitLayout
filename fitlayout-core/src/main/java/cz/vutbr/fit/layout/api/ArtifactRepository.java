@@ -41,8 +41,8 @@ public interface ArtifactRepository
     public Artifact getArtifact(IRI artifactIri);
     
     /**
-     * Adds an artifact to the repository. If the artifact IRI, a new IRI is generated
-     * using {@link #createArtifactIri(Artifact)}.
+     * Adds an artifact to the repository. If the artifact IRI is {@code null}
+     * a new IRI is generated using {@link #createArtifactIri(Artifact)}.
      * @param artifact the artifact to add
      */
     public void addArtifact(Artifact artifact);

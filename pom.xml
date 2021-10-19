@@ -255,6 +255,86 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>assembly</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>create-aggregate-javadoc</id>
+								<inherited>false</inherited>
+								<phase>package</phase>
+								<goals>
+									<goal>aggregate</goal>
+								</goals>
+								<configuration>
+									<doctitle>FitLayout ${project.version} API</doctitle>
+									<windowtitle>FitLayout ${project.version} API</windowtitle>
+									<groups>
+										<group>
+											<title>Rendered document model (artifacts)</title>
+											<packages>cz.vutbr.fit.layout.model*</packages>
+										</group>
+										<group>
+											<title>FitLayout API</title>
+											<packages>cz.vutbr.fit.layout.api:cz.vutbr.fit.layout.impl:cz.vutbr.fit.layout.ontology:cz.vutbr.fit.layout.provider</packages>
+										</group>
+										<group>
+											<title>Page rendering</title>
+											<packages>cz.vutbr.fit.layout.cssbox*:cz.vutbr.fit.layout.puppeteer*</packages>
+										</group>
+										<group>
+											<title>Page segmentation</title>
+											<packages>cz.vutbr.fit.layout.bcs*:cz.vutbr.fit.layout.segm*:cz.vutbr.fit.layout.vips*</packages>
+										</group>
+										<group>
+											<title>RDF serialization and storage</title>
+											<packages>cz.vutbr.fit.layout.rdf*</packages>
+										</group>
+										<group>
+											<title>Artifact I/O</title>
+											<packages>cz.vutbr.fit.layout.io</packages>
+										</group>
+										<group>
+											<title>Text extraction</title>
+											<packages>cz.vutbr.fit.layout.text*</packages>
+										</group>
+										<group>
+											<title>Tools</title>
+											<packages>cz.vutbr.fit.layout.console*:cz.vutbr.fit.layout.tools*</packages>
+										</group>
+									</groups>
+									<links>
+										<link>https://docs.oracle.com/en/java/javase/11/docs/api/</link>
+									</links>
+									<excludePackageNames></excludePackageNames>
+								</configuration>
+							</execution>
+						</executions>
+						<configuration>
+							<encoding>utf8</encoding>
+							<source>11</source>
+							<additionalparam>${javadoc.opts}</additionalparam>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 
 	<distributionManagement>

@@ -19,7 +19,7 @@ The module also implements a number of [generally applicable area tree operators
 
 ## Services and parameters
 
-Artifact service ID: `FitLayout.Grouping`
+Artifact service ID: `FitLayout.BasicAreas`
 
 Consumes: [Page](http://fitlayout.github.io/api/latest/cz.vutbr.fit.layout.core/cz/vutbr/fit/layout/model/Page.html)
 

@@ -36,6 +36,8 @@ import org.eclipse.rdf4j.sail.nativerdf.NativeStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.vutbr.fit.layout.ontology.BOX;
+
 
 /**
  * This class provides an abstraction of an RDF repository and implements the common
@@ -47,6 +49,8 @@ public class RDFStorage implements Closeable
 {
     private static Logger log = LoggerFactory.getLogger(RDFStorage.class);
     
+    private static final String IMPORT_BASE_URI = BOX.NAMESPACE;
+
 	private Repository repo;
 
 	/**
@@ -352,7 +356,7 @@ public class RDFStorage implements Closeable
     public void importTurtle(String query) throws StorageException, IOException
     {
         try (RepositoryConnection con = repo.getConnection()) {
-            con.add(new StringReader(query), "http://fitlayout.github.io/ontology/render.owl#", RDFFormat.TURTLE);
+            con.add(new StringReader(query), IMPORT_BASE_URI, RDFFormat.TURTLE);
         } catch (RDF4JException e) {
             throw new StorageException(e);
         }
@@ -361,7 +365,7 @@ public class RDFStorage implements Closeable
     public void importTurtle(String query, IRI context) throws StorageException, IOException
     {
         try (RepositoryConnection con = repo.getConnection()) {
-            con.add(new StringReader(query), "http://fitlayout.github.io/ontology/render.owl#", RDFFormat.TURTLE, context);
+            con.add(new StringReader(query), IMPORT_BASE_URI, RDFFormat.TURTLE, context);
         } catch (RDF4JException e) {
             throw new StorageException(e);
         }
@@ -370,7 +374,7 @@ public class RDFStorage implements Closeable
     public void importXML(String query) throws StorageException, IOException 
     {
         try (RepositoryConnection con = repo.getConnection()) {
-            con.add(new StringReader(query), "http://fitlayout.github.io/ontology/render.owl#", RDFFormat.RDFXML);
+            con.add(new StringReader(query), IMPORT_BASE_URI, RDFFormat.RDFXML);
         } catch (RDF4JException e) {
             throw new StorageException(e);
         }
@@ -379,7 +383,7 @@ public class RDFStorage implements Closeable
     public void importXML(String query, IRI context) throws StorageException, IOException 
     {
         try (RepositoryConnection con = repo.getConnection()) {
-            con.add(new StringReader(query), "http://fitlayout.github.io/ontology/render.owl#", RDFFormat.RDFXML, context);
+            con.add(new StringReader(query), IMPORT_BASE_URI, RDFFormat.RDFXML, context);
         } catch (RDF4JException e) {
             throw new StorageException(e);
         }

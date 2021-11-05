@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -13,11 +14,11 @@ import org.eclipse.rdf4j.RDF4JException;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.Namespace;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.QueryLanguage;
@@ -94,6 +95,11 @@ public class RDFStorage implements Closeable
     public Repository getRepository()
     {
         return repo;
+    }
+    
+    public ValueFactory getValueFactory()
+    {
+        return repo.getValueFactory();
     }
     
     public RepositoryConnection getConnection()
@@ -264,7 +270,7 @@ public class RDFStorage implements Closeable
     public void addValue(IRI subj, IRI pred, Object value, IRI context)
     {
         try (RepositoryConnection con = repo.getConnection()) {
-            final ValueFactory vf = SimpleValueFactory.getInstance();
+            final ValueFactory vf = getValueFactory();
             final Value val;
             if (value instanceof Integer)
                 val = vf.createLiteral((int) value);
@@ -449,10 +455,74 @@ public class RDFStorage implements Closeable
                 result.close();
             }
             val++;
-            ValueFactory vf = SimpleValueFactory.getInstance();
-            con.add(sequenceIri, RDF.VALUE, vf.createLiteral(val));
+            con.add(sequenceIri, RDF.VALUE, getValueFactory().createLiteral(val));
             con.commit();
             return val;
+        }
+        catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    //= Namespaces ==================================================================
+    
+    public List<Namespace> getNamespaces()
+    {
+        List<Namespace> ret = new ArrayList<>();
+        try (RepositoryConnection con = repo.getConnection()) {
+            RepositoryResult<Namespace> result = con.getNamespaces();
+            try {
+                while (result.hasNext())
+                {
+                    ret.add(result.next());
+                }
+            }
+            finally {
+                result.close();
+            }
+        }
+        catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+        return ret;
+    }
+    
+    public String getNamespace(String prefix)
+    {
+        String ret = null;
+        try (RepositoryConnection con = repo.getConnection()) {
+            ret = con.getNamespace(prefix);
+        }
+        catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+        return ret;
+    }
+    
+    public void addNamespace(String prefix, String namespace)
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.setNamespace(prefix, namespace);
+        }
+        catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    public void deleteNamespace(String prefix)
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.removeNamespace(prefix);
+        }
+        catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    public void clearNamespaces()
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.clearNamespaces();
         }
         catch (RDF4JException e) {
             throw new StorageException(e);

@@ -53,10 +53,10 @@
 									<transformers>
 										<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
 										<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-											<mainClass>cz.vutbr.fit.layout.console.Console</mainClass>
+											<mainClass>cz.vutbr.fit.layout.tools.Cli</mainClass>
 										</transformer>
 									</transformers>
-									<finalName>FitLayoutConsole</finalName>
+									<finalName>FitLayout</finalName>
 								</configuration>
 							</execution>
 						</executions>

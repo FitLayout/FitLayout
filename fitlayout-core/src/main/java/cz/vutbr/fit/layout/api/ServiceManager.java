@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.impl.DefaultArtifactRepository;
+import cz.vutbr.fit.layout.model.Artifact;
 
 /**
  * This class provides access to registered services. It holds the instances of the available
@@ -200,6 +201,32 @@ public class ServiceManager
     }
     
     //=============================================================================================
+    
+    /**
+     * Configures and invokes an artifact service for an input artifact.
+     *  
+     * @param serviceId the ID of the service to be invoked
+     * @param params A map of service input parametres (depending on the given service)
+     * @param inputArtifact The input artifact to apply the service on (may be {@code null} for services that
+     * do not use input artifacts, e.g. page rendering) 
+     * @return The created output artifact.
+     * @throws IllegalArgumentException when the service with the given ID is not available
+     */
+    public Artifact applyArtifactService(String serviceId, Map<String, Object> params, Artifact inputArtifact)
+    {
+        ParametrizedOperation op = findParmetrizedService(serviceId);
+        
+        if (op == null)
+            throw new IllegalArgumentException("No such service: " + serviceId);
+        
+        if (!(op instanceof ArtifactService))
+            throw new IllegalArgumentException("Not an ArtifactService: " + serviceId);
+        
+        if (params != null)
+            ServiceManager.setServiceParams(op, params);
+        
+        return ((ArtifactService) op).process(inputArtifact);
+    }
     
     /**
      * Sets the operation parametres based on a map of values.

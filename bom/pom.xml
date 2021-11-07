@@ -13,7 +13,6 @@
 
 	<name>FitLayout BOM</name>
 	<description>FitLayout Bill of Materials (BOM)</description>
-	<url>https://github.com/FitLayout/FitLayout</url>
 
 	<dependencyManagement>
 		<dependencies>

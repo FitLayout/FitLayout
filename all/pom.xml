@@ -13,7 +13,6 @@
 
 	<name>FitLayout Complete</name>
 	<description>All FitLayout modules</description>
-	<url>https://github.com/FitLayout/FitLayout</url>
 
 	<dependencies>
 		<!-- core modules -->

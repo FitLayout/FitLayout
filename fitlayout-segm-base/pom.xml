@@ -14,7 +14,6 @@
 	<description>
 		FitLayout - Basic segmentation algorithm and area tree operators. 
 	</description>
-	<url>https://github.com/FitLayout/FitLayout</url>
 
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>

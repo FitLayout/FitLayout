@@ -14,7 +14,6 @@
 	<description>
 		FitLayout - RDF bindings
 	</description>
-	<url>https://github.com/FitLayout/FitLayout</url>
 
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -41,15 +40,15 @@
 		</dependency>
 		
 		<dependency>
-		      <groupId>junit</groupId>
-		      <artifactId>junit</artifactId>
-		      <scope>test</scope>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<scope>test</scope>
+		</dependency>
 		
 	</dependencies>
 

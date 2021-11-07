@@ -14,7 +14,6 @@
 	<description>
 		FitLayout - VIPS algorithm implementation 
 	</description>
-	<url>https://github.com/FitLayout/FitLayout</url>
 
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>

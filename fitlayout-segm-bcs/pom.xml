@@ -1,20 +1,19 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<parent>
 		<groupId>cz.vutbr.fit.layout</groupId>
 		<artifactId>fitlayout</artifactId>
 		<version>2.0.2-SNAPSHOT</version>
 	</parent>
-	
+
 	<artifactId>fitlayout-segm-bcs</artifactId>
 	
 	<name>FitLayout BCS Segmentation</name>
 	<description>
 		FitLayout - BCS algorithm implementation 
 	</description>
-	<url>https://github.com/FitLayout/FitLayout</url>
 
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -25,25 +24,24 @@
 			<groupId>cz.vutbr.fit.layout</groupId>
 			<artifactId>fitlayout-core</artifactId>
 		</dependency>
-		
-        <dependency>
-            <groupId>net.sourceforge.jsi</groupId>
-            <artifactId>jsi</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.trove4j</groupId>
-            <artifactId>trove4j</artifactId>
-            <version>2.0.2</version>
-        </dependency>
+		<dependency>
+			<groupId>net.sourceforge.jsi</groupId>
+			<artifactId>jsi</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.trove4j</groupId>
+			<artifactId>trove4j</artifactId>
+			<version>2.0.2</version>
+		</dependency>
 	</dependencies>
-	
-    <repositories>
+
+	<repositories>
 		<repository>
 		  <id>jsi.sourceforge.net</id>
 		  <name>sourceforge jsi repository</name>
 		  <url>https://sourceforge.net/projects/jsi/files/m2_repo</url>
 		</repository>
-    </repositories>
+	</repositories>
 
 </project>

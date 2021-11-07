@@ -14,23 +14,6 @@
 	<description>
 		An extensible web page segmentation and analysis framework. Framework core and shared APIs.
 	</description>
-	<url>https://github.com/FitLayout/FitLayout</url>
-
-	<developers>
-		<developer>
-			<name>Radek Burget</name>
-			<roles>
-				<role>Main developer &amp; project leader</role>
-			</roles>
-		</developer>
-	</developers>
-
-	<scm>
-		<url>https://github.com/FitLayout/FitLayout</url>
-		<connection>scm:git:git@github.com:FitLayout/FitLayout.git</connection>
-		<developerConnection>scm:git:git@github.com:FitLayout/FitLayout.git</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
 
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>

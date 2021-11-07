@@ -132,7 +132,7 @@ public class AreaStyle
     /**
      * Checks if two areas have the same background color
      * @param a1 the first area to compare
-     * @param a1 the second area to compare
+     * @param a2 the second area to compare
      * @return {@code true} if the areas are both transparent or they have the same
      * background color declared
      */

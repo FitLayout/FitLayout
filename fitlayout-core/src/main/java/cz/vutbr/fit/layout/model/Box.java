@@ -86,7 +86,7 @@ public interface Box extends ContentRect, GenericTreeNode<Box>
 
     /**
      * Sets the content bounds of the box.
-     * @param visualBounds the new content bounds.
+     * @param contentBounds the new content bounds.
      */
     public void setContentBounds(Rectangular contentBounds);
     

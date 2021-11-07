@@ -183,7 +183,7 @@ public class HTMLOutputOperator extends BaseOperator
     
     /**
      * Formats the complete box tree to an output stream.
-     * @param tree the area tree to be printed
+     * @param page the page box tree to be printed
      * @param out a writer to be used for output
      */
     public void dumpTo(Page page, PrintWriter out)

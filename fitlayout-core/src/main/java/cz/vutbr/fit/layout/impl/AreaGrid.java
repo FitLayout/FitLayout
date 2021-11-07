@@ -162,7 +162,7 @@ public class AreaGrid
     
     /**
      * Finds the offset of the specified row from the grid origin.
-     * @param col the row index
+     * @param row the row index
      * @return the offset in pixels. Row 0 has always the offset 0.
      */
     public int getRowOfs(int row) throws ArrayIndexOutOfBoundsException
@@ -227,7 +227,7 @@ public class AreaGrid
     
     /**
      * Computes the absolute coordinates of the specified area in the grid.
-     * @param The area coordinates in the grid.
+     * @param area The area coordinates in the grid.
      * @return the absolute coordinates of the given area in pixels.
      */
     public Rectangular getAreaBoundsAbsolute(Rectangular area)

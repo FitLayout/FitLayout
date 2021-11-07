@@ -29,7 +29,6 @@ public class ModelTransformer
 
     /**
      * Gets the IRI factory used for creating the IRIs when building a RDF graph.
-     * @param iriFactory
      */
     public IRIFactory getIriFactory()
     {

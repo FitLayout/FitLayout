@@ -115,7 +115,7 @@ public interface AreaTopology
     
     /**
      * Translates the Y coordinate from pixels to topology position
-     * @param pixelX the pixel Y coordinate
+     * @param pixelY the pixel Y coordinate
      * @return the topology Y coordinate
      */
     public int toTopologyY(int pixelY);

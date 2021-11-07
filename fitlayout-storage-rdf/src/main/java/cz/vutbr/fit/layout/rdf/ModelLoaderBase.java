@@ -183,8 +183,8 @@ public abstract class ModelLoaderBase extends ModelTransformer
     }
     
     /**
-     * Loads the source page artifact of the area tree.
-     * @param pageIri the source page IRI
+     * Loads the source area tree artifact of this area tree.
+     * @param areaTreeIri the source page IRI
      * @param repo the repository used for loading the page artifact.
      * @return the page artifact or {@code null} when not specified or not found
      */

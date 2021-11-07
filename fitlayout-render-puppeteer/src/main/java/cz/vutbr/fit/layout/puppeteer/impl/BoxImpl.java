@@ -103,7 +103,8 @@ public class BoxImpl extends DefaultBox
     /**
      * Returns the bounds of the box as obtained from the renderer. This should correspond to the
      * border bounds of the box in the CSS terminology. This value is used when a box tree is
-     * being constructed from individual boxes obtained from the renderer (e.g. using {@link BaseBoxTreeBuilder}).
+     * being constructed from individual boxes obtained from the renderer (e.g. using 
+     * {@link cz.vutbr.fit.layout.impl.BaseBoxTreeBuilder}).
      * @return the intrinsic bounds of the box
      */
     public Rectangular getIntrinsicBounds()

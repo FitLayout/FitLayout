@@ -28,9 +28,9 @@ public class VisualBlockDetector
 	private int sizeTresholdHeight = 0;
 
 	/**
-	 * Creates a detector for the given page.
+	 * Creates a detector for the given root visual area.
 	 * 
-	 * @param page Rendered page
+	 * @param rootArea the root visual area to create detector for.
 	 */
 	public VisualBlockDetector(VisualArea rootArea) 
 	{
@@ -42,7 +42,7 @@ public class VisualBlockDetector
 	/**
 	 * Creates a new detector with the specified thresholds.
 	 * 
-	 * @param page The rendered page
+     * @param rootArea the root visual area to create detector for.
 	 * @param sizeTresholdWidth Element's width treshold
 	 * @param sizeTresholdHeight Element's height treshold
 	 */

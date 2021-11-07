@@ -123,7 +123,7 @@ public class SuperAreaOperator extends BaseOperator
     
     /**
      * Creates syntetic super areas by grouping the subareas of the given area.
-     * @param the root area to be processed
+     * @param root the root area to be processed
      * @param passlimit the maximal number of passes while some changes occur 
      */ 
     public void findSuperAreas(Area root, int passlimit)

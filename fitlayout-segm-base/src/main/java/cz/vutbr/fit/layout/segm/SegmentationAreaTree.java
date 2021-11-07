@@ -29,7 +29,7 @@ public class SegmentationAreaTree extends DefaultAreaTree
     
     /**
      * Create a new tree of areas by the analysis of a box tree
-     * @param srcpage the source box tree
+     * @param srcPage the source box tree
      * @param preserveAuxAreas preserve the auxiliary areas that are not visually separated but
      * they are used as containers containing other ares.
      */

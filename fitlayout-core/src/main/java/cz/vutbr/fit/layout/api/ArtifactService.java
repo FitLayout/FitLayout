@@ -33,7 +33,7 @@ public interface ArtifactService extends Service
     
     /**
      * Consumes an input artifact and produces an output artifact.
-     * @param source The input artifact or {@code null} when nothing is consumed
+     * @param input The input artifact or {@code null} when nothing is consumed
      * @return the output artifact {@code null} when nothing is produced
      */
     public Artifact process(Artifact input)

@@ -240,8 +240,9 @@ public class Vips
     
 
 	/**
-	 * Starts segmentation on given address
-	 * @param url
+	 * Starts segmentation of a page.
+	 * 
+	 * @param page The page to perform segmentation on.
 	 */
 	public void startSegmentation(Page page)
 	{
@@ -250,8 +251,7 @@ public class Vips
 	}
 
 	/**
-	 * Starts visual segmentation of page
-	 * @throws Exception
+	 * Starts visual segmentation of the current page.
 	 */
 	public void startSegmentation()
 	{

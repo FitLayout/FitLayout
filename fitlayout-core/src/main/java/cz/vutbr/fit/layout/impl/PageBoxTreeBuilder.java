@@ -31,7 +31,7 @@ public class PageBoxTreeBuilder extends BaseBoxTreeBuilder
     /**
      * Creates the new page from an input page.
      * @param input the input page
-     * @param the label to be set for the new page
+     * @param label the label to be set for the new page
      * @param creator the creator ID to be set for the new page
      * @param creatorParams the creator parametres to be set for the new page
      * @return the new page

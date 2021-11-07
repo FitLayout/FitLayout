@@ -35,7 +35,7 @@ public interface IRIDecoder
     
     /**
      * Gets a map that assigns uris to known prefix names.
-     * @return the map prefix name -> URI prefix
+     * @return the map prefix name to URI prefix
      */
     public Map<String, String> getPrefixUris();
 

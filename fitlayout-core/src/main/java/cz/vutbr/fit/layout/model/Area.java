@@ -156,7 +156,7 @@ public interface Area extends ContentRect, GenericTreeNode<Area>, Taggable
      * When set to true, the area is considered to be separated from other
      * areas explicitly, i.e. independently on its real borders or background.
      * This is usually used for some new superareas.
-     * @param separated <code>true</code>, if the area should be explicitly separated
+     * @param explicitlySeparated <code>true</code>, if the area should be explicitly separated
      */
     public void setExplicitlySeparated(boolean explicitlySeparated);
     

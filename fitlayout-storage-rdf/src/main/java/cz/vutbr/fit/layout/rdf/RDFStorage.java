@@ -20,8 +20,14 @@ import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.query.BindingSet;
+import org.eclipse.rdf4j.query.BooleanQuery;
+import org.eclipse.rdf4j.query.GraphQuery;
+import org.eclipse.rdf4j.query.GraphQueryResult;
+import org.eclipse.rdf4j.query.Query;
 import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.QueryResults;
+import org.eclipse.rdf4j.query.TupleQuery;
+import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.query.Update;
 import org.eclipse.rdf4j.query.resultio.text.csv.SPARQLResultsCSVWriter;
 import org.eclipse.rdf4j.repository.Repository;
@@ -236,6 +242,73 @@ public class RDFStorage implements Closeable
     {
         try {
             return Repositories.tupleQuery(repo, query, r -> QueryResults.asList(r));
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    /**
+     * Checks and executes extrenal (possibly unsafe) SPARQL SELECT query and returns a result.
+     * This is a special version of {@link #executeSparqlQuery(String, boolean, long, long)}
+     * optimized for SELECT queries.
+     * @param queryString the SPARQL SELECT query
+     * @param distinct {@code true} when only distinct results should be returned
+     * @param limit maximal number of returned results
+     * @param offset index of the first result to be returned
+     * @return a query result that holds the result type and data
+     * @throws StorageException when the query could not be parsed or executed or is not a SELECT query.
+     */
+    public List<BindingSet> executeSparqlTupleQuery(String queryString, boolean distinct, long limit, long offset) throws StorageException
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            TupleQuery query = con.prepareTupleQuery(queryString);
+            TupleQueryResult result = ((TupleQuery) query).evaluate();
+            if (distinct)
+                result = QueryResults.distinctResults(result);
+            result = QueryResults.limitResults(result, limit, offset);
+            return QueryResults.asList(result);
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    /**
+     * Checks and executes extrenal (possibly unsafe) SPARQL query and returns a result depending
+     * on the query type.
+     * @param queryString the SPARQL query
+     * @param distinct {@code true} when only distinct results should be returned
+     * @param limit maximal number of returned results
+     * @param offset index of the first result to be returned
+     * @return a query result that holds the result type and data
+     * @throws StorageException when the query could not be parsed or executed
+     */
+    public SparqlQueryResult executeSparqlQuery(String queryString, boolean distinct, long limit, long offset) throws StorageException
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            Query query = con.prepareQuery(queryString);
+            if (query instanceof TupleQuery)
+            {
+                TupleQueryResult result = ((TupleQuery) query).evaluate();
+                if (distinct)
+                    result = QueryResults.distinctResults(result);
+                result = QueryResults.limitResults(result, limit, offset);
+                return SparqlQueryResult.createTuple(QueryResults.asList(result));
+            }
+            else if (query instanceof GraphQuery)
+            {
+                GraphQueryResult result = ((GraphQuery) query).evaluate();
+                if (distinct)
+                    result = QueryResults.distinctResults(result);
+                result = QueryResults.limitResults(result, limit, offset);
+                return SparqlQueryResult.createGraph(QueryResults.asList(result));
+            }
+            else if (query instanceof BooleanQuery)
+            {
+                boolean result = ((BooleanQuery) query).evaluate();
+                return SparqlQueryResult.createBoolean(result);
+            }
+            else
+                throw new StorageException("Unsupported query type" + query.getClass().getName());
         } catch (Exception e) {
             throw new StorageException(e);
         }

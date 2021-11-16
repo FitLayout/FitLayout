@@ -6,6 +6,7 @@
 package cz.vutbr.fit.layout.rdf;
 
 import java.io.OutputStream;
+import java.util.Collection;
 
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Statement;
@@ -112,7 +113,7 @@ public class Serialization
         return writer;
     }
     
-    public static void modelToStream(Model model, OutputStream os, String mimeType)
+    public static void statementsToStream(Collection<Statement> statements, OutputStream os, String mimeType)
     {
         RDFWriter rdfw;
         switch (mimeType)
@@ -127,8 +128,13 @@ public class Serialization
                 rdfw = createRioWriterJsonLD(os);
                 break;
         }
-        for (Statement stmt : model)
+        for (Statement stmt : statements)
             rdfw.handleStatement(stmt);
         rdfw.endRDF();
+    }
+    
+    public static void modelToStream(Model model, OutputStream os, String mimeType)
+    {
+        statementsToStream(model, os, mimeType);
     }
 }

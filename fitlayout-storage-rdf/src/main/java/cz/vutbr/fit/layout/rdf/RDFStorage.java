@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.rdf4j.IsolationLevels;
-import org.eclipse.rdf4j.RDF4JException;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Model;
@@ -134,7 +133,7 @@ public class RDFStorage implements Closeable
             finally {
                 result.close();
             }
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
         return ret;
@@ -151,7 +150,7 @@ public class RDFStorage implements Closeable
         try (RepositoryConnection con = repo.getConnection()) {
             final RepositoryResult<Statement> result = con.getStatements(subject, null, null, true);
             return QueryResults.asModel(result);
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -172,7 +171,7 @@ public class RDFStorage implements Closeable
                     return (IRI) st.getObject(); 
             }
             return null; //no type statement found
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -189,7 +188,7 @@ public class RDFStorage implements Closeable
         try (RepositoryConnection con = repo.getConnection()) {
             final RepositoryResult<Statement> result = con.getStatements(null, null, null, context);
             return QueryResults.asModel(result);
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -207,7 +206,7 @@ public class RDFStorage implements Closeable
             final Resource[] res = contexts.toArray(new Resource[contexts.size()]);
             final RepositoryResult<Statement> result = con.getStatements(null, null, null, res);
             return QueryResults.asModel(result);
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -222,7 +221,7 @@ public class RDFStorage implements Closeable
     {
         try {
             return Repositories.graphQuery(repo, query, r -> QueryResults.asModel(r));
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -237,7 +236,7 @@ public class RDFStorage implements Closeable
     {
         try {
             return Repositories.tupleQuery(repo, query, r -> QueryResults.asList(r));
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -255,7 +254,7 @@ public class RDFStorage implements Closeable
             con.begin();
             con.add(subj, pred, obj, context);
             con.commit();
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -287,7 +286,7 @@ public class RDFStorage implements Closeable
             con.begin();
             con.add(subj, pred, val, context);
             con.commit();
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -303,7 +302,7 @@ public class RDFStorage implements Closeable
             con.begin();
             con.add(graph);
             con.commit();
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -320,7 +319,7 @@ public class RDFStorage implements Closeable
             con.begin();
             con.add(graph, contextIri);
             con.commit();
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -332,7 +331,7 @@ public class RDFStorage implements Closeable
     {
         try (RepositoryConnection con = repo.getConnection()) {
             con.clear();
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -344,7 +343,7 @@ public class RDFStorage implements Closeable
     {
         try (RepositoryConnection con = repo.getConnection()) {
             con.clear(context);
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -354,7 +353,7 @@ public class RDFStorage implements Closeable
         try (RepositoryConnection con = repo.getConnection()) {
             Update upd = con.prepareUpdate(QueryLanguage.SPARQL, query);
             upd.execute();
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -363,7 +362,7 @@ public class RDFStorage implements Closeable
     {
         try (RepositoryConnection con = repo.getConnection()) {
             con.add(new StringReader(query), IMPORT_BASE_URI, RDFFormat.TURTLE);
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -372,7 +371,7 @@ public class RDFStorage implements Closeable
     {
         try (RepositoryConnection con = repo.getConnection()) {
             con.add(new StringReader(query), IMPORT_BASE_URI, RDFFormat.TURTLE, context);
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -381,7 +380,7 @@ public class RDFStorage implements Closeable
     {
         try (RepositoryConnection con = repo.getConnection()) {
             con.add(new StringReader(query), IMPORT_BASE_URI, RDFFormat.RDFXML);
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -390,7 +389,7 @@ public class RDFStorage implements Closeable
     {
         try (RepositoryConnection con = repo.getConnection()) {
             con.add(new StringReader(query), IMPORT_BASE_URI, RDFFormat.RDFXML, context);
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -399,7 +398,7 @@ public class RDFStorage implements Closeable
     {
         try (RepositoryConnection con = repo.getConnection()) {
             con.prepareTupleQuery(queryString).evaluate(new SPARQLResultsCSVWriter(ostream));
-        } catch (RDF4JException e) {
+        } catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -429,7 +428,7 @@ public class RDFStorage implements Closeable
                 result.close();
             }
         }
-        catch (RDF4JException e) {
+        catch (Exception e) {
             throw new StorageException(e);
         }
         return ret;
@@ -459,7 +458,7 @@ public class RDFStorage implements Closeable
             con.commit();
             return val;
         }
-        catch (RDF4JException e) {
+        catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -481,7 +480,7 @@ public class RDFStorage implements Closeable
                 result.close();
             }
         }
-        catch (RDF4JException e) {
+        catch (Exception e) {
             throw new StorageException(e);
         }
         return ret;
@@ -493,7 +492,7 @@ public class RDFStorage implements Closeable
         try (RepositoryConnection con = repo.getConnection()) {
             ret = con.getNamespace(prefix);
         }
-        catch (RDF4JException e) {
+        catch (Exception e) {
             throw new StorageException(e);
         }
         return ret;
@@ -504,7 +503,7 @@ public class RDFStorage implements Closeable
         try (RepositoryConnection con = repo.getConnection()) {
             con.setNamespace(prefix, namespace);
         }
-        catch (RDF4JException e) {
+        catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -514,7 +513,7 @@ public class RDFStorage implements Closeable
         try (RepositoryConnection con = repo.getConnection()) {
             con.removeNamespace(prefix);
         }
-        catch (RDF4JException e) {
+        catch (Exception e) {
             throw new StorageException(e);
         }
     }
@@ -524,7 +523,7 @@ public class RDFStorage implements Closeable
         try (RepositoryConnection con = repo.getConnection()) {
             con.clearNamespaces();
         }
-        catch (RDF4JException e) {
+        catch (Exception e) {
             throw new StorageException(e);
         }
     }

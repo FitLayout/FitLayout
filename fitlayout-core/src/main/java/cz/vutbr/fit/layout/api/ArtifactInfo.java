@@ -39,9 +39,9 @@ public class ArtifactInfo extends BaseArtifact
     @Override
     public String toString()
     {
-        String ret = getIri().toString();
+        String ret = String.valueOf(getIri());
         if (artifactType != null)
-            ret += " [" + artifactType.toString() + "]";
+            ret += " [" + String.valueOf(artifactType) + "]";
         return ret;
     }
 }

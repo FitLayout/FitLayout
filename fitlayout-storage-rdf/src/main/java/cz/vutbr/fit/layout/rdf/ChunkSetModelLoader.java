@@ -85,7 +85,7 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
                 }
             }
             else
-                log.error("ChunkSet {} has no area tree IRI", csetIri.toString());
+                log.error("ChunkSet {} has no area tree IRI", String.valueOf(csetIri));
             //construct the tree
             final Map<IRI, RDFTextChunk> chunkUris = new LinkedHashMap<>();
             final Set<TextChunk> chunks = loadChunks(artifactRepo, sourceAreaTree, sourcePage, csetIri, chunkModel, tagModel, chunkUris);

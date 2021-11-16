@@ -384,7 +384,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                 + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
                 + "?s rdf:type box:Box . "
                 + "?s box:documentOrder ?ord . "
-                + "?s box:belongsTo <" + pageIri.toString() + ">}"
+                + "?s box:belongsTo <" + String.valueOf(pageIri) + ">}"
                 + " ORDER BY ?ord";
         return artifactRepo.getStorage().executeSafeQuery(query);
     }
@@ -402,7 +402,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
         final String query = artifactRepo.getIriDecoder().declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o . "
                 + "?b rdf:type box:Box . " 
-                + "?b box:belongsTo <" + pageIri.toString() + "> . "
+                + "?b box:belongsTo <" + String.valueOf(pageIri) + "> . "
                 + getDataPropertyUnion()
                 + "}";
         return artifactRepo.getStorage().executeSafeQuery(query);

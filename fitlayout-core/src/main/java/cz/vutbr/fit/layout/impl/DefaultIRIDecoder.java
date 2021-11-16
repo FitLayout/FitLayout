@@ -102,7 +102,7 @@ public class DefaultIRIDecoder implements IRIDecoder
     @Override
     public String encodeIri(IRI iri)
     {
-        String ret = iri.toString();
+        String ret = String.valueOf(iri);
         for (Map.Entry<String, String> entry : uriPrefixes.entrySet())
         {
             if (ret.startsWith(entry.getKey()))

@@ -60,7 +60,7 @@ public class DefaultIRIFactory implements IRIFactory
     @Override
     public IRI createBoxURI(IRI pageUri, Box box)
     {
-        return factory.createIRI(pageUri.toString() + "#b" + box.getId());
+        return factory.createIRI(String.valueOf(pageUri) + "#b" + box.getId());
     }
     
     @Override
@@ -102,13 +102,13 @@ public class DefaultIRIFactory implements IRIFactory
     @Override
     public IRI createContentObjectURI(IRI pageUri, int seq)
     {
-        return factory.createIRI(pageUri.toString() + "#o" + seq);
+        return factory.createIRI(String.valueOf(pageUri) + "#o" + seq);
     }
 
     @Override
     public IRI createAreaURI(IRI areaTreeNode, Area area) 
     {
-        return factory.createIRI(areaTreeNode.toString() + "#a" + area.getId());
+        return factory.createIRI(String.valueOf(areaTreeNode) + "#a" + area.getId());
     }
     
     @Override
@@ -121,13 +121,13 @@ public class DefaultIRIFactory implements IRIFactory
     @Override
     public IRI createLogicalAreaURI(IRI areaTreeNode, int cnt) 
     {
-        return factory.createIRI(areaTreeNode.toString() + "#l" + cnt);
+        return factory.createIRI(String.valueOf(areaTreeNode) + "#l" + cnt);
     }
     
     @Override
     public IRI createTagSupportURI(IRI areaUri, Tag tag) 
     {
-        return factory.createIRI(areaUri.toString() + "-" + getTagDesc(tag));
+        return factory.createIRI(String.valueOf(areaUri) + "-" + getTagDesc(tag));
     }
     
     @Override
@@ -144,7 +144,7 @@ public class DefaultIRIFactory implements IRIFactory
     @Override
     public IRI createTextChunkURI(IRI chunkSetUri, TextChunk chunk)
     {
-        return factory.createIRI(chunkSetUri.toString() + "#c" + chunk.getId());
+        return factory.createIRI(String.valueOf(chunkSetUri) + "#c" + chunk.getId());
     }
     
     @Override

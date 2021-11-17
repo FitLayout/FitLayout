@@ -139,6 +139,19 @@ public class Serialization
         return rdfw;
     }
     
+    public static RDFFormat getFormatForMimeType(String mimeType)
+    {
+        switch (mimeType)
+        {
+            case TURTLE:
+                return RDFFormat.TURTLE;
+            case RDFXML:
+                return RDFFormat.RDFXML;
+            default:
+                return RDFFormat.JSONLD;
+        }
+    }
+    
     public static void statementsToStream(Repository repo, OutputStream os, String mimeType,
             Resource subj, IRI pred, Value obj, Resource... contexts)
     {

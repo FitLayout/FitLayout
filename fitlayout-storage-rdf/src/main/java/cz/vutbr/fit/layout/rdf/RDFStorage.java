@@ -3,6 +3,7 @@ package cz.vutbr.fit.layout.rdf;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -462,6 +463,15 @@ public class RDFStorage implements Closeable
     {
         try (RepositoryConnection con = repo.getConnection()) {
             con.add(new StringReader(query), IMPORT_BASE_URI, RDFFormat.RDFXML, context);
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    public void importStream(InputStream stream, RDFFormat dataFormat, IRI context) throws StorageException
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.add(stream, IMPORT_BASE_URI, dataFormat, context);
         } catch (Exception e) {
             throw new StorageException(e);
         }

@@ -8,8 +8,14 @@ package cz.vutbr.fit.layout.rdf;
 import java.io.OutputStream;
 import java.util.Collection;
 
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFHandlerException;
 import org.eclipse.rdf4j.rio.RDFWriter;
@@ -75,6 +81,8 @@ public class Serialization
     
     private static void configureNamespaces(RDFWriter writer)
     {
+        // Default namespaces used for exports: the segm and box namespaces are renamed
+        // to 'b' and 'a' and a special 'r' prefix is used for resources.
         writer.handleNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         writer.handleNamespace("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
         writer.handleNamespace("xsd", "http://www.w3.org/2001/XMLSchema#");
@@ -113,7 +121,7 @@ public class Serialization
         return writer;
     }
     
-    public static void statementsToStream(Collection<Statement> statements, OutputStream os, String mimeType)
+    public static RDFWriter createRioWriter(OutputStream os, String mimeType)
     {
         RDFWriter rdfw;
         switch (mimeType)
@@ -128,13 +136,34 @@ public class Serialization
                 rdfw = createRioWriterJsonLD(os);
                 break;
         }
+        return rdfw;
+    }
+    
+    public static void statementsToStream(Repository repo, OutputStream os, String mimeType,
+            Resource subj, IRI pred, Value obj, Resource... contexts)
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            try (RepositoryResult<Statement> statements = con.getStatements(subj, pred, obj, false, contexts)) {
+                RDFWriter rdfw = createRioWriter(os, mimeType);
+                for (Statement st: statements) {
+                    rdfw.handleStatement(st);
+                }
+                rdfw.endRDF();
+            }
+        }
+    }
+    
+    public static void statementsToStream(Collection<Statement> statements, OutputStream os, String mimeType)
+    {
+        RDFWriter rdfw = createRioWriter(os, mimeType);
         for (Statement stmt : statements)
             rdfw.handleStatement(stmt);
         rdfw.endRDF();
     }
-    
+
     public static void modelToStream(Model model, OutputStream os, String mimeType)
     {
         statementsToStream(model, os, mimeType);
     }
+    
 }

@@ -611,4 +611,24 @@ public class RDFStorage implements Closeable
         }
     }
     
+    public List<Resource> getContexts()
+    {
+        List<Resource> ret = new ArrayList<>();
+        try (RepositoryConnection con = repo.getConnection()) {
+            RepositoryResult<Resource> result = con.getContextIDs();
+            try {
+                while (result.hasNext())
+                {
+                    ret.add(result.next());
+                }
+            }
+            finally {
+                result.close();
+            }
+        }
+        catch (Exception e) {
+            throw new StorageException(e);
+        }
+        return ret;
+    }
 }

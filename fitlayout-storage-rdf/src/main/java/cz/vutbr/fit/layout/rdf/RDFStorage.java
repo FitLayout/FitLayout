@@ -363,27 +363,13 @@ public class RDFStorage implements Closeable
     {
         try (RepositoryConnection con = repo.getConnection()) {
             final ValueFactory vf = getValueFactory();
-            final Value val;
-            if (value instanceof Integer)
-                val = vf.createLiteral((int) value);
-            else if (value instanceof Long)
-                val = vf.createLiteral((long) value);
-            else if (value instanceof Float)
-                val = vf.createLiteral((float) value);
-            else if (value instanceof Double)
-                val = vf.createLiteral((double) value);
-            else if (value instanceof Boolean)
-                val = vf.createLiteral((boolean) value);
-            else
-                val = vf.createLiteral(value.toString());
-            con.begin();
+            final Value val = createValueFromObject(value, vf);
             con.add(subj, pred, val, context);
-            con.commit();
         } catch (Exception e) {
             throw new StorageException(e);
         }
     }
-    
+
     /**
      * Inserts a new graph to the database.
      * @param graph
@@ -491,6 +477,49 @@ public class RDFStorage implements Closeable
     {
         try (RepositoryConnection con = repo.getConnection()) {
             con.clear(context);
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+
+    public void removeStatements(Resource subj, IRI pred, Value obj, Resource... contexts)
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.remove(subj, pred, obj, contexts);
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    /**
+     * Removes a quadruple from the storage.
+     * @param subj
+     * @param pred
+     * @param obj
+     * @param context
+     */
+    public void remove(IRI subj, IRI pred, IRI obj, IRI context)
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.remove(subj, pred, obj, context);
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    /**
+     * Removes a quadruple from the storage.
+     * @param subj
+     * @param pred
+     * @param value
+     * @param context
+     */
+    public void removeValue(IRI subj, IRI pred, Object value, IRI context)
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            final ValueFactory vf = getValueFactory();
+            final Value val = createValueFromObject(value, vf);
+            con.remove(subj, pred, val, context);
         } catch (Exception e) {
             throw new StorageException(e);
         }
@@ -641,4 +670,25 @@ public class RDFStorage implements Closeable
         }
         return ret;
     }
+
+    //=========================================================================================
+    
+    private Value createValueFromObject(Object value, final ValueFactory vf)
+    {
+        final Value val;
+        if (value instanceof Integer)
+            val = vf.createLiteral((int) value);
+        else if (value instanceof Long)
+            val = vf.createLiteral((long) value);
+        else if (value instanceof Float)
+            val = vf.createLiteral((float) value);
+        else if (value instanceof Double)
+            val = vf.createLiteral((double) value);
+        else if (value instanceof Boolean)
+            val = vf.createLiteral((boolean) value);
+        else
+            val = vf.createLiteral(value.toString());
+        return val;
+    }
+
 }

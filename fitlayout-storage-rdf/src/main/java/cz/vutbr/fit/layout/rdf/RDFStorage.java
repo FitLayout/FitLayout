@@ -315,6 +315,25 @@ public class RDFStorage implements Closeable
         }
     }
     
+    public void execSparqlUpdate(String query) throws StorageException 
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            Update upd = con.prepareUpdate(QueryLanguage.SPARQL, query);
+            upd.execute();
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    public void queryExportCSV(String queryString, OutputStream ostream) throws StorageException 
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.prepareTupleQuery(queryString).evaluate(new SPARQLResultsCSVWriter(ostream));
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+    
     /**
      * Adds a new quadruple to the storage.
      * @param subj
@@ -398,40 +417,6 @@ public class RDFStorage implements Closeable
         }
     }
 
-    /**
-     * Clears the entire RDF repository.
-     */
-    public void clear() throws StorageException
-    {
-        try (RepositoryConnection con = repo.getConnection()) {
-            con.clear();
-        } catch (Exception e) {
-            throw new StorageException(e);
-        }
-    }
-
-    /**
-     * Clears the entire RDF repository.
-     */
-    public void clear(IRI context) throws StorageException
-    {
-        try (RepositoryConnection con = repo.getConnection()) {
-            con.clear(context);
-        } catch (Exception e) {
-            throw new StorageException(e);
-        }
-    }
-
-    public void execSparqlUpdate(String query) throws StorageException 
-    {
-        try (RepositoryConnection con = repo.getConnection()) {
-            Update upd = con.prepareUpdate(QueryLanguage.SPARQL, query);
-            upd.execute();
-        } catch (Exception e) {
-            throw new StorageException(e);
-        }
-    }
-    
     public void importTurtle(String query) throws StorageException, IOException
     {
         try (RepositoryConnection con = repo.getConnection()) {
@@ -477,10 +462,35 @@ public class RDFStorage implements Closeable
         }
     }
     
-    public void queryExportCSV(String queryString, OutputStream ostream) throws StorageException 
+    public void importStream(InputStream stream, RDFFormat dataFormat, IRI context, String baseURI) throws StorageException
     {
         try (RepositoryConnection con = repo.getConnection()) {
-            con.prepareTupleQuery(queryString).evaluate(new SPARQLResultsCSVWriter(ostream));
+            con.add(stream, baseURI, dataFormat, context);
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    /**
+     * Clears the entire RDF repository.
+     */
+    public void clear() throws StorageException
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.clear();
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+
+    /**
+     * Clears the entire context from the RDF repository.
+     * @param context Context IRI
+     */
+    public void clear(IRI context) throws StorageException
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.clear(context);
         } catch (Exception e) {
             throw new StorageException(e);
         }

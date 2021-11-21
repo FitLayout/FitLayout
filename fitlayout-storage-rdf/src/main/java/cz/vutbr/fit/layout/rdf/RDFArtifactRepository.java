@@ -265,6 +265,14 @@ public class RDFArtifactRepository implements ArtifactRepository
     }
     
     @Override
+    public void replaceArtifact(IRI artifactIri, Artifact artifact)
+    {
+        artifact.setIri(artifactIri);
+        storage.clear(artifactIri);
+        addArtifact(artifact);
+    }
+
+    @Override
     public void removeArtifact(IRI artifactIri)
     {
         //clear the derived artifacts

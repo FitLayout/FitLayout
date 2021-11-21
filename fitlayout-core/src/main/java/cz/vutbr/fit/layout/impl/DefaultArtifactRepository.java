@@ -86,6 +86,13 @@ public class DefaultArtifactRepository implements ArtifactRepository
     }
 
     @Override
+    public void replaceArtifact(IRI artifactIri, Artifact artifact)
+    {
+        artifact.setIri(artifactIri);
+        repo.put(artifactIri, artifact);
+    }
+
+    @Override
     public void removeArtifact(IRI artifactIri)
     {
         List<Artifact> derived = new ArrayList<>();

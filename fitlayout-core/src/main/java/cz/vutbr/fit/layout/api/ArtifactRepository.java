@@ -55,6 +55,14 @@ public interface ArtifactRepository
     public IRI createArtifactIri(Artifact artifact);
     
     /**
+     * Sets an IRI to a artifact and stores it into the repository while replacing the
+     * eventual existing artifact with that IRI.
+     * @param artifactIri the target IRI 
+     * @param artifact the artifact to store
+     */
+    public void replaceArtifact(IRI artifactIri, Artifact artifact);
+    
+    /**
      * Removes an artifact and all its derived artifacts from the repository.
      * @param artifactIri the artifact IRI
      */

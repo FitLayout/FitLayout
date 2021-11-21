@@ -5,11 +5,11 @@
  */
 package cz.vutbr.fit.layout.rdf;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
@@ -112,7 +112,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                 areas.put((IRI) res, area);
             }
         }
-        List<RDFArea> rootAreas = new ArrayList<RDFArea>(areas.values());
+        Set<RDFArea> rootAreas = new HashSet<RDFArea>(areas.values());
         //construct the tree
         for (Statement st : areaModel.filter(null, SEGM.isChildOf, null))
         {
@@ -128,7 +128,9 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             }
         }
         if (rootAreas.size() == 1)
-            return rootAreas.get(0);
+        {
+            return rootAreas.iterator().next();
+        }
         else
         {
             log.error("Strange number of root areas: {}", rootAreas.toString());

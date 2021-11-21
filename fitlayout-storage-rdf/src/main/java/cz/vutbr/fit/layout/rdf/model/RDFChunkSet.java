@@ -16,7 +16,7 @@ import cz.vutbr.fit.layout.model.TextChunk;
  * 
  * @author burgetr
  */
-public class RDFChunkSet extends DefaultChunkSet implements RDFResource
+public class RDFChunkSet extends DefaultChunkSet implements RDFResource, RDFArtifact
 {
 
     public RDFChunkSet(IRI parentIri)
@@ -33,6 +33,12 @@ public class RDFChunkSet extends DefaultChunkSet implements RDFResource
     public RDFChunkSet(IRI parentIri, Set<TextChunk> chunks)
     {
         super(parentIri, chunks);
+    }
+
+    @Override
+    public void recompute()
+    {
+        // nothing needs to be recomputed at the moment
     }
 
 }

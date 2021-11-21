@@ -10,13 +10,14 @@ import java.util.Map;
 import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.impl.DefaultAreaTree;
+import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 
 /**
  * 
  * @author burgetr
  */
-public class RDFAreaTree extends DefaultAreaTree implements RDFResource
+public class RDFAreaTree extends DefaultAreaTree implements RDFResource, RDFArtifact
 {
     protected Map<IRI, RDFArea> areaIris;
     protected Map<IRI, RDFLogicalArea> logicalAreaIris;
@@ -67,6 +68,20 @@ public class RDFAreaTree extends DefaultAreaTree implements RDFResource
             return logicalAreaIris.get(iri);
         else
             return null;
+    }
+
+    @Override
+    public void recompute()
+    {
+        if (getRoot() != null)
+            recursiveInvalidateStyle(getRoot());
+    }
+    
+    private void recursiveInvalidateStyle(Area root)
+    {
+        root.childrenChanged();
+        for (Area child : root.getChildren())
+            recursiveInvalidateStyle(child);
     }
     
 }

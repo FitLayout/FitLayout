@@ -11,13 +11,14 @@ import java.util.Map;
 import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.impl.DefaultPage;
+import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Page;
 
 /**
  * 
  * @author burgetr
  */
-public class RDFPage extends DefaultPage implements RDFResource
+public class RDFPage extends DefaultPage implements RDFResource, RDFArtifact
 {
     protected Map<IRI, RDFBox> boxIris;
     
@@ -50,4 +51,19 @@ public class RDFPage extends DefaultPage implements RDFResource
         else
             return null;
     }
+
+    @Override
+    public void recompute()
+    {
+        if (getRoot() != null)
+            recursiveInvalidateStyle(getRoot());
+    }
+    
+    private void recursiveInvalidateStyle(Box root)
+    {
+        root.childrenChanged();
+        for (Box child : root.getChildren())
+            recursiveInvalidateStyle(child);
+    }
+
 }

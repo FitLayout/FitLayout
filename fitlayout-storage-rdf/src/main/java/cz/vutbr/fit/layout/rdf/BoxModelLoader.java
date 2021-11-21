@@ -230,6 +230,11 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                 if (value instanceof Literal)
                     style.fontWeight = ((Literal) value).floatValue();
             }
+            else if (BOX.contentLength.equals(pred)) 
+            {
+                if (value instanceof Literal)
+                    style.contentLength = ((Literal) value).intValue();
+            }
             else if (BOX.hasBottomBorder.equals(pred)) 
             {
                 if (value instanceof IRI)
@@ -334,7 +339,6 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                 }
             }
         }
-        style.contentLength = box.getText().length();
         box.setTextStyle(style.toTextStyle());
         
         return box;

@@ -21,6 +21,8 @@ public class FL {
 	public static final String PREFIX = "fl";
 
 	/**
+	 * Artifact
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#Artifact}.
 	 * <p>
 	 * An artifact created during the page processing
@@ -30,6 +32,8 @@ public class FL {
 	public static final IRI Artifact;
 
 	/**
+	 * createdOn
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#createdOn}.
 	 * <p>
 	 * Creation date/time for an artifact or page set
@@ -39,6 +43,8 @@ public class FL {
 	public static final IRI createdOn;
 
 	/**
+	 * creator
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#creator}.
 	 * <p>
 	 * An identification of the service that created an artifact.
@@ -48,6 +54,8 @@ public class FL {
 	public static final IRI creator;
 
 	/**
+	 * creatorParams
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#creatorParams}.
 	 * <p>
 	 * Parametres of the service used for creating an artifact.
@@ -57,6 +65,8 @@ public class FL {
 	public static final IRI creatorParams;
 
 	/**
+	 * hasParentArtifact
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#hasParentArtifact}.
 	 * <p>
 	 * Assigns a parent artifact to another artifact.

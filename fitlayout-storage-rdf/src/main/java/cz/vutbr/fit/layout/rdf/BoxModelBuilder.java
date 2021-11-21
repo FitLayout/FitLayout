@@ -166,6 +166,7 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		graph.add(individual, BOX.fontStyle, vf.createLiteral(box.getTextStyle().getFontStyle()));
         graph.add(individual, BOX.underline, vf.createLiteral(box.getTextStyle().getUnderline()));
         graph.add(individual, BOX.lineThrough, vf.createLiteral(box.getTextStyle().getLineThrough()));
+        graph.add(individual, BOX.contentLength, vf.createLiteral(box.getTextStyle().getContentLength()));
         graph.add(individual, BOX.color, vf.createLiteral(Serialization.colorString(box.getColor())));
         
         if (box.getBorderStyle(Side.TOP) != null && box.hasTopBorder())

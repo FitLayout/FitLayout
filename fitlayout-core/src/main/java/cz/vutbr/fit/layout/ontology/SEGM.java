@@ -21,6 +21,8 @@ public class SEGM {
 	public static final String PREFIX = "segm";
 
 	/**
+	 * Area
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#Area}.
 	 * <p>
 	 * A visual area within the page. The areas can be nested an together
@@ -31,6 +33,8 @@ public class SEGM {
 	public static final IRI Area;
 
 	/**
+	 * AreaTree
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#AreaTree}.
 	 * <p>
 	 * A tree of visual areas created from a rendered page by page
@@ -41,6 +45,8 @@ public class SEGM {
 	public static final IRI AreaTree;
 
 	/**
+	 * belongsTo
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#belongsTo}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#belongsTo">belongsTo</a>
@@ -48,6 +54,8 @@ public class SEGM {
 	public static final IRI belongsTo;
 
 	/**
+	 * belongsToChunkSet
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#belongsToChunkSet}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#belongsToChunkSet">belongsToChunkSet</a>
@@ -55,6 +63,8 @@ public class SEGM {
 	public static final IRI belongsToChunkSet;
 
 	/**
+	 * ChunkSet
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#ChunkSet}.
 	 * <p>
 	 * A set of text chunks extreacted from a source page.
@@ -64,6 +74,8 @@ public class SEGM {
 	public static final IRI ChunkSet;
 
 	/**
+	 * containsArea
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#containsArea}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#containsArea">containsArea</a>
@@ -71,6 +83,8 @@ public class SEGM {
 	public static final IRI containsArea;
 
 	/**
+	 * containsBox
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#containsBox}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#containsBox">containsBox</a>
@@ -78,16 +92,8 @@ public class SEGM {
 	public static final IRI containsBox;
 
 	/**
-	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#contentLength}.
+	 * hasAreaTree
 	 * <p>
-	 * The number of content elements used to compute the style statistics
-	 * such as average font weight.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#contentLength">contentLength</a>
-	 */
-	public static final IRI contentLength;
-
-	/**
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasAreaTree}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasAreaTree">hasAreaTree</a>
@@ -95,6 +101,8 @@ public class SEGM {
 	public static final IRI hasAreaTree;
 
 	/**
+	 * hasSourceArea
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasSourceArea}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasSourceArea">hasSourceArea</a>
@@ -102,6 +110,8 @@ public class SEGM {
 	public static final IRI hasSourceArea;
 
 	/**
+	 * hasSourceBox
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasSourceBox}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasSourceBox">hasSourceBox</a>
@@ -109,6 +119,8 @@ public class SEGM {
 	public static final IRI hasSourceBox;
 
 	/**
+	 * hasSourcePage
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasSourcePage}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasSourcePage">hasSourcePage</a>
@@ -116,6 +128,8 @@ public class SEGM {
 	public static final IRI hasSourcePage;
 
 	/**
+	 * hasTag
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasTag}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasTag">hasTag</a>
@@ -123,6 +137,8 @@ public class SEGM {
 	public static final IRI hasTag;
 
 	/**
+	 * isChildOf
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#isChildOf}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#isChildOf">isChildOf</a>
@@ -130,6 +146,8 @@ public class SEGM {
 	public static final IRI isChildOf;
 
 	/**
+	 * isSubordinateTo
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#isSubordinateTo}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#isSubordinateTo">isSubordinateTo</a>
@@ -137,6 +155,8 @@ public class SEGM {
 	public static final IRI isSubordinateTo;
 
 	/**
+	 * LogicalArea
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea}.
 	 * <p>
 	 * Logical area represents a set of areas that form a single semantic
@@ -149,6 +169,8 @@ public class SEGM {
 	public static final IRI LogicalArea;
 
 	/**
+	 * LogicalAreaTree
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#LogicalAreaTree}.
 	 * <p>
 	 * A tree of logical areas created from an area tree by some kind of
@@ -159,6 +181,8 @@ public class SEGM {
 	public static final IRI LogicalAreaTree;
 
 	/**
+	 * name
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#name}.
 	 * <p>
 	 * Assigned area name
@@ -168,6 +192,8 @@ public class SEGM {
 	public static final IRI name;
 
 	/**
+	 * support
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#support}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#support">support</a>
@@ -175,6 +201,8 @@ public class SEGM {
 	public static final IRI support;
 
 	/**
+	 * Tag
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#Tag}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#Tag">Tag</a>
@@ -182,6 +210,8 @@ public class SEGM {
 	public static final IRI Tag;
 
 	/**
+	 * tagSupport
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#tagSupport}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#tagSupport">tagSupport</a>
@@ -189,6 +219,8 @@ public class SEGM {
 	public static final IRI tagSupport;
 
 	/**
+	 * text
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#text}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#text">text</a>
@@ -196,6 +228,8 @@ public class SEGM {
 	public static final IRI text;
 
 	/**
+	 * TextChunk
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#TextChunk}.
 	 * <p>
 	 * A connected piece of a document text that forms a rectangular area in
@@ -206,6 +240,8 @@ public class SEGM {
 	public static final IRI TextChunk;
 
 	/**
+	 * type
+	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#type}.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#type">type</a>
@@ -222,7 +258,6 @@ public class SEGM {
 		ChunkSet = factory.createIRI(SEGM.NAMESPACE, "ChunkSet");
 		containsArea = factory.createIRI(SEGM.NAMESPACE, "containsArea");
 		containsBox = factory.createIRI(SEGM.NAMESPACE, "containsBox");
-		contentLength = factory.createIRI(SEGM.NAMESPACE, "contentLength");
 		hasAreaTree = factory.createIRI(SEGM.NAMESPACE, "hasAreaTree");
 		hasSourceArea = factory.createIRI(SEGM.NAMESPACE, "hasSourceArea");
 		hasSourceBox = factory.createIRI(SEGM.NAMESPACE, "hasSourceBox");

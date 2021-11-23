@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,8 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             Model dataModel = getBoxDataModelForPage(artifactRepo, pageIri);
             //create the box tree
             Map<IRI, RDFBox> boxes = new LinkedHashMap<IRI, RDFBox>();
-            RDFBox root = constructBoxTree(artifactRepo.getStorage(), boxTreeModel, dataModel, pageIri, boxes); 
+            RDFBox root = constructBoxTree(artifactRepo.getStorage(), boxTreeModel, dataModel, pageIri,
+                    boxes, page.getAdditionalStatements()); 
             page.setRoot(root);
             page.setBoxIris(boxes);
             if (page.getWidth() == -1 && page.getHeight() == -1) //when the page width and height was not set
@@ -116,14 +118,15 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
      * @throws RepositoryException
      */
     private RDFBox constructBoxTree(RDFStorage storage, Model boxTreeModel, Model dataModel,
-            IRI pageIri, Map<IRI, RDFBox> boxes) throws RepositoryException
+            IRI pageIri, Map<IRI, RDFBox> boxes, Collection<Statement> additionalStatements) throws RepositoryException
     {
         //find all boxes
         for (Resource res : boxTreeModel.subjects())
         {
             if (res instanceof IRI)
             {
-                RDFBox box = createBoxFromModel(storage, boxTreeModel, dataModel, pageIri, (IRI) res);
+                RDFBox box = createBoxFromModel(storage, boxTreeModel, dataModel, pageIri,
+                        (IRI) res, additionalStatements);
                 boxes.put((IRI) res, box);
             }
         }
@@ -152,7 +155,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
     }
     
     private RDFBox createBoxFromModel(RDFStorage storage, Model boxTreeModel, Model dataModel, 
-            IRI pageIri, IRI boxIri) throws RepositoryException
+            IRI pageIri, IRI boxIri, Collection<Statement> additionalStatements) throws RepositoryException
     {
         RDFBox box = new RDFBox(boxIri);
         box.setId(getIriFactory().decodeBoxId(boxIri));
@@ -337,6 +340,11 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                     if (attr != null)
                         box.setAttribute(attr.getKey(), attr.getValue());
                 }
+            }
+            else
+            {
+                // the statement was not used, keep it in additional statements
+                additionalStatements.add(st);
             }
         }
         box.setTextStyle(style.toTextStyle());

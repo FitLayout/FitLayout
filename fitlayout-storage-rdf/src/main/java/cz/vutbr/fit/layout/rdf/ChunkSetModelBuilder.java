@@ -6,9 +6,11 @@
 package cz.vutbr.fit.layout.rdf;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
@@ -23,6 +25,7 @@ import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.SEGM;
 import cz.vutbr.fit.layout.rdf.model.RDFArea;
 import cz.vutbr.fit.layout.rdf.model.RDFBox;
+import cz.vutbr.fit.layout.rdf.model.RDFChunkSet;
 
 /**
  * 
@@ -59,6 +62,14 @@ public class ChunkSetModelBuilder extends ModelBuilderBase implements ModelBuild
         for (TextChunk chunk : cset.getTextChunks())
         {
             addChunk(chunk, csetIri, graph);
+        }
+        
+        // additional RDF properties
+        if (cset instanceof RDFChunkSet)
+        {
+            final Set<Statement> toadd = ((RDFChunkSet) cset).getAdditionalStatements();
+            if (toadd != null)
+                graph.addAll(toadd);
         }
         
         return graph;

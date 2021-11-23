@@ -5,6 +5,7 @@
  */
 package cz.vutbr.fit.layout.rdf;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -88,7 +89,8 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                 sourcePage = getSourcePage(pageIri, artifactRepo);
             //construct the tree
             Map<IRI, RDFArea> areaUris = new LinkedHashMap<IRI, RDFArea>();
-            RDFArea root = constructVisualAreaTree(artifactRepo, sourcePage, atree, areaModel, dataModel, areaTreeIri, areaUris);
+            RDFArea root = constructVisualAreaTree(artifactRepo, sourcePage, atree, areaModel,
+                    dataModel, areaTreeIri, areaUris, atree.getAdditionalStatements());
             recursiveUpdateTopologies(root);
             atree.setRoot(root);
             atree.setAreaIris(areaUris);
@@ -100,14 +102,16 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
     
     private RDFArea constructVisualAreaTree(RDFArtifactRepository artifactRepo, RDFPage sourcePage, RDFAreaTree atree,
             Model areaModel, Model dataModel,
-            IRI areaTreeIri, Map<IRI, RDFArea> areas) throws RepositoryException
+            IRI areaTreeIri, Map<IRI, RDFArea> areas,
+            Collection<Statement> additionalStatements) throws RepositoryException
     {
         //find all areas
         for (Resource res : areaModel.subjects())
         {
             if (res instanceof IRI)
             {
-                RDFArea area = createAreaFromModel(artifactRepo, sourcePage, areaModel, dataModel, areaTreeIri, (IRI) res);
+                RDFArea area = createAreaFromModel(artifactRepo, sourcePage, areaModel, dataModel,
+                        areaTreeIri, (IRI) res, additionalStatements);
                 area.setAreaTree(atree);
                 areas.put((IRI) res, area);
             }
@@ -139,7 +143,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
     }
     
     private RDFArea createAreaFromModel(RDFArtifactRepository artifactRepo, RDFPage sourcePage, Model areaModel, Model dataModel,
-            IRI areaTreeIri, IRI uri) throws RepositoryException
+            IRI areaTreeIri, IRI uri, Collection<Statement> additionalStatements) throws RepositoryException
     {
         RDFArea area = new RDFArea(new Rectangular(), uri);
         area.setId(getIriFactory().decodeAreaId(uri));
@@ -282,6 +286,11 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                             area.addTag(tag, support);
                     }
                 }
+            }
+            else
+            {
+                // the statement was not used, keep it in additional statements
+                additionalStatements.add(st);
             }
         }
         area.setTextStyle(style.toTextStyle());

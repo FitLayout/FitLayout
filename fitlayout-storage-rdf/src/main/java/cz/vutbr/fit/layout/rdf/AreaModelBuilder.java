@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
@@ -20,6 +21,7 @@ import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.SEGM;
+import cz.vutbr.fit.layout.rdf.model.RDFAreaTree;
 
 /**
  * Implements an RDF graph construction from an area tree. 
@@ -61,6 +63,14 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
 		insertAllAreas(areaTree.getRoot().getChildren(), areaTreeNode, pageNode, usedTags, graph);
 		
         addUsedTags(usedTags, graph);
+        
+        // additional RDF properties
+        if (areaTree instanceof RDFAreaTree)
+        {
+            final Set<Statement> toadd = ((RDFAreaTree) areaTree).getAdditionalStatements();
+            if (toadd != null)
+                graph.addAll(toadd);
+        }
         
         return graph;
 	}

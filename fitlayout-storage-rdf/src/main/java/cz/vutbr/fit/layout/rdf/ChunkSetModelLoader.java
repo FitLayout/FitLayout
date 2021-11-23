@@ -5,6 +5,7 @@
  */
 package cz.vutbr.fit.layout.rdf;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -88,7 +89,8 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
                 log.error("ChunkSet {} has no area tree IRI", String.valueOf(csetIri));
             //construct the tree
             final Map<IRI, RDFTextChunk> chunkUris = new LinkedHashMap<>();
-            final Set<TextChunk> chunks = loadChunks(artifactRepo, sourceAreaTree, sourcePage, csetIri, chunkModel, tagModel, chunkUris);
+            final Set<TextChunk> chunks = loadChunks(artifactRepo, sourceAreaTree, sourcePage,
+                    csetIri, chunkModel, tagModel, chunkUris, cset.getAdditionalStatements());
             cset.setTextChunks(chunks);
             return cset;
         }
@@ -97,14 +99,16 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
     }
 
     private Set<TextChunk> loadChunks(RDFArtifactRepository artifactRepo, RDFAreaTree sourceAreaTree, RDFPage sourcePage,
-                                        IRI csetIri, Model model, Model tagModel, Map<IRI, RDFTextChunk> chunkUris)
+                                        IRI csetIri, Model model, Model tagModel, Map<IRI, RDFTextChunk> chunkUris,
+                                        Collection<Statement> additionalStatements)
     {
         //find all chunks
         for (Resource res : model.subjects())
         {
             if (res instanceof IRI)
             {
-                RDFTextChunk area = createChunkFromModel(artifactRepo, sourceAreaTree, sourcePage, model, tagModel, csetIri, (IRI) res);
+                RDFTextChunk area = createChunkFromModel(artifactRepo, sourceAreaTree, sourcePage, 
+                        model, tagModel, csetIri, (IRI) res, additionalStatements);
                 chunkUris.put((IRI) res, area);
             }
         }
@@ -115,7 +119,8 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
     }
     
     private RDFTextChunk createChunkFromModel(RDFArtifactRepository artifactRepo, RDFAreaTree sourceAreaTree, RDFPage sourcePage, 
-                                                Model model, Model dataModel, IRI csetIri, IRI iri) throws RepositoryException
+                                                Model model, Model dataModel, IRI csetIri, IRI iri,
+                                                Collection<Statement> additionalStatements) throws RepositoryException
     {
         RDFTextChunk chunk = new RDFTextChunk(iri);
         Map<IRI, Float> tagSupport = new HashMap<>(); //tagUri->support
@@ -204,7 +209,11 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
                     }
                 }
             }
-            
+            else
+            {
+                // the statement was not used, keep it in additional statements
+                additionalStatements.add(st);
+            }
         }
         
         return chunk;

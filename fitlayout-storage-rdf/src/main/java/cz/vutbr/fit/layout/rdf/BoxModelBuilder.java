@@ -2,9 +2,11 @@ package cz.vutbr.fit.layout.rdf;
 
 import java.util.Base64;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
@@ -22,6 +24,7 @@ import cz.vutbr.fit.layout.model.ContentObject;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.rdf.model.RDFContentImage;
+import cz.vutbr.fit.layout.rdf.model.RDFPage;
 
 /**
  * Implements an RDF graph construction from a page box model. 
@@ -67,6 +70,14 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		Box root = page.getRoot();
         insertBox(root, pageNode, graph);
         insertChildBoxes(root, pageNode, graph);
+        
+        // additional RDF properties
+        if (page instanceof RDFPage)
+        {
+            final Set<Statement> toadd = ((RDFPage) page).getAdditionalStatements();
+            if (toadd != null)
+                graph.addAll(toadd);
+        }
 		
 		return graph;
 	}

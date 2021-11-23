@@ -6,8 +6,10 @@
 package cz.vutbr.fit.layout.rdf.model;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Statement;
 
 import cz.vutbr.fit.layout.impl.DefaultAreaTree;
 import cz.vutbr.fit.layout.model.Area;
@@ -19,6 +21,7 @@ import cz.vutbr.fit.layout.model.AreaTree;
  */
 public class RDFAreaTree extends DefaultAreaTree implements RDFResource, RDFArtifact
 {
+    private Set<Statement> additionalStatements;
     protected Map<IRI, RDFArea> areaIris;
     protected Map<IRI, RDFLogicalArea> logicalAreaIris;
 
@@ -68,6 +71,17 @@ public class RDFAreaTree extends DefaultAreaTree implements RDFResource, RDFArti
             return logicalAreaIris.get(iri);
         else
             return null;
+    }
+
+    public void setAdditionalStatements(Set<Statement> additionalStatements)
+    {
+        this.additionalStatements = additionalStatements;
+    }
+
+    @Override
+    public Set<Statement> getAdditionalStatements()
+    {
+        return additionalStatements;
     }
 
     @Override

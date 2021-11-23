@@ -7,8 +7,10 @@ package cz.vutbr.fit.layout.rdf.model;
 
 import java.net.URL;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Statement;
 
 import cz.vutbr.fit.layout.impl.DefaultPage;
 import cz.vutbr.fit.layout.model.Box;
@@ -21,6 +23,7 @@ import cz.vutbr.fit.layout.model.Page;
 public class RDFPage extends DefaultPage implements RDFResource, RDFArtifact
 {
     protected Map<IRI, RDFBox> boxIris;
+    private Set<Statement> additionalStatements;
     
 
     public RDFPage(URL url)
@@ -50,6 +53,17 @@ public class RDFPage extends DefaultPage implements RDFResource, RDFArtifact
             return boxIris.get(uri);
         else
             return null;
+    }
+
+    public void setAdditionalStatements(Set<Statement> additionalStatements)
+    {
+        this.additionalStatements = additionalStatements;
+    }
+
+    @Override
+    public Set<Statement> getAdditionalStatements()
+    {
+        return additionalStatements;
     }
 
     @Override

@@ -8,6 +8,7 @@ package cz.vutbr.fit.layout.rdf.model;
 import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Statement;
 
 import cz.vutbr.fit.layout.impl.DefaultChunkSet;
 import cz.vutbr.fit.layout.model.TextChunk;
@@ -18,6 +19,7 @@ import cz.vutbr.fit.layout.model.TextChunk;
  */
 public class RDFChunkSet extends DefaultChunkSet implements RDFResource, RDFArtifact
 {
+    private Set<Statement> additionalStatements;
 
     public RDFChunkSet(IRI parentIri)
     {
@@ -33,6 +35,17 @@ public class RDFChunkSet extends DefaultChunkSet implements RDFResource, RDFArti
     public RDFChunkSet(IRI parentIri, Set<TextChunk> chunks)
     {
         super(parentIri, chunks);
+    }
+
+    public void setAdditionalStatements(Set<Statement> additionalStatements)
+    {
+        this.additionalStatements = additionalStatements;
+    }
+
+    @Override
+    public Set<Statement> getAdditionalStatements()
+    {
+        return additionalStatements;
     }
 
     @Override

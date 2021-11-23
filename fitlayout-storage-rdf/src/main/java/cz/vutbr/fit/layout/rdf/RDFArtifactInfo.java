@@ -5,6 +5,9 @@
  */
 package cz.vutbr.fit.layout.rdf;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Model;
@@ -24,20 +27,40 @@ import cz.vutbr.fit.layout.ontology.FL;
  */
 public class RDFArtifactInfo extends ArtifactInfo
 {
+    /**
+     * Additional statements that do not influence the properties of the artifact itself
+     * but should be preserved together with the artifact.
+     */
+    private Set<Statement> additionalStatements;
     
     public RDFArtifactInfo(Model model, IRI artifactIri) 
     {
         super(null); //the parent IRI is taken from the model below
         setIri(artifactIri);
+        additionalStatements = new HashSet<>();
         for (Statement st : model) 
         {
             if (st.getSubject().equals(artifactIri))
-                processStatement(st);
+            {
+                if (!processStatement(st))
+                    additionalStatements.add(st);
+            }
         }
     }
 
-    protected void processStatement(Statement st)
+    public Set<Statement> getAdditionalStatements()
     {
+        return additionalStatements;
+    }
+
+    /**
+     * Processes a model statement and changes the artifact accordingly.
+     * @param st the statement to process
+     * @return {@code true} if the statement was used for changing the model, {@code false} when the statement was ignored.
+     */
+    protected boolean processStatement(Statement st)
+    {
+        boolean ret = true;
         if (st.getPredicate().equals(RDF.TYPE))
         {
             Value val = st.getObject();
@@ -68,6 +91,9 @@ public class RDFArtifactInfo extends ArtifactInfo
         {
             setCreatorParams(st.getObject().stringValue());
         }
+        else
+            ret = false;
+        return ret;
     }
     
     public void applyToArtifact(BaseArtifact a)

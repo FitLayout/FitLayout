@@ -31,9 +31,10 @@ public class PageInfo extends RDFArtifactInfo
     }
 
     @Override
-    protected void processStatement(Statement st)
+    protected boolean processStatement(Statement st)
     {
-        super.processStatement(st);
+        boolean sret = super.processStatement(st);
+        boolean ret = true;
         
         if (st.getPredicate().equals(BOX.title))
         {
@@ -52,6 +53,10 @@ public class PageInfo extends RDFArtifactInfo
                 pngImage = null;
             }
         }
+        else
+            ret = false;
+        
+        return sret || ret;
     }
     
 	public int getWidth()
@@ -97,6 +102,7 @@ public class PageInfo extends RDFArtifactInfo
         page.setTitle(getTitle());
         if (getPngImage() != null)
             page.setPngImage(getPngImage());
+        page.setAdditionalStatements(getAdditionalStatements());
     }
     
 }

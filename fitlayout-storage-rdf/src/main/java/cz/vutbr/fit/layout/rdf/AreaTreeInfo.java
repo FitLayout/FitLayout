@@ -25,6 +25,7 @@ public class AreaTreeInfo extends RDFArtifactInfo
     public void applyToAreaTree(RDFAreaTree atree)
     {
         applyToArtifact(atree);
+        atree.setAdditionalStatements(getAdditionalStatements());
     }
     
 }

@@ -26,9 +26,10 @@ public class ChunkSetInfo extends RDFArtifactInfo
     }
 
     @Override
-    protected void processStatement(Statement st)
+    protected boolean processStatement(Statement st)
     {
-        super.processStatement(st);
+        boolean sret = super.processStatement(st);
+        boolean ret = true;
         
         if (st.getPredicate().equals(SEGM.hasAreaTree))
         {
@@ -37,6 +38,10 @@ public class ChunkSetInfo extends RDFArtifactInfo
                 areaTreeIri = (IRI) st.getObject();
             }
         }
+        else
+            ret = false;
+        
+        return sret || ret;
     }
     
     public IRI getAreaTreeIri()
@@ -53,6 +58,7 @@ public class ChunkSetInfo extends RDFArtifactInfo
     {
         applyToArtifact(cset);
         cset.setAreaTreeIri(areaTreeIri);
+        cset.setAdditionalStatements(getAdditionalStatements());
     }
 
 }

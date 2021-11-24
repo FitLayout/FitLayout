@@ -288,7 +288,7 @@ public class DefaultArea extends DefaultTreeContentRect<Area> implements Area
     public void addBox(Box box)
     {
         boxes.add(box);
-        updateTextStyleForBox(box);
+        childrenChanged(); // indicates that the text style needs to be recomputed
         Rectangular sb = box.getVisualBounds();
         if (contentBounds == null)
             contentBounds = new Rectangular(sb);
@@ -358,6 +358,7 @@ public class DefaultArea extends DefaultTreeContentRect<Area> implements Area
     public void removeBoxes(Collection<Box> box)
     {
         boxes.removeAll(box);
+        childrenChanged();
     }
     
     /**
@@ -629,7 +630,8 @@ public class DefaultArea extends DefaultTreeContentRect<Area> implements Area
     }
     
     /**
-     * Recomputes the average text style after some boxes or child areas have been added or removed.
+     * Recomputes the average text style after some boxes or child areas have been
+     * added, removed or changed (e.g. added or removed boxes).
      */
     protected void recomputeTextStyle()
     {

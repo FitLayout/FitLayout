@@ -55,6 +55,8 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             "box:visualBounds",
             "box:contentBounds"
     };
+    
+    private int next_id;
 
     public BoxModelLoader(IRIFactory iriFactory)
     {
@@ -70,6 +72,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
 
     private RDFPage constructPage(RDFArtifactRepository artifactRepo, IRI pageIri) throws RepositoryException
     {
+        next_id = 0;
         Model pageModel = artifactRepo.getStorage().getSubjectModel(pageIri);
         if (pageModel.size() > 0)
         {
@@ -163,7 +166,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             IRI pageIri, IRI boxIri, Collection<Statement> additionalStatements) throws RepositoryException
     {
         RDFBox box = new RDFBox(boxIri);
-        box.setId(getIriFactory().decodeBoxId(boxIri));
+        box.setId(next_id++);
         box.setTagName("");
         box.setType(Box.Type.ELEMENT);
         box.setDisplayType(Box.DisplayType.BLOCK);

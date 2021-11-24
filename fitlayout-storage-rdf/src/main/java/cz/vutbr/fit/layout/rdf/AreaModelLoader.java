@@ -56,6 +56,8 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             "segm:tagSupport"
     };
     
+    private int next_id;
+    
     public AreaModelLoader(IRIFactory iriFactory)
     {
         super(iriFactory);
@@ -72,6 +74,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
     
     private RDFAreaTree constructAreaTree(RDFArtifactRepository artifactRepo, IRI areaTreeIri) throws RepositoryException
     {
+        next_id = 0;
         Model artifactModel = artifactRepo.getStorage().getSubjectModel(areaTreeIri);
         if (artifactModel.size() > 0)
         {
@@ -151,7 +154,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             IRI areaTreeIri, IRI uri, Collection<Statement> additionalStatements) throws RepositoryException
     {
         RDFArea area = new RDFArea(new Rectangular(), uri);
-        area.setId(getIriFactory().decodeAreaId(uri));
+        area.setId(next_id++);
         Map<IRI, Float> tagSupport = new HashMap<>(); //tagUri->support
         RDFTextStyle style = new RDFTextStyle();
         

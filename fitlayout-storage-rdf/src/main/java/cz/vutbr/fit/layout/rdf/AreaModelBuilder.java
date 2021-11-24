@@ -94,7 +94,7 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
 	 */
 	private void addArea(Area area, IRI areaTreeNode, IRI pageNode, Set<Tag> usedTags, Model graph) 
 	{
-		final IRI individual = getIriFactory().createAreaURI(areaTreeNode, area);
+		final IRI individual = getAreaIri(areaTreeNode, area);
 		graph.add(individual, RDF.TYPE, SEGM.Area);
 		if (area.getName() != null)
 		    graph.add(individual, RDFS.LABEL, vf.createLiteral(area.getName()));
@@ -102,7 +102,7 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
         graph.add(individual, SEGM.belongsTo, areaTreeNode);
 
         if (area.getParent() != null)
-            graph.add(individual, SEGM.isChildOf, getIriFactory().createAreaURI(areaTreeNode, area.getParent()));
+            graph.add(individual, SEGM.isChildOf, getAreaIri(areaTreeNode, area.getParent()));
         
 		// append the geometry
         insertBounds(individual, BOX.bounds, "b", area.getBounds(), graph);

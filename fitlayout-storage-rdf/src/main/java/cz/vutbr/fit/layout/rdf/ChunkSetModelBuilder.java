@@ -23,8 +23,6 @@ import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TextChunk;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.SEGM;
-import cz.vutbr.fit.layout.rdf.model.RDFArea;
-import cz.vutbr.fit.layout.rdf.model.RDFBox;
 import cz.vutbr.fit.layout.rdf.model.RDFChunkSet;
 
 /**
@@ -77,7 +75,7 @@ public class ChunkSetModelBuilder extends ModelBuilderBase implements ModelBuild
     
     private void addChunk(TextChunk chunk, IRI csetIri, Model graph)
     {
-        final IRI ciri = getIriFactory().createTextChunkURI(csetIri, chunk);
+        final IRI ciri = getTextChunkIri(csetIri, chunk);
         graph.add(ciri, RDF.TYPE, SEGM.TextChunk);
         if (chunk.getName() != null)
             graph.add(ciri, RDFS.LABEL, vf.createLiteral(chunk.getName()));
@@ -90,18 +88,9 @@ public class ChunkSetModelBuilder extends ModelBuilderBase implements ModelBuild
             graph.add(ciri, BOX.backgroundColor, vf.createLiteral(Serialization.colorString(chunk.getEffectiveBackgroundColor())));
         }
         
-        final IRI areaIri;
-        if (chunk.getSourceArea() instanceof RDFArea)
-            areaIri = ((RDFArea) chunk.getSourceArea()).getIri();
-        else
-            areaIri = getIriFactory().createAreaURI(chunk.getSourceArea().getAreaTree().getIri(), chunk.getSourceArea());
+        final IRI areaIri = getAreaIri(chunk.getSourceArea().getAreaTree().getIri(), chunk.getSourceArea());
         graph.add(ciri, SEGM.hasSourceArea, areaIri);
-        
-        final IRI boxIri;
-        if (chunk.getSourceBox() instanceof RDFBox)
-            boxIri = ((RDFBox) chunk.getSourceBox()).getIri();
-        else
-            boxIri = getIriFactory().createBoxURI(chunk.getSourceBox().getPageIri(), chunk.getSourceBox());
+        final IRI boxIri = getBoxIri(chunk.getSourceBox().getPageIri(), chunk.getSourceBox());
         graph.add(ciri, SEGM.hasSourceBox, boxIri);
         
         // append the geometry

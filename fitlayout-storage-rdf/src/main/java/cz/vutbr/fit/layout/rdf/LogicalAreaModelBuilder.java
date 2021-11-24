@@ -77,7 +77,7 @@ public class LogicalAreaModelBuilder extends ModelBuilderBase implements ModelBu
 
     private IRI addLogicalArea(LogicalArea area, IRI parent, IRI areaTreeNode, Model graph) 
     {
-        final IRI individual = getIriFactory().createLogicalAreaURI(areaTreeNode, next_order++);
+        final IRI individual = getLogicalAreaIri(areaTreeNode, area, next_order++);
         graph.add(individual, RDF.TYPE, SEGM.LogicalArea);
         graph.add(individual, BOX.documentOrder, vf.createLiteral(next_order++));
         graph.add(individual, SEGM.belongsTo, areaTreeNode);

@@ -12,7 +12,6 @@ import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
-//import org.eclipse.rdf4j.query.algebra.evaluation.function.rdfterm.UUID;
 
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Border;
@@ -103,7 +102,7 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 	private void insertBox(Box box, IRI pageNode, Model graph) 
 	{
 		// add BOX individual into graph
-		final IRI individual = getIriFactory().createBoxURI(pageNode, box);
+		final IRI individual = getBoxIri(pageNode, box);
 		graph.add(individual, RDF.TYPE, BOX.Box);
 		graph.add(individual, BOX.documentOrder, vf.createLiteral(box.getOrder()));
         graph.add(individual, BOX.visible, vf.createLiteral(box.isVisible()));
@@ -113,7 +112,7 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		
 		//parent
 		if (box.getParent() != null)
-		    graph.add(individual, BOX.isChildOf, getIriFactory().createBoxURI(pageNode, box.getParent()));
+		    graph.add(individual, BOX.isChildOf, getBoxIri(pageNode, box.getParent()));
 
 		//tag properties
 		if (box.getTagName() != null)

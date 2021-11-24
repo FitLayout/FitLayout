@@ -91,10 +91,15 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             Map<IRI, RDFArea> areaUris = new LinkedHashMap<IRI, RDFArea>();
             RDFArea root = constructVisualAreaTree(artifactRepo, sourcePage, atree, areaModel,
                     dataModel, areaTreeIri, areaUris, atree.getAdditionalStatements());
-            recursiveUpdateTopologies(root);
-            atree.setRoot(root);
-            atree.setAreaIris(areaUris);
-            return atree;
+            if (root != null)
+            {
+                recursiveUpdateTopologies(root);
+                atree.setRoot(root);
+                atree.setAreaIris(areaUris);
+                return atree;
+            }
+            else
+                return null; // couldn't construct the area tree
         }
         else
             return null;
@@ -320,9 +325,9 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
         final String query = artifactRepo.getIriDecoder().declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
                 + "?s rdf:type segm:Area . "
-                + "?s box:documentOrder ?ord . "
-                + "?s segm:belongsTo <" + areaTreeIri.stringValue() + "> }"
-                + " ORDER BY ?ord";
+                + "?s segm:belongsTo <" + areaTreeIri.stringValue() + "> . "
+                + "OPTIONAL { ?s box:documentOrder ?ord } "
+                + "} ORDER BY ?ord";
         return artifactRepo.getStorage().executeSafeQuery(query);
     }
     

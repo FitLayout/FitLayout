@@ -181,7 +181,6 @@ public class RDFArtifactRepository implements ArtifactRepository
                     + "  OPTIONAL { ?pg fl:createdOn ?time } "
                     + "} ORDER BY ?time";
             
-            log.debug("QUERY: {}", query);
             List<BindingSet> data = storage.executeSafeTupleQuery(query);
             List<IRI> ret = new ArrayList<>(data.size());
             for (BindingSet binding : data)

@@ -59,8 +59,13 @@ public class LogicalAreaModelLoader extends ModelLoaderBase implements ModelLoad
             DefaultLogicalAreaTree atree = new DefaultLogicalAreaTree(areaTreeIri);
             Map<IRI, RDFLogicalArea> areaUris = new LinkedHashMap<IRI, RDFLogicalArea>();
             RDFLogicalArea root = constructLogicalAreaTree(artifactRepo, model, logicalTreeIri, areaUris);
-            atree.setRoot(root);
-            return atree;
+            if (root != null)
+            {
+                atree.setRoot(root);
+                return atree;
+            }
+            else
+                return null;
         }
         else
             return null;
@@ -165,9 +170,9 @@ public class LogicalAreaModelLoader extends ModelLoaderBase implements ModelLoad
         final String query = artifactRepo.getIriDecoder().declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
                 + "?s rdf:type segm:LogicalArea . "
-                + "?s box:documentOrder ?ord . "
-                + "?s segm:belongsTo <" + logicalTreeIri.stringValue() + "> }" //TODO is belongsTo correct?
-                + " ORDER BY ?ord";
+                + "?s segm:belongsTo <" + logicalTreeIri.stringValue() + "> " //TODO is belongsTo correct?
+                + "OPTIONAL { ?s box:documentOrder ?ord } "
+                + "} ORDER BY ?ord";
         return artifactRepo.getStorage().executeSafeQuery(query);
     }
     

@@ -95,15 +95,20 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             Map<IRI, RDFBox> boxes = new LinkedHashMap<IRI, RDFBox>();
             RDFBox root = constructBoxTree(artifactRepo.getStorage(), boxTreeModel, dataModel, pageIri,
                     boxes, page.getAdditionalStatements()); 
-            page.setRoot(root);
-            page.setBoxIris(boxes);
-            if (page.getWidth() == -1 && page.getHeight() == -1) //when the page width and height was not set
+            if (root != null)
             {
-                page.setWidth(root.getWidth());
-                page.setHeight(root.getHeight());
+                page.setRoot(root);
+                page.setBoxIris(boxes);
+                if (page.getWidth() == -1 && page.getHeight() == -1) //when the page width and height was not set
+                {
+                    page.setWidth(root.getWidth());
+                    page.setHeight(root.getHeight());
+                }
+                
+                return page;
             }
-            
-            return page;
+            else
+                return null;
         }
         else
             return null;
@@ -395,9 +400,9 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
         final String query = artifactRepo.getIriDecoder().declarePrefixes()
                 + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
                 + "?s rdf:type box:Box . "
-                + "?s box:documentOrder ?ord . "
-                + "?s box:belongsTo <" + String.valueOf(pageIri) + ">}"
-                + " ORDER BY ?ord";
+                + "?s box:belongsTo <" + String.valueOf(pageIri) + "> . "
+                + "OPTIONAL { ?s box:documentOrder ?ord } "
+                + "} ORDER BY ?ord";
         return artifactRepo.getStorage().executeSafeQuery(query);
     }
 

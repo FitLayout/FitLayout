@@ -7,6 +7,7 @@ package cz.vutbr.fit.layout.rdf;
 
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
@@ -36,9 +37,12 @@ public class Serialization
     public static final String JSONLD = "application/ld+json";
     public static final String TURTLE = "text/turtle";
     public static final String RDFXML = "application/rdf+xml";
+    public static final String NTRIPLES = "application/n-triples";
     public static final String NQUADS = "application/n-quads";
     
     public static final String SPARQL_QUERY = "application/sparql-query";
+    
+    public static final Set<String> rdfFormats = Set.of(JSONLD, TURTLE, RDFXML, NTRIPLES, NQUADS);
     
     
     public static String colorString(Color color)
@@ -122,6 +126,15 @@ public class Serialization
         return writer;
     }
     
+    public static RDFWriter createRioWriterNTriples(OutputStream os) throws RDFHandlerException
+    {
+        RDFWriter writer = Rio.createWriter(RDFFormat.NTRIPLES, os);
+        writer.startRDF();
+        configureNamespaces(writer);
+        writer.getWriterConfig().set(BasicWriterSettings.PRETTY_PRINT, true);
+        return writer;
+    }
+    
     public static RDFWriter createRioWriterNQuads(OutputStream os) throws RDFHandlerException
     {
         RDFWriter writer = Rio.createWriter(RDFFormat.NQUADS, os);
@@ -142,6 +155,9 @@ public class Serialization
             case RDFXML:
                 rdfw = createRioWriterXML(os);
                 break;
+            case NTRIPLES:
+                rdfw = createRioWriterNTriples(os);
+                break;
             case NQUADS:
                 rdfw = createRioWriterNQuads(os);
                 break;
@@ -160,6 +176,8 @@ public class Serialization
                 return RDFFormat.TURTLE;
             case RDFXML:
                 return RDFFormat.RDFXML;
+            case NTRIPLES:
+                return RDFFormat.NTRIPLES;
             case NQUADS:
                 return RDFFormat.NQUADS;
             default:

@@ -130,6 +130,8 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		    graph.add(individual, BOX.hasAttribute, attrUri);
 		}
 		
+        insertSameAs(box, individual, graph);
+		
 		// store the positions and sizes of the element
 		insertBounds(individual, BOX.bounds, "b", box.getBounds(), graph);
         insertBounds(individual, BOX.visualBounds, "v", box.getVisualBounds(), graph);

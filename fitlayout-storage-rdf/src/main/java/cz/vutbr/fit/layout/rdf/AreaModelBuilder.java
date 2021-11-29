@@ -104,6 +104,8 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
         if (area.getParent() != null)
             graph.add(individual, SEGM.isChildOf, getAreaIri(areaTreeNode, area.getParent()));
         
+        insertSameAs(area, individual, graph);
+        
 		// append the geometry
         insertBounds(individual, BOX.bounds, "b", area.getBounds(), graph);
 

@@ -10,6 +10,7 @@ import java.util.List;
 
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
+import cz.vutbr.fit.layout.model.GenericTreeNode;
 import cz.vutbr.fit.layout.model.Page;
 
 /**
@@ -81,6 +82,7 @@ public class PageBoxTreeBuilder extends BaseBoxTreeBuilder
     {
         final DefaultBox ret = new DefaultBox(root);
         ret.setId(ret.getOrder()); //use the order as ID for the visual tree boxes
+        ret.addUserAttribute(GenericTreeNode.ATTR_SAME_AS, root);
         target.add(ret);
         // hadle the root node of the whole tree
         if (treeRoot == null)

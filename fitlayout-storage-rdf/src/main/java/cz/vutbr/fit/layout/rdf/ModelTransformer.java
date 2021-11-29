@@ -53,8 +53,9 @@ public class ModelTransformer
      */
     protected IRI getBoxIri(IRI pageIri, Box box)
     {
-        if (box instanceof RDFResource)
-            return ((RDFResource) box).getIri();
+        final IRI curIri = getCurrentIri(box);
+        if (curIri != null)
+            return curIri;
         else
             return getIriFactory().createBoxURI(pageIri, box);
     }
@@ -67,8 +68,9 @@ public class ModelTransformer
      */
     protected IRI getAreaIri(IRI areaTreeIri, Area area)
     {
-        if (area instanceof RDFResource)
-            return ((RDFResource) area).getIri();
+        final IRI curIri = getCurrentIri(area);
+        if (curIri != null)
+            return curIri;
         else
             return getIriFactory().createAreaURI(areaTreeIri, area);
     }
@@ -81,8 +83,9 @@ public class ModelTransformer
      */
     protected IRI getLogicalAreaIri(IRI areaTreeIri, LogicalArea area, int ord)
     {
-        if (area instanceof RDFResource)
-            return ((RDFResource) area).getIri();
+        final IRI curIri = getCurrentIri(area);
+        if (curIri != null)
+            return curIri;
         else
             return getIriFactory().createLogicalAreaURI(areaTreeIri, ord);
     }
@@ -95,10 +98,24 @@ public class ModelTransformer
      */
     protected IRI getTextChunkIri(IRI chunkSetIri, TextChunk chunk)
     {
-        if (chunk instanceof RDFResource)
-            return ((RDFResource) chunk).getIri();
+        final IRI curIri = getCurrentIri(chunk);
+        if (curIri != null)
+            return curIri;
         else
             return getIriFactory().createTextChunkURI(chunkSetIri, chunk);
+    }
+    
+    /**
+     * For RDF resources returns the current object IRI (may be null).
+     * @param obj the object
+     * @return current IRI for RDF resources, {@code null} otherwise.
+     */
+    protected IRI getCurrentIri(Object obj)
+    {
+        if (obj instanceof RDFResource)
+            return ((RDFResource) obj).getIri();
+        else
+            return null;
     }
 
 }

@@ -109,6 +109,7 @@ public class OperatorWrapperProvider extends BaseArtifactService
         DefaultAreaTree ret = new DefaultAreaTree(input);
         Area root = ret.createArea(input.getRoot());
         recursiveCopyChildren(ret, root, input.getRoot());
+        ret.setRoot(root);
         ret.setParentIri(input.getIri()); //the new tree is the child artifact of the original tree
         ret.setLabel(getId());
         ret.setCreator(getId());

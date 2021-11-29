@@ -6,7 +6,6 @@
 package cz.vutbr.fit.layout.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import cz.vutbr.fit.layout.model.GenericTreeNode;
@@ -22,7 +21,6 @@ public class DefaultTreeNode<T extends GenericTreeNode<T>> implements GenericTre
     private T root;
     private T parent;
     private List<T> children;
-    private HashMap<String, Object> attributes;
 
     public DefaultTreeNode(Class<T> myType)
     {
@@ -30,7 +28,6 @@ public class DefaultTreeNode<T extends GenericTreeNode<T>> implements GenericTre
         parent = null;
         myself = myType.cast(this);
         root = myself;
-        attributes = new HashMap<>(1); //we do not expect many attributes
     }
 
     @Override
@@ -63,18 +60,6 @@ public class DefaultTreeNode<T extends GenericTreeNode<T>> implements GenericTre
         return (getRoot() == this);
     }
     
-    @Override
-    public <P> P getUserAttribute(String name, Class<P> clazz)
-    {
-        return clazz.cast(attributes.get(name));
-    }
-
-    @Override
-    public void addUserAttribute(String name, Object value)
-    {
-        attributes.put(name, value);
-    }
-
     @Override
     public List<T> getChildren()
     {

@@ -14,6 +14,9 @@ import org.eclipse.rdf4j.model.IRI;
  */
 public interface ContentRect extends Rect
 {
+    /** A node attribute that links to an equivalent node (e.g. produced by copying
+     * a node to another tree). */
+    public static String ATTR_SAME_AS = "core.node.sameAs";
 
     /**
      * Obtains a unique ID of the area within the page.
@@ -160,5 +163,26 @@ public interface ContentRect extends Rect
      */
     public void setBackgroundSeparated(boolean backgroundSeparated);
 
+    //=================================================================================================
+    // User attributes
+    //=================================================================================================
     
+    /**
+     * Sets a user-defined attribute for the tree node. This allows to assign multiple
+     * attributes identified by their names.
+     * @param name the attribute name
+     * @param value the attribute value
+     */
+    public void addUserAttribute(String name, Object value);
+    
+    /**
+     * Obtains the user-defined attribute value assigned to the node.
+     * @param name the attribute name
+     * @param clazz the class of the required attribute
+     * @return an object of the given class representing the value of the attribute (application-specific)
+     * or {@code null} when no such attribute is present.
+     */
+    public <P> P getUserAttribute(String name, Class<P> clazz);
+
+
 }

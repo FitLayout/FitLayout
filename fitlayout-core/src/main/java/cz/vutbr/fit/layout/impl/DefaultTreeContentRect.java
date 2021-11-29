@@ -5,6 +5,8 @@
  */
 package cz.vutbr.fit.layout.impl;
 
+import java.util.HashMap;
+
 import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.model.Border;
@@ -31,6 +33,7 @@ public class DefaultTreeContentRect<T extends GenericTreeNode<T>> extends Defaul
     private Color backgroundColor;
     private byte[] backgroundImagePng;
     private boolean backgroundSeparated;
+    private HashMap<String, Object> attributes;
 
     private TextStyle textStyle;
     /** whether the text style is accurate (true) or it needs to be recomputed (false) */
@@ -54,6 +57,7 @@ public class DefaultTreeContentRect<T extends GenericTreeNode<T>> extends Defaul
         bottomBorder = new Border();
         leftBorder = new Border();
         rightBorder = new Border();
+        attributes = new HashMap<>(1); //we do not expect many attributes
     }
     
     public DefaultTreeContentRect(Class<T> myType, ContentRect src)
@@ -69,6 +73,7 @@ public class DefaultTreeContentRect<T extends GenericTreeNode<T>> extends Defaul
         leftBorder = src.getBorderStyle(Side.LEFT);
         rightBorder = src.getBorderStyle(Side.RIGHT);
         backgroundSeparated = src.isBackgroundSeparated();
+        attributes = new HashMap<>(1); //we do not expect many attributes
     }
     
     @Override
@@ -324,6 +329,18 @@ public class DefaultTreeContentRect<T extends GenericTreeNode<T>> extends Defaul
         }
     }
 
+    @Override
+    public <P> P getUserAttribute(String name, Class<P> clazz)
+    {
+        return clazz.cast(attributes.get(name));
+    }
+
+    @Override
+    public void addUserAttribute(String name, Object value)
+    {
+        attributes.put(name, value);
+    }
+    
     @Override
     public int hashCode()
     {

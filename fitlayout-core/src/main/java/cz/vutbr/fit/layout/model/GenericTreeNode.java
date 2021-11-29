@@ -14,9 +14,6 @@ import java.util.List;
  */
 public interface GenericTreeNode<T extends GenericTreeNode<T>>
 {
-    /** A node attribute that links to an equivalent node (e.g. produced by copying
-     * a node to another tree). */
-    public static String ATTR_SAME_AS = "core.node.sameAs";
 
     public T getParent();
     
@@ -67,21 +64,4 @@ public interface GenericTreeNode<T extends GenericTreeNode<T>>
      */
     public void childrenChanged();
     
-    /**
-     * Sets a user-defined attribute for the tree node. This allows to assign multiple
-     * attributes identified by their names.
-     * @param name the attribute name
-     * @param value the attribute value
-     */
-    public void addUserAttribute(String name, Object value);
-    
-    /**
-     * Obtains the user-defined attribute value assigned to the node.
-     * @param name the attribute name
-     * @param clazz the class of the required attribute
-     * @return an object of the given class representing the value of the attribute (application-specific)
-     * or {@code null} when no such attribute is present.
-     */
-    public <P> P getUserAttribute(String name, Class<P> clazz);
-
 }

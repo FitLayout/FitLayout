@@ -14,6 +14,9 @@ import java.util.List;
  */
 public interface GenericTreeNode<T extends GenericTreeNode<T>>
 {
+    /** A node attribute that links to an equivalent node (e.g. produced by copying
+     * a node to another tree). */
+    public static String ATTR_SAME_AS = "core.node.sameAs";
 
     public T getParent();
     

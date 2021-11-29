@@ -17,6 +17,7 @@ import cz.vutbr.fit.layout.impl.DefaultAreaTree;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
+import cz.vutbr.fit.layout.model.GenericTreeNode;
 import cz.vutbr.fit.layout.ontology.SEGM;
 
 /**
@@ -126,6 +127,7 @@ public class OperatorWrapperProvider extends BaseArtifactService
         for (Area src : srcArea.getChildren())
         {
             Area dest = atree.createArea(src);
+            dest.addUserAttribute(GenericTreeNode.ATTR_SAME_AS, src);
             destArea.appendChild(dest);
             recursiveCopyChildren(atree, dest, src);
         }

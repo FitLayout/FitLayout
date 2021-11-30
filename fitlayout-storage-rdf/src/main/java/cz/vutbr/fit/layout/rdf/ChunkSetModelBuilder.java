@@ -87,6 +87,7 @@ public class ChunkSetModelBuilder extends ModelBuilderBase implements ModelBuild
         {
             graph.add(ciri, BOX.backgroundColor, vf.createLiteral(Serialization.colorString(chunk.getEffectiveBackgroundColor())));
         }
+        addTextStyle(graph, ciri, chunk);
         
         final IRI areaIri = getAreaIri(chunk.getSourceArea().getAreaTree().getIri(), chunk.getSourceArea());
         graph.add(ciri, SEGM.hasSourceArea, areaIri);

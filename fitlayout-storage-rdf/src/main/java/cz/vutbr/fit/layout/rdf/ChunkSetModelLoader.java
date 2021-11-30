@@ -124,6 +124,7 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
     {
         RDFTextChunk chunk = new RDFTextChunk(iri);
         Map<IRI, Float> tagSupport = new HashMap<>(); //tagUri->support
+        RDFTextStyle style = new RDFTextStyle();
         
         for (Statement st : model.filter(iri, null, null))
         {
@@ -209,11 +210,15 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
                     }
                 }
             }
+            else if (processStyleProperty(pred, value, style))
+            {
+            }
             else
             {
                 // the statement was not used, keep it in additional statements
                 additionalStatements.add(st);
             }
+            chunk.setTextStyle(style.toTextStyle());
         }
         
         return chunk;

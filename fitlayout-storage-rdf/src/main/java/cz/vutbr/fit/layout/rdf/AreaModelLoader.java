@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Artifact;
-import cz.vutbr.fit.layout.model.Border;
-import cz.vutbr.fit.layout.model.Border.Side;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.ontology.BOX;
@@ -163,6 +161,10 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             final IRI pred = st.getPredicate();
             final Value value = st.getObject();
             
+            if (processContentRectProperty(pred, value, area, dataModel) || processStyleProperty(pred, value, style))
+            {
+                // sucessfully processed
+            }
             if (RDFS.LABEL.equals(pred))
             {
                 String name = value.stringValue();
@@ -172,73 +174,6 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 if (value instanceof Literal)
                     area.setDocumentOrder(((Literal) value).intValue());
-            }
-            else if (BOX.backgroundColor.equals(pred)) 
-            {
-                String bgColor = value.stringValue();
-                area.setBackgroundColor( Serialization.decodeHexColor( bgColor ) );
-            }
-            else if (BOX.underline.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    style.underline = ((Literal) value).floatValue();
-            }
-            else if (BOX.lineThrough.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    style.lineThrough = ((Literal) value).floatValue();
-            }
-            else if (BOX.fontSize.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    style.fontSize = ((Literal) value).floatValue();
-            }
-            else if (BOX.fontStyle.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    style.fontStyle = ((Literal) value).floatValue();
-            }
-            else if (BOX.fontWeight.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    style.fontWeight = ((Literal) value).floatValue();
-            }
-            else if (BOX.contentLength.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    style.contentLength = ((Literal) value).intValue();
-            }
-            else if (BOX.hasBottomBorder.equals(pred)) 
-            {
-                if (value instanceof IRI)
-                {
-                    Border border = createBorder(dataModel, (IRI) value);
-                    area.setBorderStyle(Side.BOTTOM, border);
-                }
-            }
-            else if (BOX.hasLeftBorder.equals(pred)) 
-            {
-                if (value instanceof IRI)
-                {
-                    Border border = createBorder(dataModel, (IRI) value);
-                    area.setBorderStyle(Side.LEFT, border);
-                }
-            }
-            else if (BOX.hasRightBorder.equals(pred)) 
-            {
-                if (value instanceof IRI)
-                {
-                    Border border = createBorder(dataModel, (IRI) value);
-                    area.setBorderStyle(Side.RIGHT, border);
-                }
-            }
-            else if (BOX.hasTopBorder.equals(pred)) 
-            {
-                if (value instanceof IRI)
-                {
-                    Border border = createBorder(dataModel, (IRI) value);
-                    area.setBorderStyle(Side.TOP, border);
-                }
             }
             else if (BOX.bounds.equals(pred))
             {

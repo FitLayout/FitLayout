@@ -26,8 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.model.Artifact;
-import cz.vutbr.fit.layout.model.Border;
-import cz.vutbr.fit.layout.model.Border.Side;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Box.Type;
 import cz.vutbr.fit.layout.model.Rectangular;
@@ -178,7 +176,11 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             final IRI pred = st.getPredicate();
             final Value value = st.getObject();
             
-            if (BOX.documentOrder.equals(pred))
+            if (processContentRectProperty(pred, value, box, dataModel) || processStyleProperty(pred, value, style))
+            {
+                // sucessfully processed
+            }
+            else if (BOX.documentOrder.equals(pred))
             {
                 if (value instanceof Literal)
                     box.setOrder(((Literal) value).intValue());
@@ -188,12 +190,6 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                 if (value instanceof Literal)
                     box.setVisible(((Literal) value).booleanValue());
             }
-            else if (BOX.backgroundColor.equals(pred)) 
-            {
-                String bgColor = value.stringValue();
-                //bgColor = bgColor.substring(1,bgColor.length());
-                box.setBackgroundColor( Serialization.decodeHexColor( bgColor ) );
-            }
             else if (BOX.hasBackgroundImage.equals(pred)) 
             {
                 if (value instanceof IRI)
@@ -202,81 +198,14 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                     box.setBackgroundImagePng(image.getPngData());
                 }
             }
-            else if (BOX.backgroundSeparated.equals(pred))
-            {
-                if (value instanceof Literal)
-                    box.setBackgroundSeparated(((Literal) value).booleanValue());
-            }
             else if (BOX.color.equals(pred)) 
             {
                 box.setColor(Serialization.decodeHexColor(value.stringValue()));
-            }
-            else if (BOX.underline.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    style.underline = ((Literal) value).floatValue();
-            }
-            else if (BOX.lineThrough.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    style.lineThrough = ((Literal) value).floatValue();
             }
             else if (BOX.fontFamily.equals(pred)) 
             {
                 if (value instanceof Literal)
                     box.setFontFamily(value.stringValue());
-            }
-            else if (BOX.fontSize.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    style.fontSize = ((Literal) value).floatValue();
-            }
-            else if (BOX.fontStyle.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    style.fontStyle = ((Literal) value).floatValue();
-            }
-            else if (BOX.fontWeight.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    style.fontWeight = ((Literal) value).floatValue();
-            }
-            else if (BOX.contentLength.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    style.contentLength = ((Literal) value).intValue();
-            }
-            else if (BOX.hasBottomBorder.equals(pred)) 
-            {
-                if (value instanceof IRI)
-                {
-                    Border border = createBorder(dataModel, (IRI) value);
-                    box.setBorderStyle(Side.BOTTOM, border);
-                }
-            }
-            else if (BOX.hasLeftBorder.equals(pred)) 
-            {
-                if (value instanceof IRI)
-                {
-                    Border border = createBorder(dataModel, (IRI) value);
-                    box.setBorderStyle(Side.LEFT, border);
-                }
-            }
-            else if (BOX.hasRightBorder.equals(pred)) 
-            {
-                if (value instanceof IRI)
-                {
-                    Border border = createBorder(dataModel, (IRI) value);
-                    box.setBorderStyle(Side.RIGHT, border);
-                }
-            }
-            else if (BOX.hasTopBorder.equals(pred)) 
-            {
-                if (value instanceof IRI)
-                {
-                    Border border = createBorder(dataModel, (IRI) value);
-                    box.setBorderStyle(Side.TOP, border);
-                }
             }
             else if (BOX.text.equals(pred)) 
             {

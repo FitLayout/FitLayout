@@ -15,10 +15,12 @@ import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.impl.DefaultTag;
+import cz.vutbr.fit.layout.impl.DefaultTreeContentRect;
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TextStyle;
+import cz.vutbr.fit.layout.model.Border.Side;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.SEGM;
 import cz.vutbr.fit.layout.rdf.model.RDFAreaTree;
@@ -52,6 +54,117 @@ public abstract class ModelLoaderBase extends ModelTransformer
                 return (IRI) st.getObject();
         }
         return null;
+    }
+    
+    /**
+     * Applies common ContentRect properties to a target rect.
+     * 
+     * @param pred the property predicate
+     * @param value the property value
+     * @param rect the target rect
+     * @param dataModel data model to be used with borders
+     * @return {@code true} when the property was applied, {@code false} when it was ignored
+     */
+    protected boolean processContentRectProperty(IRI pred, Value value, 
+            DefaultTreeContentRect<?> rect, Model dataModel)
+    {
+        boolean ret = true;
+        if (BOX.backgroundColor.equals(pred)) 
+        {
+            String bgColor = value.stringValue();
+            //bgColor = bgColor.substring(1,bgColor.length());
+            rect.setBackgroundColor( Serialization.decodeHexColor( bgColor ) );
+        }
+        else if (BOX.backgroundSeparated.equals(pred))
+        {
+            if (value instanceof Literal)
+                rect.setBackgroundSeparated(((Literal) value).booleanValue());
+        }
+        else if (BOX.hasBottomBorder.equals(pred)) 
+        {
+            if (value instanceof IRI)
+            {
+                Border border = createBorder(dataModel, (IRI) value);
+                rect.setBorderStyle(Side.BOTTOM, border);
+            }
+        }
+        else if (BOX.hasLeftBorder.equals(pred)) 
+        {
+            if (value instanceof IRI)
+            {
+                Border border = createBorder(dataModel, (IRI) value);
+                rect.setBorderStyle(Side.LEFT, border);
+            }
+        }
+        else if (BOX.hasRightBorder.equals(pred)) 
+        {
+            if (value instanceof IRI)
+            {
+                Border border = createBorder(dataModel, (IRI) value);
+                rect.setBorderStyle(Side.RIGHT, border);
+            }
+        }
+        else if (BOX.hasTopBorder.equals(pred)) 
+        {
+            if (value instanceof IRI)
+            {
+                Border border = createBorder(dataModel, (IRI) value);
+                rect.setBorderStyle(Side.TOP, border);
+            }
+        }
+        else
+        {
+            ret = false;
+        }
+        return ret;
+    }
+    
+    /**
+     * Applies common text style properties to a target style.
+     * 
+     * @param pred the property predicate
+     * @param value the property value
+     * @param style the target rect style
+     * @return {@code true} when the property was applied, {@code false} when it was ignored
+     */
+    protected boolean processStyleProperty(IRI pred, Value value, RDFTextStyle style)
+    {
+        boolean ret = true;
+        if (BOX.underline.equals(pred)) 
+        {
+            if (value instanceof Literal)
+                style.underline = ((Literal) value).floatValue();
+        }
+        else if (BOX.lineThrough.equals(pred)) 
+        {
+            if (value instanceof Literal)
+                style.lineThrough = ((Literal) value).floatValue();
+        }
+        else if (BOX.fontSize.equals(pred)) 
+        {
+            if (value instanceof Literal)
+                style.fontSize = ((Literal) value).floatValue();
+        }
+        else if (BOX.fontStyle.equals(pred)) 
+        {
+            if (value instanceof Literal)
+                style.fontStyle = ((Literal) value).floatValue();
+        }
+        else if (BOX.fontWeight.equals(pred)) 
+        {
+            if (value instanceof Literal)
+                style.fontWeight = ((Literal) value).floatValue();
+        }
+        else if (BOX.contentLength.equals(pred)) 
+        {
+            if (value instanceof Literal)
+                style.contentLength = ((Literal) value).intValue();
+        }
+        else
+        {
+            ret = false;
+        }
+        return ret;
     }
     
     protected Border createBorder(Model model, IRI uri)

@@ -14,8 +14,11 @@ import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
 
 import cz.vutbr.fit.layout.model.Artifact;
+import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Rectangular;
+import cz.vutbr.fit.layout.model.TextStyle;
+import cz.vutbr.fit.layout.model.Border.Side;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.FL;
 import cz.vutbr.fit.layout.rdf.model.RDFResource;
@@ -27,10 +30,13 @@ import cz.vutbr.fit.layout.rdf.model.RDFResource;
  */
 public class ModelBuilderBase extends ModelTransformer
 {
+    private ValueFactory vf;
+    
     
     public ModelBuilderBase(IRIFactory iriFactory)
     {
         super(iriFactory);
+        vf = SimpleValueFactory.getInstance();
     }
 
     /**
@@ -41,8 +47,6 @@ public class ModelBuilderBase extends ModelTransformer
      */
     public void addArtifactData(Model graph, Artifact a)
     {
-        final ValueFactory vf = SimpleValueFactory.getInstance();
-        
         final IRI node = a.getIri();
         graph.add(node, RDF.TYPE, a.getArtifactType());
         if (a.getParentIri() != null)
@@ -57,10 +61,38 @@ public class ModelBuilderBase extends ModelTransformer
             graph.add(node, FL.creatorParams, vf.createLiteral(a.getCreatorParams()));
     }
     
+    /**
+     * Stores the common information about a content rectangle.
+     * 
+     * @param graph the model to add the data to
+     * @param rectIri rectangle IRI
+     * @param rect the rectangle to store
+     */
+    public void addContentRectData(Model graph, IRI rectIri, ContentRect rect)
+    {
+        if (rect.getBackgroundColor() != null)
+        {
+            graph.add(rectIri, BOX.backgroundColor, vf.createLiteral(Serialization.colorString(rect.getBackgroundColor())));
+        }
+        graph.add(rectIri, BOX.backgroundSeparated, vf.createLiteral(rect.isBackgroundSeparated()));
+
+        insertBorders(rect, rectIri, graph);
+        insertSameAs(rect, rectIri, graph);
+    }
+    
+    public void addTextStyle(Model graph, IRI rectIri, ContentRect rect)
+    {
+        final TextStyle textStyle = rect.getTextStyle();
+        graph.add(rectIri, BOX.fontSize, vf.createLiteral(textStyle.getFontSize()));
+        graph.add(rectIri, BOX.fontWeight, vf.createLiteral(textStyle.getFontWeight()));
+        graph.add(rectIri, BOX.fontStyle, vf.createLiteral(textStyle.getFontStyle()));
+        graph.add(rectIri, BOX.underline, vf.createLiteral(textStyle.getUnderline()));
+        graph.add(rectIri, BOX.lineThrough, vf.createLiteral(textStyle.getLineThrough()));
+        graph.add(rectIri, BOX.contentLength, vf.createLiteral(textStyle.getContentLength()));
+    }
+    
     public IRI insertBounds(IRI boxIri, IRI property, String type, Rectangular bounds, Model graph)
     {
-        final ValueFactory vf = SimpleValueFactory.getInstance();
-        
         final IRI iri = getIriFactory().createBoundsURI(boxIri, type);
         graph.add(boxIri, property, iri);
         graph.add(iri, BOX.positionX, vf.createLiteral(bounds.getX1()));
@@ -68,6 +100,40 @@ public class ModelBuilderBase extends ModelTransformer
         graph.add(iri, BOX.width, vf.createLiteral(bounds.getWidth()));
         graph.add(iri, BOX.height, vf.createLiteral(bounds.getHeight()));
         return iri;
+    }
+    
+    public void insertBorders(ContentRect box, final IRI boxIri, Model graph)
+    {
+        if (box.getBorderStyle(Side.TOP) != null && box.hasTopBorder())
+        {
+            IRI btop = insertBorder(box.getBorderStyle(Side.TOP), boxIri, "top", graph);
+            graph.add(boxIri, BOX.hasTopBorder, btop);
+        }
+        if (box.getBorderStyle(Side.RIGHT) != null && box.hasRightBorder())
+        {
+            IRI bright = insertBorder(box.getBorderStyle(Side.RIGHT), boxIri, "right", graph);
+            graph.add(boxIri, BOX.hasRightBorder, bright);
+        }
+        if (box.getBorderStyle(Side.BOTTOM) != null && box.hasBottomBorder())
+        {
+            IRI bbottom = insertBorder(box.getBorderStyle(Side.BOTTOM), boxIri, "bottom", graph);
+            graph.add(boxIri, BOX.hasBottomBorder, bbottom);
+        }
+        if (box.getBorderStyle(Side.LEFT) != null && box.hasLeftBorder())
+        {
+            IRI bleft = insertBorder(box.getBorderStyle(Side.LEFT), boxIri, "left", graph);
+            graph.add(boxIri, BOX.hasLeftBorder, bleft);
+        }
+    }
+
+    public IRI insertBorder(Border border, IRI boxUri, String side, Model graph)
+    {
+        IRI uri = getIriFactory().createBorderURI(boxUri, side);
+        graph.add(uri, RDF.TYPE, BOX.Border);
+        graph.add(uri, BOX.borderWidth, vf.createLiteral(border.getWidth()));
+        graph.add(uri, BOX.borderStyle, vf.createLiteral(border.getStyle().toString()));
+        graph.add(uri, BOX.borderColor, vf.createLiteral(Serialization.colorString(border.getColor())));
+        return uri;
     }
     
     /**

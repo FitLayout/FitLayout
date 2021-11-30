@@ -129,18 +129,11 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
 			}
 		}
 		
-        if (area.getBackgroundColor() != null)
-        {
-            graph.add(individual, BOX.backgroundColor, vf.createLiteral(Serialization.colorString(area.getBackgroundColor())));
-        }
+        // common ContentRect properties - background, borders, sameAs
+        addContentRectData(graph, individual, area);
 
         // font attributes
-        graph.add(individual, BOX.fontSize, vf.createLiteral(area.getTextStyle().getFontSize()));
-        graph.add(individual, BOX.fontWeight, vf.createLiteral(area.getTextStyle().getFontWeight()));
-        graph.add(individual, BOX.fontStyle, vf.createLiteral(area.getTextStyle().getFontStyle()));
-        graph.add(individual, BOX.underline, vf.createLiteral(area.getTextStyle().getUnderline()));
-        graph.add(individual, BOX.lineThrough, vf.createLiteral(area.getTextStyle().getLineThrough()));
-        graph.add(individual, BOX.contentLength, vf.createLiteral(area.getTextStyle().getContentLength()));
+        addTextStyle(graph, individual, area);
         
         //dump boxes
         for (Box box : area.getBoxes())

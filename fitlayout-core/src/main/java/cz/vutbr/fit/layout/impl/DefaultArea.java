@@ -361,15 +361,6 @@ public class DefaultArea extends DefaultTreeContentRect<Area> implements Area
         childrenChanged();
     }
     
-    /**
-     * Updates the average text style of the area with the values of the new box being added.
-     * @param box the box being added
-     */
-    private void updateTextStyleForBox(Box box)
-    {
-        getTextStyle().updateAverages(box.getTextStyle());
-    }
-    
     //====================================================================================
     // tagging
     //====================================================================================
@@ -636,13 +627,19 @@ public class DefaultArea extends DefaultTreeContentRect<Area> implements Area
     protected void recomputeTextStyle()
     {
         getTextStyle().reset();
-        for (Box box : getBoxes())
+        if (isLeaf())
         {
-            updateTextStyleForBox(box);
+            for (Box box : getBoxes())
+            {
+                getTextStyle().updateAverages(box.getTextStyle());
+            }
         }
-        for (Area area : getChildren())
+        else
         {
-            getTextStyle().updateAverages(area.getTextStyle());
+            for (Area area : getChildren())
+            {
+                getTextStyle().updateAverages(area.getTextStyle());
+            }
         }
     }
 

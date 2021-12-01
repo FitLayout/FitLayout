@@ -287,7 +287,7 @@ public class RDFArtifactRepository implements ArtifactRepository
     {
         for (Artifact a : artifacts)
         {
-            if (a.getParentIri() == artifactIri)
+            if (artifactIri.equals(a.getParentIri()))
             {
                 findDerivedArtifacts(a.getIri(), artifacts, dest);
                 dest.add(a);

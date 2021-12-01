@@ -49,6 +49,18 @@ public interface TextChunk extends ContentRect, Taggable
      * @return the source box
      */
     public Box getSourceBox();
+
+    /**
+     * Gets the font family of the chunk.
+     * @return the font family name
+     */
+    public String getFontFamily();
+    
+    /**
+     * Gets the text color of the chunk.
+     * @return the text color
+     */
+    public Color getColor();
     
     /**
      * Gets the efficient background color of the chunk.

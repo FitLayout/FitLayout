@@ -31,6 +31,8 @@ public class DefaultTextChunk extends DefaultContentRect implements TextChunk
     private String text;
     private Area sourceArea;
     private Box sourceBox;
+    private String fontFamily;
+    private Color color;
     private Color effectiveBackgroundColor;
     private String name;
     
@@ -44,6 +46,8 @@ public class DefaultTextChunk extends DefaultContentRect implements TextChunk
         name = "<chunk>";
         setBounds(new Rectangular());
         tags = new HashMap<>();
+        color = Color.BLACK;
+        fontFamily = "";
     }
     
     public DefaultTextChunk(Rectangular r, Area sourceArea, Box sourceBox)
@@ -56,6 +60,8 @@ public class DefaultTextChunk extends DefaultContentRect implements TextChunk
         tags = new HashMap<>();
         //addBox(sourceBox); //the box is used for computing the text color of the area (e.g. in AreaStyle)
         copyStyle(sourceArea);
+        color = sourceBox.getColor();
+        fontFamily = sourceBox.getFontFamily();
     }
 
     @Override
@@ -113,6 +119,28 @@ public class DefaultTextChunk extends DefaultContentRect implements TextChunk
     public void setSourceBox(Box sourceBox)
     {
         this.sourceBox = sourceBox;
+        setFontFamily(sourceBox.getFontFamily());
+        setColor(sourceBox.getColor());
+    }
+
+    public String getFontFamily()
+    {
+        return fontFamily;
+    }
+
+    public void setFontFamily(String fontFamily)
+    {
+        this.fontFamily = fontFamily;
+    }
+
+    public Color getColor()
+    {
+        return color;
+    }
+
+    public void setColor(Color color)
+    {
+        this.color = color;
     }
 
     @Override

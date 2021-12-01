@@ -145,6 +145,15 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
                 final String bgColor = value.stringValue();
                 chunk.setEffectiveBackgroundColor(Serialization.decodeHexColor(bgColor));
             }
+            else if (BOX.color.equals(pred)) 
+            {
+                chunk.setColor(Serialization.decodeHexColor(value.stringValue()));
+            }
+            else if (BOX.fontFamily.equals(pred)) 
+            {
+                if (value instanceof Literal)
+                    chunk.setFontFamily(value.stringValue());
+            }
             else if (SEGM.hasSourceArea.equals(pred))
             {
                 if (value instanceof IRI)

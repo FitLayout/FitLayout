@@ -59,6 +59,7 @@
 		<module>all</module>
 		<!-- for maven Central deployment it is important that bom is the last module -->
 		<module>bom</module>
+		<module>fitlayout-patterns</module>
 	</modules>
 
 	<build>

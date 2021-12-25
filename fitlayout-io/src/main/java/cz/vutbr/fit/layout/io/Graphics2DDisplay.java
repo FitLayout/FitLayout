@@ -32,6 +32,7 @@ import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.ContentImage;
 import cz.vutbr.fit.layout.model.ContentObject;
+import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
@@ -256,11 +257,11 @@ public class Graphics2DDisplay implements OutputDisplay
     }
     
     @Override
-    public void colorizeByTags(Area area, Set<Tag> s)
+    public void colorizeByTags(ContentRect rect, Set<Tag> s)
     {
         if (!s.isEmpty())
         {
-            Rectangular bounds = area.getBounds();
+            Rectangular bounds = rect.getBounds();
             Color c = g.getColor();
             float step = (float) bounds.getHeight() / s.size();
             float y = bounds.getY1();
@@ -284,11 +285,11 @@ public class Graphics2DDisplay implements OutputDisplay
     }
     
     @Override
-    public void colorizeByClass(Area area, String cname)
+    public void colorizeByClass(ContentRect rect, String cname)
     {
         if (cname != null && !cname.equals("") && !cname.equals("none"))
         {
-            Rectangular bounds = area.getBounds();
+            Rectangular bounds = rect.getBounds();
             Color c = g.getColor();
             float step = (float) bounds.getHeight();
             float y = bounds.getY1();

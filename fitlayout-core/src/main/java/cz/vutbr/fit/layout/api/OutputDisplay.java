@@ -11,6 +11,7 @@ import java.util.Set;
 
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Box;
+import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
@@ -71,20 +72,20 @@ public interface OutputDisplay
      * The output display should assign different colors to different tags; the exact implementation
      * of the color mapping depends on the OutputDisplay implementation. The area is not displayed
      * when the tag set is empty.
-     * @param area The area to be displayed
+     * @param rect The area to be displayed
      * @param s A set of tags used for generating the area colors
      */
-    public void colorizeByTags(Area area, Set<Tag> s);
+    public void colorizeByTags(ContentRect rect, Set<Tag> s);
     
     /**
      * Draws the colorized are bounds. The color is defined by a string. The output display
      * should assign different colors to different strings; the exact implementation
      * of the color mapping depends on the OutputDisplay implementation. The area is not displayed
      * when class name is empty.
-     * @param area  The area to be displayed
+     * @param rect  The area to be displayed
      * @param cname The class name used for generating the colors.
      */
-    public void colorizeByClass(Area area, String cname);
+    public void colorizeByClass(ContentRect rect, String cname);
 
     /**
      * Clears the given area of the display.

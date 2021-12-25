@@ -6,7 +6,6 @@
 package cz.vutbr.fit.layout.model;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import cz.vutbr.fit.layout.api.OutputDisplay;
@@ -24,7 +23,7 @@ public interface AreaTopology
      * Gets the list of areas that are being managed by this topology.
      * @return the list of areas
      */
-    public List<ContentRect> getAreas();
+    public Collection<ContentRect> getAreas();
     
     /**
      * Obtains the total width of the topology used for placing the child

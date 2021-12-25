@@ -6,7 +6,7 @@
 package cz.vutbr.fit.layout.impl;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 import cz.vutbr.fit.layout.api.AreaUtils;
 import cz.vutbr.fit.layout.model.AreaTopology;
@@ -46,7 +46,7 @@ public class AreaGrid
     private Rectangular abspos;
     
     /** The list of areas laid out in this grid */
-    private List<ContentRect> areas;
+    private Collection<ContentRect> areas;
     
     /** The target topology where the computed positions will be set */
     private AreaTopology target;
@@ -73,7 +73,7 @@ public class AreaGrid
      * @param areas the areas to be laid out in the grid.
      * @param targetTopology the area topology where the computed grid positions will be set
      */
-    public AreaGrid(Rectangular position, List<ContentRect> areas, AreaTopology targetTopology)
+    public AreaGrid(Rectangular position, Collection<ContentRect> areas, AreaTopology targetTopology)
     {
         this.abspos = position;
         this.areas = areas;

@@ -26,18 +26,18 @@ import cz.vutbr.fit.layout.model.Rectangular;
  */
 public class AreaListGridTopology implements AreaTopology
 {
-    private List<ContentRect> areas;
+    private Collection<ContentRect> areas;
     private Rectangular abspos;
     private Map<ContentRect, Rectangular> positions;
     private Map<Coords, Set<ContentRect>> index;
     private AreaGrid grid;
     
-    public AreaListGridTopology(List<ContentRect> areas)
+    public AreaListGridTopology(Collection<ContentRect> areas)
     {
         this(areas, true);
     }
     
-    public AreaListGridTopology(List<ContentRect> areas, boolean doInit)
+    public AreaListGridTopology(Collection<ContentRect> areas, boolean doInit)
     {
         this.areas = areas;
         //create the grid if required
@@ -46,7 +46,7 @@ public class AreaListGridTopology implements AreaTopology
     }
 
     @Override
-    public List<ContentRect> getAreas()
+    public Collection<ContentRect> getAreas()
     {
         return areas;
     }

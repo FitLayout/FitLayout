@@ -5,6 +5,8 @@
  */
 package cz.vutbr.fit.layout.patterns.model;
 
+import cz.vutbr.fit.layout.model.Relation;
+
 /**
  * 
  * @author burgetr

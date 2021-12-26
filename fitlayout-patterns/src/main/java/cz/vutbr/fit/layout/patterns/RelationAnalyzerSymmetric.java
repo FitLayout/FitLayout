@@ -11,12 +11,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import cz.vutbr.fit.layout.model.AreaConnection;
 import cz.vutbr.fit.layout.model.AreaTopology;
 import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
-import cz.vutbr.fit.layout.patterns.model.AreaConnection;
-import cz.vutbr.fit.layout.patterns.model.Relation;
+import cz.vutbr.fit.layout.model.Relation;
+import cz.vutbr.fit.layout.patterns.model.Relations;
 
 import java.util.Map.Entry;
 
@@ -28,9 +29,9 @@ import java.util.Map.Entry;
 public class RelationAnalyzerSymmetric extends RelationAnalyzer
 {
     private static final List<Relation> ANALYZED_RELATIONS =
-            List.of(Relation.ONRIGHT, Relation.ONLEFT, Relation.AFTER, Relation.BEFORE, 
-                    Relation.SAMELINE, Relation.UNDER, Relation.UNDERHEADING, 
-                    Relation.BELOW, Relation.ABOVE, Relation.LINEBELOW);
+            List.of(Relations.ONRIGHT, Relations.ONLEFT, Relations.AFTER, Relations.BEFORE, 
+                    Relations.SAMELINE, Relations.UNDER, Relations.UNDERHEADING, 
+                    Relations.BELOW, Relations.ABOVE, Relations.LINEBELOW);
 
     public RelationAnalyzerSymmetric(Page page, Collection<ContentRect> areas)
     {
@@ -81,29 +82,29 @@ public class RelationAnalyzerSymmetric extends RelationAnalyzer
                             {
                                 final float w = 1.0f - ((float) distLL / tw);
                                 if (w > RelationAnalyzer.MIN_RELATION_WEIGHT)
-                                    addAreaConnection(new AreaConnection(a1, a2, Relation.SAMELINE, w));
+                                    addAreaConnection(new AreaConnection(a1, a2, Relations.SAMELINE, w));
                             }
                             //after / before
                             if (distRL > 0)
                             {
                                 final float w = 1.0f - (distRL / 3) * 3.0f / tw;
                                 if (w > RelationAnalyzer.MIN_RELATION_WEIGHT)
-                                    addAreaConnection(new AreaConnection(a1, a2, Relation.AFTER, w));
+                                    addAreaConnection(new AreaConnection(a1, a2, Relations.AFTER, w));
                             }
                             else if (distLR > 0)
                             {
                                 final float w = 1.0f - (distLR / 3) * 3.0f / tw;
                                 if (w > RelationAnalyzer.MIN_RELATION_WEIGHT)
-                                    addAreaConnection(new AreaConnection(a1, a2, Relation.BEFORE, w));
+                                    addAreaConnection(new AreaConnection(a1, a2, Relations.BEFORE, w));
                             }
                             //onRight / onLeft
                             if (distRL > -0.2*em && distRL < 0.9*em)
                             {
-                                addAreaConnection(new AreaConnection(a1, a2, Relation.ONRIGHT, 1.0f));
+                                addAreaConnection(new AreaConnection(a1, a2, Relations.ONRIGHT, 1.0f));
                             }
                             else if (distLR > -0.2*em && distLR < 0.9*em)
                             {
-                                addAreaConnection(new AreaConnection(a1, a2, Relation.ONLEFT, 1.0f));
+                                addAreaConnection(new AreaConnection(a1, a2, Relations.ONLEFT, 1.0f));
                             }
                         }
                     }
@@ -151,12 +152,12 @@ public class RelationAnalyzerSymmetric extends RelationAnalyzer
                 final float w = 1.0f - dist / th;
                 if (w > RelationAnalyzer.MIN_RELATION_WEIGHT)
                 {
-                    addAreaConnection(new AreaConnection(a1, a2, Relation.BELOW, w));
-                    addAreaConnection(new AreaConnection(a2, a1, Relation.ABOVE, w));
+                    addAreaConnection(new AreaConnection(a1, a2, Relations.BELOW, w));
+                    addAreaConnection(new AreaConnection(a2, a1, Relations.ABOVE, w));
                 }
                 //add 'under' if it is close enough
                 if (dist < 0.8f*em)
-                    addAreaConnection(new AreaConnection(a1, a2, Relation.UNDER, 1.0f));
+                    addAreaConnection(new AreaConnection(a1, a2, Relations.UNDER, 1.0f));
             }
         }
     }
@@ -197,7 +198,7 @@ public class RelationAnalyzerSymmetric extends RelationAnalyzer
                 if ((cand == closest || AreaUtils.isOnSameLine(cand, closest)) && !used.contains(cand))
                 {
                     float w = computeWeight(cand, a, tw, th);
-                    addAreaConnection(new AreaConnection(cand, a, Relation.LINEBELOW, w));
+                    addAreaConnection(new AreaConnection(cand, a, Relations.LINEBELOW, w));
                     used.add(cand);
                     //try to use the chunks on the same logical line (if any)
                     if (cand.getLine() != null)
@@ -206,7 +207,7 @@ public class RelationAnalyzerSymmetric extends RelationAnalyzer
                         {
                             if (!used.contains(sibl))
                             {
-                                addAreaConnection(new AreaConnection(sibl, a, Relation.LINEBELOW, w));
+                                addAreaConnection(new AreaConnection(sibl, a, Relations.LINEBELOW, w));
                                 used.add(sibl);
                             }
                         }
@@ -241,7 +242,7 @@ public class RelationAnalyzerSymmetric extends RelationAnalyzer
         for (ContentRect c : candidates)
         {
             final float w = computeWeight(c, a, tw, th);
-            addAreaConnection(new AreaConnection(c, a, Relation.UNDERHEADING, w));
+            addAreaConnection(new AreaConnection(c, a, Relations.UNDERHEADING, w));
         }
         
         /*if (!candidates.isEmpty())

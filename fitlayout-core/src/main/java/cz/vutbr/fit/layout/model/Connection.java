@@ -3,9 +3,10 @@
  *
  * Created on 28. 2. 2016, 19:45:42 by burgetr
  */
-package cz.vutbr.fit.layout.patterns.model;
+package cz.vutbr.fit.layout.model;
 
 /**
+ * A generic connection between two objects with a given relation and a weight.
  * 
  * @author burgetr
  */
@@ -16,6 +17,14 @@ public class Connection<T>
     private Relation relation;
     private float weight;
     
+    /**
+     * Creates a new connection.
+     * 
+     * @param a1 The first connected object.
+     * @param a2 The second connected object.
+     * @param relation The relation.
+     * @param weight The weight.
+     */
     public Connection(T a1, T a2, Relation relation, float weight)
     {
         this.a1 = a1;
@@ -85,7 +94,5 @@ public class Connection<T>
         else if (!relation.equals(other.relation)) return false;
         return true;
     }
-    
-    
 
 }

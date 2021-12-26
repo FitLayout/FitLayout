@@ -10,11 +10,11 @@ import java.util.Collection;
 import java.util.List;
 
 import cz.vutbr.fit.layout.impl.AreaListGridTopology;
+import cz.vutbr.fit.layout.model.AreaConnection;
 import cz.vutbr.fit.layout.model.AreaTopology;
 import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Page;
-import cz.vutbr.fit.layout.patterns.model.AreaConnection;
-import cz.vutbr.fit.layout.patterns.model.Relation;
+import cz.vutbr.fit.layout.model.Relation;
 
 
 /**

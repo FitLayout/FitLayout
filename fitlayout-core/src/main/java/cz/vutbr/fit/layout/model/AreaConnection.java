@@ -3,11 +3,10 @@
  *
  * Created on 28. 2. 2016, 18:45:16 by burgetr
  */
-package cz.vutbr.fit.layout.patterns.model;
-
-import cz.vutbr.fit.layout.model.ContentRect;
+package cz.vutbr.fit.layout.model;
 
 /**
+ * A relation connection between two content rectangles.
  * 
  * @author burgetr
  */

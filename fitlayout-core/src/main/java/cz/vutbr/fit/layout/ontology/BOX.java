@@ -142,6 +142,17 @@ public class BOX {
 	public static final IRI color;
 
 	/**
+	 * ConnectionSet
+	 * <p>
+	 * {@code http://fitlayout.github.io/ontology/render.owl#ConnectionSet}.
+	 * <p>
+	 * A set of named area connections.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#ConnectionSet">ConnectionSet</a>
+	 */
+	public static final IRI ConnectionSet;
+
+	/**
 	 * ContainerBox
 	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/render.owl#ContainerBox}.
@@ -544,6 +555,7 @@ public class BOX {
 		bounds = factory.createIRI(BOX.NAMESPACE, "bounds");
 		Box = factory.createIRI(BOX.NAMESPACE, "Box");
 		color = factory.createIRI(BOX.NAMESPACE, "color");
+		ConnectionSet = factory.createIRI(BOX.NAMESPACE, "ConnectionSet");
 		ContainerBox = factory.createIRI(BOX.NAMESPACE, "ContainerBox");
 		containsObject = factory.createIRI(BOX.NAMESPACE, "containsObject");
 		contentBounds = factory.createIRI(BOX.NAMESPACE, "contentBounds");

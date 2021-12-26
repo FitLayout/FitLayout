@@ -5,6 +5,7 @@
  */
 package cz.vutbr.fit.layout.patterns;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -26,11 +27,15 @@ public abstract class RelationAnalyzer
     private Collection<ContentRect> areas;
     private AreaTopology topology;
     
+    private List<AreaConnection> connections;
+    
+    
     public RelationAnalyzer(Page page, Collection<ContentRect> areas)
     {
         this.page = page;
         this.areas = areas;
         topology = new AreaListGridTopology(areas);
+        connections = new ArrayList<>();
     }
 
     public abstract List<Relation> getAnalyzedRelations();
@@ -42,9 +47,14 @@ public abstract class RelationAnalyzer
     
     protected void addAreaConnection(AreaConnection conn)
     {
-        System.out.println("Add " + conn);
+        connections.add(conn);
     }
     
+    public List<AreaConnection> getConnections()
+    {
+        return connections;
+    }
+
     public Page getPage()
     {
         return page;

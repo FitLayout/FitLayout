@@ -15,6 +15,8 @@ import cz.vutbr.fit.layout.model.AreaTopology;
 import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
+import cz.vutbr.fit.layout.patterns.model.AreaConnection;
+import cz.vutbr.fit.layout.patterns.model.Relation;
 
 import java.util.Map.Entry;
 

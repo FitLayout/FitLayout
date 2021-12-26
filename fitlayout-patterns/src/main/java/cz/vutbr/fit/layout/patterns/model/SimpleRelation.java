@@ -3,7 +3,7 @@
  *
  * Created on 25. 12. 2021, 21:18:15 by burgetr
  */
-package cz.vutbr.fit.layout.patterns;
+package cz.vutbr.fit.layout.patterns.model;
 
 /**
  * 

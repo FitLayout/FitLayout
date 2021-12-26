@@ -3,7 +3,7 @@
  *
  * Created on 15. 2. 2018, 15:08:37 by burgetr
  */
-package cz.vutbr.fit.layout.patterns;
+package cz.vutbr.fit.layout.patterns.model;
 
 /**
  * A basic relation interface.

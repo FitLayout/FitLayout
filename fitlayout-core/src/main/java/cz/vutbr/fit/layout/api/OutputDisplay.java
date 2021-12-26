@@ -67,6 +67,14 @@ public interface OutputDisplay
     public void drawRectangle(Rectangular rect, Color color);
     
     /**
+     * Draws a connection between two content rectangles.
+     * @param a1 The first content rectangle
+     * @param a2 The second content rectangle
+     * @param color Connection color
+     */
+    public void drawConnection(ContentRect a1, ContentRect a2, Color color);
+    
+    /**
      * Draws the colorized are bounds. The color is defined by the tags. Multiple colors should
      * be used when there are multiple tags (e.g. splitting the area bounds to several parts).
      * The output display should assign different colors to different tags; the exact implementation

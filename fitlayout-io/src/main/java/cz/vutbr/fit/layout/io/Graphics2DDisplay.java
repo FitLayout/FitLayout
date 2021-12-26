@@ -257,6 +257,16 @@ public class Graphics2DDisplay implements OutputDisplay
     }
     
     @Override
+    public void drawConnection(ContentRect a1, ContentRect a2, Color color)
+    {
+        Color c = g.getColor();
+        g.setColor(color);
+        g.drawLine(a1.getBounds().midX(), a1.getBounds().midY(),
+                a2.getBounds().midX(), a2.getBounds().midY());
+        g.setColor(c);
+    }
+
+    @Override
     public void colorizeByTags(ContentRect rect, Set<Tag> s)
     {
         if (!s.isEmpty())

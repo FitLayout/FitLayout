@@ -17,7 +17,6 @@ import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Relation;
-import cz.vutbr.fit.layout.patterns.model.Relations;
 
 import java.util.Map.Entry;
 

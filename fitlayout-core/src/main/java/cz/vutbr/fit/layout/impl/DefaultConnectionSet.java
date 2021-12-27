@@ -3,13 +3,12 @@
  *
  * Created on 26. 12. 2021, 19:19:18 by burgetr
  */
-package cz.vutbr.fit.layout.patterns;
+package cz.vutbr.fit.layout.impl;
 
 import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
 
-import cz.vutbr.fit.layout.impl.BaseArtifact;
 import cz.vutbr.fit.layout.model.AreaConnection;
 import cz.vutbr.fit.layout.model.ConnectionSet;
 import cz.vutbr.fit.layout.ontology.BOX;

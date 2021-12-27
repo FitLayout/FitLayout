@@ -13,6 +13,7 @@ import org.eclipse.rdf4j.model.IRI;
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
+import cz.vutbr.fit.layout.impl.DefaultConnectionSet;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;

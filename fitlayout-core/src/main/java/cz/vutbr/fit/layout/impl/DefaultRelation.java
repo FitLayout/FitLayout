@@ -3,21 +3,22 @@
  *
  * Created on 25. 12. 2021, 21:18:15 by burgetr
  */
-package cz.vutbr.fit.layout.patterns.model;
+package cz.vutbr.fit.layout.impl;
 
 import cz.vutbr.fit.layout.model.Relation;
 
 /**
+ * A default simple implementation of a relation.
  * 
  * @author burgetr
  */
-public class SimpleRelation implements Relation
+public class DefaultRelation implements Relation
 {
     private String name;
     private boolean symmetric;
     private Relation inverse;
 
-    public SimpleRelation(String name)
+    public DefaultRelation(String name)
     {
         this.name = name;
         symmetric = false;

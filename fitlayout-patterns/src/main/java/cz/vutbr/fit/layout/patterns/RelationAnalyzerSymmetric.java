@@ -45,7 +45,7 @@ public class RelationAnalyzerSymmetric extends RelationAnalyzer
     }
 
     @Override
-    public void addConnections()
+    public void extractConnections()
     {
         final Collection<ContentRect> areas = getAreas();
         addSameLineConnections(areas);

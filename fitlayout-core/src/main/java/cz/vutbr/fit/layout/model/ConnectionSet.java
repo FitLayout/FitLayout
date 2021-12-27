@@ -25,6 +25,12 @@ public interface ConnectionSet extends Artifact
     public IRI getSourceIri();
     
     /**
+     * Gets the IRI of the related page.
+     * @return The page IRI.
+     */
+    public IRI getPageIri();
+    
+    /**
      * Gets the set of area connections.
      * @return the set of area connections/
      */

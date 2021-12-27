@@ -21,6 +21,7 @@ import cz.vutbr.fit.layout.ontology.BOX;
 public class DefaultConnectionSet extends BaseArtifact implements ConnectionSet
 {
     private IRI sourceIri;
+    private IRI pageIri;
     private Set<AreaConnection> areaConnections;
     
 
@@ -45,6 +46,17 @@ public class DefaultConnectionSet extends BaseArtifact implements ConnectionSet
     public void setSourceIri(IRI sourceIri)
     {
         this.sourceIri = sourceIri;
+    }
+
+    @Override
+    public IRI getPageIri()
+    {
+        return pageIri;
+    }
+
+    public void setPageIri(IRI pageIri)
+    {
+        this.pageIri = pageIri;
     }
 
     @Override

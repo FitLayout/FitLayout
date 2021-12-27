@@ -104,7 +104,8 @@ public class TextChunksProvider extends BaseArtifactService
         ChunksSource csrc = new TaggedChunksSource(tagConfig, atree.getRoot(), 0.1f);
         
         List<TextChunk> chunks = csrc.getTextChunks();
-        ChunkSet ret = new DefaultChunkSet(atree.getIri(), new HashSet<>(chunks));
+        DefaultChunkSet ret = new DefaultChunkSet(atree.getIri(), new HashSet<>(chunks));
+        ret.setPageIri(atree.getPageIri());
         return ret;
     }
 

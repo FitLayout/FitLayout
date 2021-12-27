@@ -19,6 +19,7 @@ import cz.vutbr.fit.layout.rdf.model.RDFChunkSet;
 public class ChunkSetInfo extends RDFArtifactInfo
 {
     private IRI areaTreeIri;
+    private IRI pageIri;
 
     public ChunkSetInfo(Model model, IRI areaTreeIri)
     {
@@ -38,6 +39,13 @@ public class ChunkSetInfo extends RDFArtifactInfo
                 areaTreeIri = (IRI) st.getObject();
             }
         }
+        else if (st.getPredicate().equals(SEGM.hasSourcePage))
+        {
+            if (st.getObject() instanceof IRI)
+            {
+                pageIri = (IRI) st.getObject();
+            }
+        }
         else
             ret = false;
         
@@ -54,10 +62,21 @@ public class ChunkSetInfo extends RDFArtifactInfo
         this.areaTreeIri = areaTreeIri;
     }
 
+    public IRI getPageIri()
+    {
+        return pageIri;
+    }
+
+    public void setPageIri(IRI pageIri)
+    {
+        this.pageIri = pageIri;
+    }
+
     public void applyToChunkSet(RDFChunkSet cset)
     {
         applyToArtifact(cset);
         cset.setAreaTreeIri(areaTreeIri);
+        cset.setPageIri(pageIri);
         cset.setAdditionalStatements(getAdditionalStatements());
     }
 

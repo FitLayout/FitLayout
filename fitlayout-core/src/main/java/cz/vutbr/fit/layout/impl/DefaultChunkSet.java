@@ -31,6 +31,7 @@ public class DefaultChunkSet extends BaseArtifact implements ChunkSet
     private int idcnt = 1;
     
     private IRI areaTreeIri;
+    private IRI pageIri;
     private Set<TextChunk> chunks;
     private AreaTopology topology;
     
@@ -64,6 +65,17 @@ public class DefaultChunkSet extends BaseArtifact implements ChunkSet
     public void setAreaTreeIri(IRI pageIri)
     {
         this.areaTreeIri = pageIri;
+    }
+
+    @Override
+    public IRI getPageIri()
+    {
+        return pageIri;
+    }
+
+    public void setPageIri(IRI pageIri)
+    {
+        this.pageIri = pageIri;
     }
 
     @Override

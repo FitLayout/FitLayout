@@ -55,6 +55,8 @@ public class ChunkSetModelBuilder extends ModelBuilderBase implements ModelBuild
         
         addArtifactData(graph, cset);
         graph.add(csetIri, SEGM.hasAreaTree, areaTreeNode);
+        if (cset.getPageIri() != null)
+            graph.add(csetIri, SEGM.hasSourcePage, cset.getPageIri());
         next_order = 0;
         
         for (TextChunk chunk : cset.getTextChunks())

@@ -24,6 +24,12 @@ public interface ChunkSet extends Artifact
      */
     public IRI getAreaTreeIri();
     
+    /**
+     * Gets the IRI of the related page.
+     * @return The page IRI.
+     */
+    public IRI getPageIri();
+    
     public Set<TextChunk> getTextChunks();
     
     public AreaTopology getTopology();

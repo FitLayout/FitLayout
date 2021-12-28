@@ -10,6 +10,7 @@ import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Box;
+import cz.vutbr.fit.layout.model.Relation;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TextChunk;
 
@@ -115,6 +116,20 @@ public interface IRIFactory
      * @return the created IRI
      */
     public IRI createTextChunkURI(IRI chunkSetUri, TextChunk chunk);
+    
+    /**
+     * Creates a relation IRI.
+     * @param rel the relation
+     * @return the created IRI
+     */
+    public IRI createRelationURI(Relation rel);
+    
+    /**
+     * Decodes the relation name from the relation IRI.
+     * @param iri the relation IRI
+     * @return the relation name or {@code null} if the iri doesn't seem to identify a relation.
+     */
+    public String decodeRelationURI(IRI iri);
     
     /**
      * Creates a sequence IRI from its name.

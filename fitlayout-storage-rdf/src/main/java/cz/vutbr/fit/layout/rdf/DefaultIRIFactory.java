@@ -12,6 +12,7 @@ import org.unbescape.uri.UriEscape;
 
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Box;
+import cz.vutbr.fit.layout.model.Relation;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TextChunk;
 
@@ -125,6 +126,22 @@ public class DefaultIRIFactory implements IRIFactory
         return factory.createIRI(String.valueOf(chunkSetUri) + "#c" + chunk.getId());
     }
     
+    @Override
+    public IRI createRelationURI(Relation rel)
+    {
+        return factory.createIRI(NAMESPACE, "rel-" + rel.getName());
+    }
+
+    @Override
+    public String decodeRelationURI(IRI iri)
+    {
+        final String loc = iri.getLocalName();
+        if (loc != null && loc.startsWith("rel-"))
+            return loc.substring(4);
+        else
+            return null;
+    }
+
     /**
      * Creates a sequence IRI from its name.
      * @param name the name of the sequence (alphabetical characters only)

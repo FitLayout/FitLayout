@@ -63,7 +63,7 @@ public class TextChunkConnectionProvider extends BaseArtifactService
     @Override
     public IRI getConsumes()
     {
-        return SEGM.TextChunk;
+        return SEGM.ChunkSet;
     }
 
     @Override

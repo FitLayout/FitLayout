@@ -92,6 +92,7 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
             final Set<TextChunk> chunks = loadChunks(artifactRepo, sourceAreaTree, sourcePage,
                     csetIri, chunkModel, tagModel, chunkUris, cset.getAdditionalStatements());
             cset.setTextChunks(chunks);
+            cset.setChunkIris(chunkUris);
             return cset;
         }
         else

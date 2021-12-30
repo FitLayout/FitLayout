@@ -21,6 +21,9 @@ import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Relation;
 import cz.vutbr.fit.layout.ontology.FL;
+import cz.vutbr.fit.layout.rdf.model.RDFAreaTree;
+import cz.vutbr.fit.layout.rdf.model.RDFArtifact;
+import cz.vutbr.fit.layout.rdf.model.RDFChunkSet;
 import cz.vutbr.fit.layout.rdf.model.RDFConnectionSet;
 
 /**
@@ -74,25 +77,34 @@ public class ConnectionSetModelLoader extends ModelLoaderBase implements ModelLo
             {
                 if (st.getSubject() instanceof IRI && st.getObject() instanceof IRI)
                 {
-                    // TODO reuse predefined relations from repository metadata? 
-                    final String relName = getIriFactory().decodeRelationURI(st.getPredicate());
-                    final ContentRect rect1 = findContentRect(sourceArtifact, (IRI) st.getSubject());
-                    final ContentRect rect2 = findContentRect(sourceArtifact, (IRI) st.getObject());
-                    if (relName != null && rect1 != null && rect2 != null)
+                    if (sourceArtifact instanceof RDFArtifact)
                     {
-                        Relation rel = new DefaultRelation(relName);
-                        AreaConnection con = new AreaConnection(rect1, rect2, rel, 1.0f); //TODO weights
-                        conns.add(con);
+                        // TODO reuse predefined relations from repository metadata? 
+                        final String relName = getIriFactory().decodeRelationURI(st.getPredicate());
+                        final ContentRect rect1 = findContentRect((RDFArtifact) sourceArtifact, (IRI) st.getSubject());
+                        final ContentRect rect2 = findContentRect((RDFArtifact) sourceArtifact, (IRI) st.getObject());
+                        if (relName != null && rect1 != null && rect2 != null)
+                        {
+                            Relation rel = new DefaultRelation(relName);
+                            AreaConnection con = new AreaConnection(rect1, rect2, rel, 1.0f); //TODO weights
+                            conns.add(con);
+                        }
                     }
+                    else
+                        log.warn("Source artifact of {} is not RDFArtifact");
                 }
             }
         }
     }
     
-    private ContentRect findContentRect(Artifact sourceArtifact, IRI rectIri)
+    private ContentRect findContentRect(RDFArtifact sourceArtifact, IRI rectIri)
     {
-        // TODO
-        return null;
+        if (sourceArtifact instanceof RDFAreaTree)
+            return ((RDFAreaTree) sourceArtifact).findAreaByIri(rectIri);
+        else if (sourceArtifact instanceof RDFChunkSet)
+            return ((RDFChunkSet) sourceArtifact).findTextChunkByIri(rectIri);
+        else
+            return null;
     }
     
 }

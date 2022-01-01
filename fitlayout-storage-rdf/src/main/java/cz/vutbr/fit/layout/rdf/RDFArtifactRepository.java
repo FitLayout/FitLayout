@@ -167,6 +167,21 @@ public class RDFArtifactRepository implements ArtifactRepository
         }
     }
     
+    public void clearMetadata()
+    {
+        log.info("Clearing repository metadata");
+        try {
+            for (String owl : owls)
+            {
+                final ValueFactory vf = SimpleValueFactory.getInstance();
+                final IRI context = vf.createIRI("file://resources/rdf/" + owl);
+                getStorage().clear(context);
+            }        
+        } catch (Exception e) {
+            log.error("Could clear metadata: {}", e);
+        }
+    }
+    
     //Artifact functions =============================================================
     
     @Override

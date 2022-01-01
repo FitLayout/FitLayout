@@ -49,6 +49,8 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
             "segm:tagSupport"
     };
     
+    private int next_id;
+    
     public ChunkSetModelLoader(IRIFactory iriFactory)
     {
         super(iriFactory);
@@ -64,6 +66,7 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
     
     private RDFChunkSet constructChunkSet(RDFArtifactRepository artifactRepo, IRI csetIri) throws RepositoryException
     {
+        next_id = 0;
         Model artifactModel = artifactRepo.getStorage().getSubjectModel(csetIri);
         if (artifactModel.size() > 0)
         {
@@ -124,6 +127,7 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
                                                 Collection<Statement> additionalStatements) throws RepositoryException
     {
         RDFTextChunk chunk = new RDFTextChunk(iri);
+        chunk.setId(next_id++);
         Map<IRI, Float> tagSupport = new HashMap<>(); //tagUri->support
         RDFTextStyle style = new RDFTextStyle();
         

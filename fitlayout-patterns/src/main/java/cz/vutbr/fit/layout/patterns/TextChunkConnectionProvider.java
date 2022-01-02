@@ -102,7 +102,7 @@ public class TextChunkConnectionProvider extends BaseArtifactService
         DefaultConnectionSet ret = new DefaultConnectionSet(input.getIri());
         ret.setAreaConnections(ra.getConnections());
         ret.setPageIri(page.getIri());
-        ret.setLabel(getId());
+        ret.setLabel("Relations");
         ret.setCreator(getId());
         ret.setCreatorParams(getParamString());
         return ret;

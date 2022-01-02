@@ -218,9 +218,13 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
                     }
                     if (tagUri != null && support != null)
                     {
-                        Tag tag = createTag(dataModel, (IRI) value);
+                        Tag tag = createTag(dataModel, tagUri);
                         if (tag != null)
+                        {
+                            chunk.removeTag(tag); //to remove the possible old 1.0f value
                             chunk.addTag(tag, support);
+                            tagSupport.put(tagUri, support);
+                        }
                     }
                 }
             }

@@ -224,9 +224,13 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                     }
                     if (tagUri != null && support != null)
                     {
-                        Tag tag = createTag(dataModel, (IRI) value);
+                        Tag tag = createTag(dataModel, tagUri);
                         if (tag != null)
+                        {
+                            area.removeTag(tag); //to remove the possible old 1.0f value
                             area.addTag(tag, support);
+                            tagSupport.put(tagUri, support);
+                        }
                     }
                 }
             }

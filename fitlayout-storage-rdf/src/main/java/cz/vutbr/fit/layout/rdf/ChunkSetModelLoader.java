@@ -45,6 +45,7 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
     private static Logger log = LoggerFactory.getLogger(ChunkSetModelLoader.class);
 
     private static final String[] dataObjectProperties = new String[] { 
+            "box:bounds",
             "segm:hasTag",
             "segm:tagSupport"
     };

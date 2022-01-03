@@ -53,5 +53,11 @@ public class RDFTextChunk extends DefaultTextChunk implements RDFResource
     {
         this.documentOrder = documentOrder;
     }
+
+    @Override
+    public String toString()
+    {
+        return "<" + getIri() + "> '" + getText() + "'";
+    }
     
 }

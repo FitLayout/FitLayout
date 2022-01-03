@@ -257,4 +257,13 @@ public class DefaultTextChunk extends DefaultContentRect implements TextChunk
         setTextStyle(new TextStyle(src.getTextStyle()));
         setBackgroundSeparated(src.isBackgroundSeparated());
     }
+    
+    //=============================================================================================
+
+    @Override
+    public String toString()
+    {
+        return "<chunk> '" + getText() + "'";
+    }
+    
 }

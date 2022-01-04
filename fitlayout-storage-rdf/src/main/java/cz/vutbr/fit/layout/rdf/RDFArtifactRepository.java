@@ -28,8 +28,10 @@ import org.slf4j.LoggerFactory;
 import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.api.IRIDecoder;
 import cz.vutbr.fit.layout.model.Artifact;
+import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.SEGM;
+import cz.vutbr.fit.layout.rdf.model.RDFTag;
 
 /**
  * Implementation of an ArtifactRepository on top of an RDFStorage.
@@ -371,4 +373,36 @@ public class RDFArtifactRepository implements ArtifactRepository
         return modelLoaders.get(artifactType);
     }
 
+    //Tags =============================================================
+    
+    //@Override
+    public Collection<Tag> getTags() throws StorageException
+    {
+        try {
+            final String query = iriDecoder.declarePrefixes()
+                    + "SELECT ?tag ?name ?type WHERE { "
+                    + "    ?tag segm:name ?name . "
+                    + "    ?tag segm:type ?type . "
+                    + "    ?tag rdf:type box:Tag "
+                    + "}";
+            
+            List<BindingSet> data = storage.executeSafeTupleQuery(query);
+            List<Tag> ret = new ArrayList<>(data.size());
+            for (BindingSet binding : data)
+            {
+                Binding bIri = binding.getBinding("tag");
+                Binding bName = binding.getBinding("name");
+                Binding bType = binding.getBinding("type");
+                if (bIri != null && bName != null && bType != null && bIri.getValue() instanceof IRI)
+                {
+                    RDFTag tag = new RDFTag((IRI) bIri.getValue(), bType.getValue().stringValue(), bName.getValue().stringValue());
+                    ret.add(tag);
+                }
+            }
+            return ret;
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+    
 }

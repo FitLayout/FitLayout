@@ -282,6 +282,20 @@ public class ServiceManager
     }
     
     /**
+     * Adds a new service to the manager.
+     * @param op a service to add. It must implement a ParametrizedOperation or a ScriptObject interface
+     * to be handled properly.
+     */
+    public void addService(Service op)
+    {
+        op.setServiceManager(this);
+        if (op instanceof ParametrizedOperation)
+            addParametrizedService(op.getId(), (ParametrizedOperation) op);
+        if (op instanceof ScriptObject)
+            addScriptObject(((ScriptObject) op).getVarName(), (ScriptObject) op);
+    }
+    
+    /**
      * Adds an operation to a corresponding map and updates the ParametrizedOperation and ScriptObject maps
      * when necessary.
      * @param <T> Operation tyoe
@@ -290,12 +304,8 @@ public class ServiceManager
      */
     private <T extends Service> void addTypedOperation(T op, Map<String, T> dest)
     {
-        op.setServiceManager(this);
+        addService(op);
         dest.put(op.getId(), op);
-        if (op instanceof ParametrizedOperation)
-            addParametrizedService(op.getId(), (ParametrizedOperation) op);
-        if (op instanceof ScriptObject)
-            addScriptObject(((ScriptObject) op).getVarName(), (ScriptObject) op);
     }
     
     /**

@@ -8,7 +8,11 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.rdf4j.IsolationLevels;
 import org.eclipse.rdf4j.model.IRI;
@@ -20,6 +24,7 @@ import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.model.vocabulary.XSD;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.BooleanQuery;
 import org.eclipse.rdf4j.query.GraphQuery;
@@ -43,7 +48,9 @@ import org.eclipse.rdf4j.sail.nativerdf.NativeStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.vutbr.fit.layout.api.ServiceConfig;
 import cz.vutbr.fit.layout.ontology.BOX;
+import cz.vutbr.fit.layout.ontology.FL;
 
 
 /**
@@ -121,6 +128,18 @@ public class RDFStorage implements Closeable
 	
     //= Low-level repository functions ==============================================================================
 
+    public Collection<Resource> getResourcesOfType(IRI type)
+    {
+        Set<Resource> ret = new HashSet<>(); 
+        try (RepositoryConnection con = repo.getConnection()) {
+            try (RepositoryResult<Statement> result = con.getStatements(null, RDF.TYPE, type)) {
+                for (Statement st : result)
+                    ret.add(st.getSubject());
+            }
+        }
+        return ret;
+    }
+    
     /**
      * Obtains the value of the given predicate for the given subject.
      * @param subject the subject resource
@@ -523,6 +542,67 @@ public class RDFStorage implements Closeable
         } catch (Exception e) {
             throw new StorageException(e);
         }
+    }
+    
+    //= Service descr ==============================================================
+    
+    public ServiceConfig loadServiceConfig(IRI iri) throws StorageException
+    {
+        Value serviceId = getPropertyValue(iri, FL.service);
+        if (serviceId != null && serviceId instanceof Literal)
+        {
+            Map<String, Object> params = new HashMap<>();
+            try (RepositoryConnection con = repo.getConnection()) {
+                try (RepositoryResult<Statement> result = con.getStatements(iri, FL.param, null, false)) {
+                    while (result.hasNext())
+                    {
+                        final Value paramNode = result.next().getObject();
+                        if (paramNode instanceof Resource)
+                        {
+                            String paramName = null;
+                            Object paramValue = null;
+                            try (RepositoryResult<Statement> pstatements = con.getStatements((Resource) paramNode, null, null)) {
+                                for (Statement pst : pstatements)
+                                {
+                                    if (FL.paramName.equals(pst.getPredicate()))
+                                    {
+                                        final Value val = pst.getObject();
+                                        if (val instanceof Literal)
+                                            paramName = val.stringValue();
+                                    }
+                                    else if (FL.paramValue.equals(pst.getPredicate()))
+                                    {
+                                        final Value val = pst.getObject();
+                                        if (val instanceof Literal)
+                                            paramValue = getLiteralAsObject((Literal) val);
+                                    }
+                                }
+                            }
+                            if (paramName != null && paramValue != null)
+                                params.put(paramName, paramValue);
+                        }
+                    }
+                }
+            }
+            return new ServiceConfig(serviceId.stringValue(), params);
+        }
+        else // no service ID defined
+            return null;
+    }
+    
+    public static Object getLiteralAsObject(Literal lval)
+    {
+        final IRI type = lval.getDatatype();
+        if (XSD.BOOLEAN.equals(type))
+            return Boolean.valueOf(lval.booleanValue());
+        else if (XSD.DOUBLE.equals(type))
+            return Double.valueOf(lval.doubleValue());
+        else if (XSD.FLOAT.equals(type))
+            return Float.valueOf(lval.floatValue());
+        else if (XSD.INT.equals(type) || XSD.INTEGER.equals(type))
+            return Integer.valueOf(lval.intValue());
+        else
+            return lval.stringValue();
     }
     
     //= Sequences ==================================================================

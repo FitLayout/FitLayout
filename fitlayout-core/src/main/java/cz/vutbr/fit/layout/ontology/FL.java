@@ -75,6 +75,61 @@ public class FL {
 	 */
 	public static final IRI hasParentArtifact;
 
+	/**
+	 * param
+	 * <p>
+	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#param}.
+	 * <p>
+	 * Service parameter value definition.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#param">param</a>
+	 */
+	public static final IRI param;
+
+	/**
+	 * paramName
+	 * <p>
+	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#paramName}.
+	 * <p>
+	 * Parameter name
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#paramName">paramName</a>
+	 */
+	public static final IRI paramName;
+
+	/**
+	 * paramValue
+	 * <p>
+	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#paramValue}.
+	 * <p>
+	 * Parameter value.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#paramValue">paramValue</a>
+	 */
+	public static final IRI paramValue;
+
+	/**
+	 * service
+	 * <p>
+	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#service}.
+	 * <p>
+	 * A service ID definition
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#service">service</a>
+	 */
+	public static final IRI service;
+
+	/**
+	 * Tagger
+	 * <p>
+	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#Tagger}.
+	 * <p>
+	 * A tagger that is able to assign tags to content rectangles.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#Tagger">Tagger</a>
+	 */
+	public static final IRI Tagger;
+
 	static {
 		ValueFactory factory = SimpleValueFactory.getInstance();
 
@@ -83,6 +138,11 @@ public class FL {
 		creator = factory.createIRI(FL.NAMESPACE, "creator");
 		creatorParams = factory.createIRI(FL.NAMESPACE, "creatorParams");
 		hasParentArtifact = factory.createIRI(FL.NAMESPACE, "hasParentArtifact");
+		param = factory.createIRI(FL.NAMESPACE, "param");
+		paramName = factory.createIRI(FL.NAMESPACE, "paramName");
+		paramValue = factory.createIRI(FL.NAMESPACE, "paramValue");
+		service = factory.createIRI(FL.NAMESPACE, "service");
+		Tagger = factory.createIRI(FL.NAMESPACE, "Tagger");
 	}
 
 	private FL() {

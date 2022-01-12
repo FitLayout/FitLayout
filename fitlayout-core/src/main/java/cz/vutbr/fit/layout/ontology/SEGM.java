@@ -210,6 +210,17 @@ public class SEGM {
 	public static final IRI Tag;
 
 	/**
+	 * tagger
+	 * <p>
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#tagger}.
+	 * <p>
+	 * Assigns a tagger to a tag
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#tagger">tagger</a>
+	 */
+	public static final IRI tagger;
+
+	/**
 	 * tagSupport
 	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#tagSupport}.
@@ -270,6 +281,7 @@ public class SEGM {
 		name = factory.createIRI(SEGM.NAMESPACE, "name");
 		support = factory.createIRI(SEGM.NAMESPACE, "support");
 		Tag = factory.createIRI(SEGM.NAMESPACE, "Tag");
+		tagger = factory.createIRI(SEGM.NAMESPACE, "tagger");
 		tagSupport = factory.createIRI(SEGM.NAMESPACE, "tagSupport");
 		text = factory.createIRI(SEGM.NAMESPACE, "text");
 		TextChunk = factory.createIRI(SEGM.NAMESPACE, "TextChunk");

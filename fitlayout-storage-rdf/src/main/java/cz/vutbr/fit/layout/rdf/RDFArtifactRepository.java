@@ -317,6 +317,11 @@ public class RDFArtifactRepository implements ArtifactRepository
     {
         storage.clear();
     }
+    
+    public void clearContext(IRI contextIri)
+    {
+        storage.clear(contextIri);
+    }
 
     /**
      * Gets the artifact type from an artifact model.

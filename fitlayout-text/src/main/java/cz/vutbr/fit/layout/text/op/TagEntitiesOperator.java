@@ -9,14 +9,18 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ScriptObject;
 import cz.vutbr.fit.layout.api.Tagger;
 import cz.vutbr.fit.layout.impl.BaseOperator;
+import cz.vutbr.fit.layout.impl.ParameterBoolean;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.text.tag.TreeTagger;
@@ -28,15 +32,19 @@ import cz.vutbr.fit.layout.text.tag.TreeTagger;
  */
 public class TagEntitiesOperator extends BaseOperator implements ScriptObject
 {
+    private static final String PARAM_PREFIX = "tag";
+
     private static Logger log = LoggerFactory.getLogger(TagEntitiesOperator.class);
 
     private TreeTagger tagger;
     private List<Tagger> usedTaggers;
+    private Set<String> disabledTaggers;
 
     
     public TagEntitiesOperator()
     {
         usedTaggers = new ArrayList<>();
+        disabledTaggers = new HashSet<>();
     }
     
     @Override
@@ -62,6 +70,41 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
     public String getCategory()
     {
         return "Classification";
+    }
+
+    @Override
+    public List<Parameter> defineParams()
+    {
+        List<Parameter> ret = new ArrayList<>(usedTaggers.size());
+        for (Tagger tagger : usedTaggers)
+            ret.add(new ParameterBoolean(PARAM_PREFIX + tagger.getName()));
+        return ret;
+    }
+
+    @Override
+    public boolean setParam(String name, Object value)
+    {
+        if (name.startsWith(PARAM_PREFIX) && value instanceof Boolean)
+        {
+            String tname = name.substring(PARAM_PREFIX.length());
+            Boolean val = (Boolean) value;
+            if (val)
+                disabledTaggers.remove(tname);
+            else
+                disabledTaggers.add(tname);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    @Override
+    public Object getParam(String name)
+    {
+        if (name.startsWith(PARAM_PREFIX))
+            return !disabledTaggers.contains(name.substring(PARAM_PREFIX.length()));
+        else
+            return false;
     }
 
     /**
@@ -106,7 +149,10 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
             log.warn("Applying TagEntitiesOperator with no taggers configured");
         tagger = new TreeTagger(root);
         for (Tagger t : usedTaggers)
-            tagger.addTagger(t);
+        {
+            if (!disabledTaggers.contains(t.getName()))
+                tagger.addTagger(t);
+        }
         tagger.tagTree();
     }
 

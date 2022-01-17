@@ -88,7 +88,10 @@ public class RDFTaggerConfig implements TaggerConfig
             } 
         }
         else
+        {
+            log.warn("Couldn't find usable tagger definition: {}", taggerIri);
             return null;
+        }
     }
 
 }

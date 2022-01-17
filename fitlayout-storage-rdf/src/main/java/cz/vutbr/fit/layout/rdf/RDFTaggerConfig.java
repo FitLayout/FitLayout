@@ -80,8 +80,19 @@ public class RDFTaggerConfig implements TaggerConfig
             try
             {
                 Class<?> tcls = Class.forName(conf.getServiceId());
-                Object ret = tcls.getDeclaredConstructor().newInstance();
-                return (Tagger) ret;
+                Object inst = tcls.getDeclaredConstructor().newInstance();
+                if (inst instanceof Tagger)
+                {
+                    Tagger tagger = (Tagger) inst;
+                    for (Map.Entry<String, Object> param : conf.getParams().entrySet())
+                        tagger.setParam(param.getKey(), param.getValue());
+                    return tagger;
+                }
+                else
+                {
+                    log.error("Service {} used in {} is not a tagger", conf.getServiceId(), taggerIri);
+                    return null;
+                }
             } catch (Exception e) {
                 log.error("Couldn't create instance of tagger {} : {}", conf.getServiceId(), e.getMessage());
                 return null;

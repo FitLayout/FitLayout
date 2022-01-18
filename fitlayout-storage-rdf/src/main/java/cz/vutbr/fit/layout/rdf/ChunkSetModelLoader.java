@@ -60,6 +60,7 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
     @Override
     public Artifact loadArtifact(IRI artifactIri, RDFArtifactRepository artifactRepo) throws RepositoryException
     {
+        loadTags(artifactRepo); // use the repository tags in the chunk set
         return constructChunkSet(artifactRepo, artifactIri);
     }
     
@@ -197,7 +198,7 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
                 {
                     if (!tagSupport.containsKey(value))
                     {
-                        Tag tag = createTag(dataModel, (IRI) value);
+                        Tag tag = getTag((IRI) value);
                         if (tag != null)
                             chunk.addTag(tag, 1.0f); //spport is unkwnown (yet)
                     }
@@ -219,7 +220,7 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
                     }
                     if (tagUri != null && support != null)
                     {
-                        Tag tag = createTag(dataModel, tagUri);
+                        Tag tag = getTag(tagUri);
                         if (tag != null)
                         {
                             chunk.removeTag(tag); //to remove the possible old 1.0f value

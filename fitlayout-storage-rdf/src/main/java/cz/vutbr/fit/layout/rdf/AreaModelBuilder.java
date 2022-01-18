@@ -62,8 +62,6 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
 		addArea(areaTree.getRoot(), areaTreeNode, pageNode, usedTags, graph);
 		insertAllAreas(areaTree.getRoot().getChildren(), areaTreeNode, pageNode, usedTags, graph);
 		
-        addUsedTags(usedTags, graph);
-        
         // additional RDF properties
         if (areaTree instanceof RDFAreaTree)
         {
@@ -143,14 +141,4 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
         }
 	}
 
-    private void addUsedTags(Set<Tag> usedTags, Model graph)
-    {
-        for (Tag t : usedTags)
-        {
-            IRI tagUri = getIriFactory().createTagURI(t);
-            graph.add(tagUri, SEGM.type, vf.createLiteral(t.getType()));
-            graph.add(tagUri, SEGM.name, vf.createLiteral(t.getValue()));
-        }
-    }
-    
 }

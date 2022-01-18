@@ -19,7 +19,6 @@ import cz.vutbr.fit.layout.api.Tagger;
 import cz.vutbr.fit.layout.api.TaggerConfig;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.ontology.SEGM;
-import cz.vutbr.fit.layout.rdf.model.RDFTag;
 
 /**
  * A tagger config implementation that uses a ServiceManager and the configured RDF
@@ -55,19 +54,11 @@ public class RDFTaggerConfig implements TaggerConfig
     @Override
     public Tagger getTaggerForTag(Tag tag)
     {
-        if (tag instanceof RDFTag)
-        {
-            Value val = repo.getStorage().getPropertyValue(((RDFTag) tag).getIri(), SEGM.tagger);
-            if (val instanceof IRI)
-                return loadTagger((IRI) val);
-            else
-                return null;
-        }
+        Value val = repo.getStorage().getPropertyValue(tag.getIri(), SEGM.tagger);
+        if (val instanceof IRI)
+            return loadTagger((IRI) val);
         else
-        {
-            log.error("Cannot get tagger for a non-RDF tag {}", tag);
             return null;
-        }
     }
 
     // =============================================================================

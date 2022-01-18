@@ -138,7 +138,7 @@ public class TaggedChunksSource extends ChunksSource
         newChunk.setText(occ);
         if (tag != null)
         {
-            newChunk.setName("<chunk:" + tag.getValue() + "> " + occ);
+            newChunk.setName("<chunk:" + tag.getName() + "> " + occ);
             newChunk.addTag(tag, a.getTagSupport(tag));
         }
         else

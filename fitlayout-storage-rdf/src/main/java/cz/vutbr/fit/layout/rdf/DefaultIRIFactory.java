@@ -117,7 +117,7 @@ public class DefaultIRIFactory implements IRIFactory
     
     private String getTagDesc(Tag tag) 
     {
-        return tag.getType().replaceAll("\\.", "-") + "--" + tag.getValue();
+        return tag.getType().replaceAll("\\.", "-") + "--" + tag.getName();
     }
     
     @Override

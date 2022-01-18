@@ -172,7 +172,7 @@ public class RegexpTagger extends BaseTagger
     @Override
     public boolean mayCoexistWith(Tag other)
     {
-        return (!other.getValue().equals("session"));
+        return true;
     }
     
     @Override

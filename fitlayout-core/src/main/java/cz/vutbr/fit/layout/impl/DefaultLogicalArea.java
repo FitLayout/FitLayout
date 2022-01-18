@@ -99,7 +99,7 @@ public class DefaultLogicalArea extends DefaultTreeNode<LogicalArea> implements 
     @Override
     public String toString()
     {
-        final String tagstr = (mainTag == null) ? "---" : mainTag.getValue();
+        final String tagstr = (mainTag == null) ? "---" : mainTag.getName();
         return "(" + tagstr + ") " + getText();
     }
     

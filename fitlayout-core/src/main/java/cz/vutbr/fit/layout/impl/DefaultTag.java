@@ -5,60 +5,66 @@
  */
 package cz.vutbr.fit.layout.impl;
 
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.util.Values;
+
 import cz.vutbr.fit.layout.model.Tag;
+import cz.vutbr.fit.layout.ontology.RESOURCE;
 
 /**
- * A default simple tag implementation that allows to specify the tag value and level.
+ * A default simple tag implementation.
  * 
  * @author burgetr
  */
 public class DefaultTag implements Tag
 {
-    private String value;
-    private int level;
+    private IRI iri;
+    private String name;
     private String type;
 
-    public DefaultTag(String value)
+    public DefaultTag(String name)
     {
-        this.value = value;
-        this.level = 0;
+        this.iri = createDefaultIri("x", name);
+        this.name = name;
         this.type = "";
     }
 
-    public DefaultTag(String type, String value)
+    public DefaultTag(String type, String name)
     {
-        this.value = value;
-        this.level = 0;
+        this.iri = createDefaultIri(type, name);
+        this.name = name;
         this.type = type;
     }
 
-    public DefaultTag(String value, int level)
+    public DefaultTag(IRI iri, String type, String name)
     {
-        this.value = value;
-        this.level = level;
-        this.type = "";
+        this.iri = iri;
+        this.name = name;
+        this.type = type;
     }
 
-    public String getValue()
+    public IRI getIri()
     {
-        return value;
+        return iri;
     }
 
-    public void setValue(String value)
+    public void setIri(IRI iri)
     {
-        this.value = value;
+        this.iri = iri;
     }
 
-    public int getLevel()
+    @Override
+    public String getName()
     {
-        return level;
+        return name;
     }
 
-    public void setLevel(int level)
+    public void setName(String name)
     {
-        this.level = level;
+        this.name = name;
     }
 
+    @Override
     public String getType()
     {
         return type;
@@ -72,7 +78,7 @@ public class DefaultTag implements Tag
     @Override
     public String toString()
     {
-        return value;
+        return name;
     }
 
     @Override
@@ -80,8 +86,7 @@ public class DefaultTag implements Tag
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        result = prime * result + ((value == null) ? 0 : value.hashCode());
+        result = prime * result + ((iri == null) ? 0 : iri.hashCode());
         return result;
     }
 
@@ -90,21 +95,26 @@ public class DefaultTag implements Tag
     {
         if (this == obj) return true;
         if (obj == null) return false;
-        if (!(obj instanceof Tag)) return false;
-        Tag other = (Tag) obj;
-        if (type == null)
+        if (getClass() != obj.getClass()) return false;
+        DefaultTag other = (DefaultTag) obj;
+        if (iri == null)
         {
-            if (other.getType() != null) return false;
+            if (other.iri != null) return false;
         }
-        else if (!type.equals(other.getType())) return false;
-        if (value == null)
-        {
-            if (other.getValue() != null) return false;
-        }
-        else if (!value.equals(other.getValue())) return false;
+        else if (!iri.equals(other.iri)) return false;
         return true;
     }
 
-
+    /**
+     * Creates a default IRI for a tag when no IRI is provided in constructor.
+     * 
+     * @param type
+     * @param name
+     * @return
+     */
+    public IRI createDefaultIri(String type, String name)
+    {
+        return Values.iri(RESOURCE.NAMESPACE, "tag-" + type.replaceAll("\\.", "-") + "--" + name);
+    }
     
 }

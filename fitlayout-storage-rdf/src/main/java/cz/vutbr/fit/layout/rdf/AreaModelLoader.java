@@ -65,6 +65,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
     public Artifact loadArtifact(IRI artifactIri, RDFArtifactRepository artifactRepo)
             throws RepositoryException
     {
+        loadTags(artifactRepo); // use the repository tags in the constructed tree
         return constructAreaTree(artifactRepo, artifactIri);
     }
 
@@ -202,7 +203,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                 {
                     if (!tagSupport.containsKey(value))
                     {
-                        Tag tag = createTag(dataModel, (IRI) value);
+                        Tag tag = getTag((IRI) value);
                         if (tag != null)
                             area.addTag(tag, 1.0f); //spport is unkwnown (yet)
                     }
@@ -224,7 +225,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                     }
                     if (tagUri != null && support != null)
                     {
-                        Tag tag = createTag(dataModel, tagUri);
+                        Tag tag = getTag(tagUri);
                         if (tag != null)
                         {
                             area.removeTag(tag); //to remove the possible old 1.0f value

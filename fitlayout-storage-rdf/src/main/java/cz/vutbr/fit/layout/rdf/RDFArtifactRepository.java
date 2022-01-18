@@ -27,11 +27,11 @@ import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.api.IRIDecoder;
+import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.SEGM;
-import cz.vutbr.fit.layout.rdf.model.RDFTag;
 
 /**
  * Implementation of an ArtifactRepository on top of an RDFStorage.
@@ -400,7 +400,7 @@ public class RDFArtifactRepository implements ArtifactRepository
                 Binding bType = binding.getBinding("type");
                 if (bIri != null && bName != null && bType != null && bIri.getValue() instanceof IRI)
                 {
-                    RDFTag tag = new RDFTag((IRI) bIri.getValue(), bType.getValue().stringValue(), bName.getValue().stringValue());
+                    Tag tag = new DefaultTag((IRI) bIri.getValue(), bType.getValue().stringValue(), bName.getValue().stringValue());
                     ret.add(tag);
                 }
             }

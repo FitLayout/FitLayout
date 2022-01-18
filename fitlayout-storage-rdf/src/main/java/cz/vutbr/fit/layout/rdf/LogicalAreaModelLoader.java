@@ -45,6 +45,7 @@ public class LogicalAreaModelLoader extends ModelLoaderBase implements ModelLoad
     @Override
     public Artifact loadArtifact(IRI artifactIri, RDFArtifactRepository artifactRepo) throws RepositoryException
     {
+        loadTags(artifactRepo); // use the repository tags in the constructed tree
         return constructLogicalAreaTree(artifactRepo, artifactIri);
     }
 
@@ -111,7 +112,6 @@ public class LogicalAreaModelLoader extends ModelLoaderBase implements ModelLoad
     {
         RDFLogicalArea area = new RDFLogicalArea(iri);
         
-        Model tagInfoModel = null;
         RDFAreaTree areaTree = null;
         
         for (Statement st : model.filter(iri, null, null))
@@ -127,9 +127,7 @@ public class LogicalAreaModelLoader extends ModelLoaderBase implements ModelLoad
             {
                 if (value instanceof IRI)
                 {
-                    if (tagInfoModel == null)
-                        tagInfoModel = getTagModelForAreaTree(artifactRepo, treeIri);
-                    Tag tag = createTag(tagInfoModel, (IRI) value);
+                    Tag tag = getTag((IRI) value);
                     if (tag != null)
                         area.setMainTag(tag);
                 }
@@ -176,20 +174,4 @@ public class LogicalAreaModelLoader extends ModelLoaderBase implements ModelLoad
         return artifactRepo.getStorage().executeSafeQuery(query);
     }
     
-    /**
-     * Obtains the model of visual areas for the given area tree.
-     * @param areaTreeIri
-     * @return A Model containing the triplets for all tags of the visual areas contained in the given area tree.
-     * @throws RepositoryException 
-     */
-    private Model getTagModelForAreaTree(RDFArtifactRepository artifactRepo, IRI areaTreeIri) throws RepositoryException
-    {
-        final String query = artifactRepo.getIriDecoder().declarePrefixes()
-                + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
-                + "?a rdf:type segm:LogicalArea . "
-                + "?a segm:hasTag ?s . "
-                + "?a segm:belongsTo <" + areaTreeIri.stringValue() + "> }";
-        return artifactRepo.getStorage().executeSafeQuery(query);
-    }
-
 }

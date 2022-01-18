@@ -6,6 +6,7 @@
 package cz.vutbr.fit.layout.rdf;
 
 import cz.vutbr.fit.layout.impl.DefaultIRIDecoder;
+import cz.vutbr.fit.layout.ontology.RESOURCE;
 
 /**
  * An IRI decoder that adds the 'r' prefix for RDF resources.

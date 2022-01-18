@@ -1,5 +1,6 @@
 package cz.vutbr.fit.layout.rdf;
 import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -9,7 +10,6 @@ import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
-import org.eclipse.rdf4j.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +39,12 @@ import cz.vutbr.fit.layout.rdf.model.RDFPage;
 public abstract class ModelLoaderBase extends ModelTransformer
 {
     private static Logger log = LoggerFactory.getLogger(ModelLoaderBase.class);
+    
+    /**
+     * Tags available in the repository. Initialized using loadTags().
+     */
+    private Map<IRI, Tag> repositoryTags;
+    
     
     public ModelLoaderBase(IRIFactory iriFactory)
     {
@@ -308,28 +314,34 @@ public abstract class ModelLoaderBase extends ModelTransformer
     }
     
     /**
-     * Creates a tag from the given tag IRI and the tag data model.
-     * @param tagModel
-     * @param tagIri
-     * @return the created tag or {@code null} when no tag info is found
-     * @throws RepositoryException
+     * Loads available tags from a RDF repository.
+     * 
+     * @param repo the repository to use as the tag source
      */
-    protected Tag createTag(Model tagModel, IRI tagIri) throws RepositoryException
+    protected void loadTags(RDFArtifactRepository repo)
     {
-        String name = null;
-        String type = null;
-        for (Statement st : tagModel.filter(tagIri, null, null))
+        repositoryTags = new HashMap<>();
+        for (Tag tag : repo.getTags())
+            repositoryTags.put(tag.getIri(), tag);
+    }
+    
+    /**
+     * Gets an instance of a tag defined in the repository.
+     * 
+     * @param tagIri the IRI of the tag
+     * @return a tag defined for the IRI or a "x" type tag the tag is not defined
+     */
+    protected Tag getTag(IRI tagIri)
+    {
+        if (repositoryTags == null)
+            repositoryTags = new HashMap<>();
+        Tag tag = repositoryTags.get(tagIri);
+        if (tag == null)
         {
-            IRI pred = st.getPredicate();
-            if (SEGM.name.equals(pred))
-                name = st.getObject().stringValue();
-            else if (SEGM.type.equals(pred))
-                type = st.getObject().stringValue();
+            tag = new DefaultTag(tagIri, "x", tagIri.getLocalName());
+            repositoryTags.put(tagIri, tag);
         }
-        if (name != null && type != null)
-            return new DefaultTag(type, name);
-        else
-            return null;
+        return tag;
     }
     
     /**

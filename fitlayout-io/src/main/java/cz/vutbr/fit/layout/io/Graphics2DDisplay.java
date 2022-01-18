@@ -278,7 +278,7 @@ public class Graphics2DDisplay implements OutputDisplay
             for (Iterator<Tag> it = s.iterator(); it.hasNext();)
             {
                 Tag tag = it.next();
-                g.setColor(stringColor(tag.getValue()));
+                g.setColor(stringColor(tag.getName()));
                 g.fillRect(bounds.getX1(), (int) y, bounds.getWidth(), (int) (step+0.5));
                 y += step;
             }

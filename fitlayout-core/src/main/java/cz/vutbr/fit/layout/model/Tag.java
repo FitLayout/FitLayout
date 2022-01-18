@@ -5,8 +5,12 @@
  */
 package cz.vutbr.fit.layout.model;
 
+import org.eclipse.rdf4j.model.IRI;
+
 /**
- * A tag that can be assigned to an area.
+ * A tag that can be assigned to an area. The tag is uniquely identified
+ * by its IRI. Moreoved, it has a name and a type tha allows to distinguish
+ * tags of different purposes.
  * 
  * @author burgetr
  */
@@ -14,17 +18,17 @@ public interface Tag
 {
     
     /**
-     * Obtains the string value (the name) of the tag.
-     * @return the tag value
+     * A unique tag IRI.
+     * @return
      */
-    public String getValue();
-
-    /**
-     * The tag level if the tags are hiearchically organized.
-     * @return The level, where 0 corresponds to the root tag.
-     */
-    public int getLevel();
+    public IRI getIri();
     
+    /**
+     * Obtains the name of the tag.
+     * @return the tag name
+     */
+    public String getName();
+
     /**
      * The tag type that allows to distinguish tags of different
      * purposes and different source. Each tag source should have

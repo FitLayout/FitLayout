@@ -256,12 +256,12 @@ public class PresentationBasedChunksSource extends ChunksSource
         newChunk.setText(occ.getText());
         if (present)
         {
-            newChunk.setName("<chunk:" + tag.getValue() + "> " + occ);
+            newChunk.setName("<chunk:" + tag.getName() + "> " + occ);
             newChunk.addTag(tag, a.getTagSupport(tag));
         }
         else
         {
-            newChunk.setName("<chunk:!" + tag.getValue() + "> " + occ);
+            newChunk.setName("<chunk:!" + tag.getName() + "> " + occ);
         }
         return newChunk;
     }

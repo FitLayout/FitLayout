@@ -3,7 +3,7 @@
  *
  * Created on 9. 1. 2016, 10:33:35 by burgetr
  */
-package cz.vutbr.fit.layout.rdf;
+package cz.vutbr.fit.layout.ontology;
 
 /**
  * FitLayout resource IRI.

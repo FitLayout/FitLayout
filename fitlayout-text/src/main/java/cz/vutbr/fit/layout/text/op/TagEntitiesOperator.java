@@ -8,9 +8,10 @@ package cz.vutbr.fit.layout.text.op;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import cz.vutbr.fit.layout.impl.BaseOperator;
 import cz.vutbr.fit.layout.impl.ParameterBoolean;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
+import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.text.tag.TreeTagger;
 
 
@@ -37,13 +39,13 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
     private static Logger log = LoggerFactory.getLogger(TagEntitiesOperator.class);
 
     private TreeTagger tagger;
-    private List<Tagger> usedTaggers;
+    private Map<Tag, Tagger> usedTaggers;
     private Set<String> disabledTaggers;
 
     
     public TagEntitiesOperator()
     {
-        usedTaggers = new ArrayList<>();
+        usedTaggers = new HashMap<>();
         disabledTaggers = new HashSet<>();
     }
     
@@ -76,7 +78,7 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
     public List<Parameter> defineParams()
     {
         List<Parameter> ret = new ArrayList<>(usedTaggers.size());
-        for (Tagger tagger : usedTaggers)
+        for (Tagger tagger : usedTaggers.values())
             ret.add(new ParameterBoolean(PARAM_PREFIX + tagger.getName()));
         return ret;
     }
@@ -108,22 +110,22 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
     }
 
     /**
-     * Registers a new tagger that should be used by this operator.
+     * Registers a new tagger that should be used by this operator for assigning a tag.
+     * @param tag the tag to be assigned
      * @param tagger the tagger instance to be added
      */
-    public void addTagger(Tagger tagger)
+    public void addTagger(Tag tag, Tagger tagger)
     {
-        usedTaggers.add(tagger);
+        usedTaggers.put(tag, tagger);
     }
     
     /**
-     * Registers a collection of taggers that should be used by this operator.
-     * @param taggers the collection of tagger instances to be added
+     * Registers a map of taggers that should be used by this operator.
+     * @param taggers the map of taggers to be used for assigning the tags
      */
-    public void addTaggers(Collection<Tagger> taggers)
+    public void setTaggers(Map<Tag, Tagger> taggers)
     {
-        for (Tagger tagger : taggers)
-            usedTaggers.add(tagger);
+        usedTaggers = taggers;
     }
     
     /**
@@ -147,12 +149,7 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
     {
         if (usedTaggers.isEmpty())
             log.warn("Applying TagEntitiesOperator with no taggers configured");
-        tagger = new TreeTagger(root);
-        for (Tagger t : usedTaggers)
-        {
-            if (!disabledTaggers.contains(t.getName()))
-                tagger.addTagger(t);
-        }
+        tagger = new TreeTagger(root, usedTaggers);
         tagger.tagTree();
     }
 

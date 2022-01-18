@@ -19,7 +19,6 @@ import com.joestelmach.natty.Parser;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TagOccurrence;
-import cz.vutbr.fit.layout.text.tag.TextTag;
 
 /**
  * @author burgetr
@@ -137,12 +136,6 @@ public class DateTagger extends BaseTagger
         return "Identifies dates in the most common formats";
     }
     
-    @Override
-    public TextTag getTag()
-    {
-        return new TextTag("date", this);
-    }
-
     @Override
     public float belongsTo(Area node)
     {

@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.api.Tagger;
+import cz.vutbr.fit.layout.api.TaggerConfig;
 import cz.vutbr.fit.layout.impl.DefaultTextChunk;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.ContentRect;
@@ -23,7 +24,6 @@ import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TagOccurrence;
 import cz.vutbr.fit.layout.model.TextChunk;
-import cz.vutbr.fit.layout.text.tag.TextTag;
 
 /**
  * A chunk source that follows some presentation patterns in order to improve the chunk extraction.
@@ -49,6 +49,7 @@ public class PresentationBasedChunksSource extends ChunksSource
     private static Logger log = LoggerFactory.getLogger(PresentationBasedChunksSource.class);
     
     private int idcnt;
+    private TaggerConfig tagConfig;
     private float minTagSupport;
     private ChunksCache cache;
     private List<TextChunk> areas;
@@ -62,9 +63,10 @@ public class PresentationBasedChunksSource extends ChunksSource
      * @param cache the cache of already extracted chunks for sharing the chunks among different sources
      * or {@code null} when no cache should be used.
      */
-    public PresentationBasedChunksSource(Area root, float minTagSupport, ChunksCache cache)
+    public PresentationBasedChunksSource(Area root, TaggerConfig tagConfig, float minTagSupport, ChunksCache cache)
     {
         super(root);
+        this.tagConfig = tagConfig;
         this.minTagSupport = minTagSupport;
         this.cache = cache;
         hints = new HashMap<>();
@@ -77,10 +79,10 @@ public class PresentationBasedChunksSource extends ChunksSource
         if (areas == null)
         {
             tagAreas = new HashMap<>();
-            Set<TextTag> supportedTags = findLeafTags(getRoot());
+            Set<Tag> supportedTags = findLeafTags(getRoot());
             if (!supportedTags.isEmpty())
             {
-                for (TextTag t : supportedTags)
+                for (Tag t : supportedTags)
                 {
                     final List<PresentationHint> hintList = hints.get(t);
                     List<TextChunk> chunks = null;
@@ -124,7 +126,7 @@ public class PresentationBasedChunksSource extends ChunksSource
         List<TextChunk> destChunks = new ArrayList<>();
         List<TextChunk> destAll = new ArrayList<>();
         Set<Area> processed = new HashSet<>();
-        recursiveScan(getRoot(), (TextTag) t, destChunks, destAll, processed);
+        recursiveScan(getRoot(), t, destChunks, destAll, processed);
         //apply post-processing hints on all chunks for the given tag
         if (hints != null)
             destChunks = applyHints(destChunks, hints);
@@ -169,7 +171,7 @@ public class PresentationBasedChunksSource extends ChunksSource
     
     //==============================================================================================
     
-    private void recursiveScan(Area root, TextTag tag, List<TextChunk> destChunks, List<TextChunk> destAll, Set<Area> processed)
+    private void recursiveScan(Area root, Tag tag, List<TextChunk> destChunks, List<TextChunk> destAll, Set<Area> processed)
     {
         if (root.isLeaf())
         {
@@ -185,68 +187,70 @@ public class PresentationBasedChunksSource extends ChunksSource
         }
     }
 
-    private void createAreasFromTag(Area a, TextTag t, List<TextChunk> destChunks, List<TextChunk> destAll, Set<Area> processed)
+    private void createAreasFromTag(Area a, Tag t, List<TextChunk> destChunks, List<TextChunk> destAll, Set<Area> processed)
     {
         List<TextChunk> chunks = new ArrayList<>();
         List<TextChunk> all = new ArrayList<>();
-        Tagger tg = t.getSource();
-        
-        //Stage 1: Extract boxes
-        SourceBoxList boxes = extractBoxes(a, t, processed);
-        BoxText boxText = new BoxText(boxes);
-
-        //Stage 2: Find occurences
-        List<TagOccurrence> occurrences = tg.extract(boxText.getText());
-        //apply hints on the particular list of occurences
-        if (hints.containsKey(t))
+        Tagger tg = tagConfig.getTaggerForTag(t);
+        if (tg != null)
         {
-            for (PresentationHint hint : hints.get(t))
-                occurrences = hint.processOccurrences(boxText, occurrences);
-        }
-        
-        //Stage 3: Create chunks based on the occurences
-        int last = 0;
-        for (TagOccurrence occ : occurrences)
-        {
-            if (occ.getLength() > 0)
+            //Stage 1: Extract boxes
+            SourceBoxList boxes = extractBoxes(a, t, processed);
+            BoxText boxText = new BoxText(boxes);
+    
+            //Stage 2: Find occurences
+            List<TagOccurrence> occurrences = tg.extract(boxText.getText());
+            //apply hints on the particular list of occurences
+            if (hints.containsKey(t))
             {
-                int pos = occ.getPosition();
-                if (pos > last) //some substring between, create a chunk with no tag
+                for (PresentationHint hint : hints.get(t))
+                    occurrences = hint.processOccurrences(boxText, occurrences);
+            }
+            
+            //Stage 3: Create chunks based on the occurences
+            int last = 0;
+            for (TagOccurrence occ : occurrences)
+            {
+                if (occ.getLength() > 0)
                 {
-                    String substr = boxText.getText().substring(last, pos);
-                    TagOccurrence between = new TagOccurrence(substr, last, 1);
-                    TextChunk sepArea = createSubstringArea(a, t, false, boxText, between);
-                    all.add(sepArea);
+                    int pos = occ.getPosition();
+                    if (pos > last) //some substring between, create a chunk with no tag
+                    {
+                        String substr = boxText.getText().substring(last, pos);
+                        TagOccurrence between = new TagOccurrence(substr, last, 1);
+                        TextChunk sepArea = createSubstringArea(a, t, false, boxText, between);
+                        all.add(sepArea);
+                    }
+                    TextChunk newArea = createSubstringArea(a, t, true, boxText, occ);
+                    chunks.add(newArea);
+                    all.add(newArea);
+                    last = pos + occ.getLength();
                 }
-                TextChunk newArea = createSubstringArea(a, t, true, boxText, occ);
-                chunks.add(newArea);
-                all.add(newArea);
-                last = pos + occ.getLength();
+                else
+                {
+                    log.error("Zero length occurence: {}, tag {}, area {}", occ, t, a);
+                }
             }
-            else
+            if (boxText.length() > last) //there is something remaining after the last occurrence
             {
-                log.error("Zero length occurence: {}, tag {}, area {}", occ, t, a);
+                String substr = boxText.getText().substring(last);
+                TagOccurrence between = new TagOccurrence(substr, last, 1);
+                TextChunk sepArea = createSubstringArea(a, t, false, boxText, between);
+                all.add(sepArea);
             }
+            //apply hints on the particular list of chunks
+            List<TextChunk> current = chunks;
+            if (hints.containsKey(t))
+            {
+                for (PresentationHint hint : hints.get(t))
+                    current = hint.processChunks(a, current);
+            }
+            destChunks.addAll(chunks);
+            destAll.addAll(all);
         }
-        if (boxText.length() > last) //there is something remaining after the last occurrence
-        {
-            String substr = boxText.getText().substring(last);
-            TagOccurrence between = new TagOccurrence(substr, last, 1);
-            TextChunk sepArea = createSubstringArea(a, t, false, boxText, between);
-            all.add(sepArea);
-        }
-        //apply hints on the particular list of chunks
-        List<TextChunk> current = chunks;
-        if (hints.containsKey(t))
-        {
-            for (PresentationHint hint : hints.get(t))
-                current = hint.processChunks(a, current);
-        }
-        destChunks.addAll(chunks);
-        destAll.addAll(all);
     }
 
-    private TextChunk createSubstringArea(Area a, TextTag tag, boolean present, BoxText boxText, TagOccurrence occ)
+    private TextChunk createSubstringArea(Area a, Tag tag, boolean present, BoxText boxText, TagOccurrence occ)
     {
         //determine the substring bounds
         Rectangular r = boxText.getSubstringBounds(occ.getPosition(), occ.getPosition() + occ.getLength());
@@ -282,22 +286,21 @@ public class PresentationBasedChunksSource extends ChunksSource
     
     //==============================================================================================
     
-    private Set<TextTag> findLeafTags(Area root)
+    private Set<Tag> findLeafTags(Area root)
     {
-        Set<TextTag> ret = new HashSet<>();
+        Set<Tag> ret = new HashSet<>();
         recursiveCollectTags(root, ret);
         return ret;
     }
 
-    private void recursiveCollectTags(Area root, Set<TextTag> dest)
+    private void recursiveCollectTags(Area root, Set<Tag> dest)
     {
         if (root.isLeaf())
         {
             Set<Tag> all = root.getSupportedTags(minTagSupport);
             for (Tag t : all)
             {
-                if (t instanceof TextTag)
-                    dest.add((TextTag) t);
+                dest.add(t);
             }
         }
         else

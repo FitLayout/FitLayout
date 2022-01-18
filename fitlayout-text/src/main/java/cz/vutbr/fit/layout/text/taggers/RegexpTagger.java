@@ -11,7 +11,6 @@ import cz.vutbr.fit.layout.impl.ParameterString;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TagOccurrence;
-import cz.vutbr.fit.layout.text.tag.TextTag;
 
 
 public class RegexpTagger extends BaseTagger
@@ -59,12 +58,6 @@ public class RegexpTagger extends BaseTagger
         return "General paper or news titles";
     }
     
-    @Override
-    public TextTag getTag()
-    {
-        return new TextTag("title", this);
-    }
-
     //==========================================================================================
     
     @Override

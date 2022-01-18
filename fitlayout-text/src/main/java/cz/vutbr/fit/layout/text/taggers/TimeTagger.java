@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TagOccurrence;
-import cz.vutbr.fit.layout.text.tag.TextTag;
 
 
 /**
@@ -46,12 +45,6 @@ public class TimeTagger extends BaseTagger
         return "Tags the areas that contain some time expressions";
     }
     
-    @Override
-    public TextTag getTag()
-    {
-        return new TextTag("time", this);
-    }
-
     @Override
     public float belongsTo(Area node)
     {

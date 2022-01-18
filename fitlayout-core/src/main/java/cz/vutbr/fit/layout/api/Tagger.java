@@ -21,12 +21,6 @@ public interface Tagger extends Service, ParametrizedOperation
 {
 
     /**
-     * Obtains the tag that this tagger assigns to the areas.
-     * @return the tag string
-     */
-    public Tag getTag();
-
-    /**
      * Checks whether the area may be tagged with the tag. This method does not actually assign the tag to the area.
      * @param node The examined area node.
      * @return the relevance of the assignment (0.0 = not assigned, 0.1 = hopefully possible, &gt;0.5 quite possible, 1.0 absolutely sure)

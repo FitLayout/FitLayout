@@ -14,7 +14,6 @@ import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TagOccurrence;
-import cz.vutbr.fit.layout.text.tag.TextTag;
 import edu.stanford.nlp.util.Triple;
 
 /**
@@ -82,12 +81,6 @@ public class PersonsTagger extends NERTagger
     public void setMincnt(int mincnt)
     {
         this.mincnt = mincnt;
-    }
-
-    @Override
-    public TextTag getTag()
-    {
-        return new TextTag("persons", this);
     }
 
     @Override

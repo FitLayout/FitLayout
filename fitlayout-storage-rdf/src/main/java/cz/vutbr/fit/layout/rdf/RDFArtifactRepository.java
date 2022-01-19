@@ -388,7 +388,7 @@ public class RDFArtifactRepository implements ArtifactRepository
                     + "SELECT ?tag ?name ?type WHERE { "
                     + "    ?tag segm:name ?name . "
                     + "    ?tag segm:type ?type . "
-                    + "    ?tag rdf:type box:Tag "
+                    + "    ?tag rdf:type segm:Tag "
                     + "}";
             
             List<BindingSet> data = storage.executeSafeTupleQuery(query);

@@ -106,8 +106,15 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
     public void parse(URL url) throws IOException, InterruptedException
     {
         inputFile = invokeRenderer(url);
-        if (inputFile != null)
-            parseInputFile(inputFile, url);
+        if (inputFile != null && inputFile.getError() == null)
+        {
+            if (inputFile.getStatus() >= 200 && inputFile.getStatus() < 300)
+                parseInputFile(inputFile, url);
+            else
+                throw new IOException("HTTP status: " + inputFile.getStatus() + " " + inputFile.getStatusText());
+        }
+        else if (inputFile.getError() != null)
+            throw new IOException(inputFile.getError());
         else
             throw new IOException("Backend execution failed");
     }

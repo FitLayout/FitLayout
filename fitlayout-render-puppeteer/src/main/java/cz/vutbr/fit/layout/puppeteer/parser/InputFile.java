@@ -16,6 +16,9 @@ public class InputFile
     public BoxInfo[] boxes;
     public ImageInfo[] images;
     public String screenshot;
+    public int status;
+    public String statusText;
+    public String error;
     
 
     public PageInfo getPage()
@@ -67,4 +70,35 @@ public class InputFile
     {
         this.screenshot = screenshot;
     }
+
+    public int getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(int status)
+    {
+        this.status = status;
+    }
+
+    public String getStatusText()
+    {
+        return statusText;
+    }
+
+    public void setStatusText(String statusText)
+    {
+        this.statusText = statusText;
+    }
+
+    public String getError()
+    {
+        return error;
+    }
+
+    public void setError(String error)
+    {
+        this.error = error;
+    }
+    
 }

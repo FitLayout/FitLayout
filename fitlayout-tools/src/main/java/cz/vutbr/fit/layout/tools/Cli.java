@@ -23,6 +23,7 @@ import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.puppeteer.PuppeteerTreeProvider;
 import cz.vutbr.fit.layout.segm.BasicSegmProvider;
 import cz.vutbr.fit.layout.tools.cmd.Export;
+import cz.vutbr.fit.layout.tools.cmd.Invoke;
 import cz.vutbr.fit.layout.tools.cmd.ListArtifacts;
 import cz.vutbr.fit.layout.tools.cmd.LoadArtifact;
 import cz.vutbr.fit.layout.tools.cmd.Query;
@@ -41,6 +42,7 @@ import picocli.CommandLine.Command;
 @Command(name = "fitlayout", 
     subcommands = {Renderer.class,
                    Segmentator.class,
+                   Invoke.class,
                    Export.class,
                    UseRepository.class,
                    ListArtifacts.class,
@@ -87,6 +89,16 @@ public class Cli
     public Artifact getLastArtifact()
     {
         return lastArtifact;
+    }
+    
+    public void setLastArtifact(Artifact art)
+    {
+        if (art instanceof Page)
+            setPage((Page) art);
+        else if (art instanceof AreaTree)
+            setAreaTree((AreaTree) art);
+        else
+            lastArtifact = art;
     }
     
     /**

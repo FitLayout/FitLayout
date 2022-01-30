@@ -113,7 +113,35 @@ public class Cli
         return serviceManager;
     }
 
-    public static List<List<String>> splitArgsByCommands(String[] args, Set<String> cnames)
+    public int execCommandLine(String[] args)
+    {
+        CommandLine cmd = new CommandLine(this);
+        cmd.setUsageHelpWidth(90);
+        cmd.setUsageHelpLongOptionsMaxWidth(40);
+        
+        //init subcommands
+        for (CommandLine sub : cmd.getSubcommands().values())
+        {
+            ((CliCommand) sub.getCommandSpec().userObject()).setCli(this);
+        }
+        
+        //split command line to individual commands
+        Set<String> cnames = cmd.getSubcommands().keySet();
+        List<List<String>> subcommands = splitArgsByCommands(args, cnames);
+
+        //execute the individual command lines
+        for (List<String> subcl : subcommands)
+        {
+            String[] a = subcl.toArray(new String[0]);
+            int exitCode = cmd.execute(a);
+            if (exitCode != 0)
+                return exitCode;
+        }
+        
+        return 0;
+    }
+
+    private static List<List<String>> splitArgsByCommands(String[] args, Set<String> cnames)
     {
         List<List<String>> ret = new ArrayList<>();
         List<String> current = new ArrayList<>();
@@ -145,45 +173,16 @@ public class Cli
         }
     }
     
-    public static int execCommandLine(String[] args)
-    {
-        Cli cli = new Cli();
-        
-        CommandLine cmd = new CommandLine(cli);
-        cmd.setUsageHelpWidth(90);
-        cmd.setUsageHelpLongOptionsMaxWidth(40);
-        
-        //init subcommands
-        for (CommandLine sub : cmd.getSubcommands().values())
-        {
-            ((CliCommand) sub.getCommandSpec().userObject()).setCli(cli);
-        }
-        
-        //split command line to individual commands
-        Set<String> cnames = cmd.getSubcommands().keySet();
-        List<List<String>> subcommands = splitArgsByCommands(args, cnames);
-
-        //load config file if present
-        loadConfigFile();
-        
-        //execute the individual command lines
-        for (List<String> subcl : subcommands)
-        {
-            String[] a = subcl.toArray(new String[0]);
-            int exitCode = cmd.execute(a);
-            if (exitCode != 0)
-                return exitCode;
-        }
-        
-        return 0;
-    }
-    
     /**
      * @param args
      */
     public static void main(String[] args)
     {
-        int exitCode = execCommandLine(args);
+        //load config file if present
+        loadConfigFile();
+        //create and exec the CLI
+        Cli cli = new Cli();
+        int exitCode = cli.execCommandLine(args);
         System.exit(exitCode);
     }
 

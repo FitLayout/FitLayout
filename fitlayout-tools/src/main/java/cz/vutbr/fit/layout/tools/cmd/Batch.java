@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import cz.vutbr.fit.layout.tools.Cli;
 import cz.vutbr.fit.layout.tools.CliCommand;
 import cz.vutbr.fit.layout.tools.util.ArgumentTokenizer;
 import picocli.CommandLine.Command;
@@ -48,7 +47,7 @@ public class Batch extends CliCommand implements Callable<Integer>
     {
         List<String> cmdList = ArgumentTokenizer.tokenize(cmdString);
         String[] args = cmdList.toArray(new String[0]);
-        return Cli.execCommandLine(args);
+        return getCli().execCommandLine(args);
     }
     
 }

@@ -14,14 +14,10 @@ import java.util.Properties;
 import java.util.Set;
 
 import cz.vutbr.fit.layout.api.ServiceManager;
-import cz.vutbr.fit.layout.bcs.BCSProvider;
-import cz.vutbr.fit.layout.cssbox.CSSBoxTreeProvider;
 import cz.vutbr.fit.layout.impl.DefaultArtifactRepository;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
-import cz.vutbr.fit.layout.puppeteer.PuppeteerTreeProvider;
-import cz.vutbr.fit.layout.segm.BasicSegmProvider;
 import cz.vutbr.fit.layout.tools.cmd.Batch;
 import cz.vutbr.fit.layout.tools.cmd.Export;
 import cz.vutbr.fit.layout.tools.cmd.Invoke;
@@ -32,7 +28,6 @@ import cz.vutbr.fit.layout.tools.cmd.Renderer;
 import cz.vutbr.fit.layout.tools.cmd.Segmentator;
 import cz.vutbr.fit.layout.tools.cmd.StoreArtifact;
 import cz.vutbr.fit.layout.tools.cmd.UseRepository;
-import cz.vutbr.fit.layout.vips.VipsProvider;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
@@ -111,23 +106,7 @@ public class Cli
     {
         if (serviceManager == null)
         {
-            serviceManager = ServiceManager.create();
-            //initialize the services
-            CSSBoxTreeProvider cssboxProvider = new CSSBoxTreeProvider();
-            serviceManager.addArtifactService(cssboxProvider);
-            
-            PuppeteerTreeProvider puppeteerProvider = new PuppeteerTreeProvider();
-            serviceManager.addArtifactService(puppeteerProvider);
-            
-            BasicSegmProvider segmProvider = new BasicSegmProvider();
-            serviceManager.addArtifactService(segmProvider);
-            
-            VipsProvider vipsProvider = new VipsProvider();
-            serviceManager.addArtifactService(vipsProvider);
-            
-            BCSProvider bcsProvider = new BCSProvider();
-            serviceManager.addArtifactService(bcsProvider);
-            
+            serviceManager = FLConfig.createServiceManager(null);
             //use a default in-memory repository
             serviceManager.setArtifactRepository(new DefaultArtifactRepository());
         }

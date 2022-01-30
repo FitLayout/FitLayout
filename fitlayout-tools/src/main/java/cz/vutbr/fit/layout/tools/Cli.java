@@ -22,6 +22,7 @@ import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.puppeteer.PuppeteerTreeProvider;
 import cz.vutbr.fit.layout.segm.BasicSegmProvider;
+import cz.vutbr.fit.layout.tools.cmd.Batch;
 import cz.vutbr.fit.layout.tools.cmd.Export;
 import cz.vutbr.fit.layout.tools.cmd.Invoke;
 import cz.vutbr.fit.layout.tools.cmd.ListArtifacts;
@@ -48,7 +49,8 @@ import picocli.CommandLine.Command;
                    ListArtifacts.class,
                    LoadArtifact.class,
                    StoreArtifact.class,
-                   Query.class},
+                   Query.class,
+                   Batch.class},
     footer = "Use COMMAND -h for getting usage information on the individual commands.")
 public class Cli
 {
@@ -132,7 +134,7 @@ public class Cli
         return serviceManager;
     }
 
-    private static List<List<String>> splitArgsByCommands(String[] args, Set<String> cnames)
+    public static List<List<String>> splitArgsByCommands(String[] args, Set<String> cnames)
     {
         List<List<String>> ret = new ArrayList<>();
         List<String> current = new ArrayList<>();
@@ -164,10 +166,7 @@ public class Cli
         }
     }
     
-    /**
-     * @param args
-     */
-    public static void main(String[] args)
+    public static int execCommandLine(String[] args)
     {
         Cli cli = new Cli();
         
@@ -194,8 +193,20 @@ public class Cli
             String[] a = subcl.toArray(new String[0]);
             int exitCode = cmd.execute(a);
             if (exitCode != 0)
-                System.exit(exitCode);
+                return exitCode;
         }
+        
+        return 0;
     }
+    
+    /**
+     * @param args
+     */
+    public static void main(String[] args)
+    {
+        int exitCode = execCommandLine(args);
+        System.exit(exitCode);
+    }
+
 
 }

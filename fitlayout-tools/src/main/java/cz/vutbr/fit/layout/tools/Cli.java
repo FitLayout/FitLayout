@@ -5,6 +5,7 @@
  */
 package cz.vutbr.fit.layout.tools;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,6 +51,7 @@ import picocli.CommandLine.Command;
 public class Cli
 {
     private static final String CONFIG_FILE = "config.properties";
+    private static final String CONFIG_FILE_TEST = "config.test.properties";
 
     private Page page;
     private AreaTree areaTree;
@@ -168,16 +170,22 @@ public class Cli
 
     private static void loadConfigFile()
     {
-        try (InputStream input = new FileInputStream(CONFIG_FILE)) 
+        File f = new File(CONFIG_FILE_TEST);
+        if (!f.isFile())
+            f = new File(CONFIG_FILE);
+        if (f.isFile())
         {
-            Properties p = new Properties();
-            p.load(input);
-            for (String name : p.stringPropertyNames())
+            try (InputStream input = new FileInputStream(f)) 
             {
-                String value = p.getProperty(name);
-                System.setProperty(name, value);
+                Properties p = new Properties();
+                p.load(input);
+                for (String name : p.stringPropertyNames())
+                {
+                    String value = p.getProperty(name);
+                    System.setProperty(name, value);
+                }
+            } catch (IOException e) {
             }
-        } catch (IOException e) {
         }
     }
     

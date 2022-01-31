@@ -46,6 +46,10 @@ public class Batch extends CliCommand implements Callable<Integer>
     @Parameters(arity = "1", index = "0", paramLabel = "batch_file", description = "A text file containing commands to execute")
     protected String batchFile;
 
+    int tasksToDo;
+    int tasksDone;
+    
+    
     @Override
     public Integer call() throws Exception
     {
@@ -80,6 +84,8 @@ public class Batch extends CliCommand implements Callable<Integer>
     private int iterateDataFile(String cmdString) throws IOException
     {
         List<BatchTask> tasks = createTasks(inFile, cmdString);
+        tasksToDo = tasks.size();
+        tasksDone = 0;
         ExecutorService exec = Executors.newFixedThreadPool(threads);
         try
         {
@@ -112,10 +118,12 @@ public class Batch extends CliCommand implements Callable<Integer>
         return tasks;
     }
     
-    public void taskFinished(BatchTask task, int status)
+    public synchronized void taskFinished(BatchTask task, int status)
     {
+        tasksDone++;
         System.err.print((status == 0) ? "Done: " : "ERROR: ");
         System.err.println("(" + task.getIndex() + ") " + task.getDataLine());
+        System.err.println(tasksDone + " / " + tasksToDo + " finished");
     }
     
     // ===============================================================

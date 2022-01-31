@@ -458,6 +458,24 @@ public class RDFStorage implements Closeable
         }
     }
     
+    public void importStream(InputStream stream, RDFFormat dataFormat) throws StorageException
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.add(stream, IMPORT_BASE_URI, dataFormat);
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    public void importStream(InputStream stream, RDFFormat dataFormat, String baseURI) throws StorageException
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            con.add(stream, baseURI, dataFormat);
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+    
     public void importStream(InputStream stream, RDFFormat dataFormat, IRI context) throws StorageException
     {
         try (RepositoryConnection con = repo.getConnection()) {

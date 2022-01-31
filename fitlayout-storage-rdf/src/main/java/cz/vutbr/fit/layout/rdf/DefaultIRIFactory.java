@@ -81,7 +81,7 @@ public class DefaultIRIFactory implements IRIFactory
     @Override
     public IRI createAttributeURI(IRI boxUri, String name)
     {
-        final String localName = boxUri.getLocalName() + "-attr-" + name;
+        final String localName = boxUri.getLocalName() + "-attr-" + UriEscape.escapeUriPathSegment(name);
         return factory.createIRI(boxUri.getNamespace(), localName);
     }
     

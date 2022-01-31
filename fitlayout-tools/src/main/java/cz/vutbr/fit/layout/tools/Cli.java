@@ -57,6 +57,20 @@ public class Cli
     private ServiceManager serviceManager;
     
     
+    public Cli()
+    {
+        serviceManager = FLConfig.createServiceManager(null);
+        //use a default in-memory repository for start, the USE command may change it later
+        serviceManager.setArtifactRepository(new DefaultArtifactRepository());
+    }
+    
+    public Cli(Cli parent)
+    {
+        serviceManager = FLConfig.createServiceManager(null);
+        //re-use the parent repository
+        serviceManager.setArtifactRepository(parent.getServiceManager().getArtifactRepository());
+    }
+    
     public Page getPage()
     {
         return page;
@@ -99,17 +113,11 @@ public class Cli
     }
     
     /**
-     * Creates a basic service manager and repository for generating the artifacr IRIs
+     * Gets a service manager and repository for generating the artifacr IRIs
      * @return the service manager
      */
     public ServiceManager getServiceManager()
     {
-        if (serviceManager == null)
-        {
-            serviceManager = FLConfig.createServiceManager(null);
-            //use a default in-memory repository
-            serviceManager.setArtifactRepository(new DefaultArtifactRepository());
-        }
         return serviceManager;
     }
 

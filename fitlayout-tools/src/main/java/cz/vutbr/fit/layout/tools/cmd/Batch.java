@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import cz.vutbr.fit.layout.tools.Cli;
 import cz.vutbr.fit.layout.tools.CliCommand;
 import cz.vutbr.fit.layout.tools.util.ArgumentTokenizer;
 import picocli.CommandLine.Command;
@@ -51,7 +52,7 @@ public class Batch extends CliCommand implements Callable<Integer>
         try {
             String cmdString = Files.readString(Path.of(batchFile));
             if (inFile == null)
-                return execCommandLine(cmdString, null);
+                return execCommandLine(getCli(), cmdString, null);
             else
                 return iterateDataFile(cmdString);
         } catch (IOException e) {
@@ -59,7 +60,7 @@ public class Batch extends CliCommand implements Callable<Integer>
         }
     }
 
-    private int execCommandLine(String cmdString, String dataLine)
+    private int execCommandLine(Cli cli, String cmdString, String dataLine)
     {
         if (dataLine != null)
         {
@@ -73,7 +74,7 @@ public class Batch extends CliCommand implements Callable<Integer>
         }
         List<String> cmdList = ArgumentTokenizer.tokenize(cmdString);
         String[] args = cmdList.toArray(new String[0]);
-        return getCli().execCommandLine(args);
+        return cli.execCommandLine(args);
     }
     
     private int iterateDataFile(String cmdString) throws IOException
@@ -147,7 +148,10 @@ public class Batch extends CliCommand implements Callable<Integer>
         @Override
         public Integer call() throws Exception
         {
-            int ret = parent.execCommandLine(cmdString, dataLine);
+            // create a separate CLI for the batch
+            // we need separate service instances
+            Cli cli = new Cli(parent.getCli());
+            int ret = parent.execCommandLine(cli, cmdString, dataLine);
             parent.taskFinished(this, ret);
             return ret;
         }

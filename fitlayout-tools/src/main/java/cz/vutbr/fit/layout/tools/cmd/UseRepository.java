@@ -26,7 +26,7 @@ public class UseRepository extends CliCommand implements Callable<Integer>
     private static final String KEY_SERVER = "fitlayout.rdf.server";
     private static final String KEY_PATH = "fitlayout.rdf.path";
 
-    enum RepositoryType { local, http };
+    enum RepositoryType { memory, local, http };
     
     @Parameters(arity = "1", index = "0", description = "Repository type: ${COMPLETION-CANDIDATES}")
     protected RepositoryType repositoryType;
@@ -59,6 +59,10 @@ public class UseRepository extends CliCommand implements Callable<Integer>
         RDFArtifactRepository storage = null;
         switch (repositoryType)
         {
+            case memory:
+                storage = RDFArtifactRepository.createMemory(null);
+                System.err.println("Using rdf4j memory storage");
+                break;
             case local:
                 if (configPath == null)
                     throw new IllegalArgumentException(KEY_PATH + " system property is not set. Check your repository configuration.");

@@ -187,10 +187,14 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
             log.debug("Using chromium work directory {}", workdir);
         
         String wrapper = System.getProperty("fitlayout.puppeteer.wrapper"); //wrapper to run the command in (e.g. xvfb-run)
+        String[] wrapArgs = (wrapper == null) ? null : wrapper.split("\\s"); //split by whitespace
         
         List<String> cmds = new ArrayList<>();
-        if (wrapper != null)
-            cmds.add(wrapper);
+        if (wrapArgs != null)
+        {
+            for (String arg : wrapArgs)
+                cmds.add(arg);
+        }
         cmds.add("node");
         cmds.add("index.js");
         cmds.add("-W" + String.valueOf(width));

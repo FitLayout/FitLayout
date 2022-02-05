@@ -149,7 +149,15 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
     {
         if (usedTaggers.isEmpty())
             log.warn("Applying TagEntitiesOperator with no taggers configured");
-        tagger = new TreeTagger(root, usedTaggers);
+        // collect enabled taggers
+        Map<Tag, Tagger> activeTaggers = new HashMap<>();
+        for (var entry : usedTaggers.entrySet())
+        {
+            if (!disabledTaggers.contains(entry.getValue().getName()))
+                activeTaggers.put(entry.getKey(), entry.getValue());
+        }
+        // perform tagging
+        tagger = new TreeTagger(root, activeTaggers);
         tagger.tagTree();
     }
 

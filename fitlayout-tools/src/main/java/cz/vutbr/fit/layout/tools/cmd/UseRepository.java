@@ -38,7 +38,7 @@ public class UseRepository extends CliCommand implements Callable<Integer>
         try {
             
             RDFArtifactRepository repo = createArtifactRepository();
-            getCli().getServiceManager().setArtifactRepository(repo);
+            getCli().setArtifactRepository(repo);
             
             return 0;
             

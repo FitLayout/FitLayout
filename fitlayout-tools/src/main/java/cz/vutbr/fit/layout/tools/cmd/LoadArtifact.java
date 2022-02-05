@@ -35,7 +35,7 @@ public class LoadArtifact extends CliCommand implements Callable<Integer>
     public Integer call() throws Exception
     {
         try {
-            final ArtifactRepository repo = getCli().getServiceManager().getArtifactRepository();
+            final ArtifactRepository repo = getCli().getArtifactRepository();
             if (repo == null || !(repo instanceof RDFArtifactRepository))
             {
                 errNoRepo();

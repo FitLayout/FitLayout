@@ -6,6 +6,7 @@
 package cz.vutbr.fit.layout.tools;
 
 import cz.vutbr.fit.layout.api.AreaTreeOperator;
+import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.api.ServiceManager;
 import cz.vutbr.fit.layout.bcs.BCSProvider;
 import cz.vutbr.fit.layout.cssbox.CSSBoxTreeProvider;
@@ -50,7 +51,7 @@ public class FLConfig
      * no repository should be configured.
      * @return the created ServiceManager instance
      */
-    public static ServiceManager createServiceManager(RDFArtifactRepository repo)
+    public static ServiceManager createServiceManager(ArtifactRepository repo)
     {
         //initialize the services
         ServiceManager sm = ServiceManager.create();

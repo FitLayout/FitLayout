@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.api.ServiceManager;
 import cz.vutbr.fit.layout.impl.DefaultArtifactRepository;
 import cz.vutbr.fit.layout.model.AreaTree;
@@ -55,26 +56,28 @@ public class Cli
     private static final String CONFIG_FILE = "config.properties";
     private static final String CONFIG_FILE_TEST = "config.test.properties";
 
+    private ArtifactRepository artifactRepository;
     private Page page;
     private AreaTree areaTree;
     private Artifact lastArtifact;
-    private ServiceManager serviceManager;
     
     
     public Cli()
     {
-        serviceManager = FLConfig.createServiceManager(null);
         //use a default in-memory repository for start, the USE command may change it later
-        serviceManager.setArtifactRepository(new DefaultArtifactRepository());
+        artifactRepository = new DefaultArtifactRepository();
     }
     
-    public Cli(Cli parent)
+    public ArtifactRepository getArtifactRepository()
     {
-        serviceManager = FLConfig.createServiceManager(null);
-        //re-use the parent repository
-        serviceManager.setArtifactRepository(parent.getServiceManager().getArtifactRepository());
+        return artifactRepository;
     }
-    
+
+    public void setArtifactRepository(ArtifactRepository artifactRepository)
+    {
+        this.artifactRepository = artifactRepository;
+    }
+
     public Page getPage()
     {
         return page;
@@ -122,7 +125,7 @@ public class Cli
      */
     public ServiceManager getServiceManager()
     {
-        return serviceManager;
+        return FLConfig.createServiceManager(artifactRepository);
     }
 
     public int execCommandLine(String[] args)

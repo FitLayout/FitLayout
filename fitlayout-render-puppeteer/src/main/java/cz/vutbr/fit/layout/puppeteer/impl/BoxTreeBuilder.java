@@ -37,6 +37,10 @@ import cz.vutbr.fit.layout.puppeteer.parser.PageInfo;
  */
 public class BoxTreeBuilder extends BaseBoxTreeBuilder
 {
+    private static final String PROP_BACKEND = "fitlayout.puppeteer.backend";
+    private static final String PROP_WORKDIR = "fitlayout.puppeteer.workdir";
+    private static final String PROP_WRAPPER = "fitlayout.puppeteer.wrapper";
+
     private static Logger log = LoggerFactory.getLogger(BoxTreeBuilder.class);
     
     public static final String DEFAULT_FONT_FAMILY = "sans-serif";
@@ -177,16 +181,16 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
      */
     private InputFile invokeRenderer(URL url) throws IOException, InterruptedException
     {
-        String rendererPath = System.getProperty("fitlayout.puppeteer.backend"); //puppeteer backend project path
+        String rendererPath = System.getProperty(PROP_BACKEND); //puppeteer backend project path
         if (rendererPath == null)
-            throw new IOException("Puppeteer backend path is not configured. Set the fitlayout.puppeteer.backend to point to the backend installation");
+            throw new IOException("Puppeteer backend path is not configured. Set the " + PROP_BACKEND + " to point to the backend installation");
         log.debug("Invoking puppeteer backend in {}", rendererPath);
         
-        String workdir = System.getProperty("fitlayout.puppeteer.workdir"); //chromium working directory for storing profiles
+        String workdir = System.getProperty(PROP_WORKDIR); //chromium working directory for storing profiles
         if (workdir != null)
             log.debug("Using chromium work directory {}", workdir);
         
-        String wrapper = System.getProperty("fitlayout.puppeteer.wrapper"); //wrapper to run the command in (e.g. xvfb-run)
+        String wrapper = System.getProperty(PROP_WRAPPER); //wrapper to run the command in (e.g. xvfb-run)
         String[] wrapArgs = (wrapper == null) ? null : wrapper.split("\\s"); //split by whitespace
         
         List<String> cmds = new ArrayList<>();

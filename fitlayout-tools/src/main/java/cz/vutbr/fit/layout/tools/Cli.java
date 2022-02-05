@@ -23,6 +23,7 @@ import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.tools.cmd.Batch;
 import cz.vutbr.fit.layout.tools.cmd.Dump;
 import cz.vutbr.fit.layout.tools.cmd.Export;
+import cz.vutbr.fit.layout.tools.cmd.Import;
 import cz.vutbr.fit.layout.tools.cmd.Invoke;
 import cz.vutbr.fit.layout.tools.cmd.ListArtifacts;
 import cz.vutbr.fit.layout.tools.cmd.LoadArtifact;
@@ -49,6 +50,7 @@ import picocli.CommandLine.Command;
                    StoreArtifact.class,
                    Query.class,
                    Batch.class,
+                   Import.class,
                    Dump.class},
     footer = "Use COMMAND -h for getting usage information on the individual commands.")
 public class Cli

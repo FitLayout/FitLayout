@@ -15,6 +15,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import cz.vutbr.fit.layout.tools.CliCommand;
 import cz.vutbr.fit.layout.tools.util.ArgumentTokenizer;
@@ -41,6 +43,9 @@ public class Batch extends CliCommand implements Callable<Integer>
     
     @Option(order = 3, names = {"-p", "--threads"}, description = "Number of threads to use for iteration (default 1)")
     protected int threads = 1;
+    
+    @Option(order = 3, names = {"-t", "--timeout"}, description = "Thread timeout in seconds (default 60 seconds)")
+    protected int timeout = 60;
     
     @Parameters(arity = "1", index = "0", paramLabel = "batch_file", description = "A text file containing commands to execute")
     protected String batchFile;
@@ -89,16 +94,26 @@ public class Batch extends CliCommand implements Callable<Integer>
         try
         {
             List<Future<Integer>> results = exec.invokeAll(tasks);
+            int index = 0;
             for (Future<Integer> ft : results)
             {
-                ft.get();
+                try {
+                    ft.get(timeout, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    ft.cancel(true);
+                    taskFinished(tasks.get(index), 2);
+                } catch (ExecutionException e) {
+                    ft.cancel(true);
+                    taskFinished(tasks.get(index), 3);
+                } catch (TimeoutException e) {
+                    ft.cancel(true);
+                    taskFinished(tasks.get(index), 2);
+                }
+                index++;
             }
             return 0;
         } catch (InterruptedException e) {
-            e.printStackTrace();
-            return 1;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            System.err.println("Task execution interrupted: " + e.getMessage());
             return 1;
         } finally {
             exec.shutdown();
@@ -120,7 +135,14 @@ public class Batch extends CliCommand implements Callable<Integer>
     public synchronized void taskFinished(BatchTask task, int status)
     {
         tasksDone++;
-        System.err.print((status == 0) ? "Done: " : "ERROR: ");
+        String msg = "";
+        switch (status) {
+            case 0: msg = "Done"; break;
+            case 1: msg = "ERROR"; break;
+            case 2: msg = "TIMEOUT"; break;
+            default: msg = "ERROR"; break;
+        }
+        System.err.print(msg + " ");
         System.err.println("(" + task.getIndex() + ") " + task.getDataLine());
         System.err.println(tasksDone + " / " + tasksToDo + " finished");
     }

@@ -35,8 +35,6 @@ public class ServiceManager
     
     /** All the parametrized services */
     private Map<String, ParametrizedOperation> parametrizedServices;
-    /** All the script objects (may coexist with other service types) */
-    private Map<String, ScriptObject> scriptObjects;
 
     //===============================================================================================
     
@@ -62,13 +60,10 @@ public class ServiceManager
     protected void initAndDiscover()
     {
         artifactRepository = new DefaultArtifactRepository();
-        scriptObjects = new HashMap<>();
         parametrizedServices = new HashMap<>();
         //load services of standard types
         artifactServices = loadServicesByType(ArtifactService.class);
         operators = loadServicesByType(AreaTreeOperator.class);
-        //load the remaining script objects - this should be the last step
-        loadScriptObjects();
     }
     
     /**
@@ -86,7 +81,6 @@ public class ServiceManager
     protected void initEmpty()
     {
         artifactRepository = new DefaultArtifactRepository();
-        scriptObjects = new HashMap<>();
         parametrizedServices = new HashMap<>();
         //empty service lists
         artifactServices = new HashMap<>();
@@ -162,15 +156,6 @@ public class ServiceManager
     }
 
     /**
-     * Discovers all the ScriptObject service implementations.
-     * @return A map that assigns the service {@code id} to the appropriate implementation.
-     */
-    public Map<String, ScriptObject> findScriptObjects()
-    {
-        return scriptObjects;
-    }
-
-    /**
      * Discovers the registered services of the given class.
      * @param clazz the class of the required services
      * @return A map that maps the services to their identifiers
@@ -188,18 +173,6 @@ public class ServiceManager
         return ret;
     }
 
-    private Map<String, ScriptObject> loadScriptObjects()
-    {
-        ServiceLoader<ScriptObject> loader = ServiceLoader.load(ScriptObject.class);
-        Iterator<ScriptObject> it = loader.iterator();
-        while (it.hasNext())
-        {
-            ScriptObject op = it.next();
-            addScriptObject(op.getVarName(), op);
-        }
-        return scriptObjects;
-    }
-    
     //=============================================================================================
     
     /**
@@ -291,8 +264,6 @@ public class ServiceManager
         op.setServiceManager(this);
         if (op instanceof ParametrizedOperation)
             addParametrizedService(op.getId(), (ParametrizedOperation) op);
-        if (op instanceof ScriptObject)
-            addScriptObject(((ScriptObject) op).getVarName(), (ScriptObject) op);
     }
     
     /**
@@ -316,17 +287,6 @@ public class ServiceManager
     private void addParametrizedService(String id, ParametrizedOperation op)
     {
         parametrizedServices.put(id, op);
-    }
-    
-    /**
-     * Adds a new script object to the manager.
-     * @param id
-     * @param op
-     */
-    public void addScriptObject(String id, ScriptObject op)
-    {
-        if (!scriptObjects.containsKey(id))
-            scriptObjects.put(id, op);
     }
     
     /**

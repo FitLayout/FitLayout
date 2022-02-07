@@ -7,9 +7,7 @@ package cz.vutbr.fit.layout.api;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -25,8 +23,6 @@ import cz.vutbr.fit.layout.model.Artifact;
  */
 public class ServiceManager
 {
-    private static ServiceManager globalInstance;
-    
     /** The used artifact repository */
     private ArtifactRepository artifactRepository;
     
@@ -35,41 +31,8 @@ public class ServiceManager
     
     /** All the parametrized services */
     private Map<String, ParametrizedOperation> parametrizedServices;
-    /** All the script objects (may coexist with other service types) */
-    private Map<String, ScriptObject> scriptObjects;
 
     //===============================================================================================
-    
-    public static ServiceManager instance()
-    {
-        if (globalInstance == null)
-            globalInstance = createAndDiscover();
-        return globalInstance;
-    }
-    
-    /**
-     * Creates a new service manager which is initialized by the automatic service discovery.
-     * 
-     * @return A ServiceManager instance
-     */
-    public static ServiceManager createAndDiscover() 
-    {
-        ServiceManager mgr = new ServiceManager();
-        mgr.initAndDiscover();
-        return mgr;
-    }
-    
-    protected void initAndDiscover()
-    {
-        artifactRepository = new DefaultArtifactRepository();
-        scriptObjects = new HashMap<>();
-        parametrizedServices = new HashMap<>();
-        //load services of standard types
-        artifactServices = loadServicesByType(ArtifactService.class);
-        operators = loadServicesByType(AreaTreeOperator.class);
-        //load the remaining script objects - this should be the last step
-        loadScriptObjects();
-    }
     
     /**
      * Creates a new empty service manager with no services.
@@ -86,7 +49,6 @@ public class ServiceManager
     protected void initEmpty()
     {
         artifactRepository = new DefaultArtifactRepository();
-        scriptObjects = new HashMap<>();
         parametrizedServices = new HashMap<>();
         //empty service lists
         artifactServices = new HashMap<>();
@@ -161,45 +123,6 @@ public class ServiceManager
         return operators;
     }
 
-    /**
-     * Discovers all the ScriptObject service implementations.
-     * @return A map that assigns the service {@code id} to the appropriate implementation.
-     */
-    public Map<String, ScriptObject> findScriptObjects()
-    {
-        return scriptObjects;
-    }
-
-    /**
-     * Discovers the registered services of the given class.
-     * @param clazz the class of the required services
-     * @return A map that maps the services to their identifiers
-     */
-    public <T extends Service> Map<String, T> loadServicesByType(Class<T> clazz)
-    {
-        ServiceLoader<T> loader = ServiceLoader.load(clazz);
-        Iterator<T> it = loader.iterator();
-        Map<String, T> ret = new HashMap<String, T>();
-        while (it.hasNext())
-        {
-            T op = it.next();
-            addTypedOperation(op, ret);
-        }
-        return ret;
-    }
-
-    private Map<String, ScriptObject> loadScriptObjects()
-    {
-        ServiceLoader<ScriptObject> loader = ServiceLoader.load(ScriptObject.class);
-        Iterator<ScriptObject> it = loader.iterator();
-        while (it.hasNext())
-        {
-            ScriptObject op = it.next();
-            addScriptObject(op.getVarName(), op);
-        }
-        return scriptObjects;
-    }
-    
     //=============================================================================================
     
     /**
@@ -291,14 +214,12 @@ public class ServiceManager
         op.setServiceManager(this);
         if (op instanceof ParametrizedOperation)
             addParametrizedService(op.getId(), (ParametrizedOperation) op);
-        if (op instanceof ScriptObject)
-            addScriptObject(((ScriptObject) op).getVarName(), (ScriptObject) op);
     }
     
     /**
      * Adds an operation to a corresponding map and updates the ParametrizedOperation and ScriptObject maps
      * when necessary.
-     * @param <T> Operation tyoe
+     * @param <T> Operation type
      * @param op the operation to add
      * @param dest the destination map to add to.
      */
@@ -316,17 +237,6 @@ public class ServiceManager
     private void addParametrizedService(String id, ParametrizedOperation op)
     {
         parametrizedServices.put(id, op);
-    }
-    
-    /**
-     * Adds a new script object to the manager.
-     * @param id
-     * @param op
-     */
-    public void addScriptObject(String id, ScriptObject op)
-    {
-        if (!scriptObjects.containsKey(id))
-            scriptObjects.put(id, op);
     }
     
     /**

@@ -15,8 +15,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-import cz.vutbr.fit.layout.tools.Cli;
 import cz.vutbr.fit.layout.tools.CliCommand;
 import cz.vutbr.fit.layout.tools.util.ArgumentTokenizer;
 import picocli.CommandLine.Command;
@@ -43,6 +44,9 @@ public class Batch extends CliCommand implements Callable<Integer>
     @Option(order = 3, names = {"-p", "--threads"}, description = "Number of threads to use for iteration (default 1)")
     protected int threads = 1;
     
+    @Option(order = 3, names = {"-t", "--timeout"}, description = "Thread timeout in seconds (default 60 seconds)")
+    protected int timeout = 60;
+    
     @Parameters(arity = "1", index = "0", paramLabel = "batch_file", description = "A text file containing commands to execute")
     protected String batchFile;
 
@@ -56,7 +60,7 @@ public class Batch extends CliCommand implements Callable<Integer>
         try {
             String cmdString = Files.readString(Path.of(batchFile));
             if (inFile == null)
-                return execCommandLine(getCli(), cmdString, null);
+                return execCommandLine(cmdString, null);
             else
                 return iterateDataFile(cmdString);
         } catch (IOException e) {
@@ -64,7 +68,7 @@ public class Batch extends CliCommand implements Callable<Integer>
         }
     }
 
-    private int execCommandLine(Cli cli, String cmdString, String dataLine)
+    private int execCommandLine(String cmdString, String dataLine)
     {
         if (dataLine != null)
         {
@@ -78,7 +82,7 @@ public class Batch extends CliCommand implements Callable<Integer>
         }
         List<String> cmdList = ArgumentTokenizer.tokenize(cmdString);
         String[] args = cmdList.toArray(new String[0]);
-        return cli.execCommandLine(args);
+        return getCli().execCommandLine(args);
     }
     
     private int iterateDataFile(String cmdString) throws IOException
@@ -90,16 +94,26 @@ public class Batch extends CliCommand implements Callable<Integer>
         try
         {
             List<Future<Integer>> results = exec.invokeAll(tasks);
+            int index = 0;
             for (Future<Integer> ft : results)
             {
-                ft.get();
+                try {
+                    ft.get(timeout, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    ft.cancel(true);
+                    taskFinished(tasks.get(index), 2);
+                } catch (ExecutionException e) {
+                    ft.cancel(true);
+                    taskFinished(tasks.get(index), 3);
+                } catch (TimeoutException e) {
+                    ft.cancel(true);
+                    taskFinished(tasks.get(index), 2);
+                }
+                index++;
             }
             return 0;
         } catch (InterruptedException e) {
-            e.printStackTrace();
-            return 1;
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            System.err.println("Task execution interrupted: " + e.getMessage());
             return 1;
         } finally {
             exec.shutdown();
@@ -121,7 +135,14 @@ public class Batch extends CliCommand implements Callable<Integer>
     public synchronized void taskFinished(BatchTask task, int status)
     {
         tasksDone++;
-        System.err.print((status == 0) ? "Done: " : "ERROR: ");
+        String msg = "";
+        switch (status) {
+            case 0: msg = "Done"; break;
+            case 1: msg = "ERROR"; break;
+            case 2: msg = "TIMEOUT"; break;
+            default: msg = "ERROR"; break;
+        }
+        System.err.print(msg + " ");
         System.err.println("(" + task.getIndex() + ") " + task.getDataLine());
         System.err.println(tasksDone + " / " + tasksToDo + " finished");
     }
@@ -158,8 +179,7 @@ public class Batch extends CliCommand implements Callable<Integer>
         {
             // create a separate CLI for the batch
             // we need separate service instances
-            Cli cli = new Cli(parent.getCli());
-            int ret = parent.execCommandLine(cli, cmdString, dataLine);
+            int ret = parent.execCommandLine(cmdString, dataLine);
             parent.taskFinished(this, ret);
             return ret;
         }

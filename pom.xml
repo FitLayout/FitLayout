@@ -52,7 +52,6 @@
 		<module>fitlayout-storage-rdf</module>
 		<module>fitlayout-render-puppeteer</module>
 		<module>fitlayout-segm-vips</module>
-		<module>fitlayout-console</module>
 		<module>fitlayout-io</module>
 		<module>fitlayout-segm-bcs</module>
 		<module>fitlayout-text</module>

@@ -6,16 +6,17 @@
 package cz.vutbr.fit.layout.tools;
 
 import cz.vutbr.fit.layout.api.AreaTreeOperator;
+import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.api.ServiceManager;
 import cz.vutbr.fit.layout.bcs.BCSProvider;
 import cz.vutbr.fit.layout.cssbox.CSSBoxTreeProvider;
-import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.patterns.AreaConnectionProvider;
 import cz.vutbr.fit.layout.patterns.TextChunkConnectionProvider;
 import cz.vutbr.fit.layout.provider.OperatorWrapperProvider;
 import cz.vutbr.fit.layout.provider.VisualBoxTreeProvider;
 import cz.vutbr.fit.layout.puppeteer.PuppeteerTreeProvider;
 import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
+import cz.vutbr.fit.layout.rdf.RDFTaggerConfig;
 import cz.vutbr.fit.layout.segm.BasicSegmProvider;
 import cz.vutbr.fit.layout.segm.op.CollapseAreasOperator;
 import cz.vutbr.fit.layout.segm.op.FindLineOperator;
@@ -28,11 +29,6 @@ import cz.vutbr.fit.layout.segm.op.SortByPositionOperator;
 import cz.vutbr.fit.layout.segm.op.SuperAreaOperator;
 import cz.vutbr.fit.layout.text.chunks.TextChunksProvider;
 import cz.vutbr.fit.layout.text.op.TagEntitiesOperator;
-import cz.vutbr.fit.layout.text.tag.FixedTaggerConfig;
-import cz.vutbr.fit.layout.text.taggers.DateTagger;
-import cz.vutbr.fit.layout.text.taggers.LocationsTagger;
-import cz.vutbr.fit.layout.text.taggers.PersonsTagger;
-import cz.vutbr.fit.layout.text.taggers.TimeTagger;
 import cz.vutbr.fit.layout.vips.VipsProvider;
 
 /**
@@ -50,7 +46,7 @@ public class FLConfig
      * no repository should be configured.
      * @return the created ServiceManager instance
      */
-    public static ServiceManager createServiceManager(RDFArtifactRepository repo)
+    public static ServiceManager createServiceManager(ArtifactRepository repo)
     {
         //initialize the services
         ServiceManager sm = ServiceManager.create();
@@ -78,19 +74,19 @@ public class FLConfig
         addAreaTreeOperator(sm, new GroupByDOMOperator());
         addAreaTreeOperator(sm, new HomogeneousLeafOperator());
         
-        /*if (repo != null)
+        if (repo != null && repo instanceof RDFArtifactRepository)
         {
-            RDFTaggerConfig tc = new RDFTaggerConfig(repo);
-            log.info("Using taggers from RDF: {}", tc.getTaggers());
+            RDFTaggerConfig tc = new RDFTaggerConfig((RDFArtifactRepository) repo);
+            //log.info("Using taggers from RDF: {}", tc.getTaggers());
             // configure text module using RDF taggers
             sm.addArtifactService(new TextChunksProvider(tc));
             TagEntitiesOperator tagOp = new TagEntitiesOperator();
             tagOp.setTaggers(tc.getTaggers());
             addAreaTreeOperator(sm, tagOp);
-        }*/
+        }
 
         //text module
-        FixedTaggerConfig tagConfig = new FixedTaggerConfig();
+        /*FixedTaggerConfig tagConfig = new FixedTaggerConfig();
         tagConfig.setTagger(new DefaultTag("FitLayout.TextTag", "date"), new DateTagger());
         tagConfig.setTagger(new DefaultTag("FitLayout.TextTag", "time"), new TimeTagger());
         tagConfig.setTagger(new DefaultTag("FitLayout.TextTag", "persons"), new PersonsTagger());
@@ -98,7 +94,7 @@ public class FLConfig
         sm.addArtifactService(new TextChunksProvider(tagConfig));
         TagEntitiesOperator tagOp = new TagEntitiesOperator();
         tagOp.setTaggers(tagConfig.getTaggers());
-        addAreaTreeOperator(sm, tagOp);
+        addAreaTreeOperator(sm, tagOp);*/
         
         //patterns
         sm.addArtifactService(new AreaConnectionProvider());

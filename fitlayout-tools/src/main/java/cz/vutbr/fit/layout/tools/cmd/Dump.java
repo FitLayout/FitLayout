@@ -43,7 +43,7 @@ public class Dump extends CliCommand implements Callable<Integer>
     public Integer call() throws Exception
     {
         try {
-            final ArtifactRepository repo = getCli().getServiceManager().getArtifactRepository();
+            final ArtifactRepository repo = getCli().getArtifactRepository();
             if (repo == null || !(repo instanceof RDFArtifactRepository))
             {
                 errNoRepo();
@@ -58,23 +58,7 @@ public class Dump extends CliCommand implements Callable<Integer>
                 os = new FileOutputStream(outfile);
             
             RDFArtifactRepository rdfRepo = (RDFArtifactRepository) repo;
-            
-            String mime = Serialization.NQUADS;
-            switch (format) {
-                case nquads:
-                    mime = Serialization.NQUADS;
-                    break;
-                case turtle:
-                    mime = Serialization.TURTLE;
-                    break;
-                case xml:
-                    mime = Serialization.RDFXML;
-                    break;
-                case ntriples:
-                    mime = Serialization.NTRIPLES;
-                    break;
-            }
-            
+            String mime = getTypeForFormat(format);
             Serialization.statementsToStream(rdfRepo.getStorage().getRepository(), os, mime,
                     null, null, null);
             
@@ -84,6 +68,26 @@ public class Dump extends CliCommand implements Callable<Integer>
             System.err.println(e.getMessage());
             return 1;
         }
+    }
+
+    public static String getTypeForFormat(Format format)
+    {
+        String mime = Serialization.NQUADS;
+        switch (format) {
+            case nquads:
+                mime = Serialization.NQUADS;
+                break;
+            case turtle:
+                mime = Serialization.TURTLE;
+                break;
+            case xml:
+                mime = Serialization.RDFXML;
+                break;
+            case ntriples:
+                mime = Serialization.NTRIPLES;
+                break;
+        }
+        return mime;
     }
 
 }

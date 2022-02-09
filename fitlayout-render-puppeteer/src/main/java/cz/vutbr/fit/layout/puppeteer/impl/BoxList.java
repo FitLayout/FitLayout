@@ -109,7 +109,7 @@ public class BoxList
         box.setOrder(0);
         box.setId(0);
         box.setTagName("viewport");
-        box.setSourceNodeId(-1);
+        box.setSourceNodeId("viewport");
         box.setIntrinsicBounds(new Rectangular(0, 0,
                 Math.round(input.getPage().getWidth()), 
                 Math.round(input.getPage().getHeight())));
@@ -152,6 +152,8 @@ public class BoxList
                 //text boxes
                 newbox = createTextBox(boxInfo, style, nextOrder++);
             }
+            //assign xpath ID if present
+            newbox.setSourceNodeId(boxInfo.getXpath());
             //map the offset parent if any, the coordinates are computed from the parent
             if (newbox.getOffsetParent() != null)
             {

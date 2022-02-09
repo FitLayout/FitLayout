@@ -27,7 +27,7 @@ public class GroupAnalyzerByDOM extends GroupAnalyzer
     @Override
     public Area findSuperArea(Area sub, List<Area> selected)
     {
-        Integer srcId = getId(sub);
+        String srcId = getId(sub);
         if (srcId != null)
         {
             selected.clear();
@@ -35,7 +35,7 @@ public class GroupAnalyzerByDOM extends GroupAnalyzer
             for (int i = 0; i < parent.getChildCount(); i++)
             {
                 Area chld = parent.getChildAt(i);
-                Integer cid = getId(chld);
+                String cid = getId(chld);
                 if (cid != null && cid.equals(srcId))
                 {
                     selected.add(chld);
@@ -66,7 +66,7 @@ public class GroupAnalyzerByDOM extends GroupAnalyzer
         }
     }
     
-    private Integer getId(Area area)
+    private String getId(Area area)
     {
         List<Box> boxes = area.getBoxes();
         if (!boxes.isEmpty())

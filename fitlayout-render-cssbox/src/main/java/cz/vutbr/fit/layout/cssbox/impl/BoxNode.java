@@ -50,6 +50,10 @@ public class BoxNode extends DefaultBox
     /** Zoom relative to original box sizes */
     private float zoom;
     
+    /** XPath ID of the source node */
+    private String xpath;
+    
+    
     //===================================================================================
     
     /**
@@ -414,9 +418,16 @@ public class BoxNode extends DefaultBox
     }
     
     @Override
-    public int getSourceNodeId()
+    public String getSourceNodeId()
     {
-        return System.identityHashCode(getBox().getNode());
+        if (xpath == null)
+        {
+            if (getBox() instanceof Viewport)
+                xpath = "viewport";
+            else
+                xpath = getPathTo(getBox().getNode());
+        }
+        return xpath;
     }
 
     @Override
@@ -600,5 +611,52 @@ public class BoxNode extends DefaultBox
     {
         return Math.round(src * zoom);
     }
+    
+    private String getPathTo(Node element) 
+    {
+        if (element == null)
+        {
+            return "-";
+        }
+        else
+        {
+            if (element instanceof Element)
+            {
+                if ("html".equalsIgnoreCase(((Element) element).getTagName()))
+                    return "/html[1]";
+                else if ("body".equalsIgnoreCase(((Element) element).getTagName()))
+                        return "//body[1]";
+            }
+    
+            if (element.getParentNode() != null)
+            {
+                int ix = 0;
+                var siblings = element.getParentNode().getChildNodes();
+                for (int i = 0; i < siblings.getLength(); i++) 
+                {
+                    final Node sibling = siblings.item(i);
+                    if (sibling == element)
+                    {
+                        String suffix;
+                        if (element.getNodeType() == Node.ELEMENT_NODE)
+                            suffix = "*[" + (ix+1) +"]";
+                        else
+                            suffix = "node()[" + (ix+1) +"]";
+                            
+                        Node parent = element.getParentNode();
+                        if (parent == null)
+                            return "/" + suffix;
+                        else
+                            return getPathTo(element.getParentNode()) + "/" + suffix;
+                    }
+                    // for text nodes count all nodes, for elements only count elements 
+                    if (sibling.getNodeType() == Node.ELEMENT_NODE || element.getNodeType() == Node.TEXT_NODE)
+                        ix++;
+                }
+            }
+            return ""; // this shouldn't happen
+        }
+    }
+    
     
 }

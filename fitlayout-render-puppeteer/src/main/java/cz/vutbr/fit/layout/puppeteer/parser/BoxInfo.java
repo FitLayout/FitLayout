@@ -14,6 +14,7 @@ public class BoxInfo
     public int id;
     public Integer parent; //offsetParent ID reference
     public Integer domParent; //DOM parentElement ID refrence
+    public String xpath;
     public String tagName;
     public Attribute[] attrs;
     public Boolean replaced;
@@ -44,6 +45,16 @@ public class BoxInfo
     public void setParent(Integer parent)
     {
         this.parent = parent;
+    }
+
+    public String getXpath()
+    {
+        return xpath;
+    }
+
+    public void setXpath(String xpath)
+    {
+        this.xpath = xpath;
     }
 
     public String getTagName()

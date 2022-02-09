@@ -33,7 +33,7 @@ public class DefaultBox extends DefaultTreeContentRect<Box> implements Box
     private Rectangular visualBounds;
     
     private Box intrinsicParent;
-    private int sourceNodeId;
+    private String sourceNodeId;
     private String tagName;
     private Map<String, String> attributes;
     private Box.Type type;
@@ -212,12 +212,12 @@ public class DefaultBox extends DefaultTreeContentRect<Box> implements Box
     }
 
     @Override
-    public int getSourceNodeId()
+    public String getSourceNodeId()
     {
         return sourceNodeId;
     }
 
-    public void setSourceNodeId(int sourceNodeId)
+    public void setSourceNodeId(String sourceNodeId)
     {
         this.sourceNodeId = sourceNodeId;
     }

@@ -28,7 +28,7 @@ public class GroupAnalyzerByDOM extends GroupAnalyzer
     public Area findSuperArea(Area sub, List<Area> selected)
     {
         String srcId = getId(sub);
-        if (srcId != null)
+        if (srcId != null && !srcId.isEmpty())
         {
             selected.clear();
             Rectangular mingp = null;
@@ -36,7 +36,7 @@ public class GroupAnalyzerByDOM extends GroupAnalyzer
             {
                 Area chld = parent.getChildAt(i);
                 String cid = getId(chld);
-                if (cid != null && cid.equals(srcId))
+                if (cid != null && !cid.isEmpty() && cid.equals(srcId))
                 {
                     selected.add(chld);
                     if (mingp == null)

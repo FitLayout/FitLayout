@@ -113,6 +113,8 @@ public class BoxModelBuilder extends ModelBuilderBase implements ModelBuilder
 		    graph.add(individual, BOX.isChildOf, getBoxIri(pageNode, box.getParent()));
 
 		//tag properties
+		if (box.getSourceNodeId() != null)
+		    graph.add(individual, BOX.sourceXPath, vf.createLiteral(box.getSourceNodeId()));
 		if (box.getTagName() != null)
 		    graph.add(individual, BOX.htmlTagName, vf.createLiteral(box.getTagName()));
 		

@@ -259,6 +259,10 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                         box.setContentBounds(rect);
                 }
             }
+            else if (BOX.sourceXPath.equals(pred)) 
+            {
+                box.setSourceNodeId(value.stringValue());
+            }
             else if (BOX.htmlTagName.equals(pred)) 
             {
                 box.setTagName(value.stringValue());

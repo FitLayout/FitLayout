@@ -166,7 +166,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             {
                 // sucessfully processed
             }
-            if (RDFS.LABEL.equals(pred))
+            else if (RDFS.LABEL.equals(pred))
             {
                 String name = value.stringValue();
                 area.setName(name);

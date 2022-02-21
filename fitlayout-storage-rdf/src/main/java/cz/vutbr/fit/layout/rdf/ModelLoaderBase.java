@@ -1,5 +1,6 @@
 package cz.vutbr.fit.layout.rdf;
 import java.util.AbstractMap;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.impl.DefaultTreeContentRect;
 import cz.vutbr.fit.layout.model.Border;
+import cz.vutbr.fit.layout.model.GenericTreeNode;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TextStyle;
@@ -24,6 +26,7 @@ import cz.vutbr.fit.layout.model.Border.Side;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.SEGM;
 import cz.vutbr.fit.layout.rdf.model.RDFAreaTree;
+import cz.vutbr.fit.layout.rdf.model.RDFOrderedResource;
 import cz.vutbr.fit.layout.rdf.model.RDFPage;
 
 /**
@@ -361,6 +364,52 @@ public abstract class ModelLoaderBase extends ModelTransformer
         return ret.toString();
     }
     
+    //=================================================================================
+    
+    /**
+     * Checks that each child area has a document order assigned and that the children
+     * are ordered by the assigned order.
+     * @param <T>
+     * @param root
+     */
+    protected <T extends GenericTreeNode<T>> void checkChildOrderValues(GenericTreeNode<T> root)
+    {
+        int offset = 0;
+        // ensure that each child has an assigned order
+        for (T childArea : root.getChildren())
+        {
+            final RDFOrderedResource child = (RDFOrderedResource) childArea;
+            if (child.getDocumentOrder() == -1) // order not present
+            {
+                int newOrder = -1;
+                // first, try to use the order of the first child (if any)
+                if (childArea.getChildCount() != 0)
+                    newOrder = ((RDFOrderedResource) childArea.getChildAt(0)).getDocumentOrder();
+                // if failed, use the parent order + an offset
+                if (newOrder == -1)
+                {
+                    newOrder = ((RDFOrderedResource) root).getDocumentOrder() + offset;
+                    offset++;
+                }
+                child.setDocumentOrder(newOrder);
+            }
+            // recursively apply to child nodes
+            checkChildOrderValues(childArea);
+        }
+        // sort children by order
+        root.getChildren().sort(new Comparator<T>()
+        {
+            @Override
+            public int compare(T o1, T o2)
+            {
+                return ((RDFOrderedResource) o1).getDocumentOrder()
+                        - ((RDFOrderedResource) o2).getDocumentOrder();
+            }
+        });
+    }
+    
+    //=================================================================================
+    
     protected static class RDFTextStyle
     {
         // average values loaded from RDF
@@ -383,7 +432,8 @@ public abstract class ModelLoaderBase extends ModelTransformer
             ret.setContentLength(contentLength);
             return ret;
         }
-        
     }
+    
+    
     
 }

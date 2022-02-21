@@ -140,7 +140,9 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
         }
         if (rootAreas.size() == 1)
         {
-            return rootAreas.iterator().next();
+            final RDFArea root = rootAreas.iterator().next();
+            checkChildOrderValues(root);
+            return root;
         }
         else
         {
@@ -154,6 +156,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
     {
         RDFArea area = new RDFArea(new Rectangular(), uri);
         area.setId(next_id++);
+        area.setDocumentOrder(-1);
         Map<IRI, Float> tagSupport = new HashMap<>(); //tagUri->support
         RDFTextStyle style = new RDFTextStyle();
         

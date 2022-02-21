@@ -98,6 +98,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                     boxes, page.getAdditionalStatements()); 
             if (root != null)
             {
+                checkChildOrderValues(root);
                 page.setRoot(root);
                 page.setBoxIris(boxes);
                 if (page.getWidth() == -1 && page.getHeight() == -1) //when the page width and height was not set
@@ -165,6 +166,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
     {
         RDFBox box = new RDFBox(boxIri);
         box.setId(next_id++);
+        box.setOrder(-1);
         box.setTagName("");
         box.setType(Box.Type.ELEMENT);
         box.setDisplayType(Box.DisplayType.BLOCK);

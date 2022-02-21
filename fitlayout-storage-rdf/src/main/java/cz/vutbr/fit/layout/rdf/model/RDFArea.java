@@ -18,7 +18,7 @@ import cz.vutbr.fit.layout.model.Rectangular;
  * 
  * @author burgetr
  */
-public class RDFArea extends DefaultArea implements RDFResource
+public class RDFArea extends DefaultArea implements RDFOrderedResource
 {
     protected IRI iri;
     protected int documentOrder;
@@ -40,11 +40,13 @@ public class RDFArea extends DefaultArea implements RDFResource
         this.iri = uri;
     }
 
+    @Override
     public int getDocumentOrder()
     {
         return documentOrder;
     }
 
+    @Override
     public void setDocumentOrder(int documentOrder)
     {
         this.documentOrder = documentOrder;

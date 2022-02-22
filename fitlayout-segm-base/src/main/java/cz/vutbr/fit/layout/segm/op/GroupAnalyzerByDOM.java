@@ -27,16 +27,16 @@ public class GroupAnalyzerByDOM extends GroupAnalyzer
     @Override
     public Area findSuperArea(Area sub, List<Area> selected)
     {
-        Integer srcId = getId(sub);
-        if (srcId != null)
+        String srcId = getId(sub);
+        if (srcId != null && !srcId.isEmpty())
         {
             selected.clear();
             Rectangular mingp = null;
             for (int i = 0; i < parent.getChildCount(); i++)
             {
                 Area chld = parent.getChildAt(i);
-                Integer cid = getId(chld);
-                if (cid != null && cid.equals(srcId))
+                String cid = getId(chld);
+                if (cid != null && !cid.isEmpty() && cid.equals(srcId))
                 {
                     selected.add(chld);
                     if (mingp == null)
@@ -66,7 +66,7 @@ public class GroupAnalyzerByDOM extends GroupAnalyzer
         }
     }
     
-    private Integer getId(Area area)
+    private String getId(Area area)
     {
         List<Box> boxes = area.getBoxes();
         if (!boxes.isEmpty())

@@ -13,7 +13,7 @@ import cz.vutbr.fit.layout.impl.DefaultBox;
  * 
  * @author burgetr
  */
-public class RDFBox extends DefaultBox implements RDFResource
+public class RDFBox extends DefaultBox implements RDFOrderedResource
 {
     protected IRI iri;
 
@@ -32,6 +32,18 @@ public class RDFBox extends DefaultBox implements RDFResource
     public void setIri(IRI uri)
     {
         this.iri = uri;
+    }
+
+    @Override
+    public int getDocumentOrder()
+    {
+        return getOrder();
+    }
+
+    @Override
+    public void setDocumentOrder(int order)
+    {
+        setOrder(order);
     }
 
 }

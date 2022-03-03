@@ -68,7 +68,7 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
         
         //starting grid position
         Rectangular gp = new Rectangular(sub.getGridPosition());
-        System.out.println("GSS************* Start: " + gp + " - " + sub);
+        //System.out.println("GSS************* Start: " + gp + " - " + sub);
         
         //try to expand to the whole grid
         Rectangular limit = new Rectangular(0, 0, getTopology().getTopologyWidth()-1, getTopology().getTopologyHeight()-1);
@@ -120,7 +120,7 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
     							short prefDir, short required)
     {
     	//System.out.println();
-    	System.out.println("  Expand " + sub + " DIR=" + prefDir + " sep=" + hsep + ":" + vsep);
+    	//System.out.println("  Expand " + sub + " DIR=" + prefDir + " sep=" + hsep + ":" + vsep);
     	//debugColor = new java.awt.Color(debugColor.getBlue(), debugColor.getRed(), debugColor.getGreen());*/
         //hsep = true;
         //vsep = true;

@@ -3,7 +3,7 @@
  *
  * Created on 20. 5. 2022, 13:27:07 by burgetr
  */
-package cz.vutbr.fit.layout.meta;
+package cz.vutbr.fit.layout.rdf;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -44,7 +44,7 @@ public class MetadataExtractor
         {
             for (Metadata metadata : page.getMetadata())
             {
-                if ("application/ld+json".equals(metadata.getType()) && metadata.getContent() instanceof String)
+                if (Serialization.JSONLD.equals(metadata.getType()) && metadata.getContent() instanceof String)
                     parseJSON((String) metadata.getContent(), model);
                 else
                     log.warn("Skipping unknown metadata of type {}", metadata.getType());

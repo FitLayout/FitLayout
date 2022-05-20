@@ -42,6 +42,8 @@ public class RDFArtifactRepository implements ArtifactRepository
 {
     private static Logger log = LoggerFactory.getLogger(RDFArtifactRepository.class);
     
+    public static String METADATA_SUFFIX = "meta";
+    
     /** Required OWL resources containing the storage metadata */
     private static String[] owls = new String[] {"render.owl", "segmentation.owl", "fitlayout.owl", "mapping.owl"};
     
@@ -267,6 +269,12 @@ public class RDFArtifactRepository implements ArtifactRepository
         {
             Model graph = builder.createGraph(artifact);
             storage.insertGraph(graph, artifact.getIri());
+            if (artifact.getMetadata() != null)
+            {
+                final IRI metaIRI = iriFactory.createRelatedIri(artifact.getIri(), METADATA_SUFFIX);
+                Model metadata = MetadataExtractor.extract(artifact);
+                storage.insertGraph(metadata, metaIRI);
+            }
         }
         else
             log.error("Could not find RDF model builder for artifact {}, type {}", artifact, artifact.getArtifactType());
@@ -284,7 +292,7 @@ public class RDFArtifactRepository implements ArtifactRepository
     public void replaceArtifact(IRI artifactIri, Artifact artifact)
     {
         artifact.setIri(artifactIri);
-        storage.clear(artifactIri);
+        clearArtifact(artifactIri);
         addArtifact(artifact);
     }
 
@@ -295,9 +303,21 @@ public class RDFArtifactRepository implements ArtifactRepository
         List<Artifact> derived = new ArrayList<>();
         findDerivedArtifacts(artifactIri, getArtifactInfo(), derived);
         for (Artifact a : derived)
-            storage.clear(a.getIri());
+            clearArtifact(a.getIri());
         //clear the artifact itself
+        clearArtifact(artifactIri);
+    }
+    
+    /**
+     * Removes the artifact subpgraph and the related subgraphs
+     * without checking the derived artifacts.
+     * @param artifactIri the artifact IRI to remove
+     */
+    private void clearArtifact(IRI artifactIri)
+    {
         storage.clear(artifactIri);
+        final IRI metaIRI = iriFactory.createRelatedIri(artifactIri, METADATA_SUFFIX);
+        storage.clear(metaIRI);
     }
     
     private void findDerivedArtifacts(IRI artifactIri, Collection<Artifact> artifacts, List<Artifact> dest)

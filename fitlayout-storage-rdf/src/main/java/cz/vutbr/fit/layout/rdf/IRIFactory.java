@@ -137,5 +137,14 @@ public interface IRIFactory
      * @return the created IRI
      */
     public IRI createSequenceURI(String name);
+    
+    /**
+     * Creates a new IRI from the given source IRI by adding a relation.
+     * 
+     * @param source the source IRI
+     * @param relation the name of the relation between the source IRI and the new one
+     * @return The new IRI
+     */
+    public IRI createRelatedIri(IRI source, String relation);
 
 }

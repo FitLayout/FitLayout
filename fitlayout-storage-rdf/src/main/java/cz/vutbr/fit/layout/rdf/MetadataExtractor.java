@@ -19,8 +19,8 @@ import org.eclipse.rdf4j.rio.helpers.StatementCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Metadata;
-import cz.vutbr.fit.layout.model.Page;
 
 /**
  * Functions for extracting RDF metadata from source objects.
@@ -32,17 +32,17 @@ public class MetadataExtractor
     private static Logger log = LoggerFactory.getLogger(MetadataExtractor.class);
 
     /**
-     * Extracts RDF metadata from a source page.
+     * Extracts RDF metadata from a source artifact (e.g. JSON-LD metadata for a page)
      * 
-     * @param page the source page
+     * @param artifact the source artifact
      * @return RDF model of the extracted metadata (may be empty if no metadata was found)
      */
-    public static Model extract(Page page)
+    public static Model extract(Artifact artifact)
     {
         Model model = new LinkedHashModel();
-        if (page.getMetadata() != null)
+        if (artifact.getMetadata() != null)
         {
-            for (Metadata metadata : page.getMetadata())
+            for (Metadata metadata : artifact.getMetadata())
             {
                 if (Serialization.JSONLD.equals(metadata.getType()) && metadata.getContent() instanceof String)
                     parseJSON((String) metadata.getContent(), model);

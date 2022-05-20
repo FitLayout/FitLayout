@@ -152,5 +152,11 @@ public class DefaultIRIFactory implements IRIFactory
     {
         return factory.createIRI(NAMESPACE, "seq-" + name);
     }
+
+    @Override
+    public IRI createRelatedIri(IRI source, String relation)
+    {
+        return factory.createIRI(source.getNamespace(), source.getLocalName() + "-" + relation);
+    }
     
 }

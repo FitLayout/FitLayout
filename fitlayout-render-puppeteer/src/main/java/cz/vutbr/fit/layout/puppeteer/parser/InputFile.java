@@ -15,6 +15,7 @@ public class InputFile
     public String[] fonts;
     public BoxInfo[] boxes;
     public ImageInfo[] images;
+    public MetadataDef[] metadata;
     public String screenshot;
     public int status;
     public String statusText;
@@ -69,6 +70,16 @@ public class InputFile
     public void setScreenshot(String screenshot)
     {
         this.screenshot = screenshot;
+    }
+
+    public MetadataDef[] getMetadata()
+    {
+        return metadata;
+    }
+
+    public void setMetadata(MetadataDef[] metadata)
+    {
+        this.metadata = metadata;
     }
 
     public int getStatus()

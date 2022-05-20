@@ -6,6 +6,7 @@
 package cz.vutbr.fit.layout.model;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -51,6 +52,13 @@ public interface Page extends Artifact
      * @return PNG image data array or {@code null} when the page image was not provided by the renderer.
      */
     public byte[] getPngImage();
+    
+    /**
+     * Metadata provided at page level. The format depends on the metadata source.
+     * For JSON-LD metadata this is a generic JSON object.
+     * @return The metadata object or {@code null} when no metadata is provided.
+     */
+    public Collection<Metadata> getMetadata();
     
     /**
      * Finds all the boxes that contain the given point within their visual bounds.

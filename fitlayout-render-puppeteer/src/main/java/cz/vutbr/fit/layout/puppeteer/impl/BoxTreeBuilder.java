@@ -27,8 +27,10 @@ import com.google.gson.Gson;
 import cz.vutbr.fit.layout.impl.BaseBoxTreeBuilder;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
+import cz.vutbr.fit.layout.model.Metadata;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.puppeteer.parser.InputFile;
+import cz.vutbr.fit.layout.puppeteer.parser.MetadataDef;
 import cz.vutbr.fit.layout.puppeteer.parser.PageInfo;
 
 /**
@@ -162,6 +164,15 @@ public class BoxTreeBuilder extends BaseBoxTreeBuilder
         BoxList boxlist = new BoxList(inputFile);
         Box root = buildTree(boxlist.getVisibleBoxes(), Color.WHITE);
         page.setRoot(root);
+        
+        //copy the metadata (if provided)
+        if (input.getMetadata() != null)
+        {
+            List<Metadata> data = new ArrayList<>();
+            for (MetadataDef item : input.getMetadata())
+                data.add(item);
+            page.setMetadata(data);
+        }
     }
     
     @Override

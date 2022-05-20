@@ -7,11 +7,13 @@ package cz.vutbr.fit.layout.impl;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.model.Box;
+import cz.vutbr.fit.layout.model.Metadata;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.ontology.BOX;
@@ -31,6 +33,7 @@ public class DefaultPage extends BaseArtifact implements Page
     protected int width;
     protected int height;
     protected byte[] pngImage;
+    private Collection<Metadata> metadata;
     
 
     public DefaultPage(URL url)
@@ -116,6 +119,16 @@ public class DefaultPage extends BaseArtifact implements Page
     public void setPngImage(byte[] pngImage)
     {
         this.pngImage = pngImage;
+    }
+
+    public Collection<Metadata> getMetadata()
+    {
+        return metadata;
+    }
+
+    public void setMetadata(Collection<Metadata> metadata)
+    {
+        this.metadata = metadata;
     }
 
     @Override

@@ -26,6 +26,11 @@
 			<artifactId>fitlayout-io</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>cz.vutbr.fit.layout</groupId>
+			<artifactId>fitlayout-metadata</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- rendering -->
 		<dependency>
 			<groupId>cz.vutbr.fit.layout</groupId>

@@ -51,6 +51,7 @@
 		<module>fitlayout-tools</module>
 		<module>fitlayout-storage-rdf</module>
 		<module>fitlayout-render-puppeteer</module>
+		<module>fitlayout-metadata</module>
 		<module>fitlayout-segm-vips</module>
 		<module>fitlayout-io</module>
 		<module>fitlayout-segm-bcs</module>

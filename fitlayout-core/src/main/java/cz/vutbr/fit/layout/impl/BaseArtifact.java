@@ -5,11 +5,13 @@
  */
 package cz.vutbr.fit.layout.impl;
 
+import java.util.Collection;
 import java.util.Date;
 
 import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.model.Artifact;
+import cz.vutbr.fit.layout.model.Metadata;
 
 /**
  * A common base class for artifact implementations.
@@ -24,6 +26,7 @@ public abstract class BaseArtifact implements Artifact
     private Date createdOn;
     private String creator;
     private String creatorParams;
+    private Collection<Metadata> metadata;
     
 
     public BaseArtifact(IRI parentIri)
@@ -102,6 +105,16 @@ public abstract class BaseArtifact implements Artifact
     public void setCreatorParams(String creatorParams)
     {
         this.creatorParams = creatorParams;
+    }
+
+    public Collection<Metadata> getMetadata()
+    {
+        return metadata;
+    }
+
+    public void setMetadata(Collection<Metadata> metadata)
+    {
+        this.metadata = metadata;
     }
 
     @Override

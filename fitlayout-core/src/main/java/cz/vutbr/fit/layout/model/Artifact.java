@@ -5,6 +5,7 @@
  */
 package cz.vutbr.fit.layout.model;
 
+import java.util.Collection;
 import java.util.Date;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -64,5 +65,11 @@ public interface Artifact
      * @return a service parameter string
      */
     public String getCreatorParams();
+    
+    /**
+     * Metadata provided for the entire artifact.
+     * @return A metadata collection or {@code null} when no metadata is provided.
+     */
+    public Collection<Metadata> getMetadata();
     
 }

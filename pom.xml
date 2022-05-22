@@ -59,7 +59,8 @@
 		<module>all</module>
 		<!-- for maven Central deployment it is important that bom is the last module -->
 		<module>bom</module>
-	</modules>
+    <module>fitlayout-mapping</module>
+  </modules>
 
 	<build>
 		<plugins>
@@ -337,7 +338,7 @@
 									<links>
 										<link>https://docs.oracle.com/en/java/javase/11/docs/api/</link>
 									</links>
-									<excludePackageNames />
+									<excludePackageNames/>
 								</configuration>
 							</execution>
 						</executions>

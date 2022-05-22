@@ -271,7 +271,7 @@ public class RDFArtifactRepository implements ArtifactRepository
             storage.insertGraph(graph, artifact.getIri());
             if (artifact.getMetadata() != null)
             {
-                final IRI metaIRI = iriFactory.createRelatedIri(artifact.getIri(), METADATA_SUFFIX);
+                final IRI metaIRI = getMetadataIRI(artifact.getIri());
                 Model metadata = MetadataExtractor.extract(artifact);
                 storage.insertGraph(metadata, metaIRI);
             }
@@ -308,6 +308,11 @@ public class RDFArtifactRepository implements ArtifactRepository
         clearArtifact(artifactIri);
     }
     
+    public IRI getMetadataIRI(IRI artifactIri)
+    {
+        return iriFactory.createRelatedIri(artifactIri, METADATA_SUFFIX);
+    }
+    
     /**
      * Removes the artifact subpgraph and the related subgraphs
      * without checking the derived artifacts.
@@ -316,8 +321,7 @@ public class RDFArtifactRepository implements ArtifactRepository
     private void clearArtifact(IRI artifactIri)
     {
         storage.clear(artifactIri);
-        final IRI metaIRI = iriFactory.createRelatedIri(artifactIri, METADATA_SUFFIX);
-        storage.clear(metaIRI);
+        storage.clear(getMetadataIRI(artifactIri));
     }
     
     private void findDerivedArtifacts(IRI artifactIri, Collection<Artifact> artifacts, List<Artifact> dest)

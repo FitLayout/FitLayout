@@ -13,6 +13,7 @@ import java.util.Map;
 import org.eclipse.rdf4j.model.IRI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.unbescape.html.HtmlEscape;
 
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.impl.BaseOperator;
@@ -93,7 +94,8 @@ public class TagByExampleOperator extends BaseOperator
 
     private void recursiveTagOcurrences(Area root, Map<String, List<Example>> mapping)
     {
-        final List<Example> examples = mapping.get(textFilter(root.getText()));
+        final String text = textFilter(root.getText());
+        final List<Example> examples = mapping.get(text);
         if (examples != null)
         {
             for (Example ex : examples)
@@ -140,7 +142,10 @@ public class TagByExampleOperator extends BaseOperator
         if (src == null)
             return "";
         else
-            return src.toLowerCase().trim().replaceAll("\\s+", " ");
+        {
+            final String text = src.toLowerCase().trim().replaceAll("\\s+", " "); //normalize white space
+            return HtmlEscape.unescapeHtml(text); //remove HTML entities
+        }
     }
 
 }

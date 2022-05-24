@@ -49,13 +49,13 @@ public class RegexpTagger extends BaseTagger
     @Override
     public String getName()
     {
-        return "Titles";
+        return "Regular expressions";
     }
 
     @Override
     public String getDescription()
     {
-        return "General paper or news titles";
+        return "Tag by regular expressions";
     }
     
     //==========================================================================================

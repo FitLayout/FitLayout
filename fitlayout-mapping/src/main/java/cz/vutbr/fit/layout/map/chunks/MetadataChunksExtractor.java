@@ -9,14 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.rdf4j.model.IRI;
-import org.eclipse.rdf4j.model.Resource;
-import org.eclipse.rdf4j.query.Binding;
-import org.eclipse.rdf4j.query.BindingSet;
 
+import cz.vutbr.fit.layout.map.Example;
+import cz.vutbr.fit.layout.map.MetadataExampleGenerator;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.TextChunk;
 import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
-import cz.vutbr.fit.layout.rdf.StorageException;
 import cz.vutbr.fit.layout.text.chunks.ChunksSource;
 
 /**
@@ -47,67 +45,10 @@ public class MetadataChunksExtractor extends ChunksSource
     
     private List<Example> getExamples()
     {
-        try {
-            final String query = "SELECT ?s ?p ?text WHERE {"
-                    + "  ?s ?p ?text . "
-                    + "  FILTER (isLiteral(?text)) "
-                    + "}";
-            
-            List<BindingSet> data = repo.getStorage().executeSafeTupleQuery(query);
-            List<Example> ret = new ArrayList<>(data.size());
-            for (BindingSet binding : data)
-            {
-                Binding bS = binding.getBinding("s");
-                Binding bP = binding.getBinding("p");
-                Binding bText = binding.getBinding("text");
-                if (bS != null && bP != null && bText != null 
-                        && bS.getValue() instanceof Resource && bP.getValue() instanceof IRI)
-                {
-                    Example e = new Example((Resource) bS.getValue(), (IRI) bP.getValue(), bText.getValue().stringValue());
-                    ret.add(e);
-                }
-            }
-            return ret;
-        } catch (Exception e) {
-            throw new StorageException(e);
-        }
+        final IRI pageIri = getRoot().getPageIri();
+        final IRI metaIri = repo.getMetadataIRI(pageIri);
+        var gen = new MetadataExampleGenerator(repo, metaIri);
+        return gen.getExamples();
     }
     
-    private static class Example
-    {
-        private Resource subject;
-        private IRI predicate;
-        private String text;
-        
-        public Example(Resource subject, IRI predicate, String text)
-        {
-            this.subject = subject;
-            this.predicate = predicate;
-            this.text = text;
-        }
-
-        public Resource getSubject()
-        {
-            return subject;
-        }
-
-        public IRI getPredicate()
-        {
-            return predicate;
-        }
-
-        public String getText()
-        {
-            return text;
-        }
-
-        @Override
-        public String toString()
-        {
-            return "Example [subject=" + subject + ", predicate=" + predicate
-                    + ", text=" + text + "]";
-        }
-        
-    }
-
 }

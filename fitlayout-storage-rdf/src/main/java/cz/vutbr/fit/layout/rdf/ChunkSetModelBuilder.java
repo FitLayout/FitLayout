@@ -93,10 +93,16 @@ public class ChunkSetModelBuilder extends ModelBuilderBase implements ModelBuild
         graph.add(ciri, BOX.fontFamily, vf.createLiteral(chunk.getFontFamily()));
         addTextStyle(graph, ciri, chunk);
         
-        final IRI areaIri = getAreaIri(chunk.getSourceArea().getAreaTree().getIri(), chunk.getSourceArea());
-        graph.add(ciri, SEGM.hasSourceArea, areaIri);
-        final IRI boxIri = getBoxIri(chunk.getSourceBox().getPageIri(), chunk.getSourceBox());
-        graph.add(ciri, SEGM.hasSourceBox, boxIri);
+        if (chunk.getSourceArea() != null)
+        {
+            final IRI areaIri = getAreaIri(chunk.getSourceArea().getAreaTree().getIri(), chunk.getSourceArea());
+            graph.add(ciri, SEGM.hasSourceArea, areaIri);
+        }
+        if (chunk.getSourceBox() != null)
+        {
+            final IRI boxIri = getBoxIri(chunk.getSourceBox().getPageIri(), chunk.getSourceBox());
+            graph.add(ciri, SEGM.hasSourceBox, boxIri);
+        }
         
         // append the geometry
         insertBounds(ciri, BOX.bounds, "b", chunk.getBounds(), graph);

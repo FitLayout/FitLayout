@@ -16,6 +16,7 @@ import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.api.TaggerConfig;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.impl.DefaultChunkSet;
+import cz.vutbr.fit.layout.impl.ParameterBoolean;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.ChunkSet;
@@ -30,15 +31,19 @@ import cz.vutbr.fit.layout.text.tag.FixedTaggerConfig;
 public class TextChunksProvider extends BaseArtifactService
 {
     private TaggerConfig tagConfig;
+    private boolean useWholeAreaText;
+    
 
     public TextChunksProvider()
     {
         tagConfig = new FixedTaggerConfig();
+        useWholeAreaText = false;
     }
     
     public TextChunksProvider(TaggerConfig tagConfig)
     {
         this.tagConfig = tagConfig;
+        useWholeAreaText = false;
     }
     
     public TaggerConfig getTaggerConfig()
@@ -49,6 +54,16 @@ public class TextChunksProvider extends BaseArtifactService
     public void setTaggerConfig(TaggerConfig tagConfig)
     {
         this.tagConfig = tagConfig;
+    }
+
+    public boolean getUseWholeAreaText()
+    {
+        return useWholeAreaText;
+    }
+
+    public void setUseWholeAreaText(boolean useAreaText)
+    {
+        this.useWholeAreaText = useAreaText;
     }
 
     @Override
@@ -73,6 +88,7 @@ public class TextChunksProvider extends BaseArtifactService
     public List<Parameter> defineParams()
     {
         List<Parameter> ret = new ArrayList<>(1);
+        ret.add(new ParameterBoolean("useWholeAreaText"));
         return ret;
     }
 
@@ -101,7 +117,11 @@ public class TextChunksProvider extends BaseArtifactService
     
     private ChunkSet extractChunks(AreaTree atree)
     {
-        ChunksSource csrc = new TaggedChunksSource(tagConfig, atree.getRoot(), 0.1f);
+        final ChunksSource csrc;
+        if (useWholeAreaText)
+            csrc = new AreaTextChunksSource(atree.getRoot(), tagConfig);
+        else
+            csrc = new TaggedChunksSource(tagConfig, atree.getRoot(), 0.1f);
         
         List<TextChunk> chunks = csrc.getTextChunks();
         DefaultChunkSet ret = new DefaultChunkSet(atree.getIri(), new HashSet<>(chunks));

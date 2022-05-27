@@ -15,6 +15,7 @@ import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.impl.DefaultChunkSet;
+import cz.vutbr.fit.layout.map.MetadataExampleGenerator;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.ChunkSet;
@@ -84,8 +85,15 @@ public class MetadataTextChunksProvider extends BaseArtifactService
     
     private ChunkSet extractChunks(AreaTree atree)
     {
-        ChunksSource csrc = new MetadataChunksExtractor(atree.getRoot(), (RDFArtifactRepository) getServiceManager().getArtifactRepository());
+        // get the annotated examples from metadata
+        var repo = (RDFArtifactRepository) getServiceManager().getArtifactRepository();
+        var metadataContextIri = repo.getMetadataIRI(atree.getPageIri());
+        var gen = new MetadataExampleGenerator(repo, metadataContextIri, MetadataExampleGenerator::normalizeText);
         
+        // setup the extractor
+        ChunksSource csrc = new MetadataChunksExtractor(atree.getRoot(), gen);
+        
+        // create a chunk set from the chunks
         List<TextChunk> chunks = csrc.getTextChunks();
         DefaultChunkSet ret = new DefaultChunkSet(atree.getIri(), new HashSet<>(chunks));
         ret.setPageIri(atree.getPageIri());

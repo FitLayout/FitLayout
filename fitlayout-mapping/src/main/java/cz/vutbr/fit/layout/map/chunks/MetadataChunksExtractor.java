@@ -5,16 +5,19 @@
  */
 package cz.vutbr.fit.layout.map.chunks;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.eclipse.rdf4j.model.IRI;
-
+import cz.vutbr.fit.layout.impl.DefaultTag;
+import cz.vutbr.fit.layout.impl.DefaultTextChunk;
 import cz.vutbr.fit.layout.map.Example;
 import cz.vutbr.fit.layout.map.MetadataExampleGenerator;
 import cz.vutbr.fit.layout.model.Area;
+import cz.vutbr.fit.layout.model.Box;
+import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.TextChunk;
-import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
 import cz.vutbr.fit.layout.text.chunks.ChunksSource;
 
 /**
@@ -23,32 +26,75 @@ import cz.vutbr.fit.layout.text.chunks.ChunksSource;
  */
 public class MetadataChunksExtractor extends ChunksSource
 {
-    private RDFArtifactRepository repo;
+    private int idCounter = 1;
+    private MetadataExampleGenerator exampleGenerator;
+    private Map<String, List<Example>> examples;
+    
 
-    public MetadataChunksExtractor(Area root, RDFArtifactRepository repo)
+    public MetadataChunksExtractor(Area root, MetadataExampleGenerator exampleGenerator)
     {
         super(root);
-        this.repo = repo;
+        this.exampleGenerator = exampleGenerator;
+        examples = exampleGenerator.getMappedExamples();
     }
 
     @Override
     public List<TextChunk> getTextChunks()
     {
-        List<TextChunk> ret = new ArrayList<>();
-        List<Example> examples = getExamples();
-        for (Example ex : examples)
-        {
-            System.out.println(ex);
-        }
-        return ret;
+        return this.createChunksForSubtree(this.getRoot())
+                .collect(Collectors.toList());
     }
-    
-    private List<Example> getExamples()
+
+    private Stream<TextChunk> createChunksForSubtree(Area root)
     {
-        final IRI pageIri = getRoot().getPageIri();
-        final IRI metaIri = repo.getMetadataIRI(pageIri);
-        var gen = new MetadataExampleGenerator(repo, metaIri);
-        return gen.getExamples();
+        if (root.toString().contains("nameextc"))
+            System.out.println("jo!");
+        final String text = exampleGenerator.filterKey(getText(root));
+        final List<Example> mappedExamples = examples.get(text);
+        
+        if (mappedExamples != null && !mappedExamples.isEmpty())
+            return this.createChunksForArea(root, mappedExamples);
+
+        return root.getChildren()
+            .stream()
+            .flatMap(this::createChunksForSubtree);
     }
-    
+
+    private Stream<TextChunk> createChunksForArea(Area area, List<Example> mappedExamples)
+    {
+        return mappedExamples.stream()
+            .map(example -> this.createChunkForExample(area, example));
+    }
+
+    private TextChunk createChunkForExample(Area area, Example example)
+    {
+        var rectangular = new Rectangular(area.getBounds());
+        var chunk = new DefaultTextChunk();
+        chunk.setId(this.idCounter++);
+        chunk.setBounds(rectangular);
+        chunk.setSourceArea(area);
+        chunk.setText(example.getText());
+        chunk.addTag(new DefaultTag("meta", example.getPredicate().getLocalName()), 0.95f);
+        chunk.setName("<chunk:" + example.getPredicate().getLocalName() + "> " + example.getText());
+
+        return chunk;
+    }
+
+    private String getText(Area area)
+    {
+        if (area.isLeaf())
+        {
+            return area.getBoxes()
+                .stream()
+                .map(Box::getOwnText)
+                .collect(Collectors.joining());
+        }
+        else
+        {
+            return area.getChildren()
+                .stream()
+                .map((child) -> getText(child))
+                .collect(Collectors.joining());
+        }
+    }
 }

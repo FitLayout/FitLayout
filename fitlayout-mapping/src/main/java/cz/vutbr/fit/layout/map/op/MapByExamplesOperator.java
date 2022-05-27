@@ -6,7 +6,6 @@
 package cz.vutbr.fit.layout.map.op;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +13,6 @@ import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.unbescape.html.HtmlEscape;
 
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.impl.BaseOperator;
@@ -92,7 +90,8 @@ public class MapByExamplesOperator extends BaseOperator
         final ValueFactory vf = repo.getStorage().getValueFactory();
         final IRI pageIri = atree.getPageIri();
         final IRI metaIri = repo.getMetadataIRI(pageIri);
-        var mapping = createMapping(repo, metaIri);
+        var gen = new MetadataExampleGenerator(repo, metaIri, MetadataExampleGenerator::normalizeText);
+        var mapping = gen.getMappedExamples();
         log.info("Metadata context IRI: {}", metaIri);
         log.info("Mapping: {}", mapping);
         
@@ -101,7 +100,7 @@ public class MapByExamplesOperator extends BaseOperator
 
     private void recursiveMapOcurrences(RDFAreaTree atree, RDFArea root, Map<String, List<Example>> mapping, ValueFactory vf)
     {
-        final String text = textFilter(root.getText());
+        final String text = MetadataExampleGenerator.normalizeText(root.getText());
         final List<Example> examples = mapping.get(text);
         if (examples != null)
         {
@@ -115,45 +114,6 @@ public class MapByExamplesOperator extends BaseOperator
         {
             if (child instanceof RDFArea)
                 recursiveMapOcurrences(atree, (RDFArea) child, mapping, vf);
-        }
-    }
-    
-    /**
-     * Creates the mapping from metadata taken from the repository.
-     * @param repo
-     * @param metadataContextIri
-     * @return
-     */
-    private Map<String, List<Example>> createMapping(RDFArtifactRepository repo, IRI metadataContextIri)
-    {
-        var gen = new MetadataExampleGenerator(repo, metadataContextIri);
-        var allExamples = gen.getExamples();
-        Map<String, List<Example>> ret = new HashMap<>();
-        for (Example ex : allExamples)
-        {
-            final String text = textFilter(ex.getText());
-            if (!text.isBlank())
-            {
-                List<Example> list = ret.get(text);
-                if (list == null)
-                {
-                    list = new ArrayList<>(1);
-                    ret.put(text, list);
-                }
-                list.add(ex);
-            }
-        }
-        return ret;
-    }
-    
-    private String textFilter(String src)
-    {
-        if (src == null)
-            return "";
-        else
-        {
-            final String text = src.toLowerCase().trim().replaceAll("\\s+", " "); //normalize white space
-            return HtmlEscape.unescapeHtml(text); //remove HTML entities
         }
     }
 

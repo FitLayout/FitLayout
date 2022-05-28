@@ -5,10 +5,10 @@
  */
 package cz.vutbr.fit.layout.map.chunks;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.impl.DefaultTextChunk;
@@ -41,29 +41,44 @@ public class MetadataChunksExtractor extends ChunksSource
     @Override
     public List<TextChunk> getTextChunks()
     {
-        return this.createChunksForSubtree(this.getRoot())
-                .collect(Collectors.toList());
+        final List<TextChunk> dest = new ArrayList<>(100);
+        createChunksForSubtree(this.getRoot(), dest);
+        return dest;
     }
 
-    private Stream<TextChunk> createChunksForSubtree(Area root)
+    private boolean createChunksForSubtree(Area root, List<TextChunk> dest)
     {
-        if (root.toString().contains("nameextc"))
-            System.out.println("jo!");
-        final String text = exampleGenerator.filterKey(getText(root));
-        final List<Example> mappedExamples = examples.get(text);
+        boolean childrenMatched = false;
+        for (Area child : root.getChildren())
+        {
+            childrenMatched |= createChunksForSubtree(child, dest);
+        }
         
-        if (mappedExamples != null && !mappedExamples.isEmpty())
-            return this.createChunksForArea(root, mappedExamples);
-
-        return root.getChildren()
-            .stream()
-            .flatMap(this::createChunksForSubtree);
+        if (childrenMatched)
+        {
+            // some children matched, do not match this one anymore
+            return true; 
+        }
+        else
+        {
+            // no children matched, try this node
+            final String text = exampleGenerator.filterKey(getText(root));
+            final List<Example> mappedExamples = examples.get(text);
+            
+            if (mappedExamples != null && !mappedExamples.isEmpty())
+            {
+                this.createChunksForArea(root, mappedExamples, dest);
+                return true;
+            }
+            else
+                return false;
+        }
     }
 
-    private Stream<TextChunk> createChunksForArea(Area area, List<Example> mappedExamples)
+    private void createChunksForArea(Area area, List<Example> mappedExamples, List<TextChunk> dest)
     {
-        return mappedExamples.stream()
-            .map(example -> this.createChunkForExample(area, example));
+        for (Example ex : mappedExamples)
+            dest.add(createChunkForExample(area, ex));
     }
 
     private TextChunk createChunkForExample(Area area, Example example)

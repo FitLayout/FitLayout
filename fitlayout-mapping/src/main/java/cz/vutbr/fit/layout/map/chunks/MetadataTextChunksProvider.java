@@ -85,6 +85,9 @@ public class MetadataTextChunksProvider extends BaseArtifactService
     
     private ChunkSet extractChunks(AreaTree atree)
     {
+        if (!(getServiceManager().getArtifactRepository() instanceof RDFArtifactRepository))
+            throw new ServiceException(getId() + " can be used with RDFArtifactRepository only");
+        
         // get the annotated examples from metadata
         var repo = (RDFArtifactRepository) getServiceManager().getArtifactRepository();
         var metadataContextIri = repo.getMetadataIRI(atree.getPageIri());

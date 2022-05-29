@@ -12,9 +12,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.impl.DefaultTextChunk;
 import cz.vutbr.fit.layout.map.Example;
+import cz.vutbr.fit.layout.map.MetaRefTag;
 import cz.vutbr.fit.layout.map.MetadataExampleGenerator;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Box;
@@ -32,6 +32,7 @@ public class MetadataChunksExtractor extends ChunksSource
     private MetadataExampleGenerator exampleGenerator;
     private Map<String, List<Example>> examples;
     private Map<Float, List<Example>> floatExamples;
+    private Set<MetaRefTag> assignedTags;
     
 
     public MetadataChunksExtractor(Area root, MetadataExampleGenerator exampleGenerator)
@@ -40,6 +41,12 @@ public class MetadataChunksExtractor extends ChunksSource
         this.exampleGenerator = exampleGenerator;
         examples = exampleGenerator.getStringExamples();
         floatExamples = exampleGenerator.getFloatExamples();
+        assignedTags = new HashSet<>();
+    }
+
+    public Set<MetaRefTag> getAssignedTags()
+    {
+        return assignedTags;
     }
 
     @Override
@@ -129,7 +136,9 @@ public class MetadataChunksExtractor extends ChunksSource
         chunk.setBounds(rectangular);
         chunk.setSourceArea(area);
         chunk.setText(example.getText());
-        chunk.addTag(new DefaultTag("meta", example.getPredicate().getLocalName()), 0.95f);
+        final var tag = new MetaRefTag(example.getPredicate().getLocalName(), example);
+        assignedTags.add(tag);
+        chunk.addTag(tag, 0.95f);
         chunk.setName("<chunk:" + example.getPredicate().getLocalName() + "> " + example.getText());
 
         return chunk;
@@ -152,4 +161,5 @@ public class MetadataChunksExtractor extends ChunksSource
                 .collect(Collectors.joining());
         }
     }
+    
 }

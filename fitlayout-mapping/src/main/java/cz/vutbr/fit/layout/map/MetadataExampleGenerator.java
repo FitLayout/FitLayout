@@ -29,7 +29,7 @@ public class MetadataExampleGenerator
 {
     private RDFArtifactRepository repo;
     private IRI contextIri;
-    private Function<String, String> keyFilter;
+    private Function<String, String> stringFilter;
     
     /**
      * Creates an example generator for a metadata context in a repository with a identity
@@ -41,7 +41,7 @@ public class MetadataExampleGenerator
     {
         this.repo = repo;
         this.contextIri = metadataContextIri;
-        this.keyFilter = MetadataExampleGenerator::useExact; 
+        this.stringFilter = MetadataExampleGenerator::useExact; 
     }
 
     /**
@@ -49,14 +49,14 @@ public class MetadataExampleGenerator
      * key filter function.
      * @param repo
      * @param metadataContextIri
-     * @param textFilter the filter function to be applied to the strings in order to make them
+     * @param stringFilter the filter function to be applied to the strings in order to make them
      * a map key.
      */
-    public MetadataExampleGenerator(RDFArtifactRepository repo, IRI metadataContextIri, Function<String, String> keyFilter)
+    public MetadataExampleGenerator(RDFArtifactRepository repo, IRI metadataContextIri, Function<String, String> stringFilter)
     {
         this.repo = repo;
         this.contextIri = metadataContextIri;
-        this.keyFilter = keyFilter; 
+        this.stringFilter = stringFilter; 
     }
 
     /**
@@ -99,13 +99,13 @@ public class MetadataExampleGenerator
      * @return A map that maps filtered strings to the individual examples. Generally a list
      * of examples may be mapped to a single string.
      */
-    public Map<String, List<Example>> getMappedExamples()
+    public Map<String, List<Example>> getStringExamples()
     {
         var allExamples = getExamples();
         Map<String, List<Example>> ret = new HashMap<>();
         for (Example ex : allExamples)
         {
-            final String text = keyFilter.apply(ex.getText());
+            final String text = stringFilter.apply(ex.getText());
             if (!text.isBlank())
             {
                 List<Example> list = ret.get(text);
@@ -121,6 +121,34 @@ public class MetadataExampleGenerator
     }
 
     /**
+     * Creates the mapping from floats to examples for the examples that may be converted
+     * to float.
+     * 
+     * @return A map that maps float values to the individual examples. Generally a list
+     * of examples may be mapped to a single string.
+     */
+    public Map<Float, List<Example>> getFloatExamples()
+    {
+        var allExamples = getExamples();
+        Map<Float, List<Example>> ret = new HashMap<>();
+        for (Example ex : allExamples)
+        {
+            final Float key = getFloatValue(ex.getText());
+            if (key != null)
+            {
+                List<Example> list = ret.get(key);
+                if (list == null)
+                {
+                    list = new ArrayList<>(1);
+                    ret.put(key, list);
+                }
+                list.add(ex);
+            }
+        }
+        return ret;
+    }
+
+    /**
      * Applies the configured keyFilter function to a source string.
      * 
      * @param src
@@ -128,7 +156,26 @@ public class MetadataExampleGenerator
      */
     public String filterKey(final String src)
     {
-        return keyFilter.apply(src);
+        return stringFilter.apply(src);
+    }
+    
+    /**
+     * Converts a string to a float value if possible.
+     * @param src
+     * @return
+     */
+    public Float getFloatValue(String src)
+    {
+        if (src != null && !src.isBlank())
+        {
+            try {
+                return Float.parseFloat(src);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        else
+            return null;
     }
     
     //=================================================================================================

@@ -6,8 +6,10 @@
 package cz.vutbr.fit.layout.map.chunks;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import cz.vutbr.fit.layout.impl.DefaultTag;
@@ -29,13 +31,15 @@ public class MetadataChunksExtractor extends ChunksSource
     private int idCounter = 1;
     private MetadataExampleGenerator exampleGenerator;
     private Map<String, List<Example>> examples;
+    private Map<Float, List<Example>> floatExamples;
     
 
     public MetadataChunksExtractor(Area root, MetadataExampleGenerator exampleGenerator)
     {
         super(root);
         this.exampleGenerator = exampleGenerator;
-        examples = exampleGenerator.getMappedExamples();
+        examples = exampleGenerator.getStringExamples();
+        floatExamples = exampleGenerator.getFloatExamples();
     }
 
     @Override
@@ -62,18 +66,54 @@ public class MetadataChunksExtractor extends ChunksSource
         else
         {
             // no children matched, try this node
-            final String text = exampleGenerator.filterKey(getText(root));
-            final List<Example> mappedExamples = examples.get(text);
-            
-            if (mappedExamples != null && !mappedExamples.isEmpty())
+            Set<Example> usedExamples = new HashSet<>();
+            boolean ret = tryStringExamples(root, dest, usedExamples);
+            if (!ret && !floatExamples.isEmpty())
+                ret |= tryFloatExamples(root, dest, usedExamples);
+            return ret;
+        }
+    }
+
+    private boolean tryStringExamples(Area root, List<TextChunk> dest, Set<Example> usedExamples)
+    {
+        final String text = exampleGenerator.filterKey(getText(root));
+        final List<Example> mappedExamples = examples.get(text);
+        
+        if (mappedExamples != null && !mappedExamples.isEmpty())
+        {
+            this.createChunksForArea(root, mappedExamples, dest);
+            usedExamples.addAll(mappedExamples);
+            return true;
+        }
+        else
+            return false;
+    }
+    
+    private boolean tryFloatExamples(Area root, List<TextChunk> dest, Set<Example> usedExamples)
+    {
+        String text = getText(root).replaceAll("[^a-zA-Z0-9\\,\\.]", "");
+        if (text.contains(",") && !text.contains(".")) // may be comma used for decimals
+            text = text.replace(',', '.');
+        try {
+            float val = Float.parseFloat(text);
+            final List<Example> mappedExamples = floatExamples.get(val);
+            if (mappedExamples != null)
             {
-                this.createChunksForArea(root, mappedExamples, dest);
-                return true;
+                mappedExamples.removeAll(usedExamples); //avoid re-using examples already mapped as strings
+                if (!mappedExamples.isEmpty())
+                {
+                    this.createChunksForArea(root, mappedExamples, dest);
+                    return true;
+                }
+                else
+                    return false;
             }
             else
                 return false;
+        } catch (NumberFormatException e) {
+            return false;
         }
-    }
+    }    
 
     private void createChunksForArea(Area area, List<Example> mappedExamples, List<TextChunk> dest)
     {

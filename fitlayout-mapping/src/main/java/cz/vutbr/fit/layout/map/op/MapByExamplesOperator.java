@@ -91,7 +91,7 @@ public class MapByExamplesOperator extends BaseOperator
         final IRI pageIri = atree.getPageIri();
         final IRI metaIri = repo.getMetadataIRI(pageIri);
         var gen = new MetadataExampleGenerator(repo, metaIri, MetadataExampleGenerator::normalizeText);
-        var mapping = gen.getMappedExamples();
+        var mapping = gen.getStringExamples();
         log.info("Metadata context IRI: {}", metaIri);
         log.info("Mapping: {}", mapping);
         

@@ -85,7 +85,7 @@ public class LogicalAreaModelBuilder extends ModelBuilderBase implements ModelBu
         if (parent != null)
             graph.add(individual, SEGM.isSubordinateTo, parent);
         if (area.getMainTag() != null)
-            graph.add(individual, SEGM.hasTag, getIriFactory().createTagURI(area.getMainTag()));
+            graph.add(individual, SEGM.hasTag, area.getMainTag().getIri());
         for (Area a : area.getAreas())
         {
             IRI areaUri = getAreaIri(areaTreeNode, a);

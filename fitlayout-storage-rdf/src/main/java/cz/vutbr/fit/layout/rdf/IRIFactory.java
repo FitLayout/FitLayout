@@ -103,13 +103,6 @@ public interface IRIFactory
     public IRI createTagSupportURI(IRI areaUri, Tag tag);
 
     /**
-     * Creates an IRI of a tag.
-     * @param tag
-     * @return
-     */
-    public IRI createTagURI(Tag tag);
-
-    /**
      * Creates a text chunk IRI.
      * @param chunkSetUri the IRI of the owning chunk set
      * @param chunk the text chunk itself

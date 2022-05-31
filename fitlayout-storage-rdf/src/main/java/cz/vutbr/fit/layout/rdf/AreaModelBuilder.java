@@ -117,7 +117,7 @@ public class AreaModelBuilder extends ModelBuilderBase implements ModelBuilder
 				if (support != null && support > 0.0f)
 				{
 				    usedTags.add(t);
-				    final IRI tagUri = getIriFactory().createTagURI(t);
+				    final IRI tagUri = t.getIri();
 				    graph.add(individual, SEGM.hasTag, tagUri);
 				    final IRI supUri = getIriFactory().createTagSupportURI(individual, t);
 				    graph.add(individual, SEGM.tagSupport, supUri);

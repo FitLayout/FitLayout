@@ -116,7 +116,7 @@ public class ChunkSetModelBuilder extends ModelBuilderBase implements ModelBuild
                 Float support = tags.get(t);
                 if (support != null && support > 0.0f)
                 {
-                    final IRI tagUri = getIriFactory().createTagURI(t);
+                    final IRI tagUri = t.getIri();
                     graph.add(ciri, SEGM.hasTag, tagUri);
                     final IRI supUri = getIriFactory().createTagSupportURI(ciri, t);
                     graph.add(ciri, SEGM.tagSupport, supUri);

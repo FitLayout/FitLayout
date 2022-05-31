@@ -106,18 +106,7 @@ public class DefaultIRIFactory implements IRIFactory
     @Override
     public IRI createTagSupportURI(IRI areaUri, Tag tag) 
     {
-        return factory.createIRI(String.valueOf(areaUri) + "-" + getTagDesc(tag));
-    }
-    
-    @Override
-    public IRI createTagURI(Tag tag) 
-    {
-        return factory.createIRI(NAMESPACE, "tag-" + getTagDesc(tag));
-    }
-    
-    private String getTagDesc(Tag tag) 
-    {
-        return tag.getType().replaceAll("\\.", "-") + "--" + tag.getName();
+        return factory.createIRI(String.valueOf(areaUri) + "-" + tag.getIri().getLocalName());
     }
     
     @Override

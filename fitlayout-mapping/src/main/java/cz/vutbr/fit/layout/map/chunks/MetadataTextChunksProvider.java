@@ -8,21 +8,25 @@ package cz.vutbr.fit.layout.map.chunks;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
 
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
-import cz.vutbr.fit.layout.impl.DefaultChunkSet;
 import cz.vutbr.fit.layout.map.MetadataExampleGenerator;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.ChunkSet;
 import cz.vutbr.fit.layout.model.TextChunk;
+import cz.vutbr.fit.layout.ontology.MAPPING;
 import cz.vutbr.fit.layout.ontology.SEGM;
 import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
-import cz.vutbr.fit.layout.text.chunks.ChunksSource;
+import cz.vutbr.fit.layout.rdf.model.RDFChunkSet;
 
 /**
  * 
@@ -94,16 +98,30 @@ public class MetadataTextChunksProvider extends BaseArtifactService
         var gen = new MetadataExampleGenerator(repo, metadataContextIri, MetadataExampleGenerator::normalizeText);
         
         // setup the extractor
-        ChunksSource csrc = new MetadataChunksExtractor(atree.getRoot(), gen);
+        var csrc = new MetadataChunksExtractor(atree.getRoot(), gen);
         
         // create a chunk set from the chunks
         List<TextChunk> chunks = csrc.getTextChunks();
-        DefaultChunkSet ret = new DefaultChunkSet(atree.getIri(), new HashSet<>(chunks));
+        RDFChunkSet ret = new RDFChunkSet(atree.getIri(), new HashSet<>(chunks));
         ret.setPageIri(atree.getPageIri());
         ret.setLabel(getId());
         ret.setCreator(getId());
         ret.setCreatorParams(getParamString());
+        
+        // add tag info as additional statements
+        final ValueFactory vf = repo.getStorage().getValueFactory();
+        Set<Statement> stmts = new HashSet<>();
+        for (var tag : csrc.getAssignedTags())
+        {
+            stmts.add(vf.createStatement(tag.getIri(), RDF.TYPE, SEGM.Tag));
+            stmts.add(vf.createStatement(tag.getIri(), SEGM.type, vf.createLiteral(tag.getType())));
+            stmts.add(vf.createStatement(tag.getIri(), SEGM.name, vf.createLiteral(tag.getName())));
+            stmts.add(vf.createStatement(tag.getIri(), MAPPING.describesInstance, tag.getExample().getSubject()));
+            stmts.add(vf.createStatement(tag.getIri(), MAPPING.isValueOf, tag.getExample().getPredicate()));
+        }
+        ret.setAdditionalStatements(stmts);
+        
         return ret;
     }
-
+    
 }

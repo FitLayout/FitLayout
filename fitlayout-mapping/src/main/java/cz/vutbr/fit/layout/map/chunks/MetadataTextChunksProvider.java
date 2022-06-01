@@ -19,6 +19,7 @@ import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.map.MetadataExampleGenerator;
+import cz.vutbr.fit.layout.map.MetadataTagManager;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.ChunkSet;
@@ -97,8 +98,12 @@ public class MetadataTextChunksProvider extends BaseArtifactService
         var metadataContextIri = repo.getMetadataIRI(atree.getPageIri());
         var gen = new MetadataExampleGenerator(repo, metadataContextIri, MetadataExampleGenerator::normalizeText);
         
+        // get/create tags for examples
+        var tagMgr = new MetadataTagManager(repo, metadataContextIri);
+        var tags = tagMgr.checkForTags(gen.getExamples());
+        
         // setup the extractor
-        var csrc = new MetadataChunksExtractor(atree.getRoot(), gen);
+        var csrc = new MetadataChunksExtractor(atree.getRoot(), gen, tags);
         
         // create a chunk set from the chunks
         List<TextChunk> chunks = csrc.getTextChunks();

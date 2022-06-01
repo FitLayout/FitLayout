@@ -48,4 +48,37 @@ public class Example
         return "Example [subject=" + subject + ", predicate=" + predicate
                 + ", text=" + text + "]";
     }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((predicate == null) ? 0 : predicate.hashCode());
+        result = prime * result + ((subject == null) ? 0 : subject.toString().hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        Example other = (Example) obj;
+        if (predicate == null)
+        {
+            if (other.predicate != null) return false;
+        }
+        else if (!predicate.equals(other.predicate)) return false;
+        if (subject == null)
+        {
+            if (other.subject != null) return false;
+        }
+        else if (!subject.toString().equals(other.subject.toString())) return false;
+        return true;
+    }
+    
+    
 }

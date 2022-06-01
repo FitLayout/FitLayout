@@ -14,7 +14,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.eclipse.rdf4j.model.util.Values;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.impl.DefaultTextChunk;
 import cz.vutbr.fit.layout.map.Example;
@@ -24,7 +25,6 @@ import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.TextChunk;
-import cz.vutbr.fit.layout.ontology.RESOURCE;
 import cz.vutbr.fit.layout.text.chunks.ChunksSource;
 
 /**
@@ -33,23 +33,26 @@ import cz.vutbr.fit.layout.text.chunks.ChunksSource;
  */
 public class MetadataChunksExtractor extends ChunksSource
 {
+    private static Logger log = LoggerFactory.getLogger(MetadataChunksExtractor.class);
+    
     private int idCounter = 1;
     private MetadataExampleGenerator exampleGenerator;
     private Map<String, List<Example>> examples;
     private Map<Float, List<Example>> floatExamples;
     private Map<Example, MetaRefTag> assignedTags;
-    private String tagIriBase; 
-    private int tagIdCnt;
     
 
-    public MetadataChunksExtractor(Area root, MetadataExampleGenerator exampleGenerator)
+    public MetadataChunksExtractor(Area root, MetadataExampleGenerator exampleGenerator, Collection<MetaRefTag> tags)
     {
         super(root);
         this.exampleGenerator = exampleGenerator;
         examples = exampleGenerator.getStringExamples();
         floatExamples = exampleGenerator.getFloatExamples();
+        
+        //create index of tags
         assignedTags = new HashMap<>();
-        tagIriBase = root.getAreaTree().getIri().getLocalName();
+        for (var tag : tags)
+            assignedTags.put(tag.getExample(), tag);
     }
 
     public Collection<MetaRefTag> getAssignedTags()
@@ -60,8 +63,6 @@ public class MetadataChunksExtractor extends ChunksSource
     @Override
     public List<TextChunk> getTextChunks()
     {
-        assignedTags.clear();
-        tagIdCnt = 1;
         final List<TextChunk> dest = new ArrayList<>(100);
         createChunksForSubtree(this.getRoot(), dest);
         return dest;
@@ -148,14 +149,9 @@ public class MetadataChunksExtractor extends ChunksSource
         chunk.setText(example.getText());
         MetaRefTag tag = assignedTags.get(example);
         if (tag == null)
-        {
-            final var tagName = example.getPredicate().getLocalName() + tagIdCnt;
-            final var tagIri = Values.iri(RESOURCE.NAMESPACE, tagIriBase + "-tag-meta--" + tagName); 
-            tag = new MetaRefTag(tagIri, tagName, example);
-            assignedTags.put(example, tag);
-            tagIdCnt++;
-        }
-        chunk.addTag(tag, 0.95f);
+            log.warn("No tag found for example {}", example);
+        else
+            chunk.addTag(tag, 0.95f);
         chunk.setName("<chunk:" + example.getPredicate().getLocalName() + "> " + example.getText());
 
         return chunk;

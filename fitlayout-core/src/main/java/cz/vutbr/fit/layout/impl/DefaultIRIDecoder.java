@@ -17,6 +17,7 @@ import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import cz.vutbr.fit.layout.api.IRIDecoder;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.FL;
+import cz.vutbr.fit.layout.ontology.MAPPING;
 import cz.vutbr.fit.layout.ontology.SEGM;
 
 
@@ -44,6 +45,7 @@ public class DefaultIRIDecoder implements IRIDecoder
         addPrefix("rdfs", RDFS.NAMESPACE);
         addPrefix("box", BOX.NAMESPACE);
         addPrefix("segm", SEGM.NAMESPACE);
+        addPrefix("map", MAPPING.NAMESPACE);
         addPrefix("fl", FL.NAMESPACE);
     }
     

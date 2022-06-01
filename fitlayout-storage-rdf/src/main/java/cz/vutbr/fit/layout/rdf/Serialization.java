@@ -14,6 +14,9 @@ import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.model.vocabulary.RDFS;
+import org.eclipse.rdf4j.model.vocabulary.XSD;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryResult;
@@ -27,6 +30,11 @@ import org.eclipse.rdf4j.rio.helpers.JSONLDSettings;
 
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
+import cz.vutbr.fit.layout.ontology.BOX;
+import cz.vutbr.fit.layout.ontology.FL;
+import cz.vutbr.fit.layout.ontology.MAPPING;
+import cz.vutbr.fit.layout.ontology.RESOURCE;
+import cz.vutbr.fit.layout.ontology.SEGM;
 
 /**
  * 
@@ -88,13 +96,14 @@ public class Serialization
     {
         // Default namespaces used for exports: the segm and box namespaces are renamed
         // to 'b' and 'a' and a special 'r' prefix is used for resources.
-        writer.handleNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        writer.handleNamespace("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-        writer.handleNamespace("xsd", "http://www.w3.org/2001/XMLSchema#");
-        writer.handleNamespace("b", "http://fitlayout.github.io/ontology/render.owl#");
-        writer.handleNamespace("a", "http://fitlayout.github.io/ontology/segmentation.owl#");
-        writer.handleNamespace("fl", "http://fitlayout.github.io/ontology/fitlayout.owl#");
-        writer.handleNamespace("r", "http://fitlayout.github.io/resource/");
+        writer.handleNamespace("rdf", RDF.NAMESPACE);
+        writer.handleNamespace("rdfs", RDFS.NAMESPACE);
+        writer.handleNamespace("xsd", XSD.NAMESPACE);
+        writer.handleNamespace("b", BOX.NAMESPACE);
+        writer.handleNamespace("a", SEGM.NAMESPACE);
+        writer.handleNamespace("map", MAPPING.NAMESPACE);
+        writer.handleNamespace("fl", FL.NAMESPACE);
+        writer.handleNamespace("r", RESOURCE.NAMESPACE);
     }
     
     public static RDFWriter createRioWriterJsonLD(OutputStream os) throws RDFHandlerException

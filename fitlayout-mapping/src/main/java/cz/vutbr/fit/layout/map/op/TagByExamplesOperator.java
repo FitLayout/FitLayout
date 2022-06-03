@@ -16,13 +16,14 @@ import org.slf4j.LoggerFactory;
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.impl.BaseOperator;
 import cz.vutbr.fit.layout.map.Example;
+import cz.vutbr.fit.layout.map.ExampleMatcher;
 import cz.vutbr.fit.layout.map.MetaRefTag;
 import cz.vutbr.fit.layout.map.MetadataExampleGenerator;
 import cz.vutbr.fit.layout.map.MetadataTagManager;
+import cz.vutbr.fit.layout.map.TextUtils;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
-import cz.vutbr.fit.layout.rdf.model.RDFArea;
 
 /**
  * Tags the areas that correspond to the occurrences of examples obtained from page metadata 
@@ -97,33 +98,46 @@ public class TagByExamplesOperator extends BaseOperator
         for (var tag : tags)
             assignedTags.put(tag.getExample(), tag);
 
-        var mapping = gen.getStringExamples();
-        //log.info("Metadata context IRI: {}", metadataContextIri);
-        //log.info("Mapping: {}", mapping);
-        
-        recursiveMapOcurrences(root, mapping, assignedTags);
+        ExampleMatcher matcher = new ExampleMatcher(gen);
+        recursiveMapOcurrences(root, matcher, assignedTags);
     }
 
-    private void recursiveMapOcurrences(Area root, Map<String, List<Example>> mapping, Map<Example, MetaRefTag> assignedTags)
+    private boolean recursiveMapOcurrences(Area root, ExampleMatcher matcher, Map<Example, MetaRefTag> assignedTags)
     {
-        final String text = MetadataExampleGenerator.normalizeText(root.getText());
-        final List<Example> examples = mapping.get(text);
-        if (examples != null)
-        {
-            for (Example example : examples)
-            {
-                final MetaRefTag tag = assignedTags.get(example);
-                if (tag == null)
-                    log.warn("No tag found for example {}", example);
-                else
-                    root.addTag(tag, 0.95f);
-            }
-        }
+        if (root.toString().contains("h1c"))
+            System.out.println("jo!");
+        
+        boolean childrenMatched = false;
         for (Area child : root.getChildren())
         {
-            if (child instanceof RDFArea)
-                recursiveMapOcurrences(child, mapping, assignedTags);
+            childrenMatched |= recursiveMapOcurrences(child, matcher, assignedTags);
+        }
+
+        if (childrenMatched)
+        {
+            // some children matched, do not match this one anymore
+            return true; 
+        }
+        else
+        {
+            // no children matched, try this node
+            return matcher.match(TextUtils.getText(root),
+                    (mappedExamples) -> this.assignTagsForExamples(root, mappedExamples, assignedTags));
         }
     }
+
+    private void assignTagsForExamples(Area root, List<Example> examples,
+            Map<Example, MetaRefTag> assignedTags)
+    {
+        for (Example example : examples)
+        {
+            final MetaRefTag tag = assignedTags.get(example);
+            if (tag == null)
+                log.warn("No tag found for example {}", example);
+            else
+                root.addTag(tag, 0.95f);
+        }
+    }
+    
 
 }

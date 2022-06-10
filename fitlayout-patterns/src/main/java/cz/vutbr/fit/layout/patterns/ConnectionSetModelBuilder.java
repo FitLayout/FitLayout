@@ -3,30 +3,26 @@
  *
  * Created on 27. 12. 2021, 19:41:27 by burgetr
  */
-package cz.vutbr.fit.layout.rdf;
+package cz.vutbr.fit.layout.patterns;
 
-import java.util.Set;
+import java.util.Collection;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
-import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaConnection;
-import cz.vutbr.fit.layout.model.Artifact;
-import cz.vutbr.fit.layout.model.ConnectionSet;
 import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.TextChunk;
-import cz.vutbr.fit.layout.ontology.BOX;
-import cz.vutbr.fit.layout.ontology.SEGM;
-import cz.vutbr.fit.layout.rdf.model.RDFConnectionSet;
+import cz.vutbr.fit.layout.rdf.IRIFactory;
+import cz.vutbr.fit.layout.rdf.ModelBuilderBase;
 
 /**
  * 
  * @author burgetr
  */
-public class ConnectionSetModelBuilder extends ModelBuilderBase implements ModelBuilder
+public class ConnectionSetModelBuilder extends ModelBuilderBase
 {
 
     public ConnectionSetModelBuilder(IRIFactory iriFactory)
@@ -34,37 +30,14 @@ public class ConnectionSetModelBuilder extends ModelBuilderBase implements Model
         super(iriFactory);
     }
 
-    @Override
-    public Model createGraph(Artifact artifact)
-    {
-        return createModel((ConnectionSet) artifact, artifact.getIri());
-    }
-    
-    //=========================================================================
-
-    private Model createModel(ConnectionSet cset, IRI csetIri) 
+    public Model createModel(IRI artifactIri, Collection<AreaConnection> conns) 
     {
         final Model graph = new LinkedHashModel();
-        
-        addArtifactData(graph, cset);
-        graph.add(csetIri, BOX.hasSource, cset.getSourceIri());
-        if (cset.getPageIri() != null)
-            graph.add(csetIri, SEGM.hasSourcePage, cset.getPageIri());
-        
-        addConnections(cset.getSourceIri(), cset.getAreaConnections(), graph);
-        
-        // additional RDF properties
-        if (cset instanceof RDFConnectionSet)
-        {
-            final Set<Statement> toadd = ((RDFConnectionSet) cset).getAdditionalStatements();
-            if (toadd != null)
-                graph.addAll(toadd);
-        }
-        
+        addConnections(artifactIri, conns, graph);
         return graph;
     }
 
-    private void addConnections(IRI sourceIri, Set<AreaConnection> conns, Model graph)
+    private void addConnections(IRI sourceIri, Collection<AreaConnection> conns, Model graph)
     {
         for (AreaConnection con : conns)
             addConnection(sourceIri, con, graph);

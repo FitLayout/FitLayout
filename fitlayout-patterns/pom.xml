@@ -32,6 +32,10 @@
 			<groupId>cz.vutbr.fit.layout</groupId>
 			<artifactId>fitlayout-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>cz.vutbr.fit.layout</groupId>
+			<artifactId>fitlayout-storage-rdf</artifactId>
+		</dependency>
 	</dependencies>
 
 </project>

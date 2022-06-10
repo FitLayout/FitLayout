@@ -3,8 +3,9 @@
  *
  * Created on 27. 12. 2021, 20:48:17 by burgetr
  */
-package cz.vutbr.fit.layout.rdf;
+package cz.vutbr.fit.layout.patterns;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,17 +21,18 @@ import cz.vutbr.fit.layout.model.AreaConnection;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Relation;
-import cz.vutbr.fit.layout.ontology.FL;
+import cz.vutbr.fit.layout.rdf.IRIFactory;
+import cz.vutbr.fit.layout.rdf.ModelLoaderBase;
+import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
 import cz.vutbr.fit.layout.rdf.model.RDFAreaTree;
 import cz.vutbr.fit.layout.rdf.model.RDFArtifact;
 import cz.vutbr.fit.layout.rdf.model.RDFChunkSet;
-import cz.vutbr.fit.layout.rdf.model.RDFConnectionSet;
 
 /**
  * 
  * @author burgetr
  */
-public class ConnectionSetModelLoader extends ModelLoaderBase implements ModelLoader
+public class ConnectionSetModelLoader extends ModelLoaderBase
 {
     private static Logger log = LoggerFactory.getLogger(ConnectionSetModelLoader.class);
 
@@ -39,31 +41,18 @@ public class ConnectionSetModelLoader extends ModelLoaderBase implements ModelLo
         super(iriFactory);
     }
 
-    @Override
-    public Artifact loadArtifact(IRI artifactIri, RDFArtifactRepository artifactRepo) throws RepositoryException
-    {
-        return constructConnectionSet(artifactRepo, artifactIri);
-    }
-    
-    //================================================================================================
-    
-    private RDFConnectionSet constructConnectionSet(RDFArtifactRepository artifactRepo, IRI csetIri) throws RepositoryException
+    public Collection<AreaConnection> constructConnectionSet(IRI csetIri, RDFArtifactRepository artifactRepo) throws RepositoryException
     {
         Model artifactModel = artifactRepo.getStorage().getSubjectModel(csetIri);
         if (artifactModel.size() > 0)
         {
-            ConnectionSetInfo csetInfo = new ConnectionSetInfo(artifactModel, csetIri);
-            IRI parentIri = getPredicateIriValue(artifactModel, csetIri, FL.hasParentArtifact);
-            RDFConnectionSet cset = new RDFConnectionSet(parentIri);
-            csetInfo.applyToConnectionSet(cset);
             // load source artifact
-            Artifact sourceArtifact = artifactRepo.getArtifact(cset.getSourceIri());
+            Artifact sourceArtifact = artifactRepo.getArtifact(csetIri);
             // load connections data from a complete context model
             Model completeModel = artifactRepo.getStorage().getContextModel(csetIri);
             Set<AreaConnection> conns = new HashSet<>();
             loadConnections(completeModel, csetIri, sourceArtifact, conns);
-            cset.setAreaConnections(conns);
-            return cset;
+            return conns;
         }
         else
             return null;

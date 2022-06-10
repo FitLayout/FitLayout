@@ -6,6 +6,7 @@
 package cz.vutbr.fit.layout.patterns;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,13 +16,11 @@ import org.eclipse.rdf4j.model.IRI;
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.BaseArtifactService;
-import cz.vutbr.fit.layout.impl.DefaultConnectionSet;
+import cz.vutbr.fit.layout.model.AreaConnection;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.ChunkSet;
-import cz.vutbr.fit.layout.model.ConnectionSet;
 import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Page;
-import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.SEGM;
 
 /**
@@ -69,7 +68,13 @@ public class TextChunkConnectionProvider extends BaseArtifactService
     @Override
     public IRI getProduces()
     {
-        return BOX.ConnectionSet;
+        return null;
+    }
+
+    @Override
+    public String getCategory()
+    {
+        return "Relations";
     }
 
     @Override
@@ -82,7 +87,11 @@ public class TextChunkConnectionProvider extends BaseArtifactService
             {
                 Artifact page = getServiceManager().getArtifactRepository().getArtifact(cset.getPageIri());
                 if (page != null && page instanceof Page)
-                    return extractConnections(cset, (Page) page);
+                {
+                    extractConnections(cset, (Page) page);
+                    //TODO save
+                    return input;
+                }
                 else
                     throw new ServiceException("Couldn't fetch source page");
             }
@@ -93,19 +102,12 @@ public class TextChunkConnectionProvider extends BaseArtifactService
             throw new ServiceException("Source artifact not specified or not a chunk set");
     }
 
-    public ConnectionSet extractConnections(ChunkSet input, Page page)
+    public Collection<AreaConnection> extractConnections(ChunkSet input, Page page)
     {
         Set<ContentRect> chunks = new HashSet<>(input.getTextChunks());
         RelationAnalyzer ra = new RelationAnalyzerSymmetric(page, chunks);
         ra.extractConnections();
-        
-        DefaultConnectionSet ret = new DefaultConnectionSet(input.getIri());
-        ret.setAreaConnections(ra.getConnections());
-        ret.setPageIri(page.getIri());
-        ret.setLabel("Relations");
-        ret.setCreator(getId());
-        ret.setCreatorParams(getParamString());
-        return ret;
+        return ra.getConnections();
     }
     
 

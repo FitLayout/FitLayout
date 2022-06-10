@@ -142,17 +142,6 @@ public class BOX {
 	public static final IRI color;
 
 	/**
-	 * ConnectionSet
-	 * <p>
-	 * {@code http://fitlayout.github.io/ontology/render.owl#ConnectionSet}.
-	 * <p>
-	 * A set of named area connections.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#ConnectionSet">ConnectionSet</a>
-	 */
-	public static final IRI ConnectionSet;
-
-	/**
 	 * ContainerBox
 	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/render.owl#ContainerBox}.
@@ -325,17 +314,6 @@ public class BOX {
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#hasRightBorder">hasRightBorder</a>
 	 */
 	public static final IRI hasRightBorder;
-
-	/**
-	 * hasSource
-	 * <p>
-	 * {@code http://fitlayout.github.io/ontology/render.owl#hasSource}.
-	 * <p>
-	 * Assigns a source artifact to a connection set.
-	 *
-	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#hasSource">hasSource</a>
-	 */
-	public static final IRI hasSource;
 
 	/**
 	 * hasTopBorder
@@ -566,7 +544,6 @@ public class BOX {
 		bounds = factory.createIRI(BOX.NAMESPACE, "bounds");
 		Box = factory.createIRI(BOX.NAMESPACE, "Box");
 		color = factory.createIRI(BOX.NAMESPACE, "color");
-		ConnectionSet = factory.createIRI(BOX.NAMESPACE, "ConnectionSet");
 		ContainerBox = factory.createIRI(BOX.NAMESPACE, "ContainerBox");
 		containsObject = factory.createIRI(BOX.NAMESPACE, "containsObject");
 		contentBounds = factory.createIRI(BOX.NAMESPACE, "contentBounds");
@@ -585,7 +562,6 @@ public class BOX {
 		hasBottomBorder = factory.createIRI(BOX.NAMESPACE, "hasBottomBorder");
 		hasLeftBorder = factory.createIRI(BOX.NAMESPACE, "hasLeftBorder");
 		hasRightBorder = factory.createIRI(BOX.NAMESPACE, "hasRightBorder");
-		hasSource = factory.createIRI(BOX.NAMESPACE, "hasSource");
 		hasTopBorder = factory.createIRI(BOX.NAMESPACE, "hasTopBorder");
 		height = factory.createIRI(BOX.NAMESPACE, "height");
 		htmlTagName = factory.createIRI(BOX.NAMESPACE, "htmlTagName");

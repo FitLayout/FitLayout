@@ -8,7 +8,7 @@
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-    <owl:Ontology rdf:about="http://fitlayout.github.io/ontology/mapping.owl">
+    <owl:Ontology rdf:about="http://fitlayout.github.io/ontology/mapping.owl#">
         <owl:imports rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#"/>
         <dc:creator>Radek Burget</dc:creator>
         <dc:description>An ontology for mapping visual areas to ontological instances and properties.</dc:description>

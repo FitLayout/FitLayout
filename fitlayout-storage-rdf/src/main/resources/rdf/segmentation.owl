@@ -132,6 +132,7 @@
                 <owl:unionOf rdf:parseType="Collection">
                     <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
                     <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea"/>
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#TextChunk"/>
                 </owl:unionOf>
             </owl:Class>
         </rdfs:domain>

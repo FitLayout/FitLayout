@@ -15,7 +15,6 @@ import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
-import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.model.AreaConnection;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.ChunkSet;
@@ -27,7 +26,7 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  * 
  * @author burgetr
  */
-public class TextChunkConnectionProvider extends BaseArtifactService
+public class TextChunkConnectionProvider extends ConnectionSetArtifactService
 {
 
     public TextChunkConnectionProvider()
@@ -88,9 +87,9 @@ public class TextChunkConnectionProvider extends BaseArtifactService
                 Artifact page = getServiceManager().getArtifactRepository().getArtifact(cset.getPageIri());
                 if (page != null && page instanceof Page)
                 {
-                    extractConnections(cset, (Page) page);
-                    //TODO save
-                    return input;
+                    final var conns = extractConnections(cset, (Page) page);
+                    saveConnections(input.getIri(), conns);
+                    return null; // no new artifact created
                 }
                 else
                     throw new ServiceException("Couldn't fetch source page");

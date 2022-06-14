@@ -13,7 +13,6 @@ import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
-import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaConnection;
 import cz.vutbr.fit.layout.model.AreaTree;
@@ -26,7 +25,7 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  * 
  * @author burgetr
  */
-public class AreaConnectionProvider extends BaseArtifactService
+public class AreaConnectionProvider extends ConnectionSetArtifactService
 {
 
     public AreaConnectionProvider()
@@ -87,9 +86,9 @@ public class AreaConnectionProvider extends BaseArtifactService
                 Artifact page = getServiceManager().getArtifactRepository().getArtifact(atree.getPageIri());
                 if (page != null && page instanceof Page)
                 {
-                    extractConnections(atree, (Page) page);
-                    // TODO save
-                    return input;
+                    final var conns = extractConnections(atree, (Page) page);
+                    saveConnections(input.getIri(), conns);
+                    return null;
                 }
                 else
                     throw new ServiceException("Couldn't fetch source page");

@@ -15,12 +15,14 @@ import org.eclipse.rdf4j.rio.RDFHandlerException;
 import org.eclipse.rdf4j.rio.RDFParseException;
 import org.eclipse.rdf4j.rio.RDFParser;
 import org.eclipse.rdf4j.rio.Rio;
+import org.eclipse.rdf4j.rio.helpers.BasicParserSettings;
 import org.eclipse.rdf4j.rio.helpers.StatementCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Metadata;
+import cz.vutbr.fit.layout.ontology.RESOURCE;
 
 /**
  * Functions for extracting RDF metadata from source objects.
@@ -57,6 +59,7 @@ public class MetadataExtractor
     {
         RDFParser rdfParser = Rio.createParser(RDFFormat.JSONLD);
         rdfParser.setRDFHandler(new StatementCollector(model));
+        rdfParser.getParserConfig().set(BasicParserSettings.SKOLEMIZE_ORIGIN, RESOURCE.NAMESPACE);
         try
         {
             rdfParser.parse(new StringReader(src));

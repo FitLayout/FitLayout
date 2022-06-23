@@ -37,6 +37,7 @@
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree"/>
+        <rdfs:comment>Assigns an AreaTree to an Area.</rdfs:comment>
         <rdfs:label>belongsTo</rdfs:label>
     </owl:ObjectProperty>
     
@@ -48,7 +49,19 @@
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#TextChunk"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#ChunkSet"/>
+        <rdfs:comment>Assigns a ChunkSet to a TextChunk.</rdfs:comment>
         <rdfs:label>belongsToChunkSet</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#belongsToLogicalTree -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#belongsToLogicalTree">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalArea"/>
+        <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#LogicalAreaTree"/>
+        <rdfs:comment>Assigns the owning LogicalAreaTree to a LogicalArea.</rdfs:comment>
+        <rdfs:label>belongsToLogicalTree</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -164,6 +177,24 @@
     
 
 
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#tagSupport -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#tagSupport">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#TextChunk"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:comment>Assigns a node that refers to a tag and the assigned support.</rdfs:comment>
+        <rdfs:label>tagSupport</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#tagger -->
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#tagger">
@@ -204,16 +235,6 @@
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
         <rdfs:label>support</rdfs:label>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://fitlayout.github.io/ontology/segmentation.owl#tagSupport -->
-
-    <owl:DatatypeProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#tagSupport">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
-        <rdfs:label>tagSupport</rdfs:label>
     </owl:DatatypeProperty>
     
 

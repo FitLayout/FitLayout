@@ -57,7 +57,7 @@ public class BOX {
 	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/render.owl#belongsTo}.
 	 * <p>
-	 * Assigns an owning page to a rectangle
+	 * Assigns an owning page to a box
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/render.owl#belongsTo">belongsTo</a>
 	 */

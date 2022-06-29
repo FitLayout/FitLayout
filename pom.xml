@@ -56,10 +56,10 @@
 		<module>fitlayout-segm-bcs</module>
 		<module>fitlayout-text</module>
 		<module>fitlayout-patterns</module>
+		<module>fitlayout-mapping</module>
 		<module>all</module>
 		<!-- for maven Central deployment it is important that bom is the last module -->
 		<module>bom</module>
-    <module>fitlayout-mapping</module>
   </modules>
 
 	<build>
@@ -186,6 +186,11 @@
 			<dependency>
 				<groupId>cz.vutbr.fit.layout</groupId>
 				<artifactId>fitlayout-patterns</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>cz.vutbr.fit.layout</groupId>
+				<artifactId>fitlayout-mapping</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 

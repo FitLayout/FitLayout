@@ -10,6 +10,8 @@ import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.api.ServiceManager;
 import cz.vutbr.fit.layout.bcs.BCSProvider;
 import cz.vutbr.fit.layout.cssbox.CSSBoxTreeProvider;
+import cz.vutbr.fit.layout.map.chunks.MetadataTextChunksProvider;
+import cz.vutbr.fit.layout.map.op.TagByExamplesOperator;
 import cz.vutbr.fit.layout.patterns.AreaConnectionProvider;
 import cz.vutbr.fit.layout.patterns.TextChunkConnectionProvider;
 import cz.vutbr.fit.layout.provider.OperatorWrapperProvider;
@@ -74,6 +76,7 @@ public class FLConfig
         addAreaTreeOperator(sm, new GroupByDOMOperator());
         addAreaTreeOperator(sm, new HomogeneousLeafOperator());
         
+        //text module when the tags are configured in the repo metadata
         if (repo != null && repo instanceof RDFArtifactRepository)
         {
             RDFTaggerConfig tc = new RDFTaggerConfig((RDFArtifactRepository) repo);
@@ -83,6 +86,12 @@ public class FLConfig
             TagEntitiesOperator tagOp = new TagEntitiesOperator();
             tagOp.setTaggers(tc.getTaggers());
             addAreaTreeOperator(sm, tagOp);
+        }
+        
+        //metadata tagging
+        if (repo != null)
+        {
+            addAreaTreeOperator(sm, new TagByExamplesOperator());
         }
 
         //text module
@@ -95,6 +104,9 @@ public class FLConfig
         TagEntitiesOperator tagOp = new TagEntitiesOperator();
         tagOp.setTaggers(tagConfig.getTaggers());
         addAreaTreeOperator(sm, tagOp);*/
+        
+        //page metadata-based text chunks
+        sm.addArtifactService(new MetadataTextChunksProvider());
         
         //patterns
         sm.addArtifactService(new AreaConnectionProvider());

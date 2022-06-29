@@ -109,6 +109,15 @@ public abstract class BaseParametrizedOperation extends BaseService implements P
                     m.invoke(this, n);
                     return true;
                 } catch (NumberFormatException e) {
+                } catch (NoSuchMethodException e) {
+                }
+                //try the boolean version
+                try {
+                    boolean b = Boolean.parseBoolean(value.toString());
+                    m = getClass().getMethod(sname, boolean.class);
+                    m.invoke(this, b);
+                    return true;
+                } catch (NoSuchMethodException e) {
                 }
             }
             return true;

@@ -21,6 +21,7 @@ import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.tools.cmd.Batch;
+import cz.vutbr.fit.layout.tools.cmd.Clear;
 import cz.vutbr.fit.layout.tools.cmd.Dump;
 import cz.vutbr.fit.layout.tools.cmd.Export;
 import cz.vutbr.fit.layout.tools.cmd.Import;
@@ -51,7 +52,8 @@ import picocli.CommandLine.Command;
                    Query.class,
                    Batch.class,
                    Import.class,
-                   Dump.class},
+                   Dump.class,
+                   Clear.class},
     footer = "Use COMMAND -h for getting usage information on the individual commands.")
 public class Cli
 {

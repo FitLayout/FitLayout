@@ -34,9 +34,9 @@
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#belongsTo">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#RectArea"/>
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#Box"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/render.owl#Page"/>
-        <rdfs:comment>Assigns an owning page to a rectangle</rdfs:comment>
+        <rdfs:comment>Assigns an owning page to a box</rdfs:comment>
         <rdfs:label>belongsTo</rdfs:label>
     </owl:ObjectProperty>
     
@@ -134,18 +134,6 @@
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#RectArea"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/render.owl#Border"/>
         <rdfs:label>hasRightBorder</rdfs:label>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://fitlayout.github.io/ontology/render.owl#hasSource -->
-
-    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/render.owl#hasSource">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/render.owl#ConnectionSet"/>
-        <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
-        <rdfs:comment>Assigns a source artifact to a connection set.</rdfs:comment>
-        <rdfs:label>hasSource</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -631,17 +619,6 @@
     <owl:Class rdf:about="http://fitlayout.github.io/ontology/render.owl#Box">
         <rdfs:subClassOf rdf:resource="http://fitlayout.github.io/ontology/render.owl#RectArea"/>
         <rdfs:label>Box</rdfs:label>
-    </owl:Class>
-    
-
-
-    <!-- http://fitlayout.github.io/ontology/render.owl#ConnectionSet -->
-
-    <owl:Class rdf:about="http://fitlayout.github.io/ontology/render.owl#ConnectionSet">
-        <rdfs:subClassOf rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
-        <owl:disjointWith rdf:resource="http://fitlayout.github.io/ontology/render.owl#Page"/>
-        <rdfs:comment>A set of named area connections.</rdfs:comment>
-        <rdfs:label>ConnectionSet</rdfs:label>
     </owl:Class>
     
 

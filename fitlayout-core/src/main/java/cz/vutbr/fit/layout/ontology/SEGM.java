@@ -48,6 +48,8 @@ public class SEGM {
 	 * belongsTo
 	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#belongsTo}.
+	 * <p>
+	 * Assigns an AreaTree to an Area.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#belongsTo">belongsTo</a>
 	 */
@@ -57,10 +59,23 @@ public class SEGM {
 	 * belongsToChunkSet
 	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#belongsToChunkSet}.
+	 * <p>
+	 * Assigns a ChunkSet to a TextChunk.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#belongsToChunkSet">belongsToChunkSet</a>
 	 */
 	public static final IRI belongsToChunkSet;
+
+	/**
+	 * belongsToLogicalTree
+	 * <p>
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#belongsToLogicalTree}.
+	 * <p>
+	 * Assigns the owning LogicalAreaTree to a LogicalArea.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#belongsToLogicalTree">belongsToLogicalTree</a>
+	 */
+	public static final IRI belongsToLogicalTree;
 
 	/**
 	 * ChunkSet
@@ -224,6 +239,8 @@ public class SEGM {
 	 * tagSupport
 	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#tagSupport}.
+	 * <p>
+	 * Assigns a node that refers to a tag and the assigned support.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#tagSupport">tagSupport</a>
 	 */
@@ -266,6 +283,7 @@ public class SEGM {
 		AreaTree = factory.createIRI(SEGM.NAMESPACE, "AreaTree");
 		belongsTo = factory.createIRI(SEGM.NAMESPACE, "belongsTo");
 		belongsToChunkSet = factory.createIRI(SEGM.NAMESPACE, "belongsToChunkSet");
+		belongsToLogicalTree = factory.createIRI(SEGM.NAMESPACE, "belongsToLogicalTree");
 		ChunkSet = factory.createIRI(SEGM.NAMESPACE, "ChunkSet");
 		containsArea = factory.createIRI(SEGM.NAMESPACE, "containsArea");
 		containsBox = factory.createIRI(SEGM.NAMESPACE, "containsBox");

@@ -41,7 +41,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<rdf4j.version>3.7.7</rdf4j.version>
+		<rdf4j.version>4.0.4</rdf4j.version>
 	</properties>
 
 	<modules>

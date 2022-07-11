@@ -12,6 +12,7 @@ import org.eclipse.rdf4j.repository.RepositoryException;
 import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
 import cz.vutbr.fit.layout.tools.CliCommand;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 /**
@@ -28,10 +29,15 @@ public class UseRepository extends CliCommand implements Callable<Integer>
 
     enum RepositoryType { memory, local, http };
     
+    @Option(order = 100, names = {"-h", "--help"}, usageHelp = true, description = "print help")
+    protected boolean help;
+    
+    @Option(order = 1, names = {"-s", "--suffix"}, description = "Repository path suffix to be used with the local repository (to distinguish multiple local repositories)")
+    protected String pathSuffix;
+    
     @Parameters(arity = "1", index = "0", description = "Repository type: ${COMPLETION-CANDIDATES}")
     protected RepositoryType repositoryType;
 
-    
     @Override
     public Integer call() throws Exception
     {
@@ -54,6 +60,8 @@ public class UseRepository extends CliCommand implements Callable<Integer>
     private RDFArtifactRepository createArtifactRepository()
     {
         String configPath = System.getProperty(KEY_PATH);
+        if (pathSuffix != null && configPath != null)
+            configPath = configPath + "-" + pathSuffix;
         String configServer = System.getProperty(KEY_SERVER);
         String configRepository = System.getProperty(KEY_REPOSITORY);
         RDFArtifactRepository storage = null;

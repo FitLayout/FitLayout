@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.rdf4j.IsolationLevels;
+import org.eclipse.rdf4j.common.transaction.IsolationLevels;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Model;
@@ -23,6 +23,7 @@ import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.XSD;
 import org.eclipse.rdf4j.query.BindingSet;
@@ -245,8 +246,19 @@ public class RDFStorage implements Closeable
      */
     public Model executeSafeQuery(String query) throws StorageException
     {
-        try {
-            return Repositories.graphQuery(repo, query, r -> QueryResults.asModel(r));
+        try (RepositoryConnection con = repo.getConnection()) {
+            //return Repositories.graphQuery(repo, query, r -> QueryResults.asModel(r)); // problems with multithreading
+            
+            con.begin(IsolationLevels.SERIALIZABLE);
+            GraphQueryResult graphResult = con.prepareGraphQuery(query).evaluate();
+            Model ret = new LinkedHashModel();
+            for (Statement st: graphResult)
+                ret.add(st);
+            graphResult.close();
+            con.commit();
+            return ret;
+
+            
         } catch (Exception e) {
             throw new StorageException(e);
         }
@@ -656,8 +668,26 @@ public class RDFStorage implements Closeable
     
     public long getNextSequenceValue(IRI sequenceIri) throws StorageException
     {
+        int tries = 100;
+        while (tries > 0)
+        {
+            // the sequence value fails if the transaction fails (e.g. conflict)
+            // give it 100 tries and re-throw the exception when it keeps failing
+            try {
+                return getNextSequenceValueUnsafe(sequenceIri);
+            } catch (StorageException e) {
+                tries--;
+                if (tries == 0)
+                    throw e;
+            }
+        }
+        return 0;
+    }
+    
+    private long getNextSequenceValueUnsafe(IRI sequenceIri) throws StorageException
+    {
         try (RepositoryConnection con = repo.getConnection()) {
-            con.begin(IsolationLevels.SERIALIZABLE); //TODO is this supported everywhere?
+            con.begin(IsolationLevels.SERIALIZABLE);
             long val = 0;
             RepositoryResult<Statement> result = con.getStatements(sequenceIri, RDF.VALUE, null, false);
             try {

@@ -65,7 +65,7 @@ public class Invoke extends CliCommand implements Callable<Integer>
     {
         
         ParametrizedOperation op = getCli().getServiceManager().findParmetrizedService(serviceId);
-        System.err.println("Invoke: " + op);
+        System.err.println("Invoke: " + op + " srcArt=" + srcArt);
         if (op != null)
         {
             if (sopts != null)

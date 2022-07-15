@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.rdf4j.common.transaction.IsolationLevel;
 import org.eclipse.rdf4j.common.transaction.IsolationLevels;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
@@ -240,26 +241,39 @@ public class RDFStorage implements Closeable
     }
     
     /**
-     * Executes an internal (safe) SPARQL graph query.
+     * Executes an internal (safe) SPARQL graph query in a default isolation level.
      * @param query the SPARQL query
      * @return a the resulting model
      * @throws StorageException
      */
     public Model executeSafeQuery(String query) throws StorageException
     {
+        return executeSafeQuery(query, IsolationLevels.SNAPSHOT_READ);
+    }
+
+    /**
+     * Executes an internal (safe) SPARQL graph query in a given transaction isolation level.
+     * @param query the SPARQL query
+     * @param isolationLevel the transaction isolation level or {@code null} when no transaction is required.
+     * @return a the resulting model
+     * @throws StorageException
+     */
+    public Model executeSafeQuery(String query, IsolationLevel isolationLevel) throws StorageException
+    {
         try (RepositoryConnection con = repo.getConnection()) {
             //return Repositories.graphQuery(repo, query, r -> QueryResults.asModel(r)); // problems with multithreading
             
-            con.begin(IsolationLevels.SERIALIZABLE);
+            if (isolationLevel != null)
+                con.begin(isolationLevel);
             GraphQueryResult graphResult = con.prepareGraphQuery(query).evaluate();
             Model ret = new LinkedHashModel();
             for (Statement st: graphResult)
                 ret.add(st);
             graphResult.close();
-            con.commit();
+            if (isolationLevel != null)
+                con.commit();
             return ret;
 
-            
         } catch (Exception e) {
             throw new StorageException(e);
         }

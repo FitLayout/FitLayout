@@ -171,7 +171,7 @@ public class LogicalAreaModelLoader extends ModelLoaderBase implements ModelLoad
                 + "?s segm:belongsTo <" + logicalTreeIri.stringValue() + "> " //TODO is belongsTo correct?
                 + "OPTIONAL { ?s box:documentOrder ?ord } "
                 + "} ORDER BY ?ord";
-        return artifactRepo.getStorage().executeSafeQuery(query);
+        return execArtifactReadQuery(artifactRepo, query);
     }
     
 }

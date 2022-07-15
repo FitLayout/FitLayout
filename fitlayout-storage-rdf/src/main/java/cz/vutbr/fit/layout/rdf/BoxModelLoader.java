@@ -341,7 +341,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                 + "?s box:belongsTo <" + String.valueOf(pageIri) + "> . "
                 + "OPTIONAL { ?s box:documentOrder ?ord } "
                 + "} ORDER BY ?ord";
-        return artifactRepo.getStorage().executeSafeQuery(query);
+        return execArtifactReadQuery(artifactRepo, query);
     }
 
     /**
@@ -360,7 +360,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                 + "?b box:belongsTo <" + String.valueOf(pageIri) + "> . "
                 + getDataPropertyUnion()
                 + "}";
-        return artifactRepo.getStorage().executeSafeQuery(query);
+        return execArtifactReadQuery(artifactRepo, query);
     }
     
     private String getDataPropertyUnion()

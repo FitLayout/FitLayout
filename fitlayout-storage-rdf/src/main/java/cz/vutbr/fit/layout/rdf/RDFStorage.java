@@ -39,6 +39,7 @@ import org.eclipse.rdf4j.query.Update;
 import org.eclipse.rdf4j.query.resultio.text.csv.SPARQLResultsCSVWriter;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
 import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.eclipse.rdf4j.repository.http.HTTPRepository;
 import org.eclipse.rdf4j.repository.sail.SailRepository;
@@ -375,9 +376,13 @@ public class RDFStorage implements Closeable
     public void add(IRI subj, IRI pred, IRI obj, IRI context)
     {
         try (RepositoryConnection con = repo.getConnection()) {
-            con.begin();
-            con.add(subj, pred, obj, context);
-            con.commit();
+            try {
+                con.begin();
+                con.add(subj, pred, obj, context);
+                con.commit();
+            } catch (RepositoryException e) {
+                con.rollback();
+            }
         } catch (Exception e) {
             throw new StorageException(e);
         }
@@ -409,9 +414,13 @@ public class RDFStorage implements Closeable
     public void insertGraph(Model graph) throws StorageException
     {
         try (RepositoryConnection con = repo.getConnection()) {
-            con.begin();
-            con.add(graph);
-            con.commit();
+            try {
+                con.begin();
+                con.add(graph);
+                con.commit();
+            } catch (RepositoryException e) {
+                con.rollback();
+            }
         } catch (Exception e) {
             throw new StorageException(e);
         }
@@ -426,9 +435,13 @@ public class RDFStorage implements Closeable
     public void insertGraph(Model graph, IRI contextIri) throws StorageException
     {
         try (RepositoryConnection con = repo.getConnection()) {
-            con.begin();
-            con.add(graph, contextIri);
-            con.commit();
+            try {
+                con.begin();
+                con.add(graph, contextIri);
+                con.commit();
+            } catch (RepositoryException e) {
+                con.rollback();
+            }
         } catch (Exception e) {
             throw new StorageException(e);
         }
@@ -687,26 +700,31 @@ public class RDFStorage implements Closeable
     private long getNextSequenceValueUnsafe(IRI sequenceIri) throws StorageException
     {
         try (RepositoryConnection con = repo.getConnection()) {
-            con.begin(IsolationLevels.SERIALIZABLE);
-            long val = 0;
-            RepositoryResult<Statement> result = con.getStatements(sequenceIri, RDF.VALUE, null, false);
             try {
-                if (result.hasNext())
-                {
-                    Statement statement = result.next();
-                    Value vval = statement.getObject();
-                    if (vval instanceof Literal)
-                        val = ((Literal) vval).longValue();
-                    con.remove(statement);
+                con.begin(IsolationLevels.SERIALIZABLE);
+                long val = 0;
+                RepositoryResult<Statement> result = con.getStatements(sequenceIri, RDF.VALUE, null, false);
+                try {
+                    if (result.hasNext())
+                    {
+                        Statement statement = result.next();
+                        Value vval = statement.getObject();
+                        if (vval instanceof Literal)
+                            val = ((Literal) vval).longValue();
+                        con.remove(statement);
+                    }
                 }
+                finally {
+                    result.close();
+                }
+                val++;
+                con.add(sequenceIri, RDF.VALUE, getValueFactory().createLiteral(val));
+                con.commit();
+                return val;
+            } catch (RepositoryException e) {
+                con.rollback();
+                throw new StorageException(e);
             }
-            finally {
-                result.close();
-            }
-            val++;
-            con.add(sequenceIri, RDF.VALUE, getValueFactory().createLiteral(val));
-            con.commit();
-            return val;
         }
         catch (Exception e) {
             throw new StorageException(e);

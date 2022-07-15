@@ -268,7 +268,11 @@ public class RDFArtifactRepository implements ArtifactRepository
         if (builder != null)
         {
             Model graph = builder.createGraph(artifact);
-            storage.insertGraph(graph, artifact.getIri());
+            try {
+                storage.insertGraph(graph, artifact.getIri());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             if (artifact.getMetadata() != null)
             {
                 final IRI metaIRI = getMetadataIRI(artifact.getIri());

@@ -43,6 +43,14 @@ public class UseRepository extends CliCommand implements Callable<Integer>
     {
         try {
             
+            // try to properly close an old repository if applicable
+            final var oldRepo = getCli().getArtifactRepository();
+            if (oldRepo != null && oldRepo instanceof RDFArtifactRepository)
+            {
+                ((RDFArtifactRepository) oldRepo).disconnect();
+            }
+            
+            // open the new repository
             RDFArtifactRepository repo = createArtifactRepository();
             getCli().setArtifactRepository(repo);
             

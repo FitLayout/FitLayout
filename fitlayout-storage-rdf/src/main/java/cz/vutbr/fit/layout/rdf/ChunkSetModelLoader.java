@@ -260,7 +260,7 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
                 + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
                 + "?s rdf:type segm:TextChunk . "
                 + "?s segm:belongsToChunkSet <" + chunkSetIri.stringValue() + "> }";
-        return artifactRepo.getStorage().executeSafeQuery(query);
+        return execArtifactReadQuery(artifactRepo, query);
     }
     
     private Model getChunkTagModelForSet(RDFArtifactRepository artifactRepo, IRI chunkSetIri) throws RepositoryException
@@ -271,7 +271,7 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
                 + "?a segm:belongsToChunkSet <" + chunkSetIri.stringValue() + "> . "
                 + getDataPropertyUnion(dataObjectProperties)
                 + "}";
-        return artifactRepo.getStorage().executeSafeQuery(query);
+        return execArtifactReadQuery(artifactRepo, query);
     }
 
 }

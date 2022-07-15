@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.rdf4j.common.transaction.IsolationLevels;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Model;
@@ -362,6 +363,13 @@ public abstract class ModelLoaderBase extends ModelTransformer
             ret.append("{?a ").append(p).append(" ?s}");
         }
         return ret.toString();
+    }
+    
+    //=================================================================================
+    
+    protected Model execArtifactReadQuery(RDFArtifactRepository artifactRepo, String query)
+    {
+        return artifactRepo.getStorage().executeSafeQuery(query, IsolationLevels.SNAPSHOT_READ);
     }
     
     //=================================================================================

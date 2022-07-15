@@ -274,7 +274,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                 + "?s segm:belongsTo <" + areaTreeIri.stringValue() + "> . "
                 + "OPTIONAL { ?s box:documentOrder ?ord } "
                 + "} ORDER BY ?ord";
-        return artifactRepo.getStorage().executeSafeQuery(query);
+        return execArtifactReadQuery(artifactRepo, query);
     }
     
     /**
@@ -293,7 +293,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
                 + "?a segm:belongsTo <" + areaTreeIri.stringValue() + "> . "
                 + getDataPropertyUnion(dataObjectProperties)
                 + "}";
-        return artifactRepo.getStorage().executeSafeQuery(query);
+        return execArtifactReadQuery(artifactRepo, query);
     }
     
 }

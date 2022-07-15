@@ -8,6 +8,7 @@ package cz.vutbr.fit.layout.tools.cmd;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -93,33 +94,30 @@ public class Batch extends CliCommand implements Callable<Integer>
         tasksToDo = tasks.size();
         tasksDone = 0;
         ExecutorService exec = Executors.newFixedThreadPool(threads);
-        try
+        
+        List<Future<Integer>> results = new ArrayList<>(tasks.size());
+        for (BatchTask task : tasks)
+            results.add(exec.submit(task));
+        exec.shutdown();
+        int index = 0;
+        for (Future<Integer> ft : results)
         {
-            List<Future<Integer>> results = exec.invokeAll(tasks);
-            int index = 0;
-            for (Future<Integer> ft : results)
-            {
-                try {
-                    ft.get(timeout, TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    ft.cancel(true);
-                    taskFinished(tasks.get(index), 2);
-                } catch (ExecutionException e) {
-                    ft.cancel(true);
-                    taskFinished(tasks.get(index), 3);
-                } catch (TimeoutException e) {
-                    ft.cancel(true);
-                    taskFinished(tasks.get(index), 2);
-                }
-                index++;
+            try {
+                ft.get(timeout, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                ft.cancel(true);
+                taskFinished(tasks.get(index), 2);
+            } catch (ExecutionException e) {
+                ft.cancel(true);
+                taskFinished(tasks.get(index), 3);
+            } catch (TimeoutException e) {
+                ft.cancel(true);
+                taskFinished(tasks.get(index), 2);
             }
-            return 0;
-        } catch (InterruptedException e) {
-            System.err.println("Task execution interrupted: " + e.getMessage());
-            return 1;
-        } finally {
-            exec.shutdown();
+            index++;
         }
+        
+        return 0;
     }
 
     private List<BatchTask> createTasks(String listFile, String cmdString)

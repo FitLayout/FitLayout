@@ -84,7 +84,7 @@ public class Batch extends CliCommand implements Callable<Integer>
         }
         List<String> cmdList = ArgumentTokenizer.tokenize(cmdString);
         String[] args = cmdList.toArray(new String[0]);
-        return getCli().execCommandLine(args);
+        return getCli().copy().execCommandLine(args);
     }
     
     private int iterateDataFile(String cmdString) throws IOException

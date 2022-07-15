@@ -72,6 +72,25 @@ public class Cli
         artifactRepository = new DefaultArtifactRepository();
     }
     
+    public Cli(ArtifactRepository repo)
+    {
+        artifactRepository = repo;
+    }
+    
+    /**
+     * Creates a sub-shell for parallel tasks. It shares the same artifact repository and initial
+     * initial values of the artifacts being processed.
+     * @return a new Cli instance for a sub-task
+     */
+    public Cli copy()
+    {
+        Cli ret = new Cli(this.artifactRepository);
+        ret.page = page;
+        ret.areaTree = areaTree;
+        ret.lastArtifact = lastArtifact;
+        return ret;
+    }
+    
     public ArtifactRepository getArtifactRepository()
     {
         return artifactRepository;

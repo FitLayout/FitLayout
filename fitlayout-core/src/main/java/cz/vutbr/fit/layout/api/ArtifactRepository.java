@@ -20,6 +20,13 @@ public interface ArtifactRepository
 {
 
     /**
+     * Checks if the repository should be treated as read-only. If true is returned, all modification
+     * operations such as adding or removing artifacts should fail with a StorageException.
+     * @return {@code true} when the repository is read-only, {@code false} otherwise. 
+     */
+    public boolean isReadOnly();
+    
+    /**
      * Obtains a list of all artifact IRIs in the repository.
      * @return The list of all artifacts.
      */

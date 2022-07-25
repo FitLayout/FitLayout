@@ -47,6 +47,7 @@ public class RDFArtifactRepository implements ArtifactRepository
     /** Required OWL resources containing the storage metadata */
     private static String[] owls = new String[] {"render.owl", "segmentation.owl", "fitlayout.owl", "mapping.owl"};
     
+    private boolean readOnly;
     private RDFStorage storage;
     private IRIFactory iriFactory;
     private RDFIRIDecoder iriDecoder;
@@ -56,6 +57,7 @@ public class RDFArtifactRepository implements ArtifactRepository
     
     public RDFArtifactRepository(RDFStorage storage)
     {
+        readOnly = false;
         this.storage = storage;
         iriFactory = new DefaultIRIFactory();
         iriDecoder = new RDFIRIDecoder();
@@ -78,6 +80,17 @@ public class RDFArtifactRepository implements ArtifactRepository
         return new RDFArtifactRepository(RDFStorage.createHTTP(serverUrl, repositoryId));
     }
     
+    @Override
+    public boolean isReadOnly()
+    {
+        return readOnly;
+    }
+
+    public void setReadOnly(boolean readOnly)
+    {
+        this.readOnly = readOnly;
+    }
+
     @Override
     public void disconnect()
     {
@@ -260,6 +273,9 @@ public class RDFArtifactRepository implements ArtifactRepository
     @Override
     public void addArtifact(Artifact artifact)
     {
+        if (isReadOnly())
+            throw new StorageException("Read-only repository");
+            
         if (artifact.getIri() == null)
             artifact.setIri(createArtifactIri(artifact));
         
@@ -295,6 +311,8 @@ public class RDFArtifactRepository implements ArtifactRepository
     @Override
     public void replaceArtifact(IRI artifactIri, Artifact artifact)
     {
+        if (isReadOnly())
+            throw new StorageException("Read-only repository");
         artifact.setIri(artifactIri);
         clearArtifact(artifactIri);
         addArtifact(artifact);
@@ -303,6 +321,8 @@ public class RDFArtifactRepository implements ArtifactRepository
     @Override
     public void removeArtifact(IRI artifactIri)
     {
+        if (isReadOnly())
+            throw new StorageException("Read-only repository");
         //clear the derived artifacts
         List<Artifact> derived = new ArrayList<>();
         findDerivedArtifacts(artifactIri, getArtifactInfo(), derived);
@@ -343,11 +363,15 @@ public class RDFArtifactRepository implements ArtifactRepository
     @Override
     public void clear()
     {
+        if (isReadOnly())
+            throw new StorageException("Read-only repository");
         storage.clear();
     }
     
     public void clearContext(IRI contextIri)
     {
+        if (isReadOnly())
+            throw new StorageException("Read-only repository");
         storage.clear(contextIri);
     }
 

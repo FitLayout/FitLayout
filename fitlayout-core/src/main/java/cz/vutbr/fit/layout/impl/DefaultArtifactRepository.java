@@ -44,6 +44,12 @@ public class DefaultArtifactRepository implements ArtifactRepository
     }
 
     @Override
+    public boolean isReadOnly()
+    {
+        return false;
+    }
+
+    @Override
     public Collection<IRI> getArtifactIRIs()
     {
         return repo.keySet();

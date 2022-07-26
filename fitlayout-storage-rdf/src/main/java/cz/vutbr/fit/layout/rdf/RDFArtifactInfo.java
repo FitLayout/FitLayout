@@ -35,6 +35,11 @@ public class RDFArtifactInfo extends ArtifactInfo
     
     public RDFArtifactInfo(Model model, IRI artifactIri) 
     {
+        this(model, artifactIri, true);
+    }
+    
+    public RDFArtifactInfo(Model model, IRI artifactIri, boolean useAdditionalStatements) 
+    {
         super(null); //the parent IRI is taken from the model below
         setIri(artifactIri);
         additionalStatements = new HashSet<>();
@@ -43,7 +48,10 @@ public class RDFArtifactInfo extends ArtifactInfo
             if (st.getSubject().equals(artifactIri))
             {
                 if (!processStatement(st))
-                    additionalStatements.add(st);
+                {
+                    if (useAdditionalStatements)
+                        additionalStatements.add(st);
+                }
             }
         }
     }

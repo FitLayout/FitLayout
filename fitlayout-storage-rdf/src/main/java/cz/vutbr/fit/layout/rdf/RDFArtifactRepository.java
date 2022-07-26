@@ -236,7 +236,7 @@ public class RDFArtifactRepository implements ArtifactRepository
             Model artifactModel = getStorage().getSubjectModel(iri);
             if (artifactModel.size() > 0)
             {
-                RDFArtifactInfo info = new RDFArtifactInfo(artifactModel, iri);
+                RDFArtifactInfo info = new RDFArtifactInfo(artifactModel, iri, false);
                 ret.add(info);
             }
         }

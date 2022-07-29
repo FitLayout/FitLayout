@@ -227,7 +227,34 @@ public class RDFArtifactRepository implements ArtifactRepository
     }
     
     @Override
-    public Collection<Artifact> getArtifactInfo()
+    public Collection<Artifact> getArtifactInfo() throws StorageException
+    {
+        try {
+            final String query = iriDecoder.declarePrefixes()
+                    + "SELECT DISTINCT ?pg ?type ?label ?time ?parent ?creator ?creatorParams\n"
+                    + "WHERE {\n"
+                    + "  ?pg rdf:type ?type .\n"
+                    + "  ?type rdfs:subClassOf fl:Artifact .\n"
+                    + "  ?pg rdfs:label ?label .\n"
+                    + "  ?pg fl:creator ?creator .\n"
+                    + "  ?pg fl:creatorParams ?creatorParams .\n"
+                    + "  OPTIONAL { ?pg fl:hasParentArtifact ?parent } .\n"
+                    + "  OPTIONAL { ?pg fl:createdOn ?time }\n"
+                    + "} ORDER BY ?time\n";
+            
+            List<BindingSet> data = storage.executeSafeTupleQuery(query);
+            List<Artifact> ret = new ArrayList<>(data.size());
+            for (BindingSet binding : data)
+            {
+                ret.add(new RDFArtifactInfo(binding));
+            }
+            return ret;
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    public Collection<Artifact> getArtifactInfoOld()
     {
         Collection<IRI> iris = getArtifactIRIs();
         List<Artifact> ret = new ArrayList<>(iris.size());

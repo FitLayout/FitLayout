@@ -15,6 +15,7 @@ import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
+import org.eclipse.rdf4j.query.BindingSet;
 
 import cz.vutbr.fit.layout.api.ArtifactInfo;
 import cz.vutbr.fit.layout.impl.BaseArtifact;
@@ -54,6 +55,21 @@ public class RDFArtifactInfo extends ArtifactInfo
                 }
             }
         }
+    }
+    
+    public RDFArtifactInfo(BindingSet binding)
+    {
+        super(null); //the parent IRI is taken from the bindings below
+        additionalStatements = new HashSet<>();
+        setIri((IRI) binding.getBinding("pg").getValue());
+        setArtifactType((IRI) binding.getBinding("type").getValue());
+        setLabel(binding.getBinding("label").getValue().stringValue());
+        setCreator(binding.getBinding("creator").getValue().stringValue());
+        setCreatorParams(binding.getBinding("creatorParams").getValue().stringValue());
+        if (binding.hasBinding("createdOn"))
+            setCreatedOn(((Literal) binding.getBinding("createdOn").getValue()).calendarValue().toGregorianCalendar().getTime());
+        if (binding.hasBinding("parent"))
+            setParentIri((IRI) binding.getBinding("parent").getValue());
     }
 
     public Set<Statement> getAdditionalStatements()

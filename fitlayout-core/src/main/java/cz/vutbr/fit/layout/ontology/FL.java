@@ -80,7 +80,7 @@ public class FL {
 	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#param}.
 	 * <p>
-	 * Service parameter value definition.
+	 * Service parameter name and value definition.
 	 *
 	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#param">param</a>
 	 */

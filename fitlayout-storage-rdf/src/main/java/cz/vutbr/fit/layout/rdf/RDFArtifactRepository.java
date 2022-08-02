@@ -226,6 +226,37 @@ public class RDFArtifactRepository implements ArtifactRepository
         }
     }
     
+    /**
+     * Gets the artifact IRIs for a source page only
+     * @param pageIri the source page IRI
+     * @return the list of artifact IRIs
+     * @throws StorageException
+     */
+    public Collection<IRI> getArtifactIRIs(IRI pageIri) throws StorageException
+    {
+        try {
+            final String query = iriDecoder.declarePrefixes()
+                    + "SELECT DISTINCT ?pg "
+                    + "WHERE {"
+                    + "  ?pg segm:hasSourcePage <" + pageIri.toString() + "> . "
+                    + "  ?pg rdf:type ?type . "
+                    + "  ?type rdfs:subClassOf fl:Artifact . "
+                    + "  OPTIONAL { ?pg fl:createdOn ?time } "
+                    + "} ORDER BY ?time";
+            
+            List<BindingSet> data = storage.executeSafeTupleQuery(query);
+            List<IRI> ret = new ArrayList<>(data.size());
+            for (BindingSet binding : data)
+            {
+                Binding b = binding.getBinding("pg");
+                ret.add((IRI) b.getValue());
+            }
+            return ret;
+        } catch (RDF4JException e) {
+            throw new StorageException(e);
+        }
+    }
+    
     @Override
     public Collection<Artifact> getArtifactInfo() throws StorageException
     {

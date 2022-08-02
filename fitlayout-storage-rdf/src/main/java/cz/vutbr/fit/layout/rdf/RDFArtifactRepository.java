@@ -210,7 +210,8 @@ public class RDFArtifactRepository implements ArtifactRepository
                     + "WHERE {"
                     + "  ?pg rdf:type ?type . "
                     + "  ?type rdfs:subClassOf fl:Artifact . "
-                    + "  OPTIONAL { ?pg fl:createdOn ?time } "
+                    + "  OPTIONAL { ?pg fl:createdOn ?ctime } "
+                    + "  bind(coalesce(?ctime, 0) as ?time) "
                     + "} ORDER BY ?time";
             
             List<BindingSet> data = storage.executeSafeTupleQuery(query);
@@ -241,7 +242,8 @@ public class RDFArtifactRepository implements ArtifactRepository
                     + "  ?pg segm:hasSourcePage <" + pageIri.toString() + "> . "
                     + "  ?pg rdf:type ?type . "
                     + "  ?type rdfs:subClassOf fl:Artifact . "
-                    + "  OPTIONAL { ?pg fl:createdOn ?time } "
+                    + "  OPTIONAL { ?pg fl:createdOn ?ctime } "
+                    + "  bind(coalesce(?ctime, 0) as ?time) "
                     + "} ORDER BY ?time";
             
             List<BindingSet> data = storage.executeSafeTupleQuery(query);

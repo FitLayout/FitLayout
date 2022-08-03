@@ -13,7 +13,7 @@
         <owl:imports rdf:resource="http://fitlayout.github.io/ontology/render.owl#"/>
         <dc:creator>Radek Burget</dc:creator>
         <dc:description>Document visual area (segmentation) ontology.</dc:description>
-        <dc:title>Document Visual Area Ontology</dc:title>
+        <dc:title>Visual Area Ontology</dc:title>
         <rdfs:comment>Document visual area (segmentation) ontology.</rdfs:comment>
         <owl:versionInfo>1.0.0</owl:versionInfo>
     </owl:Ontology>
@@ -130,7 +130,15 @@
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasSourcePage">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#AreaTree"/>
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#ChunkSet"/>
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#LogicalAreaTree"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/render.owl#Page"/>
         <rdfs:label>hasSourcePage</rdfs:label>
     </owl:ObjectProperty>

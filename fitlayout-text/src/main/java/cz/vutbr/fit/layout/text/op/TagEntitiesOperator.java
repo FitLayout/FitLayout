@@ -34,19 +34,19 @@ import cz.vutbr.fit.layout.text.tag.TreeTagger;
  */
 public class TagEntitiesOperator extends BaseOperator implements ScriptObject
 {
-    private static final String PARAM_PREFIX = "tag";
+    private static final String PARAM_PREFIX = "tag_";
 
     private static Logger log = LoggerFactory.getLogger(TagEntitiesOperator.class);
 
     private TreeTagger tagger;
     private Map<Tag, Tagger> usedTaggers;
-    private Set<String> disabledTaggers;
+    private Set<String> disabledTags;
 
     
     public TagEntitiesOperator()
     {
         usedTaggers = new HashMap<>();
-        disabledTaggers = new HashSet<>();
+        disabledTags = new HashSet<>();
     }
     
     @Override
@@ -77,9 +77,13 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
     @Override
     public List<Parameter> defineParams()
     {
-        List<Parameter> ret = new ArrayList<>(usedTaggers.size());
-        for (Tagger tagger : usedTaggers.values())
-            ret.add(new ParameterBoolean(PARAM_PREFIX + tagger.getName()));
+        final var definedTags = usedTaggers.keySet();
+        List<Parameter> ret = new ArrayList<>(definedTags.size());
+        for (Tag tag : definedTags)
+        {
+            String pname = tag.getName();
+            ret.add(new ParameterBoolean(PARAM_PREFIX + pname));
+        }
         return ret;
     }
 
@@ -91,9 +95,9 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
             String tname = name.substring(PARAM_PREFIX.length());
             Boolean val = (Boolean) value;
             if (val)
-                disabledTaggers.remove(tname);
+                disabledTags.remove(tname);
             else
-                disabledTaggers.add(tname);
+                disabledTags.add(tname);
             return true;
         }
         else
@@ -104,7 +108,7 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
     public Object getParam(String name)
     {
         if (name.startsWith(PARAM_PREFIX))
-            return !disabledTaggers.contains(name.substring(PARAM_PREFIX.length()));
+            return !disabledTags.contains(name.substring(PARAM_PREFIX.length()));
         else
             return false;
     }
@@ -153,7 +157,8 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
         Map<Tag, Tagger> activeTaggers = new HashMap<>();
         for (var entry : usedTaggers.entrySet())
         {
-            if (!disabledTaggers.contains(entry.getValue().getName()))
+            final String tagName = entry.getKey().getName();
+            if (!disabledTags.contains(tagName))
                 activeTaggers.put(entry.getKey(), entry.getValue());
         }
         // perform tagging

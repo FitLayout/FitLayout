@@ -111,6 +111,16 @@ public class RegexpTagger extends BaseTagger
         this.minWords = minWords;
     }
 
+    public int getMinWordLength()
+    {
+        return minWordLength;
+    }
+
+    public void setMinWordLength(int minWordLength)
+    {
+        this.minWordLength = minWordLength;
+    }
+
     //==========================================================================================
     
     @Override

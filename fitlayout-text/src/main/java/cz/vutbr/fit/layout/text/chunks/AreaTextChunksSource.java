@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A text chunks source that extracts the tagged chunks only.
  * 
@@ -20,6 +23,8 @@ import java.util.stream.Stream;
  */
 public class AreaTextChunksSource extends ChunksSource
 {
+    private static Logger log = LoggerFactory.getLogger(AreaTextChunksSource.class);
+    
 	private int idCounter = 1;
 
 	private final float minSupport = 0.1f;
@@ -57,12 +62,19 @@ public class AreaTextChunksSource extends ChunksSource
 
 	private Stream<TextChunk> createChunksForTag(Area area, Tag tag)
 	{
-		var tagger = this.taggerConfig.getTaggerForTag(tag);
-		var text = this.getText(area);
-
-		return tagger.extract(text)
-			.stream()
-			.map(tagOccurrence -> this.createChunk(area, tag, tagOccurrence));
+		final var tagger = this.taggerConfig.getTaggerForTag(tag);
+		if (tagger != null)
+		{
+    		final var text = this.getText(area);
+    		return tagger.extract(text)
+    			.stream()
+    			.map(tagOccurrence -> this.createChunk(area, tag, tagOccurrence));
+		}
+		else
+		{
+		    log.warn("Couldn't find tagger for {}", tag);
+		    return Stream.empty();
+		}
 	}
 
 	private TextChunk createChunk(Area area, Tag tag, TagOccurrence tagOccurrence)

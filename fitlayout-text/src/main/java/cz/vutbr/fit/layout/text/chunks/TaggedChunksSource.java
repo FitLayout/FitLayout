@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.vutbr.fit.layout.api.Tagger;
 import cz.vutbr.fit.layout.api.TaggerConfig;
 import cz.vutbr.fit.layout.impl.DefaultTextChunk;
@@ -26,6 +29,8 @@ import cz.vutbr.fit.layout.model.TextChunk;
  */
 public class TaggedChunksSource extends ChunksSource
 {
+    private static Logger log = LoggerFactory.getLogger(TaggedChunksSource.class);
+            
     private int idcnt;
     private float minTagSupport;
     private List<TextChunk> chunks;
@@ -89,29 +94,34 @@ public class TaggedChunksSource extends ChunksSource
     {
         List<TextChunk> ret = new ArrayList<>();
         Tagger tg = tagConfig.getTaggerForTag(t);
-        for (Box box : a.getBoxes())
+        if (tg != null)
         {
-            String text = box.getOwnText();
-            List<TagOccurrence> occurences = tg.extract(text);
-            int last = 0;
-            for (TagOccurrence occ : occurences)
+            for (Box box : a.getBoxes())
             {
-                int pos = occ.getPosition();
-                if (pos > last) //some substring between, create a chunk with no tag
+                String text = box.getOwnText();
+                List<TagOccurrence> occurences = tg.extract(text);
+                int last = 0;
+                for (TagOccurrence occ : occurences)
                 {
-                    final TextChunk sepArea = createSubstringChunk(a, box, null, text.substring(last, pos), last);
+                    int pos = occ.getPosition();
+                    if (pos > last) //some substring between, create a chunk with no tag
+                    {
+                        final TextChunk sepArea = createSubstringChunk(a, box, null, text.substring(last, pos), last);
+                        ret.add(sepArea);
+                    }
+                    final TextChunk newArea = createSubstringChunk(a, box, t, occ.getText(), pos);
+                    ret.add(newArea);
+                    last = pos + occ.getLength();
+                }
+                if (text.length() > last)
+                {
+                    final TextChunk sepArea = createSubstringChunk(a, box, null, text.substring(last), last);
                     ret.add(sepArea);
                 }
-                final TextChunk newArea = createSubstringChunk(a, box, t, occ.getText(), pos);
-                ret.add(newArea);
-                last = pos + occ.getLength();
-            }
-            if (text.length() > last)
-            {
-                final TextChunk sepArea = createSubstringChunk(a, box, null, text.substring(last), last);
-                ret.add(sepArea);
             }
         }
+        else
+            log.warn("Couldn't find tagger for {}", t);
         return ret;
     }
 

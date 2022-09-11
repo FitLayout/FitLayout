@@ -104,9 +104,6 @@ public class TagByExamplesOperator extends BaseOperator
 
     private boolean recursiveMapOcurrences(Area root, ExampleMatcher matcher, Map<Example, MetaRefTag> assignedTags)
     {
-        if (root.toString().contains("h1c"))
-            System.out.println("jo!");
-        
         boolean childrenMatched = false;
         for (Area child : root.getChildren())
         {

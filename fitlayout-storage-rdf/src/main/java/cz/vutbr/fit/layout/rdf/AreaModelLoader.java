@@ -5,10 +5,13 @@
  */
 package cz.vutbr.fit.layout.rdf;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,8 +21,11 @@ import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,17 +49,6 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
 {
     private static Logger log = LoggerFactory.getLogger(AreaModelLoader.class);
 
-    private static final String[] dataObjectProperties = new String[] { 
-            "box:hasTopBorder",
-            "box:hasBottomBorder",
-            "box:hasLeftBorder",
-            "box:hasRightBorder",
-            "box:hasAttribute",
-            "box:bounds",
-            "segm:hasTag",
-            "segm:tagSupport"
-    };
-    
     private int next_id;
     
     public AreaModelLoader(IRIFactory iriFactory)
@@ -82,17 +77,18 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             IRI parentIri = getPredicateIriValue(artifactModel, areaTreeIri, FL.hasParentArtifact);
             RDFAreaTree atree = new RDFAreaTree(parentIri, pageIri);
             atreeInfo.applyToAreaTree(atree);
-            //load the models
-            Model areaModel = getAreaModelForAreaTree(artifactRepo, areaTreeIri);
-            Model dataModel = getAreaDataModelForAreaTree(artifactRepo, areaTreeIri);
             //load the source page
             RDFPage sourcePage = null;
             if (pageIri != null)
                 sourcePage = getSourcePage(pageIri, artifactRepo);
             //construct the tree
             Map<IRI, RDFArea> areaUris = new LinkedHashMap<IRI, RDFArea>();
-            RDFArea root = constructVisualAreaTree(artifactRepo, sourcePage, atree, areaModel,
-                    dataModel, areaTreeIri, areaUris, atree.getAdditionalStatements());
+            RDFArea root;
+            final var repo = artifactRepo.getStorage().getRepository();
+            try (RepositoryConnection con = repo.getConnection()) {
+                root = constructVisualAreaTree(con, sourcePage, atree, areaTreeIri,
+                        areaUris, atree.getAdditionalStatements());
+            }
             if (root != null)
             {
                 recursiveUpdateTopologies(root);
@@ -107,34 +103,53 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             return null;
     }
     
-    private RDFArea constructVisualAreaTree(RDFArtifactRepository artifactRepo, RDFPage sourcePage, RDFAreaTree atree,
-            Model areaModel, Model dataModel,
+    private RDFArea constructVisualAreaTree(RepositoryConnection con, RDFPage sourcePage, RDFAreaTree atree,
             IRI areaTreeIri, Map<IRI, RDFArea> areas,
             Collection<Statement> additionalStatements) throws RepositoryException
     {
-        //find all areas
-        for (Resource res : areaModel.subjects())
+        // find area IRIs
+        final Set<Resource> areaIris = new HashSet<>();
+        try (RepositoryResult<Statement> result = con.getStatements(null, RDF.TYPE, SEGM.Area, areaTreeIri)) {
+            for (Statement st : result)
+                areaIris.add(st.getSubject());
+        }
+        
+        // create areas
+        List<RDFArea> areaList = new ArrayList<>(areaIris.size());
+        for (Resource res : areaIris)
         {
             if (res instanceof IRI)
             {
-                RDFArea area = createAreaFromModel(artifactRepo, sourcePage, areaModel, dataModel,
-                        areaTreeIri, (IRI) res, additionalStatements);
-                area.setAreaTree(atree);
-                areas.put((IRI) res, area);
+                final RDFArea area = createArea(con, sourcePage, areaTreeIri, (IRI) res, additionalStatements);
+                areaList.add(area);
             }
         }
-        Set<RDFArea> rootAreas = new HashSet<RDFArea>(areas.values());
-        //construct the tree
-        for (Statement st : areaModel.filter(null, SEGM.isChildOf, null))
-        {
-            if (st.getSubject() instanceof IRI && st.getObject() instanceof IRI)
+
+        // sort and put to map
+        areaList.sort(new Comparator<RDFArea>() {
+            @Override
+            public int compare(RDFArea o1, RDFArea o2)
             {
-                RDFArea parent = areas.get(st.getObject());
-                RDFArea child = areas.get(st.getSubject());
-                if (parent != null && child != null)
+                return o1.getDocumentOrder() - o2.getDocumentOrder();
+            }
+        });
+        for (RDFArea area : areaList)
+            areas.put(area.getIri(), area);
+        
+        //construct the tree
+        Set<RDFArea> rootAreas = new HashSet<RDFArea>(areaList);
+        try (RepositoryResult<Statement> result = con.getStatements(null, SEGM.isChildOf, null, areaTreeIri)) {
+            for (Statement st : result)
+            {
+                if (st.getSubject() instanceof IRI && st.getObject() instanceof IRI)
                 {
-                    parent.appendChild(child);
-                    rootAreas.remove(child);
+                    RDFArea parent = areas.get(st.getObject());
+                    RDFArea child = areas.get(st.getSubject());
+                    if (parent != null && child != null)
+                    {
+                        parent.appendChild(child);
+                        rootAreas.remove(child);
+                    }
                 }
             }
         }
@@ -151,97 +166,101 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
         }
     }
     
-    private RDFArea createAreaFromModel(RDFArtifactRepository artifactRepo, RDFPage sourcePage, Model areaModel, Model dataModel,
-            IRI areaTreeIri, IRI uri, Collection<Statement> additionalStatements) throws RepositoryException
+    private RDFArea createArea(RepositoryConnection con, RDFPage sourcePage,
+            IRI areaTreeIri, IRI areaIri, Collection<Statement> additionalStatements) throws RepositoryException
     {
-        RDFArea area = new RDFArea(new Rectangular(), uri);
+        RDFArea area = new RDFArea(new Rectangular(), areaIri);
         area.setId(next_id++);
         area.setDocumentOrder(-1);
         Map<IRI, Float> tagSupport = new HashMap<>(); //tagUri->support
         RDFTextStyle style = new RDFTextStyle();
         
-        for (Statement st : areaModel.filter(uri, null, null))
-        {
-            final IRI pred = st.getPredicate();
-            final Value value = st.getObject();
-            
-            if (processContentRectProperty(pred, value, area, dataModel) || processStyleProperty(pred, value, style))
+        try (RepositoryResult<Statement> result = con.getStatements(areaIri, null, null, areaTreeIri)) {
+            for (Statement st : result)
             {
-                // sucessfully processed
-            }
-            else if (RDFS.LABEL.equals(pred))
-            {
-                String name = value.stringValue();
-                area.setName(name);
-            }
-            else if (BOX.documentOrder.equals(pred))
-            {
-                if (value instanceof Literal)
-                    area.setDocumentOrder(((Literal) value).intValue());
-            }
-            else if (BOX.bounds.equals(pred))
-            {
-                if (value instanceof IRI)
+                final IRI pred = st.getPredicate();
+                final Value value = st.getObject();
+                
+                if (processContentRectProperty(con, pred, value, area) || processStyleProperty(pred, value, style))
                 {
-                    final Rectangular rect = createBounds(dataModel, (IRI) value);
-                    if (rect != null)
-                        area.setBounds(rect);
+                    // sucessfully processed
                 }
-            }
-            else if (SEGM.containsBox.equals(pred))
-            {
-                if (value instanceof IRI)
+                else if (RDFS.LABEL.equals(pred))
                 {
-                    if (sourcePage != null)
+                    String name = value.stringValue();
+                    area.setName(name);
+                }
+                else if (BOX.documentOrder.equals(pred))
+                {
+                    if (value instanceof Literal)
+                        area.setDocumentOrder(((Literal) value).intValue());
+                }
+                else if (BOX.bounds.equals(pred))
+                {
+                    if (value instanceof IRI)
                     {
-                        RDFBox box = sourcePage.findBoxByIri((IRI) value);
-                        if (box != null)
-                            area.addBox(box);
+                        final Rectangular rect = createBounds(con, (IRI) value);
+                        if (rect != null)
+                            area.setBounds(rect);
                     }
                 }
-            }
-            else if (SEGM.hasTag.equals(pred))
-            {
-                if (value instanceof IRI)
+                else if (SEGM.containsBox.equals(pred))
                 {
-                    if (!tagSupport.containsKey(value))
+                    if (value instanceof IRI)
                     {
-                        Tag tag = getTag((IRI) value);
-                        if (tag != null)
-                            area.addTag(tag, 1.0f); //spport is unkwnown (yet)
-                    }
-                }
-            }
-            else if (SEGM.tagSupport.equals(pred))
-            {
-                if (value instanceof IRI)
-                {
-                    IRI tsUri = (IRI) value;
-                    IRI tagUri = null;
-                    Float support = null;
-                    for (Statement sst : dataModel.filter(tsUri, null, null))
-                    {
-                        if (SEGM.hasTag.equals(sst.getPredicate()) && sst.getObject() instanceof IRI)
-                            tagUri = (IRI) sst.getObject();
-                        else if (SEGM.support.equals(sst.getPredicate()) && sst.getObject() instanceof Literal)
-                            support = ((Literal) sst.getObject()).floatValue();
-                    }
-                    if (tagUri != null && support != null)
-                    {
-                        Tag tag = getTag(tagUri);
-                        if (tag != null)
+                        if (sourcePage != null)
                         {
-                            area.removeTag(tag); //to remove the possible old 1.0f value
-                            area.addTag(tag, support);
-                            tagSupport.put(tagUri, support);
+                            RDFBox box = sourcePage.findBoxByIri((IRI) value);
+                            if (box != null)
+                                area.addBox(box);
                         }
                     }
                 }
-            }
-            else
-            {
-                // the statement was not used, keep it in additional statements
-                additionalStatements.add(st);
+                else if (SEGM.hasTag.equals(pred))
+                {
+                    if (value instanceof IRI)
+                    {
+                        if (!tagSupport.containsKey(value))
+                        {
+                            Tag tag = getTag((IRI) value);
+                            if (tag != null)
+                                area.addTag(tag, 1.0f); //spport is unkwnown (yet)
+                        }
+                    }
+                }
+                else if (SEGM.tagSupport.equals(pred))
+                {
+                    if (value instanceof IRI)
+                    {
+                        IRI tsUri = (IRI) value;
+                        IRI tagUri = null;
+                        Float support = null;
+                        try (RepositoryResult<Statement> tsResult = con.getStatements(tsUri, null, null)) {
+                            for (Statement sst : tsResult)
+                            {
+                                if (SEGM.hasTag.equals(sst.getPredicate()) && sst.getObject() instanceof IRI)
+                                    tagUri = (IRI) sst.getObject();
+                                else if (SEGM.support.equals(sst.getPredicate()) && sst.getObject() instanceof Literal)
+                                    support = ((Literal) sst.getObject()).floatValue();
+                            }
+                        }
+                        if (tagUri != null && support != null)
+                        {
+                            Tag tag = getTag(tagUri);
+                            if (tag != null)
+                            {
+                                area.removeTag(tag); //to remove the possible old 1.0f value
+                                area.addTag(tag, support);
+                                tagSupport.put(tagUri, support);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // the statement was not used, keep it in additional statements
+                    additionalStatements.add(st);
+                }
             }
         }
         area.setTextStyle(style.toTextStyle());
@@ -255,45 +274,6 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
         for (int i = 0; i < root.getChildCount(); i++)
             recursiveUpdateTopologies(root.getChildAt(i));
         root.updateTopologies();
-    }
-    
-    //================================================================================================
-    
-    /**
-     * Obtains the model of visual areas for the given area tree.
-     * @param artifactRepo the repository to query 
-     * @param areaTreeIri the area tree IRI
-     * @return A Model containing the triplets for all the visual areas contained in the given area tree.
-     * @throws RepositoryException 
-     */
-    private Model getAreaModelForAreaTree(RDFArtifactRepository artifactRepo, IRI areaTreeIri) throws RepositoryException
-    {
-        final String query = artifactRepo.getIriDecoder().declarePrefixes()
-                + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
-                + "?s rdf:type segm:Area . "
-                + "?s segm:belongsTo <" + areaTreeIri.stringValue() + "> . "
-                + "OPTIONAL { ?s box:documentOrder ?ord } "
-                + "} ORDER BY ?ord";
-        return execArtifactReadQuery(artifactRepo, query);
-    }
-    
-    /**
-     * Gets the model of additional object properties of the areas. It contains the data about the
-     * bounds, borders, tags and other object properties.
-     * @param artifactRepo the repository to query 
-     * @param areaTreeIri the area tree IRI
-     * @return The created model
-     * @throws RepositoryException 
-     */
-    private Model getAreaDataModelForAreaTree(RDFArtifactRepository artifactRepo, IRI areaTreeIri) throws RepositoryException
-    {
-        final String query = artifactRepo.getIriDecoder().declarePrefixes()
-                + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
-                + "?a rdf:type segm:Area . "
-                + "?a segm:belongsTo <" + areaTreeIri.stringValue() + "> . "
-                + getDataPropertyUnion(dataObjectProperties)
-                + "}";
-        return execArtifactReadQuery(artifactRepo, query);
     }
     
 }

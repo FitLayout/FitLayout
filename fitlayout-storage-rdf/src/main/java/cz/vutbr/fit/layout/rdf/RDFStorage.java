@@ -131,11 +131,34 @@ public class RDFStorage implements Closeable
 	
     //= Low-level repository functions ==============================================================================
 
+    /**
+     * Finds IRIs of resources of the given type.
+     * @param type The resource type IRI.
+     * @return a collection of Resources
+     */
     public Collection<Resource> getResourcesOfType(IRI type)
     {
         Set<Resource> ret = new HashSet<>(); 
         try (RepositoryConnection con = repo.getConnection()) {
             try (RepositoryResult<Statement> result = con.getStatements(null, RDF.TYPE, type)) {
+                for (Statement st : result)
+                    ret.add(st.getSubject());
+            }
+        }
+        return ret;
+    }
+    
+    /**
+     * Finds IRIs of resources of the given type.
+     * @param type The resource type IRI.
+     * @param context Repository context
+     * @return a collection of Resources
+     */
+    public Collection<Resource> getResourcesOfType(IRI type, Resource context)
+    {
+        Set<Resource> ret = new HashSet<>(); 
+        try (RepositoryConnection con = repo.getConnection()) {
+            try (RepositoryResult<Statement> result = con.getStatements(null, RDF.TYPE, type, context)) {
                 for (Statement st : result)
                     ret.add(st.getSubject());
             }

@@ -6,16 +6,21 @@
 package cz.vutbr.fit.layout.rdf;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +44,6 @@ public class LogicalAreaModelLoader extends ModelLoaderBase implements ModelLoad
     public LogicalAreaModelLoader(IRIFactory iriFactory)
     {
         super(iriFactory);
-        // TODO Auto-generated constructor stub
     }
     
     @Override
@@ -53,13 +57,19 @@ public class LogicalAreaModelLoader extends ModelLoaderBase implements ModelLoad
     
     private LogicalAreaTree constructLogicalAreaTree(RDFArtifactRepository artifactRepo, IRI logicalTreeIri) throws RepositoryException
     {
-        Model model = getLogicalAreaModelForAreaTree(artifactRepo, logicalTreeIri);
+        Model model = artifactRepo.getStorage().getSubjectModel(logicalTreeIri);
         if (model.size() > 0)
         {
             IRI areaTreeIri = getSourceAreaTreeIri(model, logicalTreeIri);
+            RDFAreaTree areaTree = getSourceAreaTree(areaTreeIri, artifactRepo);
+            
             DefaultLogicalAreaTree atree = new DefaultLogicalAreaTree(areaTreeIri);
             Map<IRI, RDFLogicalArea> areaUris = new LinkedHashMap<IRI, RDFLogicalArea>();
-            RDFLogicalArea root = constructLogicalAreaTree(artifactRepo, model, logicalTreeIri, areaUris);
+            RDFLogicalArea root = null;
+            final var repo = artifactRepo.getStorage().getRepository();
+            try (RepositoryConnection con = repo.getConnection()) {
+                root = constructLogicalAreaTree(con, model, areaTree, logicalTreeIri, areaUris);
+            }
             if (root != null)
             {
                 atree.setRoot(root);
@@ -72,29 +82,39 @@ public class LogicalAreaModelLoader extends ModelLoaderBase implements ModelLoad
             return null;
     }
     
-    private RDFLogicalArea constructLogicalAreaTree(RDFArtifactRepository artifactRepo, Model model, IRI logicalTreeIri, Map<IRI, RDFLogicalArea> areas) throws RepositoryException
+    private RDFLogicalArea constructLogicalAreaTree(RepositoryConnection con, Model model, RDFAreaTree sourceAreaTree, IRI logicalTreeIri, Map<IRI, RDFLogicalArea> areas) throws RepositoryException
     {
+        // find area IRIs
+        final Set<Resource> areaIris = new HashSet<>();
+        try (RepositoryResult<Statement> result = con.getStatements(null, RDF.TYPE, SEGM.LogicalArea, logicalTreeIri)) {
+            for (Statement st : result)
+                areaIris.add(st.getSubject());
+        }
+        
         //find all areas
-        for (Resource res : model.subjects())
+        for (Resource res : areaIris)
         {
             if (res instanceof IRI)
             {
-                RDFLogicalArea area = createLogicalAreaFromModel(artifactRepo, model, logicalTreeIri, (IRI) res);
+                RDFLogicalArea area = createLogicalArea(con, logicalTreeIri, (IRI) res, model, sourceAreaTree);
                 areas.put((IRI) res, area);
             }
         }
-        List<RDFLogicalArea> rootAreas = new ArrayList<RDFLogicalArea>(areas.values());
+        
         //construct the tree
-        for (Statement st : model.filter(null, SEGM.isSubordinateTo, null))
-        {
-            if (st.getSubject() instanceof IRI && st.getObject() instanceof IRI)
+        List<RDFLogicalArea> rootAreas = new ArrayList<RDFLogicalArea>(areas.values());
+        try (RepositoryResult<Statement> result = con.getStatements(null, SEGM.isSubordinateTo, null, logicalTreeIri)) {
+            for (Statement st : result)
             {
-                RDFLogicalArea parent = areas.get(st.getObject());
-                RDFLogicalArea child = areas.get(st.getSubject());
-                if (parent != null && child != null)
+                if (st.getSubject() instanceof IRI && st.getObject() instanceof IRI)
                 {
-                    parent.appendChild(child);
-                    rootAreas.remove(child);
+                    RDFLogicalArea parent = areas.get(st.getObject());
+                    RDFLogicalArea child = areas.get(st.getSubject());
+                    if (parent != null && child != null)
+                    {
+                        parent.appendChild(child);
+                        rootAreas.remove(child);
+                    }
                 }
             }
         }
@@ -108,45 +128,40 @@ public class LogicalAreaModelLoader extends ModelLoaderBase implements ModelLoad
         
     }
     
-    private RDFLogicalArea createLogicalAreaFromModel(RDFArtifactRepository artifactRepo, Model model, IRI treeIri, IRI iri) throws RepositoryException
+    private RDFLogicalArea createLogicalArea(RepositoryConnection con, IRI treeIri, IRI iri,
+            Model artifactModel, RDFAreaTree sourceAreaTree) throws RepositoryException
     {
         RDFLogicalArea area = new RDFLogicalArea(iri);
         
-        RDFAreaTree areaTree = null;
-        
-        for (Statement st : model.filter(iri, null, null))
-        {
-            final IRI pred = st.getPredicate();
-            final Value value = st.getObject();
-            
-            if (SEGM.text.equals(pred)) 
+        try (RepositoryResult<Statement> result = con.getStatements(iri, null, null, treeIri)) {
+            for (Statement st : result)
             {
-                area.setText(value.stringValue());
-            }
-            else if (SEGM.hasTag.equals(pred))
-            {
-                if (value instanceof IRI)
+                final IRI pred = st.getPredicate();
+                final Value value = st.getObject();
+                
+                if (SEGM.text.equals(pred)) 
                 {
-                    Tag tag = getTag((IRI) value);
-                    if (tag != null)
-                        area.setMainTag(tag);
+                    area.setText(value.stringValue());
                 }
-            }
-            else if (SEGM.containsArea.equals(pred))
-            {
-                if (value instanceof IRI)
+                else if (SEGM.hasTag.equals(pred))
                 {
-                    if (areaTree == null)
+                    if (value instanceof IRI)
                     {
-                        IRI areaTreeIri = getSourceAreaTreeIri(model, treeIri);
-                        if (areaTreeIri != null)
-                            areaTree = getSourceAreaTree(areaTreeIri, artifactRepo);
+                        Tag tag = getTag((IRI) value);
+                        if (tag != null)
+                            area.setMainTag(tag);
                     }
-                    if (areaTree != null)
+                }
+                else if (SEGM.containsArea.equals(pred))
+                {
+                    if (value instanceof IRI)
                     {
-                        Area a = areaTree.findAreaByIri((IRI) value);
-                        if (a != null)
-                            area.addArea(a);
+                        if (sourceAreaTree != null)
+                        {
+                            Area a = sourceAreaTree.findAreaByIri((IRI) value);
+                            if (a != null)
+                                area.addArea(a);
+                        }
                     }
                 }
             }
@@ -155,23 +170,4 @@ public class LogicalAreaModelLoader extends ModelLoaderBase implements ModelLoad
         return area;
     }
 
-    //================================================================================================
-    
-    /**
-     * Obtains the model of logical areas for the given area tree.
-     * @param logicalTreeIri
-     * @return A Model containing the triplets for all the visual areas contained in the given area tree.
-     * @throws RepositoryException 
-     */
-    private Model getLogicalAreaModelForAreaTree(RDFArtifactRepository artifactRepo, IRI logicalTreeIri) throws RepositoryException
-    {
-        final String query = artifactRepo.getIriDecoder().declarePrefixes()
-                + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
-                + "?s rdf:type segm:LogicalArea . "
-                + "?s segm:belongsTo <" + logicalTreeIri.stringValue() + "> " //TODO is belongsTo correct?
-                + "OPTIONAL { ?s box:documentOrder ?ord } "
-                + "} ORDER BY ?ord";
-        return execArtifactReadQuery(artifactRepo, query);
-    }
-    
 }

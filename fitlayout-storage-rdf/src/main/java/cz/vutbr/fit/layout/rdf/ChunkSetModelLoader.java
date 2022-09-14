@@ -18,7 +18,10 @@ import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,12 +47,6 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
 {
     private static Logger log = LoggerFactory.getLogger(ChunkSetModelLoader.class);
 
-    private static final String[] dataObjectProperties = new String[] { 
-            "box:bounds",
-            "segm:hasTag",
-            "segm:tagSupport"
-    };
-    
     private int next_id;
     
     public ChunkSetModelLoader(IRIFactory iriFactory)
@@ -76,9 +73,6 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
             IRI parentIri = getPredicateIriValue(artifactModel, csetIri, FL.hasParentArtifact);
             RDFChunkSet cset = new RDFChunkSet(parentIri);
             csetInfo.applyToChunkSet(cset);
-            //load the model
-            Model chunkModel = getChunkModelForSet(artifactRepo, csetIri);
-            Model tagModel = getChunkTagModelForSet(artifactRepo, csetIri);
             //load the source area tree and page
             RDFAreaTree sourceAreaTree = null;
             RDFPage sourcePage = null;
@@ -94,8 +88,12 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
                 log.error("ChunkSet {} has no area tree IRI", String.valueOf(csetIri));
             //construct the tree
             final Map<IRI, RDFTextChunk> chunkUris = new LinkedHashMap<>();
-            final Set<TextChunk> chunks = loadChunks(artifactRepo, sourceAreaTree, sourcePage,
-                    csetIri, chunkModel, tagModel, chunkUris, cset.getAdditionalStatements());
+            final var repo = artifactRepo.getStorage().getRepository();
+            Set<TextChunk> chunks = null;
+            try (RepositoryConnection con = repo.getConnection()) {
+                chunks = loadChunks(con, sourceAreaTree, sourcePage,
+                    csetIri, chunkUris, cset.getAdditionalStatements());
+            }
             cset.setTextChunks(chunks);
             cset.setChunkIris(chunkUris);
             return cset;
@@ -104,17 +102,24 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
             return null;
     }
 
-    private Set<TextChunk> loadChunks(RDFArtifactRepository artifactRepo, RDFAreaTree sourceAreaTree, RDFPage sourcePage,
-                                        IRI csetIri, Model model, Model tagModel, Map<IRI, RDFTextChunk> chunkUris,
-                                        Collection<Statement> additionalStatements)
+    private Set<TextChunk> loadChunks(RepositoryConnection con, RDFAreaTree sourceAreaTree, RDFPage sourcePage,
+                                      IRI csetIri, Map<IRI, RDFTextChunk> chunkUris,
+                                      Collection<Statement> additionalStatements)
     {
-        //find all chunks
-        for (Resource res : model.subjects())
+        // find chunk IRIs
+        final Set<Resource> chunkIris = new HashSet<>();
+        try (RepositoryResult<Statement> result = con.getStatements(null, RDF.TYPE, SEGM.TextChunk, csetIri)) {
+            for (Statement st : result)
+                chunkIris.add(st.getSubject());
+        }
+        
+        // create chunks
+        for (Resource res : chunkIris)
         {
             if (res instanceof IRI)
             {
-                RDFTextChunk area = createChunkFromModel(artifactRepo, sourceAreaTree, sourcePage, 
-                        model, tagModel, csetIri, (IRI) res, additionalStatements);
+                RDFTextChunk area = createChunk(con, sourceAreaTree, sourcePage, 
+                        csetIri, (IRI) res, additionalStatements);
                 chunkUris.put((IRI) res, area);
             }
         }
@@ -124,154 +129,127 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
         return ret;
     }
     
-    private RDFTextChunk createChunkFromModel(RDFArtifactRepository artifactRepo, RDFAreaTree sourceAreaTree, RDFPage sourcePage, 
-                                                Model model, Model dataModel, IRI csetIri, IRI iri,
-                                                Collection<Statement> additionalStatements) throws RepositoryException
+    private RDFTextChunk createChunk(RepositoryConnection con, RDFAreaTree sourceAreaTree, RDFPage sourcePage, 
+                                     IRI csetIri, IRI iri,
+                                     Collection<Statement> additionalStatements) throws RepositoryException
     {
         RDFTextChunk chunk = new RDFTextChunk(iri);
         chunk.setId(next_id++);
         Map<IRI, Float> tagSupport = new HashMap<>(); //tagUri->support
         RDFTextStyle style = new RDFTextStyle();
         
-        for (Statement st : model.filter(iri, null, null))
-        {
-            final IRI pred = st.getPredicate();
-            final Value value = st.getObject();
-            
-            if (SEGM.text.equals(pred)) 
+        try (RepositoryResult<Statement> result = con.getStatements(iri, null, null, csetIri)) {
+            for (Statement st : result)
             {
-                chunk.setText(value.stringValue());
-            }
-            else if (BOX.documentOrder.equals(pred))
-            {
-                if (value instanceof Literal)
-                    chunk.setDocumentOrder(((Literal) value).intValue());
-            }
-            else if (BOX.backgroundColor.equals(pred))
-            {
-                final String bgColor = value.stringValue();
-                chunk.setEffectiveBackgroundColor(Serialization.decodeHexColor(bgColor));
-            }
-            else if (BOX.color.equals(pred)) 
-            {
-                chunk.setColor(Serialization.decodeHexColor(value.stringValue()));
-            }
-            else if (BOX.fontFamily.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    chunk.setFontFamily(value.stringValue());
-            }
-            else if (SEGM.hasSourceArea.equals(pred))
-            {
-                if (value instanceof IRI)
+                final IRI pred = st.getPredicate();
+                final Value value = st.getObject();
+                
+                if (SEGM.text.equals(pred)) 
                 {
-                    final Area a = sourceAreaTree.findAreaByIri((IRI) value);
-                    if (a != null)
-                        chunk.setSourceArea(a);
-                    else
-                        log.error("hasSourceArea points to a non-existent area {}", value.toString());
-                }                
-            }
-            else if (SEGM.hasSourceBox.equals(pred))
-            {
-                if (value instanceof IRI)
-                {
-                    final Box b = sourcePage.findBoxByIri((IRI) value);
-                    if (b != null)
-                        chunk.setSourceBox(b);
-                    else
-                        log.error("hasSourceBox points to a non-existent box {}", value.toString());
-                }                
-            }
-            else if (BOX.bounds.equals(pred))
-            {
-                if (value instanceof IRI)
-                {
-                    final Rectangular rect = createBounds(dataModel, (IRI) value);
-                    if (rect != null)
-                        chunk.setBounds(rect);
+                    chunk.setText(value.stringValue());
                 }
-            }
-            else if (SEGM.hasTag.equals(pred))
-            {
-                if (value instanceof IRI)
+                else if (BOX.documentOrder.equals(pred))
                 {
-                    if (!tagSupport.containsKey(value))
+                    if (value instanceof Literal)
+                        chunk.setDocumentOrder(((Literal) value).intValue());
+                }
+                else if (BOX.backgroundColor.equals(pred))
+                {
+                    final String bgColor = value.stringValue();
+                    chunk.setEffectiveBackgroundColor(Serialization.decodeHexColor(bgColor));
+                }
+                else if (BOX.color.equals(pred)) 
+                {
+                    chunk.setColor(Serialization.decodeHexColor(value.stringValue()));
+                }
+                else if (BOX.fontFamily.equals(pred)) 
+                {
+                    if (value instanceof Literal)
+                        chunk.setFontFamily(value.stringValue());
+                }
+                else if (SEGM.hasSourceArea.equals(pred))
+                {
+                    if (value instanceof IRI)
                     {
-                        Tag tag = getTag((IRI) value);
-                        if (tag != null)
-                            chunk.addTag(tag, 1.0f); //spport is unkwnown (yet)
+                        final Area a = sourceAreaTree.findAreaByIri((IRI) value);
+                        if (a != null)
+                            chunk.setSourceArea(a);
+                        else
+                            log.error("hasSourceArea points to a non-existent area {}", value.toString());
+                    }                
+                }
+                else if (SEGM.hasSourceBox.equals(pred))
+                {
+                    if (value instanceof IRI)
+                    {
+                        final Box b = sourcePage.findBoxByIri((IRI) value);
+                        if (b != null)
+                            chunk.setSourceBox(b);
+                        else
+                            log.error("hasSourceBox points to a non-existent box {}", value.toString());
+                    }                
+                }
+                else if (BOX.bounds.equals(pred))
+                {
+                    if (value instanceof IRI)
+                    {
+                        final Rectangular rect = createBounds(con, (IRI) value);
+                        if (rect != null)
+                            chunk.setBounds(rect);
                     }
                 }
-            }
-            else if (SEGM.tagSupport.equals(pred))
-            {
-                if (value instanceof IRI)
+                else if (SEGM.hasTag.equals(pred))
                 {
-                    IRI tsUri = (IRI) value;
-                    IRI tagUri = null;
-                    Float support = null;
-                    for (Statement sst : dataModel.filter(tsUri, null, null))
+                    if (value instanceof IRI)
                     {
-                        if (SEGM.hasTag.equals(sst.getPredicate()) && sst.getObject() instanceof IRI)
-                            tagUri = (IRI) sst.getObject();
-                        else if (SEGM.support.equals(sst.getPredicate()) && sst.getObject() instanceof Literal)
-                            support = ((Literal) sst.getObject()).floatValue();
-                    }
-                    if (tagUri != null && support != null)
-                    {
-                        Tag tag = getTag(tagUri);
-                        if (tag != null)
+                        if (!tagSupport.containsKey(value))
                         {
-                            chunk.removeTag(tag); //to remove the possible old 1.0f value
-                            chunk.addTag(tag, support);
-                            tagSupport.put(tagUri, support);
+                            Tag tag = getTag((IRI) value);
+                            if (tag != null)
+                                chunk.addTag(tag, 1.0f); //spport is unkwnown (yet)
                         }
                     }
                 }
+                else if (SEGM.tagSupport.equals(pred))
+                {
+                    if (value instanceof IRI)
+                    {
+                        IRI tsUri = (IRI) value;
+                        IRI tagUri = null;
+                        Float support = null;
+                        try (RepositoryResult<Statement> tsResult = con.getStatements(tsUri, null, null)) {
+                            for (Statement sst : tsResult)
+                            {
+                                if (SEGM.hasTag.equals(sst.getPredicate()) && sst.getObject() instanceof IRI)
+                                    tagUri = (IRI) sst.getObject();
+                                else if (SEGM.support.equals(sst.getPredicate()) && sst.getObject() instanceof Literal)
+                                    support = ((Literal) sst.getObject()).floatValue();
+                            }
+                        }
+                        if (tagUri != null && support != null)
+                        {
+                            Tag tag = getTag(tagUri);
+                            if (tag != null)
+                            {
+                                chunk.removeTag(tag); //to remove the possible old 1.0f value
+                                chunk.addTag(tag, support);
+                                tagSupport.put(tagUri, support);
+                            }
+                        }
+                    }
+                }
+                else if (processStyleProperty(pred, value, style))
+                {
+                }
+                else
+                {
+                    // the statement was not used, keep it in additional statements
+                    additionalStatements.add(st);
+                }
             }
-            else if (processStyleProperty(pred, value, style))
-            {
-            }
-            else
-            {
-                // the statement was not used, keep it in additional statements
-                additionalStatements.add(st);
-            }
-            chunk.setTextStyle(style.toTextStyle());
         }
-        
+        chunk.setTextStyle(style.toTextStyle());
         return chunk;
-    }
-
-    
-    //================================================================================================
-    
-    /**
-     * Obtains the model of chunks for the given chunk set.
-     * @param artifactRepo the repository to query 
-     * @param chunkSetIri the area tree IRI
-     * @return A Model containing the triplets for all the visual areas contained in the given area tree.
-     * @throws RepositoryException 
-     */
-    private Model getChunkModelForSet(RDFArtifactRepository artifactRepo, IRI chunkSetIri) throws RepositoryException
-    {
-        final String query = artifactRepo.getIriDecoder().declarePrefixes()
-                + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
-                + "?s rdf:type segm:TextChunk . "
-                + "?s segm:belongsToChunkSet <" + chunkSetIri.stringValue() + "> }";
-        return execArtifactReadQuery(artifactRepo, query);
-    }
-    
-    private Model getChunkTagModelForSet(RDFArtifactRepository artifactRepo, IRI chunkSetIri) throws RepositoryException
-    {
-        final String query = artifactRepo.getIriDecoder().declarePrefixes()
-                + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
-                + "?a rdf:type segm:TextChunk . "
-                + "?a segm:belongsToChunkSet <" + chunkSetIri.stringValue() + "> . "
-                + getDataPropertyUnion(dataObjectProperties)
-                + "}";
-        return execArtifactReadQuery(artifactRepo, query);
     }
 
 }

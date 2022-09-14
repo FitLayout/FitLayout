@@ -15,7 +15,6 @@ import java.util.Scanner;
 import org.eclipse.rdf4j.common.exception.RDF4JException;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
-import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
@@ -306,8 +305,7 @@ public class RDFArtifactRepository implements ArtifactRepository
     @Override
     public Artifact getArtifact(IRI artifactIri)
     {
-        Model model = getArtifactModel(artifactIri);
-        IRI type = getArtifactType(model, artifactIri);
+        IRI type = getArtifactType(artifactIri);
         if (type != null)
         {
             ModelLoader loader = getModelLoader(type);
@@ -436,20 +434,17 @@ public class RDFArtifactRepository implements ArtifactRepository
     }
 
     /**
-     * Gets the artifact type from an artifact model.
-     * @param model the artifact model
+     * Determines a stored artifact type.
      * @param artifactIri the artifact IRI
      * @return the type IRI or {@code null} when no type declaration (rdf:type) was found.
      */
-    private IRI getArtifactType(Model model, IRI artifactIri)
+    private IRI getArtifactType(IRI artifactIRI)
     {
-        Iterable<Statement> typeStatements = model.getStatements(artifactIri, RDF.TYPE, null);
-        for (Statement st : typeStatements)
-        {
-            if (st.getObject() instanceof IRI)
-                return (IRI) st.getObject();
-        }
-        return null; //no type statement found
+        final Value val = storage.getPropertyValue(artifactIRI, RDF.TYPE);
+        if (val.isIRI())
+            return (IRI) val;
+        else
+            return null;
     }
     
     //Model builders =================================================================

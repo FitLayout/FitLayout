@@ -8,10 +8,13 @@ import org.eclipse.rdf4j.common.transaction.IsolationLevels;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.RDFS;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,14 +72,14 @@ public abstract class ModelLoaderBase extends ModelTransformer
     /**
      * Applies common ContentRect properties to a target rect.
      * 
+     * @param con repository connection used to load additional triples
      * @param pred the property predicate
      * @param value the property value
      * @param rect the target rect
-     * @param dataModel data model to be used with borders
      * @return {@code true} when the property was applied, {@code false} when it was ignored
      */
-    protected boolean processContentRectProperty(IRI pred, Value value, 
-            DefaultTreeContentRect<?> rect, Model dataModel)
+    protected boolean processContentRectProperty(RepositoryConnection con, IRI pred, Value value, 
+            DefaultTreeContentRect<?> rect)
     {
         boolean ret = true;
         if (BOX.backgroundColor.equals(pred)) 
@@ -94,7 +97,7 @@ public abstract class ModelLoaderBase extends ModelTransformer
         {
             if (value instanceof IRI)
             {
-                Border border = createBorder(dataModel, (IRI) value);
+                Border border = createBorder(con, (IRI) value);
                 rect.setBorderStyle(Side.BOTTOM, border);
             }
         }
@@ -102,7 +105,7 @@ public abstract class ModelLoaderBase extends ModelTransformer
         {
             if (value instanceof IRI)
             {
-                Border border = createBorder(dataModel, (IRI) value);
+                Border border = createBorder(con, (IRI) value);
                 rect.setBorderStyle(Side.LEFT, border);
             }
         }
@@ -110,7 +113,7 @@ public abstract class ModelLoaderBase extends ModelTransformer
         {
             if (value instanceof IRI)
             {
-                Border border = createBorder(dataModel, (IRI) value);
+                Border border = createBorder(con, (IRI) value);
                 rect.setBorderStyle(Side.RIGHT, border);
             }
         }
@@ -118,7 +121,7 @@ public abstract class ModelLoaderBase extends ModelTransformer
         {
             if (value instanceof IRI)
             {
-                Border border = createBorder(dataModel, (IRI) value);
+                Border border = createBorder(con, (IRI) value);
                 rect.setBorderStyle(Side.TOP, border);
             }
         }
@@ -177,31 +180,34 @@ public abstract class ModelLoaderBase extends ModelTransformer
         return ret;
     }
     
-    protected Border createBorder(Model model, IRI uri)
+    protected Border createBorder(RepositoryConnection con, IRI borderIri)
     {
         Border ret = new Border();
         
-        for (Statement st : model.filter(uri, null, null))
+        try (RepositoryResult<Statement> result = con.getStatements(borderIri, null, null))
         {
-            final IRI pred = st.getPredicate();
-            final Value value = st.getObject();
-            
-            if (BOX.borderColor.equals(pred)) 
+            for (Statement st : result)
             {
-                ret.setColor(Serialization.decodeHexColor(value.stringValue()));
-            }
-            else if (BOX.borderWidth.equals(pred))
-            {
-                if (value instanceof Literal)
-                    ret.setWidth(((Literal) value).intValue());
-            }
-            else if (BOX.borderStyle.equals(pred))
-            {
-                String style = value.stringValue();
-                try {
-                    ret.setStyle(Border.Style.valueOf(style));
-                } catch (IllegalArgumentException r) {
-                    log.error("Invalid style value: {}", style);
+                final IRI pred = st.getPredicate();
+                final Value value = st.getObject();
+                
+                if (BOX.borderColor.equals(pred)) 
+                {
+                    ret.setColor(Serialization.decodeHexColor(value.stringValue()));
+                }
+                else if (BOX.borderWidth.equals(pred))
+                {
+                    if (value instanceof Literal)
+                        ret.setWidth(((Literal) value).intValue());
+                }
+                else if (BOX.borderStyle.equals(pred))
+                {
+                    String style = value.stringValue();
+                    try {
+                        ret.setStyle(Border.Style.valueOf(style));
+                    } catch (IllegalArgumentException r) {
+                        log.error("Invalid style value: {}", style);
+                    }
                 }
             }
         }
@@ -209,23 +215,27 @@ public abstract class ModelLoaderBase extends ModelTransformer
         return ret;
     }
     
-    protected Map.Entry<String, String> createAttribute(Model model, IRI uri)
+    protected Map.Entry<String, String> createAttribute(RepositoryConnection con, IRI attrIri)
     {
         String name = null;
         String avalue = null;
-        for (Statement st : model.filter(uri, null, null))
+        
+        try (RepositoryResult<Statement> result = con.getStatements(attrIri, null, null))
         {
-            final IRI pred = st.getPredicate();
-            final Value value = st.getObject();
-            if (RDFS.LABEL.equals(pred))
+            for (Statement st : result)
             {
-                if (value instanceof Literal)
-                    name = ((Literal) value).stringValue();
-            }
-            else if (RDF.VALUE.equals(pred))
-            {
-                if (value instanceof Literal)
-                    avalue = ((Literal) value).stringValue();
+                final IRI pred = st.getPredicate();
+                final Value value = st.getObject();
+                if (RDFS.LABEL.equals(pred))
+                {
+                    if (value instanceof Literal)
+                        name = ((Literal) value).stringValue();
+                }
+                else if (RDF.VALUE.equals(pred))
+                {
+                    if (value instanceof Literal)
+                        avalue = ((Literal) value).stringValue();
+                }
             }
         }
         if (name != null && avalue != null)
@@ -234,35 +244,39 @@ public abstract class ModelLoaderBase extends ModelTransformer
             return null;
     }
     
-    protected Rectangular createBounds(Model model, IRI iri)
+    protected Rectangular createBounds(RepositoryConnection con, IRI boundsIri)
     {
         Integer x = null;
         Integer y = null;
         Integer width = null;
         Integer height = null;
-        for (Statement st : model.filter(iri, null, null))
+        
+        try (RepositoryResult<Statement> result = con.getStatements(boundsIri, null, null))
         {
-            final IRI pred = st.getPredicate();
-            final Value value = st.getObject();
-            if (BOX.positionX.equals(pred))
+            for (Statement st : result)
             {
-                if (value instanceof Literal)
-                    x = ((Literal) value).intValue();
-            }
-            else if (BOX.positionY.equals(pred))
-            {
-                if (value instanceof Literal)
-                    y = ((Literal) value).intValue();
-            }
-            else if (BOX.width.equals(pred))
-            {
-                if (value instanceof Literal)
-                    width = ((Literal) value).intValue();
-            }
-            else if (BOX.height.equals(pred))
-            {
-                if (value instanceof Literal)
-                    height = ((Literal) value).intValue();
+                final IRI pred = st.getPredicate();
+                final Value value = st.getObject();
+                if (BOX.positionX.equals(pred))
+                {
+                    if (value instanceof Literal)
+                        x = ((Literal) value).intValue();
+                }
+                else if (BOX.positionY.equals(pred))
+                {
+                    if (value instanceof Literal)
+                        y = ((Literal) value).intValue();
+                }
+                else if (BOX.width.equals(pred))
+                {
+                    if (value instanceof Literal)
+                        width = ((Literal) value).intValue();
+                }
+                else if (BOX.height.equals(pred))
+                {
+                    if (value instanceof Literal)
+                        height = ((Literal) value).intValue();
+                }
             }
         }        
         if (x != null && y != null && width != null && height != null)
@@ -372,6 +386,19 @@ public abstract class ModelLoaderBase extends ModelTransformer
         return artifactRepo.getStorage().executeSafeQuery(query, IsolationLevels.SNAPSHOT_READ);
     }
     
+    public Value getPropertyValue(RepositoryConnection con, Resource subject, IRI predicate) throws StorageException
+    {
+        Value ret = null;
+        RepositoryResult<Statement> result = con.getStatements(subject, predicate, null, true);
+        try {
+            if (result.hasNext())
+                ret = result.next().getObject();
+        }
+        finally {
+            result.close();
+        }
+        return ret;
+    }
     //=================================================================================
     
     /**

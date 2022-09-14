@@ -10,9 +10,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
@@ -21,7 +24,9 @@ import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,17 +47,6 @@ import cz.vutbr.fit.layout.rdf.model.RDFPage;
 public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
 {
     private static Logger log = LoggerFactory.getLogger(BoxModelLoader.class);
-    
-    private static final String[] dataObjectProperties = new String[] { 
-            "box:hasTopBorder",
-            "box:hasBottomBorder",
-            "box:hasLeftBorder",
-            "box:hasRightBorder",
-            "box:hasAttribute",
-            "box:bounds",
-            "box:visualBounds",
-            "box:contentBounds"
-    };
     
     private int next_id;
 
@@ -89,13 +83,14 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             RDFPage page = new RDFPage(srcURL);
             info.applyToPage(page);
             
-            //load the models
-            Model boxTreeModel = getBoxModelForPage(artifactRepo, pageIri);
-            Model dataModel = getBoxDataModelForPage(artifactRepo, pageIri);
             //create the box tree
             Map<IRI, RDFBox> boxes = new LinkedHashMap<IRI, RDFBox>();
-            RDFBox root = constructBoxTree(artifactRepo.getStorage(), boxTreeModel, dataModel, pageIri,
-                    boxes, page.getAdditionalStatements()); 
+            RDFBox root = null;
+            final var repo = artifactRepo.getStorage().getRepository();
+            try (RepositoryConnection con = repo.getConnection()) {
+                root = constructBoxTree(con, pageIri,
+                        boxes, page.getAdditionalStatements());
+            }
             if (root != null)
             {
                 checkChildOrderValues(root);
@@ -124,31 +119,52 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
      * @return the root box or {@code null} if the provided model does not have a tree structure
      * @throws RepositoryException
      */
-    private RDFBox constructBoxTree(RDFStorage storage, Model boxTreeModel, Model dataModel,
+    private RDFBox constructBoxTree(RepositoryConnection con,
             IRI pageIri, Map<IRI, RDFBox> boxes, Collection<Statement> additionalStatements) throws RepositoryException
     {
-        //find all boxes
-        for (Resource res : boxTreeModel.subjects())
+        // find box IRIs
+        final Set<Resource> boxIris = new HashSet<>();
+        try (RepositoryResult<Statement> result = con.getStatements(null, RDF.TYPE, BOX.Box, pageIri)) {
+            for (Statement st : result)
+                boxIris.add(st.getSubject());
+        }
+        
+        // create boxes
+        List<RDFBox> boxList = new ArrayList<>(boxIris.size());
+        for (Resource res : boxIris)
         {
             if (res instanceof IRI)
             {
-                RDFBox box = createBoxFromModel(storage, boxTreeModel, dataModel, pageIri,
-                        (IRI) res, additionalStatements);
-                boxes.put((IRI) res, box);
+                final RDFBox box = createBox(con, pageIri, (IRI) res, additionalStatements);
+                boxList.add(box);
             }
         }
-        List<RDFBox> rootBoxes = new ArrayList<RDFBox>(boxes.values());
-        //construct the tree
-        for (Statement st : boxTreeModel.filter(null, BOX.isChildOf, null))
-        {
-            if (st.getSubject() instanceof IRI && st.getObject() instanceof IRI)
+        
+        // sort and put to map
+        boxList.sort(new Comparator<RDFBox>() {
+            @Override
+            public int compare(RDFBox o1, RDFBox o2)
             {
-                RDFBox parent = boxes.get(st.getObject());
-                RDFBox child = boxes.get(st.getSubject());
-                if (parent != null && child != null)
+                return o1.getDocumentOrder() - o2.getDocumentOrder();
+            }
+        });
+        for (RDFBox box : boxList)
+            boxes.put(box.getIri(), box);
+        
+        //construct the tree
+        List<RDFBox> rootBoxes = new ArrayList<RDFBox>(boxList);
+        try (RepositoryResult<Statement> result = con.getStatements(null, BOX.isChildOf, null, pageIri)) {
+            for (Statement st : result)
+            {
+                if (st.getSubject() instanceof IRI && st.getObject() instanceof IRI)
                 {
-                    parent.appendChild(child);
-                    rootBoxes.remove(child);
+                    RDFBox parent = boxes.get(st.getObject());
+                    RDFBox child = boxes.get(st.getSubject());
+                    if (parent != null && child != null)
+                    {
+                        parent.appendChild(child);
+                        rootBoxes.remove(child);
+                    }
                 }
             }
         }
@@ -161,8 +177,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
         }
     }
     
-    private RDFBox createBoxFromModel(RDFStorage storage, Model boxTreeModel, Model dataModel, 
-            IRI pageIri, IRI boxIri, Collection<Statement> additionalStatements) throws RepositoryException
+    private RDFBox createBox(RepositoryConnection con, IRI pageIri, IRI boxIri, Collection<Statement> additionalStatements) throws RepositoryException
     {
         RDFBox box = new RDFBox(boxIri);
         box.setId(next_id++);
@@ -172,122 +187,123 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
         box.setDisplayType(Box.DisplayType.BLOCK);
         
         RDFTextStyle style = new RDFTextStyle();
-        
-        for (Statement st : boxTreeModel.filter(boxIri, null, null))
-        {
-            final IRI pred = st.getPredicate();
-            final Value value = st.getObject();
-            
-            if (processContentRectProperty(pred, value, box, dataModel) || processStyleProperty(pred, value, style))
+        try (RepositoryResult<Statement> result = con.getStatements(boxIri, null, null, pageIri)) {
+            for (Statement st : result)
             {
-                // sucessfully processed
-            }
-            else if (BOX.documentOrder.equals(pred))
-            {
-                if (value instanceof Literal)
-                    box.setOrder(((Literal) value).intValue());
-            }
-            else if (BOX.visible.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    box.setVisible(((Literal) value).booleanValue());
-            }
-            else if (BOX.hasBackgroundImage.equals(pred)) 
-            {
-                if (value instanceof IRI)
+                final IRI pred = st.getPredicate();
+                final Value value = st.getObject();
+                
+                if (processContentRectProperty(con, pred, value, box) || processStyleProperty(pred, value, style))
                 {
-                    final RDFContentImage image = loadImage(storage, (IRI) value);
-                    box.setBackgroundImagePng(image.getPngData());
+                    // sucessfully processed
                 }
-            }
-            else if (BOX.color.equals(pred)) 
-            {
-                box.setColor(Serialization.decodeHexColor(value.stringValue()));
-            }
-            else if (BOX.fontFamily.equals(pred)) 
-            {
-                if (value instanceof Literal)
-                    box.setFontFamily(value.stringValue());
-            }
-            else if (BOX.text.equals(pred)) 
-            {
-                if (box.getType() != Type.REPLACED_CONTENT) //once it is a replaced box, do not change it back to text box
-                    box.setType(Type.TEXT_CONTENT);
-                box.setDisplayType(null); //text boxes have no display type
-                box.setOwnText(value.stringValue());
-            }
-            else if (BOX.containsObject.equals(pred))
-            {
-                box.setType(Type.REPLACED_CONTENT);
-                if (value instanceof IRI)
+                else if (BOX.documentOrder.equals(pred))
                 {
-                    final Value valueType = storage.getPropertyValue((IRI) value, RDF.TYPE);
-                    if (BOX.Image.equals(valueType)) // treat images in a special way
+                    if (value instanceof Literal)
+                        box.setOrder(((Literal) value).intValue());
+                }
+                else if (BOX.visible.equals(pred)) 
+                {
+                    if (value instanceof Literal)
+                        box.setVisible(((Literal) value).booleanValue());
+                }
+                else if (BOX.hasBackgroundImage.equals(pred)) 
+                {
+                    if (value instanceof IRI)
                     {
-                        final RDFContentImage obj = loadImage(storage, (IRI) value);
-                        box.setContentObject(obj);
-                    }
-                    else // other objects than images
-                    {
-                        final RDFContentObject obj = new RDFContentObject((IRI) value);
-                        box.setContentObject(obj);
+                        final RDFContentImage image = loadImage(con, (IRI) value);
+                        box.setBackgroundImagePng(image.getPngData());
                     }
                 }
-            }
-            else if (BOX.bounds.equals(pred))
-            {
-                if (value instanceof IRI)
+                else if (BOX.color.equals(pred)) 
                 {
-                    final Rectangular rect = createBounds(dataModel, (IRI) value);
-                    if (rect != null)
-                        box.setBounds(rect);
+                    box.setColor(Serialization.decodeHexColor(value.stringValue()));
                 }
-            }
-            else if (BOX.visualBounds.equals(pred))
-            {
-                if (value instanceof IRI)
+                else if (BOX.fontFamily.equals(pred)) 
                 {
-                    final Rectangular rect = createBounds(dataModel, (IRI) value);
-                    if (rect != null)
-                        box.setVisualBounds(rect);
+                    if (value instanceof Literal)
+                        box.setFontFamily(value.stringValue());
                 }
-            }
-            else if (BOX.contentBounds.equals(pred))
-            {
-                if (value instanceof IRI)
+                else if (BOX.text.equals(pred)) 
                 {
-                    final Rectangular rect = createBounds(dataModel, (IRI) value);
-                    if (rect != null)
-                        box.setContentBounds(rect);
+                    if (box.getType() != Type.REPLACED_CONTENT) //once it is a replaced box, do not change it back to text box
+                        box.setType(Type.TEXT_CONTENT);
+                    box.setDisplayType(null); //text boxes have no display type
+                    box.setOwnText(value.stringValue());
                 }
-            }
-            else if (BOX.sourceXPath.equals(pred)) 
-            {
-                box.setSourceNodeId(value.stringValue());
-            }
-            else if (BOX.htmlTagName.equals(pred)) 
-            {
-                box.setTagName(value.stringValue());
-            }
-            else if (BOX.displayType.equals(pred))
-            {
-                final Box.DisplayType type = Serialization.decodeDisplayType(value.stringValue());
-                if (type != null)
-                    box.setDisplayType(type);
-            }
-            else if (BOX.hasAttribute.equals(pred))
-            {
-                if (value instanceof IRI)
+                else if (BOX.containsObject.equals(pred))
                 {
-                    Map.Entry<String, String> attr = createAttribute(dataModel, (IRI) value);
-                    if (attr != null)
-                        box.setAttribute(attr.getKey(), attr.getValue());
+                    box.setType(Type.REPLACED_CONTENT);
+                    if (value instanceof IRI)
+                    {
+                        final Value valueType = getPropertyValue(con, (IRI) value, RDF.TYPE);
+                        if (BOX.Image.equals(valueType)) // treat images in a special way
+                        {
+                            final RDFContentImage obj = loadImage(con, (IRI) value);
+                            box.setContentObject(obj);
+                        }
+                        else // other objects than images
+                        {
+                            final RDFContentObject obj = new RDFContentObject((IRI) value);
+                            box.setContentObject(obj);
+                        }
+                    }
                 }
-            }
-            else
-            {
-                // the statement was not used, keep it in additional statements
-                additionalStatements.add(st);
+                else if (BOX.bounds.equals(pred))
+                {
+                    if (value instanceof IRI)
+                    {
+                        final Rectangular rect = createBounds(con, (IRI) value);
+                        if (rect != null)
+                            box.setBounds(rect);
+                    }
+                }
+                else if (BOX.visualBounds.equals(pred))
+                {
+                    if (value instanceof IRI)
+                    {
+                        final Rectangular rect = createBounds(con, (IRI) value);
+                        if (rect != null)
+                            box.setVisualBounds(rect);
+                    }
+                }
+                else if (BOX.contentBounds.equals(pred))
+                {
+                    if (value instanceof IRI)
+                    {
+                        final Rectangular rect = createBounds(con, (IRI) value);
+                        if (rect != null)
+                            box.setContentBounds(rect);
+                    }
+                }
+                else if (BOX.sourceXPath.equals(pred)) 
+                {
+                    box.setSourceNodeId(value.stringValue());
+                }
+                else if (BOX.htmlTagName.equals(pred)) 
+                {
+                    box.setTagName(value.stringValue());
+                }
+                else if (BOX.displayType.equals(pred))
+                {
+                    final Box.DisplayType type = Serialization.decodeDisplayType(value.stringValue());
+                    if (type != null)
+                        box.setDisplayType(type);
+                }
+                else if (BOX.hasAttribute.equals(pred))
+                {
+                    if (value instanceof IRI)
+                    {
+                        Map.Entry<String, String> attr = createAttribute(con, (IRI) value);
+                        if (attr != null)
+                            box.setAttribute(attr.getKey(), attr.getValue());
+                    }
+                }
+                else
+                {
+                    // the statement was not used, keep it in additional statements
+                    additionalStatements.add(st);
+                }
             }
         }
         box.setTextStyle(style.toTextStyle());
@@ -301,10 +317,10 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
      * @param imageIri
      * @return
      */
-    private RDFContentImage loadImage(RDFStorage storage, final IRI imageIri)
+    private RDFContentImage loadImage(RepositoryConnection con, final IRI imageIri)
     {
         RDFContentImage obj = new RDFContentImage(imageIri);
-        Value urlVal = storage.getPropertyValue(imageIri, BOX.imageUrl);
+        Value urlVal = getPropertyValue(con, imageIri, BOX.imageUrl);
         if (urlVal != null && urlVal instanceof Literal)
         {
             try {
@@ -313,7 +329,7 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
                 log.error(e.getMessage());
             }
         }
-        Value dataVal = storage.getPropertyValue(imageIri, BOX.imageData);
+        Value dataVal = getPropertyValue(con, imageIri, BOX.imageData);
         if (dataVal != null && dataVal instanceof Literal)
         {
             final String dataStr = dataVal.stringValue();
@@ -324,55 +340,6 @@ public class BoxModelLoader extends ModelLoaderBase implements ModelLoader
             }
         }
         return obj;
-    }
-
-    /**
-     * Gets page box model from the unique page ID.
-     * @param artifactRepo the repository to query 
-     * @param pageIri the page IRI
-     * @return The creayed model
-     * @throws RepositoryException 
-     */
-    private Model getBoxModelForPage(RDFArtifactRepository artifactRepo, IRI pageIri) throws RepositoryException
-    {
-        final String query = artifactRepo.getIriDecoder().declarePrefixes()
-                + "CONSTRUCT { ?s ?p ?o } " + "WHERE { ?s ?p ?o . "
-                + "?s rdf:type box:Box . "
-                + "?s box:belongsTo <" + String.valueOf(pageIri) + "> . "
-                + "OPTIONAL { ?s box:documentOrder ?ord } "
-                + "} ORDER BY ?ord";
-        return execArtifactReadQuery(artifactRepo, query);
-    }
-
-    /**
-     * Gets the model of additional object properties of the boxes. It contains the data about the
-     * bounds, borders, attributes and other object properties.
-     * @param artifactRepo the repository to query 
-     * @param pageIri the page IRI
-     * @return The created model
-     * @throws RepositoryException 
-     */
-    private Model getBoxDataModelForPage(RDFArtifactRepository artifactRepo, IRI pageIri) throws RepositoryException
-    {
-        final String query = artifactRepo.getIriDecoder().declarePrefixes()
-                + "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o . "
-                + "?b rdf:type box:Box . " 
-                + "?b box:belongsTo <" + String.valueOf(pageIri) + "> . "
-                + getDataPropertyUnion()
-                + "}";
-        return execArtifactReadQuery(artifactRepo, query);
-    }
-    
-    private String getDataPropertyUnion()
-    {
-        StringBuilder ret = new StringBuilder();
-        for (String p : dataObjectProperties)
-        {
-            if (ret.length() > 0)
-                ret.append(" UNION ");
-            ret.append("{?b ").append(p).append(" ?s}");
-        }
-        return ret.toString();
     }
     
 }

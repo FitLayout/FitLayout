@@ -57,13 +57,14 @@ public class MetadataTagManager
     {
         try {
             final String query = repo.getIriDecoder().declarePrefixes()
-                    + "SELECT ?tag ?name ?type ?subj ?pred WHERE { "
+                    + "SELECT ?tag ?name ?type ?subj ?subjType ?pred WHERE { "
                     + " GRAPH <" + contextIri + "> {"
                     + "    ?tag segm:name ?name . "
                     + "    ?tag segm:type ?type . "
                     + "    ?tag map:describesInstance ?subj . "
                     + "    ?tag map:isValueOf ?pred . "
-                    + "    ?tag rdf:type segm:Tag "
+                    + "    ?tag rdf:type segm:Tag . "
+                    + "    OPTIONAL { ?subj rdf:type ?subjType } "
                     + "}}";
             
             List<BindingSet> data = repo.getStorage().executeSafeTupleQuery(query);
@@ -74,6 +75,7 @@ public class MetadataTagManager
                 final Binding bName = binding.getBinding("name");
                 final Binding bType = binding.getBinding("type");
                 final Binding bSubj = binding.getBinding("subj");
+                final Binding bSubjType = binding.getBinding("subjType");
                 final Binding bPred = binding.getBinding("pred");
                 if (bIri != null && bName != null && bType != null && bSubj != null && bPred != null 
                         && bIri.getValue() instanceof IRI
@@ -81,6 +83,8 @@ public class MetadataTagManager
                         && bPred.getValue() instanceof IRI)
                 {
                     Example ex = new Example((Resource) bSubj.getValue(), (IRI) bPred.getValue(), "");
+                    if (bSubjType != null && bSubjType.getValue() instanceof IRI)
+                        ex.setSubjectType((IRI) bSubjType.getValue());
                     MetaRefTag tag = new MetaRefTag((IRI) bIri.getValue(), bName.getValue().stringValue(), ex);
                     ret.add(tag);
                 }

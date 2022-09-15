@@ -19,6 +19,8 @@ public class Example
     private Resource subject;
     private IRI predicate;
     private String text;
+    private IRI subjectType; //optional subject type
+    
     
     public Example(Resource subject, IRI predicate, String text)
     {
@@ -40,6 +42,16 @@ public class Example
     public String getText()
     {
         return text;
+    }
+    
+    public IRI getSubjectType()
+    {
+        return subjectType;
+    }
+
+    public void setSubjectType(IRI subjectType)
+    {
+        this.subjectType = subjectType;
     }
 
     @Override

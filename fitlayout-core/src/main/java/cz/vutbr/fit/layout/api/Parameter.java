@@ -19,4 +19,10 @@ public interface Parameter
      */
     public String getName();
     
+    /**
+     * The decription of the parameter, its meaning and values.
+     * @return The parameter description.
+     */
+    public String getDescription();
+    
 }

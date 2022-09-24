@@ -14,6 +14,13 @@ public class ParameterString extends BaseParameter
     private int minLength;
     private int maxLength;
     
+    public ParameterString(String name, String description, int minLength, int maxLength)
+    {
+        super(name, description);
+        this.minLength = minLength;
+        this.maxLength = maxLength;
+    }
+    
     public ParameterString(String name, int minLength, int maxLength)
     {
         super(name);

@@ -14,6 +14,13 @@ public class ParameterFloat extends BaseParameter
     private float minValue;
     private float maxValue;
     
+    public ParameterFloat(String name, String description, float minValue, float maxValue)
+    {
+        super(name, description);
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+    }
+    
     public ParameterFloat(String name, float minValue, float maxValue)
     {
         super(name);

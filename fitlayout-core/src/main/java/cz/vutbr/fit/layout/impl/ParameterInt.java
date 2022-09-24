@@ -14,6 +14,13 @@ public class ParameterInt extends BaseParameter
     private int minValue;
     private int maxValue;
     
+    public ParameterInt(String name, String description, int minValue, int maxValue)
+    {
+        super(name, description);
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+    }
+
     public ParameterInt(String name, int minValue, int maxValue)
     {
         super(name);

@@ -12,6 +12,11 @@ package cz.vutbr.fit.layout.impl;
 public class ParameterBoolean extends BaseParameter
 {
 
+    public ParameterBoolean(String name, String description)
+    {
+        super(name, description);
+    }
+
     public ParameterBoolean(String name)
     {
         super(name);

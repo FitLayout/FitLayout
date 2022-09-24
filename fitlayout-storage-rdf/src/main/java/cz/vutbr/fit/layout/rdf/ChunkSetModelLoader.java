@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Box;
+import cz.vutbr.fit.layout.model.ChunkSet;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TextChunk;
@@ -92,7 +93,7 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
             Set<TextChunk> chunks = null;
             try (RepositoryConnection con = repo.getConnection()) {
                 chunks = loadChunks(con, sourceAreaTree, sourcePage,
-                    csetIri, chunkUris, cset.getAdditionalStatements());
+                    csetIri, cset, chunkUris, cset.getAdditionalStatements());
             }
             cset.setTextChunks(chunks);
             cset.setChunkIris(chunkUris);
@@ -103,7 +104,7 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
     }
 
     private Set<TextChunk> loadChunks(RepositoryConnection con, RDFAreaTree sourceAreaTree, RDFPage sourcePage,
-                                      IRI csetIri, Map<IRI, RDFTextChunk> chunkUris,
+                                      IRI csetIri, ChunkSet cset, Map<IRI, RDFTextChunk> chunkUris,
                                       Collection<Statement> additionalStatements)
     {
         // find chunk IRIs
@@ -118,9 +119,10 @@ public class ChunkSetModelLoader extends ModelLoaderBase implements ModelLoader
         {
             if (res instanceof IRI)
             {
-                RDFTextChunk area = createChunk(con, sourceAreaTree, sourcePage, 
+                RDFTextChunk chunk = createChunk(con, sourceAreaTree, sourcePage, 
                         csetIri, (IRI) res, additionalStatements);
-                chunkUris.put((IRI) res, area);
+                chunk.setChunkSet(cset);
+                chunkUris.put((IRI) res, chunk);
             }
         }
         //create the resulting set

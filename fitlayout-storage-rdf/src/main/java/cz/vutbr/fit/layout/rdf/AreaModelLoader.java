@@ -121,6 +121,7 @@ public class AreaModelLoader extends ModelLoaderBase implements ModelLoader
             if (res instanceof IRI)
             {
                 final RDFArea area = createArea(con, sourcePage, areaTreeIri, (IRI) res, additionalStatements);
+                area.setAreaTree(atree);
                 areaList.add(area);
             }
         }

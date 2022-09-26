@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import cz.vutbr.fit.layout.api.AreaUtils;
 import cz.vutbr.fit.layout.model.AreaConnection;
 import cz.vutbr.fit.layout.model.AreaTopology;
 import cz.vutbr.fit.layout.model.ContentRect;

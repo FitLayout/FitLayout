@@ -13,7 +13,7 @@ import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTopology;
 import cz.vutbr.fit.layout.model.AreaTree;
-import cz.vutbr.fit.layout.segm.AreaUtils;
+import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
  * 
@@ -126,7 +126,7 @@ public class SortByLinesOperator extends SortByPositionOperator
                     int threshold = (Math.min(area.getHeight(), neigh.getHeight()) / 2);
                     if (threshold < 0) threshold = 0;
                     //check if the nodes could be on the same line
-                    if (AreaUtils.isOnSameLine(area, neigh, threshold))
+                    if (isOnSameLine(area, neigh, threshold))
                     {
                         ret.add(neigh);
                         break;
@@ -149,7 +149,7 @@ public class SortByLinesOperator extends SortByPositionOperator
                     int threshold = (Math.min(area.getHeight(), neigh.getHeight()) / 2);
                     if (threshold < 0) threshold = 0;
                     //check if the nodes could be on the same line
-                    if (AreaUtils.isOnSameLine(area, neigh, threshold))
+                    if (isOnSameLine(area, neigh, threshold))
                     {
                         ret.insertElementAt(neigh, 0);
                         break;
@@ -162,4 +162,18 @@ public class SortByLinesOperator extends SortByPositionOperator
         return ret;
     }
     
+    /**
+     * Checks if the given areas are on the same line.
+     * @param a1
+     * @param a2
+     * @return
+     */
+    protected boolean isOnSameLine(Area a1, Area a2, int threshold)
+    {
+        final Rectangular gp1 = a1.getBounds();
+        final Rectangular gp2 = a2.getBounds();
+        return (Math.abs(gp1.getY1() - gp2.getY1()) <= threshold 
+                && Math.abs(gp1.getY2() - gp2.getY2()) <= threshold); 
+    }
+
 }

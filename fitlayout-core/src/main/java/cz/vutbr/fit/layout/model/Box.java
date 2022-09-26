@@ -7,6 +7,9 @@ package cz.vutbr.fit.layout.model;
 
 import java.util.Map;
 
+import cz.vutbr.fit.layout.api.BoxConcatenator;
+import cz.vutbr.fit.layout.api.Concatenators;
+
 
 /**
  * This class represents a box in the rendered page tree. It may contain a text or a content
@@ -39,10 +42,20 @@ public interface Box extends ContentRect, GenericTreeNode<Box>
     /**
      * Obtains the complete text contained in this box. For the leaf boxes,
      * it returns the corresponding string. For non-leaft boxes, it returns
-     * the concatentaion of the leaf box strings.
+     * the concatentaion of the leaf box strings using the default concatenator
+     * defined by {@link Concatenators#getDefaultBoxConcatenator()}.
      * @return a text string (possibly empty)
      */
     public String getText();
+    
+    /**
+     * Obtains the complete text contained in this box. For the leaf boxes,
+     * it returns the corresponding string. For non-leaft boxes, it returns
+     * the concatentaion of the leaf box strings using a given concatenator.
+     * @param concatenator The concatenator to be used to join the boxes.
+     * @return a text string (possibly empty)
+     */
+    public String getText(BoxConcatenator concatenator);
     
     /**
      * Obtains the text contained directly in this box without considering its child boxes.

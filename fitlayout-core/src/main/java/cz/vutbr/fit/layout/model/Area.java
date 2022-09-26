@@ -7,6 +7,8 @@ package cz.vutbr.fit.layout.model;
 
 import java.util.List;
 
+import cz.vutbr.fit.layout.api.AreaConcatenator;
+import cz.vutbr.fit.layout.api.Concatenators;
 import cz.vutbr.fit.layout.model.Border.Side;
 
 /**
@@ -56,7 +58,8 @@ public interface Area extends ContentRect, GenericTreeNode<Area>, Taggable
     public List<Box> getAllBoxes();
     
     /**
-     * Returns the complete text contained in this area and its sub area.
+     * Returns the complete text contained in this area and its sub areas concatenated
+     * using the default concatenator defined by {@link Concatenators#getDefaultAreaConcatenator()}.
      * @return A text string (possibly empty)
      */
     public String getText();
@@ -66,8 +69,17 @@ public interface Area extends ContentRect, GenericTreeNode<Area>, Taggable
      * areas are separated by the given string separator.
      * @param separator the string separating the individual areas
      * @return A text string (possibly empty)
+     * @deprecated Deprecated in favor of {@link #getText(AreaConcatenator)}
      */
     public String getText(String separator);
+    
+    /**
+     * Returns the complete text contained in this area and its sub areas concatenated
+     * using the specified concatenator.
+     * @param concatenator The concatenator to be used to join the areas (and boxes in leaf areas)
+     * @return A text string (possibly empty)
+     */
+    public String getText(AreaConcatenator concatenator);
     
     /**
      * Checks whether this area is formed by replaced boxes.

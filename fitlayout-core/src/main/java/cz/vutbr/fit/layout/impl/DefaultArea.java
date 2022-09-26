@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import cz.vutbr.fit.layout.api.AreaConcatenator;
+import cz.vutbr.fit.layout.api.BoxConcatenator;
+import cz.vutbr.fit.layout.api.Concatenators;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTopology;
 import cz.vutbr.fit.layout.model.AreaTree;
@@ -240,33 +242,25 @@ public class DefaultArea extends DefaultTreeContentRect<Area> implements Area
     @Override
     public String getText()
     {
-        String ret = "";
-        if (isLeaf())
-            ret = getBoxText();
-        else
-            for (int i = 0; i < getChildCount(); i++)
-                ret += getChildAt(i).getText();
-        return ret;
+        return getText(Concatenators.getDefaultAreaConcatenator());
     }
     
     @Override
     public String getText(String separator)
     {
-        String ret = "";
-        if (isLeaf())
-            ret = getBoxText();
-        else
-        {
-            for (int i = 0; i < getChildCount(); i++)
-            {
-                if (getChildAt(i).isLeaf() && !ret.isEmpty())
-                    ret += separator;
-                ret += getChildAt(i).getText(separator);
-            }
-        }
-        return ret;
+        final AreaConcatenator concat = new Concatenators.SeparatedAreaConcatenator(separator, Concatenators.getDefaultBoxConcatenator());
+        return getText(concat);
     }
     
+    @Override
+    public String getText(AreaConcatenator concatenator)
+    {
+        if (isLeaf())
+            return getBoxText(concatenator.getBoxConcatenator());
+        else
+            return concatenator.concat(getChildren());
+    }
+
     @Override
     public boolean isReplaced()
     {
@@ -328,18 +322,20 @@ public class DefaultArea extends DefaultTreeContentRect<Area> implements Area
     /**
      * Returns the text string represented by a concatenation of all
      * the boxes contained directly in this area (no subareas)
+     * @deprecated Depracated in favor of {@link #getBoxText(BoxConcatenator)}.
      */
     public String getBoxText()
     {
-        StringBuilder ret = new StringBuilder();
-        boolean start = true;
-        for (Iterator<Box> it = boxes.iterator(); it.hasNext(); )
-        {
-            if (!start) ret.append(' ');
-            else start = false;
-            ret.append(it.next().getText());
-        }
-        return ret.toString();
+        return Concatenators.getDefaultBoxConcatenator().concat(getBoxes());
+    }
+    
+    /**
+     * Returns the text string represented by a concatenation of all
+     * the boxes contained directly in this area (no subareas)
+     */
+    public String getBoxText(BoxConcatenator concat)
+    {
+        return concat.concat(getBoxes());
     }
     
     /**

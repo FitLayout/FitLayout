@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import cz.vutbr.fit.layout.api.BoxConcatenator;
+import cz.vutbr.fit.layout.api.Concatenators;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.ContentObject;
@@ -117,23 +119,18 @@ public class DefaultBox extends DefaultTreeContentRect<Box> implements Box
     @Override
     public String getText()
     {
-        if (isLeaf())
-        {
-            return getOwnText();
-        }
-        else
-        {
-            String ret = "";
-            for (int i = 0; i < getChildCount(); i++)
-            {
-                if (ret.trim().length() > 0)
-                    ret += " ";
-                ret = ret + getChildAt(i).getText().trim();
-            }
-            return ret;
-        }
+        return getText(Concatenators.getDefaultBoxConcatenator());
     }
     
+    @Override
+    public String getText(BoxConcatenator concatenator)
+    {
+        if (isLeaf())
+            return getOwnText();
+        else
+            return concatenator.concat(getChildren());
+    }
+
     @Override
     public String getOwnText()
     {

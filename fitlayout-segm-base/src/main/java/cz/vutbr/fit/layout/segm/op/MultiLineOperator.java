@@ -259,7 +259,7 @@ public class MultiLineOperator extends BaseOperator
     /**
      * Checks if the area can be horizontally expanded to the given 
      * X coordinate, i.e. there is a free space in the space on this X coordinate
-     * for the whole width of the area.
+     * for the whole height of the area.
      * @param node the area node that should be expanded
      * @param x the X coordinate to that the area should be expanded
      * @param except an area that shouldn't be considered for conflicts (e.g. an overlaping area)
@@ -267,10 +267,9 @@ public class MultiLineOperator extends BaseOperator
      */
     private boolean canExpandX(Area parent, Area node, int x, Area except)
     {
-        AreaTopology t = parent.getTopology();
-        int gy = t.getPosition(node).getY1();
-        int gh = t.getTopologyHeight();
-        for (int y = gy; y < gy + gh; y++)
+        final AreaTopology t = parent.getTopology();
+        final Rectangular nodePos = t.getPosition(node);
+        for (int y = nodePos.getY1(); y < nodePos.getY1() + nodePos.getHeight(); y++)
         {
             Area cand = (Area) t.findAreaAt(x, y);
             if (cand != null && cand != except)

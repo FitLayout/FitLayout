@@ -42,10 +42,12 @@ public class TreeOp
         target.setGridPosition(pos);
         if (flatten)
         {
+            // use area text for names of non-leaf areas
+            final String name1 = target.isLeaf() ? target.getName() : target.getText();
+            final String name2 = other.isLeaf() ? other.getName() : other.getText();
             // flattening - remove all the child areas
             target.removeAllChildren();
-            // use area text for name
-            target.setName(target.getText() + " . " + other.getText());
+            target.setName(name1 + " . " + name2);
         }
         else
         {
@@ -56,6 +58,7 @@ public class TreeOp
                 for (Iterator<Area> it = adopt.iterator(); it.hasNext();)
                     target.appendChild(it.next());
             }
+            target.setName(target.getName() + " . " + other.getName());
         }
         join(target, other, horizontal);
         //copy the tag while preserving the higher support //TODO is this corect?
@@ -76,7 +79,6 @@ public class TreeOp
     public static void join(Area target, Area other, boolean horizontal)
     {
         target.getBounds().expandToEnclose(other.getBounds());
-        target.setName(target.getName() + " . " + other.getName());
         //update border information according to the mutual area positions
         if (horizontal)
         {

@@ -145,21 +145,31 @@ public class FindLineOperator extends BaseOperator
     /**
      * Goes through all the areas in the tree and tries to join their sub-areas into single
      * areas.
+     * @param root The root area to process recursively.
+     * @return {@code true} when entirely succeeded for the subtree, {@code false} when at least some
+     * areas could not be joined.
      */
-    protected void recursiveJoinAreas(Area root)
+    protected boolean recursiveJoinAreas(Area root)
     {
+        boolean success = true;
         for (int i = 0; i < root.getChildCount(); i++)
-            recursiveJoinAreas(root.getChildAt(i));
-        joinAreas(root);
+            success &= recursiveJoinAreas(root.getChildAt(i));
+        if (success)
+            success &= joinAreas(root);
+        return success;
     }
     
     /**
      * Goes through the grid of areas and joins the adjacent visual areas that are not
-     * separated by anything
+     * separated by anything.
+     * @param a The root area to process.
+     * @return {@code true} when entirely succeeded, {@code false} when at least some
+     * areas could not be joined.
      */
-    protected void joinAreas(Area a)
+    protected boolean joinAreas(Area a)
     {
         //TODO: detekce radku by asi mela brat v uvahu separatory
+        boolean ret = true;
         AreaTopology t = a.getTopology();
         
         boolean change = true;
@@ -192,6 +202,8 @@ public class FindLineOperator extends BaseOperator
                                     node.updateTopologies();
                                     change = true;
                                 }
+                                else
+                                    ret = false;
                             }
                             else
                             {
@@ -200,6 +212,8 @@ public class FindLineOperator extends BaseOperator
                                     node.addUserAttribute(LINE_NEXT, neigh);
                                     neigh.addUserAttribute(LINE_PREV, node);
                                 }
+                                else
+                                    ret = false;
                             }
                         }
                     }
@@ -208,6 +222,7 @@ public class FindLineOperator extends BaseOperator
                 if (change) break; //something changed, repeat
             }
         }
+        return ret;
     }
 
     /**

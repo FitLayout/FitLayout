@@ -36,6 +36,9 @@ public class FindLineOperator extends BaseOperator
     /** Area attribute key for storing the previous area on line */
     public static final String LINE_PREV = "core.line.prev";
     
+    /** Remove the sub-areas? */
+    protected boolean flattenLines;
+    
     /** Should the lines have a consistent visual style? */
     protected boolean useConsistentStyle;
     
@@ -45,12 +48,14 @@ public class FindLineOperator extends BaseOperator
     
     public FindLineOperator()
     {
+        flattenLines = false;
         useConsistentStyle = false;
         maxLineEmSpace = 1.5f;
     }
     
-    public FindLineOperator(boolean useConsistentStyle, float maxLineEmSpace)
+    public FindLineOperator(boolean flattenLines, boolean useConsistentStyle, float maxLineEmSpace)
     {
+        this.flattenLines = flattenLines;
         this.useConsistentStyle = useConsistentStyle;
         this.maxLineEmSpace = maxLineEmSpace;
     }
@@ -83,10 +88,21 @@ public class FindLineOperator extends BaseOperator
     @Override
     public List<Parameter> defineParams()
     {
-        List<Parameter> ret = new ArrayList<>();
-        ret.add(new ParameterBoolean("useConsistentStyle"));
-        ret.add(new ParameterFloat("maxLineEmSpace"));
+        List<Parameter> ret = new ArrayList<>(3);
+        ret.add(new ParameterBoolean("useConsistentStyle", "Require consistent visual style of all areas to join them."));
+        ret.add(new ParameterFloat("maxLineEmSpace", "Maximal horizontal distance between two areas in font size (em) units.", 0.0f, 100.0f));
+        ret.add(new ParameterBoolean("flattenLines", "Remove the sub-areas of the detected lines."));
         return ret;
+    }
+
+    public boolean getFlattenLines()
+    {
+        return flattenLines;
+    }
+
+    public void setFlattenLines(boolean flattenLines)
+    {
+        this.flattenLines = flattenLines;
     }
 
     public boolean getUseConsistentStyle()
@@ -132,9 +148,9 @@ public class FindLineOperator extends BaseOperator
      */
     protected void recursiveJoinAreas(Area root)
     {
-        joinAreas(root);
         for (int i = 0; i < root.getChildCount(); i++)
             recursiveJoinAreas(root.getChildAt(i));
+        joinAreas(root);
     }
     
     /**
@@ -263,7 +279,7 @@ public class FindLineOperator extends BaseOperator
             log.debug("Join: {} + {}", n1, n2);
             Rectangular newpos = new Rectangular(n1.getGridPosition().getX1(), sy1,
                                                  n2.getGridPosition().getX2(), ey1);
-            TreeOp.joinArea(n1, n2, newpos, true);
+            TreeOp.joinArea(n1, n2, newpos, true, flattenLines);
             parent.removeChild(n2);
         }
         return true;

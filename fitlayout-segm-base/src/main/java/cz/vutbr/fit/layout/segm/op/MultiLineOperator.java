@@ -249,7 +249,7 @@ public class MultiLineOperator extends BaseOperator
             log.debug("VJoin: {} + {}", n1, n2);
             Rectangular newpos = new Rectangular(sx1, n1.getGridPosition().getY1(),
                                                  ex1, n2.getGridPosition().getY2());
-            TreeOp.joinArea(n1, n2, newpos, true);
+            TreeOp.joinArea(n1, n2, newpos, true, false);
             parent.removeChild(n2);
         }
         return true;

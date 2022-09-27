@@ -35,15 +35,27 @@ public class TreeOp
      * @param other The area to be joined to the target area
      * @param pos The position of the result in the grid
      * @param horizontal Horizontal or vertical join?
+     * @param flatten Remove the child areas, preserve the boxes only.
      */
-    public static void joinArea(Area target, Area other, Rectangular pos, boolean horizontal)
+    public static void joinArea(Area target, Area other, Rectangular pos, boolean horizontal, boolean flatten)
     {
         target.setGridPosition(pos);
-        if (other.getChildCount() > 0)
+        if (flatten)
         {
-            List<Area> adopt = new ArrayList<>(other.getChildren());
-            for (Iterator<Area> it = adopt.iterator(); it.hasNext();)
-                target.appendChild(it.next());
+            // flattening - remove all the child areas
+            target.removeAllChildren();
+            // use area text for name
+            target.setName(target.getText() + " . " + other.getText());
+        }
+        else
+        {
+            // not flattening - move the child areas of the other area to the target area
+            if (other.getChildCount() > 0)
+            {
+                final List<Area> adopt = new ArrayList<>(other.getChildren());
+                for (Iterator<Area> it = adopt.iterator(); it.hasNext();)
+                    target.appendChild(it.next());
+            }
         }
         join(target, other, horizontal);
         //copy the tag while preserving the higher support //TODO is this corect?

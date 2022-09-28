@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cz.vutbr.fit.layout.api.AreaConcatenator;
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.impl.ParameterString;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TagOccurrence;
+import cz.vutbr.fit.layout.text.TextFlowConcatenator;
 
 
 public class RegexpTagger extends BaseTagger
@@ -31,10 +33,14 @@ public class RegexpTagger extends BaseTagger
     private Pattern contExpr = Pattern.compile("[A-Za-z\\s\\.\\:\\-\\p{Pd}]+"); 
 
     /** Words that are not allowed in the presentation title */
-    protected List<String> blacklist;
+    private List<String> blacklist;
+    
+    /** The concatenator used for converting areas to text */
+    private AreaConcatenator concat; 
     
     public RegexpTagger()
     {
+        concat = new TextFlowConcatenator();
         blacklist = new ArrayList<String>();
         //blacklist.add("session");
         //blacklist.add("chair");
@@ -120,6 +126,11 @@ public class RegexpTagger extends BaseTagger
     {
         this.minWordLength = minWordLength;
     }
+    
+    public AreaConcatenator getConcatenator()
+    {
+        return concat;
+    }
 
     //==========================================================================================
     
@@ -200,11 +211,9 @@ public class RegexpTagger extends BaseTagger
     
     protected String getText(Area node)
     {
-        String s = node.getText().trim();
-        //if (s.contains("\""))
-        //    System.out.println("jo!");
-        s = s.replaceAll("^[\\\"\\p{Pi}]+", "");
-        s = s.replaceAll("[\\\"\\p{Pf}]+$", "");
+        String s = node.getText(getConcatenator()).trim();
+        s = s.replaceAll("^[\\\"\\p{Pi}]+", ""); //remove starting quotes and other unicode "initial punctuation"
+        s = s.replaceAll("[\\\"\\p{Pf}]+$", ""); //remove trailing quotes and other unicode "final punctuation"
         return s;
     }
     

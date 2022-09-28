@@ -33,6 +33,10 @@
 			<artifactId>fitlayout-core</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>cz.vutbr.fit.layout</groupId>
+			<artifactId>fitlayout-segm-base</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>edu.stanford.nlp</groupId>
 			<artifactId>stanford-corenlp</artifactId>
 			<version>4.4.0</version>

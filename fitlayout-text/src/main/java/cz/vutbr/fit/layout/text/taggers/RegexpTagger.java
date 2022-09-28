@@ -137,7 +137,7 @@ public class RegexpTagger extends BaseTagger
     @Override
     public float belongsTo(Area node)
     {
-        if (node.isLeaf())
+        if (isHomogeneous(node))
         {
             String text = getText(node);
             if (areaExpr.matcher(text).lookingAt()) //check the allowed text start

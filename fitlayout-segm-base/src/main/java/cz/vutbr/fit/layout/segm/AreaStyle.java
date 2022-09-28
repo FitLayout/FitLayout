@@ -143,6 +143,33 @@ public class AreaStyle
                    && a1.getBackgroundColor().equals(a2.getBackgroundColor()));
     }
 
+    /**
+     * Checks whether all children of a given area have a consistent
+     * visual style (as defined by {@link #hasSameStyle(Area, Area)}).
+     * @param root The area to test.
+     * @return {@code true} when the area is a leaf area or all the child
+     * areas have a consistent visual style.
+     */
+    public static boolean hasConsistentStyle(Area root)
+    {
+        if (root.isLeaf())
+        {
+            return true;
+        }
+        else
+        {
+            Area prevChild = null;
+            for (Area child : root.getChildren())
+            {
+                if (!hasConsistentStyle(child))
+                    return false;
+                if (prevChild != null && !hasSameStyle(prevChild, child))
+                    return false;
+                prevChild = child;
+            }
+            return true;
+        }
+    }
     
     //====================================================================================
     

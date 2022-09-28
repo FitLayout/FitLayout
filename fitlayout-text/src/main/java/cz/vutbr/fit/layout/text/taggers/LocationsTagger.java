@@ -79,7 +79,7 @@ public class LocationsTagger extends NERTagger
     @Override
     public float belongsTo(Area node)
     {
-        if (node.isLeaf())
+        if (isHomogeneous(node))
         {
             String text = node.getText();
             List<Triple<String,Integer,Integer>> list = getClassifier().classifyToCharacterOffsets(text);

@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
@@ -17,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import cz.vutbr.fit.layout.impl.BaseBoxTreeBuilder;
+import cz.vutbr.fit.layout.model.Box;
+import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.Page;
 
 /**
@@ -78,7 +81,18 @@ public class PDFBoxTreeBuilder extends BaseBoxTreeBuilder
     public void parse(URL url) throws IOException, SAXException
     {
         FLBoxTree boxTree = createBoxTree(url);
-        //TODO create page from boxTree
+        
+        List<Box> boxlist = boxTree.getAllBoxes();
+        //Color bg = Units.toColor(vp.getBgcolor());
+        Color bg = Color.WHITE; //TODO detect background color?
+        Box root = buildTree(boxlist, bg);
+        
+        //wrap the root box with a page
+        PageImpl pg = page = new PageImpl(pageUrl);
+        pg.setTitle(pageTitle);
+        pg.setRoot(root);
+        pg.setWidth(root.getWidth());
+        pg.setHeight(root.getHeight());
     }
     
     private FLBoxTree createBoxTree(URL url) throws IOException

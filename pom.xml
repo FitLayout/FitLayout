@@ -47,6 +47,7 @@
 	<modules>
 		<module>fitlayout-core</module>
 		<module>fitlayout-render-cssbox</module>
+		<module>fitlayout-render-pdf</module>
 		<module>fitlayout-segm-base</module>
 		<module>fitlayout-tools</module>
 		<module>fitlayout-storage-rdf</module>

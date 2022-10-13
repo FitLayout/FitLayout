@@ -26,8 +26,7 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.cssbox</groupId>
-			<artifactId>pdf2dom-light</artifactId>
-			<version>2.0.2</version>
+			<artifactId>pdf2dom-lite</artifactId>
 		</dependency>
 	</dependencies>
 

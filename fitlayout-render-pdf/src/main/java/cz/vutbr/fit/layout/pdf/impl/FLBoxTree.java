@@ -21,6 +21,7 @@ import org.fit.pdfdom.resource.ImageResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.vutbr.fit.layout.impl.DefaultContentImage;
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Box.Type;
@@ -166,11 +167,11 @@ public class FLBoxTree extends PDFBoxTree
     }
 
     @Override
-    protected void renderImage(float x, float y, float width, float height,
-            ImageResource data) throws IOException
+    protected void renderImage(float x, float y, float width, float height, ImageResource data) throws IOException
     {
-        // TODO Auto-generated method stub
-        
+        BoxImpl imageBox = createImageBox(x, y, width, height, curPageY, data);
+        pageBox.appendChild(imageBox);
+        allBoxes.add(imageBox);
     }
     
     //=============================================================================
@@ -244,6 +245,30 @@ public class FLBoxTree extends PDFBoxTree
         return ret;
     }
     
+    protected BoxImpl createImageBox(float x, float y, float width, float height, int pageOffset, ImageResource resource) throws IOException
+    {
+        BoxImpl ret = createBox(convertLength(x),
+                convertLength(y) + pageOffset,
+                convertLength(width),
+                convertLength(height));
+        
+        ret.setTagName("img");
+        ret.setType(Type.REPLACED_CONTENT);
+        //ret.setBackgroundColor(Color.BLACK);
+        
+        if (resource.getData() != null)
+        {
+            try {
+                DefaultContentImage img = new DefaultContentImage();
+                img.setPngData(resource.getData());
+                ret.setContentObject(img);
+            } catch (IOException e) {
+            }
+        }
+        
+        return ret;
+    }
+    
     protected int convertLength(float length)
     {
         int ret = Math.round(length * 1.5f); //TODO convert pt to px?
@@ -302,6 +327,5 @@ public class FLBoxTree extends PDFBoxTree
         }
         return color;
     }
-
 
 }

@@ -5,10 +5,16 @@
  */
 package cz.vutbr.fit.layout.pdf.impl;
 
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -260,7 +266,8 @@ public class FLBoxTree extends PDFBoxTree
         {
             try {
                 DefaultContentImage img = new DefaultContentImage();
-                img.setPngData(resource.getData());
+                byte[] scaled = scaleImageData(resource.getData(), convertLength(width), convertLength(height));
+                img.setPngData(scaled);
                 ret.setContentObject(img);
             } catch (IOException e) {
             }
@@ -326,6 +333,25 @@ public class FLBoxTree extends PDFBoxTree
             log.error("convertColor: UnsupportedOperationException: {}", e.getMessage());
         }
         return color;
+    }
+
+    public byte[] scaleImageData(byte[] srcData, int destWidth, int destHeight) throws IOException
+    {
+        ByteArrayInputStream is = new ByteArrayInputStream(srcData);
+        BufferedImage srcImage = ImageIO.read(is);
+        BufferedImage scaledImage = scaleImage(srcImage, destWidth, destHeight);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(scaledImage, "png", os);
+        return os.toByteArray();
+    }
+    
+    public static BufferedImage scaleImage(BufferedImage source, int destWidth, int destHeight)
+    {
+        BufferedImage copy = new BufferedImage(destWidth, destHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics gfx = copy.getGraphics();
+        gfx.drawImage(source, 0, 0, destWidth, destHeight, null);
+        gfx.dispose();
+        return copy;
     }
 
 }

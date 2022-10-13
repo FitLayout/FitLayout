@@ -12,6 +12,8 @@ import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
+import org.fit.pdfdom.HtmlDivLine;
 import org.fit.pdfdom.PDFBoxTree;
 import org.fit.pdfdom.PathSegment;
 import org.fit.pdfdom.TextMetrics;
@@ -19,6 +21,7 @@ import org.fit.pdfdom.resource.ImageResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Box.Type;
 import cz.vutbr.fit.layout.model.Color;
@@ -33,6 +36,8 @@ public class FLBoxTree extends PDFBoxTree
 {
     private static Logger log = LoggerFactory.getLogger(FLBoxTree.class);
     
+    private static final Color DOCUMENT_COLOR = new Color(0xee, 0xee, 0xee);
+    private static final Color PAGE_COLOR = Color.WHITE;
     private static final int PAGE_GAP = 10;
     
     private List<Box> allBoxes;
@@ -82,7 +87,7 @@ public class FLBoxTree extends PDFBoxTree
     {
         root = createBox(0, 0, 100, 100);
         root.setTagName("#document");
-        root.setBackgroundColor(new Color(0xee, 0xee, 0xee));
+        root.setBackgroundColor(DOCUMENT_COLOR);
         // TODO root box properties
         allBoxes.add(root);
     }
@@ -111,7 +116,7 @@ public class FLBoxTree extends PDFBoxTree
             curPageY = nextPageY;
             pageBox = createBox(0, curPageY, w, h);
             pageBox.setTagName("page");
-            pageBox.setBackgroundColor(Color.WHITE);
+            pageBox.setBackgroundColor(PAGE_COLOR);
             
             nextPageY += h + PAGE_GAP;
             maxPageWidth = Math.max(maxPageWidth, w);
@@ -140,11 +145,24 @@ public class FLBoxTree extends PDFBoxTree
     }
 
     @Override
-    protected void renderPath(List<PathSegment> path, boolean stroke,
-            boolean fill) throws IOException
+    protected void renderPath(List<PathSegment> path, boolean stroke, boolean fill) throws IOException
     {
-        // TODO Auto-generated method stub
-        
+        float[] rect = toRectangle(path);
+        if (rect != null)
+        {
+            final BoxImpl rectBox = createRectangleBox(rect[0], rect[1], rect[2]-rect[0], rect[3]-rect[1], curPageY, stroke, fill); //TODO +1?
+            pageBox.appendChild(rectBox);
+            allBoxes.add(rectBox);
+        }
+        else if (stroke)
+        {
+            for (PathSegment segm : path)
+            {
+                BoxImpl lineBox = createLineBox(segm.getX1(), segm.getY1(), segm.getX2(), segm.getY2(), curPageY);
+                pageBox.appendChild(lineBox);
+                allBoxes.add(lineBox);
+            }
+        }
     }
 
     @Override
@@ -168,14 +186,70 @@ public class FLBoxTree extends PDFBoxTree
         final BoxImpl ret = createBox();
         ret.setOrder(orderCounter++);
         ret.setId(ret.getOrder());
+        ret.setSourceNodeId("b" + ret.getOrder());
         ret.setBounds(new Rectangular(x, y, x + w - 1, y + h - 1, false));
         ret.setContentBounds(new Rectangular(ret.getBounds()));
         return ret;
     }
     
+    protected BoxImpl createRectangleBox(float x, float y, float width, float height, int pageOffset, boolean stroke, boolean fill)
+    {
+        float lineWidth = transformWidth(getGraphicsState().getLineWidth());
+        float wcor = stroke ? lineWidth : 0.0f;
+        float strokeOffset = (wcor == 0) ? 0 : wcor / 2;
+        float w = width - wcor < 0 ? 1 : width - wcor;
+        float h = height - wcor < 0 ? 1 : height - wcor;
+        
+        int dx = convertLength(x - strokeOffset);
+        int dy = convertLength(y - strokeOffset) + pageOffset;
+        int dw = convertLength(w);
+        int dh = convertLength(h);
+        
+        BoxImpl ret = createBox(dx, dy, dw, dh);
+        ret.setTagName("rect");
+        ret.setType(Type.ELEMENT);
+        
+        if (stroke)
+        {
+            Color clr = convertColor(getGraphicsState().getStrokingColor());
+            Border b = new Border(convertLength(lineWidth), Border.Style.SOLID, clr);
+            for (Border.Side side : Border.Side.values())
+                ret.setBorderStyle(side, b);
+        }
+        
+        if (fill)
+        {
+            Color clr = convertColor(getGraphicsState().getNonStrokingColor());
+            ret.setBackgroundColor(clr);
+        }
+        
+        return ret;
+    }
+    
+    protected BoxImpl createLineBox(float x1, float y1, float x2, float y2, int pageOffset)
+    {
+        HtmlDivLine line = new HtmlDivLine(x1, y1, x2, y2, transformWidth(getGraphicsState().getLineWidth()));
+        Color color = convertColor(getGraphicsState().getStrokingColor());
+        
+        BoxImpl ret = createBox(convertLength(line.getLeft()),
+                convertLength(line.getTop()) + pageOffset,
+                convertLength(line.getWidth()),
+                convertLength(line.getHeight()));
+        ret.setTagName("line");
+        ret.setType(Type.ELEMENT);
+        
+        Border.Side side = line.isVertical() ? Border.Side.RIGHT : Border.Side.BOTTOM;
+        ret.setBorderStyle(side, new Border(convertLength(line.getLineStrokeWidth()), Border.Style.SOLID, color));
+        
+        return ret;
+    }
+    
     protected int convertLength(float length)
     {
-        return Math.round(length * 1.5f); //TODO convert pt to px?
+        int ret = Math.round(length * 1.5f); //TODO convert pt to px?
+        if (ret == 0 && length > 0.1f) // convert minimal widths to at least 1px
+            ret = 1;
+        return ret;
     }
     
     protected TextStyle getCurrentTextStyle(int contentLength)
@@ -214,5 +288,20 @@ public class FLBoxTree extends PDFBoxTree
         return Color.BLACK;
     }
     
+    protected Color convertColor(PDColor pdcolor)
+    {
+        Color color = null;
+        try
+        {
+            float[] rgb = pdcolor.getColorSpace().toRGB(pdcolor.getComponents());
+            color = new Color(Math.round(rgb[0] * 255), Math.round(rgb[1] * 255), Math.round(rgb[2] * 255));
+        } catch (IOException e) {
+            log.error("convertColor: IOException: {}", e.getMessage());
+        } catch (UnsupportedOperationException e) {
+            log.error("convertColor: UnsupportedOperationException: {}", e.getMessage());
+        }
+        return color;
+    }
+
 
 }

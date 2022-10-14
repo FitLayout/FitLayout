@@ -88,6 +88,16 @@ public class FLBoxTree extends PDFBoxTree
            They create the DOM structures instead */
         super.writeText(doc, new OutputStreamWriter(System.out));
     }
+    
+    protected void addBox(BoxImpl parent, BoxImpl newBox)
+    {
+        allBoxes.add(newBox);
+        if (parent != null)
+        {
+            parent.appendChild(newBox);
+            newBox.setIntrinsicParent(parent);
+        }
+    }
 
     @Override
     protected void startDocument(PDDocument document) throws IOException
@@ -95,8 +105,7 @@ public class FLBoxTree extends PDFBoxTree
         root = createBox(0, 0, 100, 100);
         root.setTagName("#document");
         root.setBackgroundColor(DOCUMENT_COLOR);
-        // TODO root box properties
-        allBoxes.add(root);
+        addBox(null, root);
     }
 
     @Override
@@ -128,8 +137,7 @@ public class FLBoxTree extends PDFBoxTree
             nextPageY += h + PAGE_GAP;
             maxPageWidth = Math.max(maxPageWidth, w);
             
-            root.appendChild(pageBox);
-            allBoxes.add(pageBox);
+            addBox(root, pageBox);
         }
         else
             log.warn("No media box found");
@@ -147,8 +155,7 @@ public class FLBoxTree extends PDFBoxTree
         textBox.setFontFamily(curstyle.getFontFamily());
         textBox.setTextStyle(getCurrentTextStyle(data.length()));
         textBox.setColor(parseColor(curstyle.getColor()));
-        pageBox.appendChild(textBox);
-        allBoxes.add(textBox);
+        addBox(pageBox, textBox);
     }
 
     @Override
@@ -158,16 +165,14 @@ public class FLBoxTree extends PDFBoxTree
         if (rect != null)
         {
             final BoxImpl rectBox = createRectangleBox(rect[0], rect[1], rect[2]-rect[0], rect[3]-rect[1], curPageY, stroke, fill); //TODO +1?
-            pageBox.appendChild(rectBox);
-            allBoxes.add(rectBox);
+            addBox(pageBox, rectBox);
         }
         else if (stroke)
         {
             for (PathSegment segm : path)
             {
                 BoxImpl lineBox = createLineBox(segm.getX1(), segm.getY1(), segm.getX2(), segm.getY2(), curPageY);
-                pageBox.appendChild(lineBox);
-                allBoxes.add(lineBox);
+                addBox(pageBox, lineBox);
             }
         }
     }
@@ -176,8 +181,7 @@ public class FLBoxTree extends PDFBoxTree
     protected void renderImage(float x, float y, float width, float height, ImageResource data) throws IOException
     {
         BoxImpl imageBox = createImageBox(x, y, width, height, curPageY, data);
-        pageBox.appendChild(imageBox);
-        allBoxes.add(imageBox);
+        addBox(pageBox, imageBox);
     }
     
     //=============================================================================

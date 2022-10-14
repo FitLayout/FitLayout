@@ -121,8 +121,8 @@ public class FLBoxTree extends PDFBoxTree
         PDRectangle layout = getCurrentMediaBox();
         if (layout != null)
         {
-            int w = convertLength(layout.getWidth());
-            int h = convertLength(layout.getHeight());
+            int w = convertLengthI(layout.getWidth());
+            int h = convertLengthI(layout.getHeight());
             final int rot = pdpage.getRotation();
             if (rot == 90 || rot == 270)
             {
@@ -146,10 +146,10 @@ public class FLBoxTree extends PDFBoxTree
     @Override
     protected void renderText(String data, TextMetrics metrics)
     {
-        final BoxImpl textBox = createBox(convertLength(curstyle.getLeft()),
-                curPageY + convertLength(curstyle.getTop()),
-                convertLength(metrics.getWidth()),
-                convertLength(metrics.getHeight()));
+        final BoxImpl textBox = createBox(convertLengthI(curstyle.getLeft()),
+                curPageY + convertLengthI(curstyle.getTop()),
+                convertLengthI(metrics.getWidth()),
+                convertLengthI(metrics.getHeight()));
         textBox.setType(Type.TEXT_CONTENT);
         textBox.setOwnText(data);
         textBox.setFontFamily(curstyle.getFontFamily());
@@ -164,7 +164,7 @@ public class FLBoxTree extends PDFBoxTree
         float[] rect = toRectangle(path);
         if (rect != null)
         {
-            final BoxImpl rectBox = createRectangleBox(rect[0], rect[1], rect[2]-rect[0], rect[3]-rect[1], curPageY, stroke, fill); //TODO +1?
+            final BoxImpl rectBox = createRectangleBox(rect[0], rect[1], rect[2]-rect[0]+1, rect[3]-rect[1]+1, curPageY, stroke, fill);
             addBox(pageBox, rectBox);
         }
         else if (stroke)
@@ -211,10 +211,10 @@ public class FLBoxTree extends PDFBoxTree
         float w = width - wcor < 0 ? 1 : width - wcor;
         float h = height - wcor < 0 ? 1 : height - wcor;
         
-        int dx = convertLength(x - strokeOffset);
-        int dy = convertLength(y - strokeOffset) + pageOffset;
-        int dw = convertLength(w);
-        int dh = convertLength(h);
+        int dx = convertLengthI(x - strokeOffset);
+        int dy = convertLengthI(y - strokeOffset) + pageOffset;
+        int dw = convertLengthI(w);
+        int dh = convertLengthI(h);
         
         BoxImpl ret = createBox(dx, dy, dw, dh);
         ret.setTagName("rect");
@@ -223,7 +223,7 @@ public class FLBoxTree extends PDFBoxTree
         if (stroke)
         {
             Color clr = convertColor(getGraphicsState().getStrokingColor());
-            Border b = new Border(convertLength(lineWidth), Border.Style.SOLID, clr);
+            Border b = new Border(convertLengthI(lineWidth), Border.Style.SOLID, clr);
             for (Border.Side side : Border.Side.values())
                 ret.setBorderStyle(side, b);
         }
@@ -242,25 +242,25 @@ public class FLBoxTree extends PDFBoxTree
         HtmlDivLine line = new HtmlDivLine(x1, y1, x2, y2, transformWidth(getGraphicsState().getLineWidth()));
         Color color = convertColor(getGraphicsState().getStrokingColor());
         
-        BoxImpl ret = createBox(convertLength(line.getLeft()),
-                convertLength(line.getTop()) + pageOffset,
-                convertLength(line.getWidth()),
-                convertLength(line.getHeight()));
+        BoxImpl ret = createBox(convertLengthI(line.getLeft()),
+                convertLengthI(line.getTop()) + pageOffset,
+                convertLengthI(line.getWidth()),
+                convertLengthI(line.getHeight()));
         ret.setTagName("line");
         ret.setType(Type.ELEMENT);
         
         Border.Side side = line.isVertical() ? Border.Side.RIGHT : Border.Side.BOTTOM;
-        ret.setBorderStyle(side, new Border(convertLength(line.getLineStrokeWidth()), Border.Style.SOLID, color));
+        ret.setBorderStyle(side, new Border(convertLengthI(line.getLineStrokeWidth()), Border.Style.SOLID, color));
         
         return ret;
     }
     
     protected BoxImpl createImageBox(float x, float y, float width, float height, int pageOffset, ImageResource resource) throws IOException
     {
-        BoxImpl ret = createBox(convertLength(x),
-                convertLength(y) + pageOffset,
-                convertLength(width),
-                convertLength(height));
+        BoxImpl ret = createBox(convertLengthI(x),
+                convertLengthI(y) + pageOffset,
+                convertLengthI(width),
+                convertLengthI(height));
         
         ret.setTagName("img");
         ret.setType(Type.REPLACED_CONTENT);
@@ -270,7 +270,7 @@ public class FLBoxTree extends PDFBoxTree
         {
             try {
                 DefaultContentImage img = new DefaultContentImage();
-                byte[] scaled = scaleImageData(resource.getData(), convertLength(width), convertLength(height));
+                byte[] scaled = scaleImageData(resource.getData(), convertLengthI(width), convertLengthI(height));
                 img.setPngData(scaled);
                 ret.setContentObject(img);
             } catch (IOException e) {
@@ -280,9 +280,14 @@ public class FLBoxTree extends PDFBoxTree
         return ret;
     }
     
-    protected int convertLength(float length)
+    protected float convertLength(float length)
     {
-        int ret = Math.round(length * 1.5f); //TODO convert pt to px?
+        return length * (96.0f / 72.0f); // convert from pt to pixels (considering 96 dpi)
+    }
+    
+    protected int convertLengthI(float length)
+    {
+        int ret = Math.round(convertLength(length)); 
         if (ret == 0 && length > 0.1f) // convert minimal widths to at least 1px
             ret = 1;
         return ret;

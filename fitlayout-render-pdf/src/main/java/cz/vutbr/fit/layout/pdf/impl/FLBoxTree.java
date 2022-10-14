@@ -218,9 +218,9 @@ public class FLBoxTree extends PDFBoxTree
     {
         float lineWidth = transformWidth(getGraphicsState().getLineWidth());
         float wcor = stroke ? lineWidth : 0.0f;
-        float strokeOffset = (wcor == 0) ? 0 : wcor / 2;
-        float w = width - wcor < 0 ? 1 : width - wcor;
-        float h = height - wcor < 0 ? 1 : height - wcor;
+        float strokeOffset = wcor / 2;
+        float w = width + wcor;
+        float h = height + wcor;
         
         int dx = convertLengthI(x - strokeOffset);
         int dy = convertLengthI(y - strokeOffset) + pageOffset;

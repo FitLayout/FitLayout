@@ -117,7 +117,6 @@ public class PDFBoxTreeBuilder extends BaseBoxTreeBuilder
         FLBoxTree boxTree = createBoxTree(url);
         
         List<Box> boxlist = boxTree.getAllBoxes();
-        //Color bg = Units.toColor(vp.getBgcolor());
         Color bg = Color.WHITE; //TODO detect background color?
         Box root = buildTree(boxlist, bg);
         
@@ -151,7 +150,9 @@ public class PDFBoxTreeBuilder extends BaseBoxTreeBuilder
             boxTree.setZoom(getZoom());
             boxTree.processDocument(doc, getStartPage(), getEndPage());
             doc.close();
-            pageTitle = "";
+            pageTitle = doc.getDocumentInformation().getTitle();
+            if (pageTitle == null)
+                pageTitle = "";
             return boxTree;
         }
         else

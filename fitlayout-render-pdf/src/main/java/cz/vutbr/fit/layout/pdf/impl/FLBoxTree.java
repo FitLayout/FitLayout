@@ -47,6 +47,8 @@ public class FLBoxTree extends PDFBoxTree
     private static final Color PAGE_COLOR = Color.WHITE;
     private static final int PAGE_GAP = 10;
     
+    private float zoom = 1.0f;
+    
     private List<Box> allBoxes;
     private BoxImpl root;
     private BoxImpl pageBox;
@@ -56,7 +58,6 @@ public class FLBoxTree extends PDFBoxTree
     private int maxPageWidth = 0;
     private int orderCounter = 0;
     
-    
 
     public FLBoxTree() throws IOException
     {
@@ -64,6 +65,16 @@ public class FLBoxTree extends PDFBoxTree
         allBoxes = new ArrayList<>();
     }
     
+    public float getZoom()
+    {
+        return zoom;
+    }
+
+    public void setZoom(float zoom)
+    {
+        this.zoom = zoom;
+    }
+
     public List<Box> getAllBoxes()
     {
         return allBoxes;
@@ -164,7 +175,7 @@ public class FLBoxTree extends PDFBoxTree
         float[] rect = toRectangle(path);
         if (rect != null)
         {
-            final BoxImpl rectBox = createRectangleBox(rect[0], rect[1], rect[2]-rect[0]+1, rect[3]-rect[1]+1, curPageY, stroke, fill);
+            final BoxImpl rectBox = createRectangleBox(rect[0], rect[1], rect[2]-rect[0], rect[3]-rect[1], curPageY, stroke, fill);
             addBox(pageBox, rectBox);
         }
         else if (stroke)
@@ -282,7 +293,7 @@ public class FLBoxTree extends PDFBoxTree
     
     protected float convertLength(float length)
     {
-        return length * (96.0f / 72.0f); // convert from pt to pixels (considering 96 dpi)
+        return length * (96.0f / 72.0f) * zoom; // convert from pt to pixels (considering 96 dpi) and zoom
     }
     
     protected int convertLengthI(float length)

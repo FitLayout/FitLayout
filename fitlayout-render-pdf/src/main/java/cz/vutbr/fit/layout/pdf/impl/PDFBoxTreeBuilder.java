@@ -40,6 +40,10 @@ public class PDFBoxTreeBuilder extends BaseBoxTreeBuilder
     
     /** Inlcude screen shots? */
     private boolean includeScreenshot;
+    
+    private float zoom = 1.0f;
+    private int startPage = 0;
+    private int endPage = 1000;
 
     
     public PDFBoxTreeBuilder(boolean useVisualBounds, boolean preserveAux)
@@ -67,6 +71,36 @@ public class PDFBoxTreeBuilder extends BaseBoxTreeBuilder
         this.includeScreenshot = includeScreenshot;
     }
     
+    public float getZoom()
+    {
+        return zoom;
+    }
+
+    public void setZoom(float zoom)
+    {
+        this.zoom = zoom;
+    }
+
+    public int getStartPage()
+    {
+        return startPage;
+    }
+
+    public void setStartPage(int startPage)
+    {
+        this.startPage = startPage;
+    }
+
+    public int getEndPage()
+    {
+        return endPage;
+    }
+
+    public void setEndPage(int endPage)
+    {
+        this.endPage = endPage;
+    }
+
     @Override
     public Page getPage()
     {
@@ -114,7 +148,8 @@ public class PDFBoxTreeBuilder extends BaseBoxTreeBuilder
         {
             PDDocument doc = loadPdf(is);
             FLBoxTree boxTree = new FLBoxTree();
-            boxTree.processDocument(doc, 0, Integer.MAX_VALUE);
+            boxTree.setZoom(getZoom());
+            boxTree.processDocument(doc, getStartPage(), getEndPage());
             doc.close();
             pageTitle = "";
             return boxTree;

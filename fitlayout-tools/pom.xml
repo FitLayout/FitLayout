@@ -77,6 +77,10 @@
 		</dependency>
 		<dependency>
 			<groupId>cz.vutbr.fit.layout</groupId>
+			<artifactId>fitlayout-render-pdf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cz.vutbr.fit.layout</groupId>
 			<artifactId>fitlayout-segm-base</artifactId>
 		</dependency>
 		<dependency>

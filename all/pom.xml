@@ -37,6 +37,11 @@
 			<artifactId>fitlayout-render-puppeteer</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>cz.vutbr.fit.layout</groupId>
+			<artifactId>fitlayout-render-pdf</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- segmentation -->
 		<dependency>
 			<groupId>cz.vutbr.fit.layout</groupId>

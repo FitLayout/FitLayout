@@ -160,7 +160,7 @@ public class Graphics2DDisplay implements OutputDisplay
             if (bg != null)
             {
                 g.setColor(bg);
-                g.fillRect(r.getX1(), r.getY1(), r.getWidth() - 1, r.getHeight() - 1);
+                g.fillRect(r.getX1(), r.getY1(), r.getWidth(), r.getHeight());
             }
             //background image
             if (box.getBackgroundImagePng() != null)

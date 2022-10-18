@@ -95,7 +95,7 @@
 					<version>3.0.0-M4</version>
 					<configuration>
 						<autoVersionSubmodules>true</autoVersionSubmodules>
-						<commitByProject>true</commitByProject>
+						<commitByProject>false</commitByProject>
 						<useReleaseProfile>false</useReleaseProfile>
 						<releaseProfiles>release</releaseProfiles>
 						<goals>deploy</goals>

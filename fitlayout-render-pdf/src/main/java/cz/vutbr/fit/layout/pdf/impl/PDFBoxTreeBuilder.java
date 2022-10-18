@@ -114,21 +114,37 @@ public class PDFBoxTreeBuilder extends BaseBoxTreeBuilder
     
     public void parse(URL url) throws IOException, SAXException
     {
-        FLBoxTree boxTree = createBoxTree(url);
+        PDDocument doc = loadPdf(url);
+        FLBoxTree boxTree = createBoxTree(doc);
         
         List<Box> boxlist = boxTree.getAllBoxes();
         Color bg = Color.WHITE; //TODO detect background color?
         Box root = buildTree(boxlist, bg);
-        
+
+        String pageTitle = doc.getDocumentInformation().getTitle();
+        if (pageTitle == null)
+            pageTitle = "";
+
         //wrap the root box with a page
         PageImpl pg = page = new PageImpl(pageUrl);
         pg.setTitle(pageTitle);
         pg.setRoot(root);
         pg.setWidth(root.getWidth());
         pg.setHeight(root.getHeight());
+        
+        doc.close();
     }
     
-    private FLBoxTree createBoxTree(URL url) throws IOException
+    private FLBoxTree createBoxTree(PDDocument doc) throws IOException
+    {
+        FLBoxTree boxTree = new FLBoxTree();
+        boxTree.setAcquireImages(acquireImages);
+        boxTree.setZoom(getZoom());
+        boxTree.processDocument(doc, getStartPage(), getEndPage());
+        return boxTree;
+    }
+    
+    private PDDocument loadPdf(URL url) throws IOException
     {
         URLConnection con = url.openConnection();
         con.setRequestProperty("User-Agent", USER_AGENT);
@@ -144,22 +160,9 @@ public class PDFBoxTreeBuilder extends BaseBoxTreeBuilder
         log.info("File type: " + mime);
         
         if (mime.equals("application/pdf"))
-        {
-            PDDocument doc = loadPdf(is);
-            FLBoxTree boxTree = new FLBoxTree();
-            boxTree.setZoom(getZoom());
-            boxTree.processDocument(doc, getStartPage(), getEndPage());
-            doc.close();
-            pageTitle = doc.getDocumentInformation().getTitle();
-            if (pageTitle == null)
-                pageTitle = "";
-            return boxTree;
-        }
+            return loadPdf(is);
         else
-        {
-            log.error("Unsupported MIME type {}", mime);
-            return null;
-        }
+            throw new IOException("Unsupported MIME type " + mime);
     }
     
     private PDDocument loadPdf(InputStream is) throws IOException

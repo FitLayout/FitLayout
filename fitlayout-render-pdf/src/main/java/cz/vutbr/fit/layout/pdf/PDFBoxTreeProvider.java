@@ -91,7 +91,7 @@ public class PDFBoxTreeProvider extends BaseArtifactService
         List<Parameter> ret = new ArrayList<>(6);
         ret.add(new ParameterString("url", "The URL of the document to render", 0, 64));
         ret.add(new ParameterBoolean("acquireImages", "Include the images in the rendered page model?"));
-        //ret.add(new ParameterBoolean("includeScreenshot")); //not supported at the moment
+        ret.add(new ParameterBoolean("includeScreenshot", "Include the screen shot of the entire page in the rendered page model?"));
         ret.add(new ParameterFloat("zoom", "Zoom factor to be applied on the rendered page", -5.0f, 10.0f));
         ret.add(new ParameterInt("startPage", "The first page to be rendered (starting with 0)", 0, 1000));
         ret.add(new ParameterInt("endPage", "The last page to be rendered", 0, 1000));

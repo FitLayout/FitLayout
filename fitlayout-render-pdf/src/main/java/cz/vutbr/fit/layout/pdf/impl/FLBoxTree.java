@@ -53,6 +53,7 @@ public class FLBoxTree extends PDFBoxTree
     private List<Box> allBoxes;
     private BoxImpl root;
     private BoxImpl pageBox;
+    private List<Integer> pageYOffsets;
     
     private int curPageY = 0;
     private int nextPageY = 0; // the Y coordinate of the next page
@@ -64,6 +65,7 @@ public class FLBoxTree extends PDFBoxTree
     {
         super();
         allBoxes = new ArrayList<>();
+        pageYOffsets = new ArrayList<>();
     }
     
     public boolean isAcquireImages()
@@ -94,6 +96,11 @@ public class FLBoxTree extends PDFBoxTree
     public BoxImpl getRoot()
     {
         return root;
+    }
+
+    public List<Integer> getPageYOffsets()
+    {
+        return pageYOffsets;
     }
 
     public void processDocument(PDDocument pdfdocument, int startPage, int endPage) throws IOException
@@ -152,6 +159,7 @@ public class FLBoxTree extends PDFBoxTree
             }
             
             curPageY = nextPageY;
+            pageYOffsets.add(curPageY);
             pageBox = createBox(0, curPageY, w, h);
             pageBox.setTagName("page");
             pageBox.setBackgroundColor(PAGE_COLOR);

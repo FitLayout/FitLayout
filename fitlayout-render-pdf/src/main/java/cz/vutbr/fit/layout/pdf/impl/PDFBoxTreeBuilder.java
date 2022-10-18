@@ -5,6 +5,9 @@
  */
 package cz.vutbr.fit.layout.pdf.impl;
 
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -12,7 +15,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -131,6 +137,10 @@ public class PDFBoxTreeBuilder extends BaseBoxTreeBuilder
         pg.setRoot(root);
         pg.setWidth(root.getWidth());
         pg.setHeight(root.getHeight());
+        if (includeScreenshot)
+        {
+            pg.setPngImage(createScreenShot(doc, root.getWidth(), root.getHeight(), boxTree.getPageYOffsets()));
+        }
         
         doc.close();
     }
@@ -170,6 +180,23 @@ public class PDFBoxTreeBuilder extends BaseBoxTreeBuilder
         PDDocument document = null;
         document = PDDocument.load(is);
         return document;
+    }
+    
+    private byte[] createScreenShot(PDDocument doc, int width, int height, List<Integer> pageYOffsets) throws IOException
+    {
+        PDFRenderer renderer = new PDFRenderer(doc);
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics gfx = img.getGraphics();
+        int curPage = startPage;
+        for (Integer ofs : pageYOffsets)
+        {
+            BufferedImage pageImg = renderer.renderImageWithDPI(curPage, 96.0f * zoom);
+            gfx.drawImage(pageImg, 0, ofs, null);
+            curPage++;
+        }
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(img, "png", os);
+        return os.toByteArray();
     }
 
 }

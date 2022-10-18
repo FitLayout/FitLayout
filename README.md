@@ -1,5 +1,5 @@
 # FitLayout/2 - Web Page Analysis Framework
-(c) 2015-2021 Radek Burget (burgetr@fit.vutbr.cz)
+(c) 2015-2022 Radek Burget (burgetr@fit.vutbr.cz)
 
 FitLayout/2 is an extensible framework for web document rendering, modeling and analysis. It provides a Java API as well as the platform-independent Command-line interface (CLI) and the Web API (REST) that allow implementing a complete web page processing workflow including the following features:  
 
@@ -7,6 +7,7 @@ FitLayout/2 is an extensible framework for web document rendering, modeling and 
 - **Page renderers for creating page models from source documents.** Currently, two renderers are available:
   - A full-featured [Chromium-based renderer](https://github.com/FitLayout/FitLayout/tree/main/fitlayout-render-puppeteer) - it allows rendering any web page including complex and dynamic web pages with JavaScript. It requires a [separate backend](https://github.com/FitLayout/fitlayout-puppeteer) based on Node.js that contains the Chromium web browser under the hood.
   - A simple built-in [CSSBox-based renderer](https://github.com/FitLayout/FitLayout/tree/main/fitlayout-render-cssbox) - it is a pure Java renderer with no additional dependencies that is suitable for a quick rendering of simple web pages. It renders HTML+CSS pages and PDF documents and it may be faster for shorter documents because no external browser needs to be started. However, it does not support dynamic pages with JavaScript and complex CSS layouts.
+  - A [PDF renderer](https://github.com/FitLayout/FitLayout/tree/main/fitlayout-render-pdf) for rendering PDF documents with the possibility of choosing a range of pages and a zoom factor. The implementation is based on [Apache PDFBox](https://pdfbox.apache.org/).
 - **Page segmentation algorithms** for performing page segmentation on the rendered pages and the corresponding **area tree model** that describe the segmentation result. Currently, the following page segmentation methods are available:
   - **[VIPS](https://github.com/FitLayout/FitLayout/tree/main/fitlayout-segm-vips)** - Vision-based page segmentation
   - **[BCS](https://github.com/FitLayout/FitLayout/tree/main/fitlayout-segm-bcs)** - Block clustering segmentation 

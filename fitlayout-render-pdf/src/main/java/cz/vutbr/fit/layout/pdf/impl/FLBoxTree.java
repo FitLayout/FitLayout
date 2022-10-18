@@ -47,6 +47,7 @@ public class FLBoxTree extends PDFBoxTree
     private static final Color PAGE_COLOR = Color.WHITE;
     private static final int PAGE_GAP = 10;
     
+    private boolean acquireImages = true;
     private float zoom = 1.0f;
     
     private List<Box> allBoxes;
@@ -65,6 +66,16 @@ public class FLBoxTree extends PDFBoxTree
         allBoxes = new ArrayList<>();
     }
     
+    public boolean isAcquireImages()
+    {
+        return acquireImages;
+    }
+
+    public void setAcquireImages(boolean acquireImages)
+    {
+        this.acquireImages = acquireImages;
+    }
+
     public float getZoom()
     {
         return zoom;
@@ -277,7 +288,7 @@ public class FLBoxTree extends PDFBoxTree
         ret.setType(Type.REPLACED_CONTENT);
         //ret.setBackgroundColor(Color.BLACK);
         
-        if (resource.getData() != null)
+        if (isAcquireImages() && resource.getData() != null)
         {
             try {
                 DefaultContentImage img = new DefaultContentImage();

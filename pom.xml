@@ -48,10 +48,11 @@
 		<module>fitlayout-core</module>
 		<module>fitlayout-render-cssbox</module>
 		<module>fitlayout-render-pdf</module>
+		<module>fitlayout-render-puppeteer</module>
+		<module>fitlayout-render-playwright</module>
 		<module>fitlayout-segm-base</module>
 		<module>fitlayout-tools</module>
 		<module>fitlayout-storage-rdf</module>
-		<module>fitlayout-render-puppeteer</module>
 		<module>fitlayout-segm-vips</module>
 		<module>fitlayout-io</module>
 		<module>fitlayout-segm-bcs</module>

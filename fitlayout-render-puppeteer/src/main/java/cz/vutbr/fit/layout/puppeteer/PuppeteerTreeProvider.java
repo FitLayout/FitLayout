@@ -85,7 +85,7 @@ public class PuppeteerTreeProvider extends BaseArtifactService
     @Override
     public String getDescription()
     {
-        return "Uses the CSSBox rendering engine for obtaining the box tree.";
+        return "Uses the remotely controlled Chromium browser for obtaining the box tree.";
     }
 
     @Override

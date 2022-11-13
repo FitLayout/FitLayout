@@ -5,6 +5,12 @@
  */
 package cz.vutbr.fit.layout.playwright;
 
+import java.io.IOException;
+import java.io.PrintStream;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+
 import cz.vutbr.fit.layout.playwright.impl.BrowserControl;
 
 /**
@@ -20,8 +26,18 @@ public class BrowserCli
 
             bc.setNoHeadless(true);
             bc.setPersist(3);
+            bc.setIncludeScreenshot(true);
             
-            bc.visit("https://www.fit.vut.cz/person/burgetr");
+            var pg = bc.visit("https://www.fit.vut.cz/person/burgetr");
+            
+            Gson gson = new Gson();
+            JsonElement jsonPage = gson.toJsonTree(pg);
+            
+            try (PrintStream out = new PrintStream("/tmp/bbb.json")) {
+                out.println(gson.toJson(jsonPage));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }        
     }
     

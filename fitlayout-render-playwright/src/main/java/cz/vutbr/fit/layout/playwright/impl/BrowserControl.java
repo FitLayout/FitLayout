@@ -7,7 +7,9 @@ package cz.vutbr.fit.layout.playwright.impl;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import com.microsoft.playwright.Browser;
@@ -15,6 +17,7 @@ import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.Response;
 import com.microsoft.playwright.options.WaitUntilState;
 
 import cz.vutbr.fit.layout.playwright.App;
@@ -124,8 +127,9 @@ public class BrowserControl implements AutoCloseable
     
     //================================================================================
     
-    public void visit(String urlstring)
+    public Map<String, Object> visit(String urlstring)
     {
+        String lastError = null;
         initCurrentContext();
         
         Page.NavigateOptions waitOptions;
@@ -155,21 +159,50 @@ public class BrowserControl implements AutoCloseable
                 break;
         }
         
+        // create the page
         Page page = currentContext.newPage();
-        page.navigate(urlstring, waitOptions);
+        
+        // open the target page
+        Response lastResponse = null;
+        try {
+            lastResponse = page.navigate(urlstring, waitOptions);
+        } catch (Exception e) {
+            lastError = e.getMessage();
+        }
 
+        // scroll the page to load more content
         String scrollFn = loadResource("/common/scroll.js");
         page.evaluate(scrollFn, scrollPages);
         
+        // take the screenshot
+        byte[] screenshot = page.screenshot();
+        
+        // run the analysis script
         String clientScript = getClientScript();
         String execScript = "() => { \n" 
                 + clientScript 
                 + "   fitlayoutDetectLines();"
                 + "   return fitlayoutExportBoxes();"
                 + "}"; 
-        Object ret = page.evaluate(execScript);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> ret = (Map<String, Object>) page.evaluate(execScript);
         
-        System.out.println(ret);
+        // add the screenshot to the page if required
+        if (includeScreenshot)
+            ret.put("screenshot", Base64.getEncoder().encodeToString(screenshot));
+        
+        if (lastResponse != null)
+        {
+            ret.put("status", lastResponse.status());
+            ret.put("statusText", lastResponse.statusText());
+        }
+        
+        if (lastError != null)
+        {
+            ret.put("error", lastError);
+        }
+        
+        return ret;
     }
 
     @Override
@@ -215,6 +248,7 @@ public class BrowserControl implements AutoCloseable
         
         var copts = new Browser.NewContextOptions();
         copts.setScreenSize(width, height);
+        copts.setViewportSize(width, height);
         return currentBrowser.newContext(copts);
     }
     
@@ -227,6 +261,7 @@ public class BrowserControl implements AutoCloseable
         //opts.setArgs(List.of("--window-size=" + width + "x" + "height"));
         opts.setIgnoreDefaultArgs(List.of("--disable-extensions"));
         opts.setScreenSize(width, height);
+        opts.setViewportSize(width, height);
         return btype.launchPersistentContext(userDir, opts);
     }
     
@@ -245,4 +280,5 @@ public class BrowserControl implements AutoCloseable
             return scanner.next();
         }
     }
+   
 }

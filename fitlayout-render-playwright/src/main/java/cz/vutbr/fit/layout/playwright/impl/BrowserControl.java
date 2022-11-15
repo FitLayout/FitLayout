@@ -15,9 +15,11 @@ import java.util.Scanner;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.Response;
+import com.microsoft.playwright.options.ScreenshotType;
 import com.microsoft.playwright.options.WaitUntilState;
 
 import cz.vutbr.fit.layout.playwright.App;
@@ -172,10 +174,14 @@ public class BrowserControl implements AutoCloseable
 
         // scroll the page to load more content
         String scrollFn = loadResource("/common/scroll.js");
-        page.evaluate(scrollFn, scrollPages);
+        var totalHeight = page.evaluate(scrollFn, scrollPages);
+        if (totalHeight instanceof Integer)
+            page.setViewportSize(width, ((Integer) totalHeight).intValue());
         
         // take the screenshot
-        byte[] screenshot = page.screenshot();
+        byte[] screenshot = page.screenshot(
+                new Page.ScreenshotOptions()
+                .setFullPage(true).setType(ScreenshotType.PNG));
         
         // run the analysis script
         String clientScript = getClientScript();
@@ -189,8 +195,61 @@ public class BrowserControl implements AutoCloseable
         
         // add the screenshot to the page if required
         if (includeScreenshot)
+        {
             ret.put("screenshot", Base64.getEncoder().encodeToString(screenshot));
+        }
         
+        // capture tha background images if required
+        var imagesObj = ret.get("images");
+        if (acquireImages && imagesObj != null && imagesObj instanceof List)
+        {
+            @SuppressWarnings("unchecked")
+            final List<Object> images = (List<Object>) imagesObj;
+            // hide the contents of the marked elemens
+            page.addStyleTag(new Page.AddStyleTagOptions().setContent("[data-fitlayoutbg=\"1\"] * { display: none }"));
+            // take the screenshots
+            for (Object imgObj : images)
+            {
+                if (imgObj instanceof Map)
+                {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> img = (Map<String, Object>) imgObj;
+                    boolean bg = (img.get("bg") instanceof Boolean) && ((Boolean) img.get("bg")).booleanValue();
+                    String id = String.valueOf(img.get("id"));
+                    String selector = "*[data-fitlayoutid=\"" + id + "\"]";
+                    
+                    try {
+                        
+                        Locator elem = page.locator(selector);
+                        if (elem != null)
+                        {
+                            if (bg)
+                            {
+                                // for background images switch off the contents
+                                elem.evaluate("e => { e.setAttribute('data-fitlayoutbg', '1'); }");
+                            }
+                            
+                            var imgData = elem.screenshot(new Locator.ScreenshotOptions()
+                                    .setType(ScreenshotType.PNG)
+                                    .setTimeout(100));
+                            img.put("data", Base64.getEncoder().encodeToString(imgData));
+                            
+                            if (bg)
+                            {
+                                // for background images switch the contents on again
+                                elem.evaluate("e => { e.setAttribute('data-fitlayoutbg', '0'); }");
+                            }
+                        }
+                        
+                    } catch (Exception e) {
+                        System.err.println(img + " : " + e.getMessage());
+                        //e.printStackTrace();
+                    }
+                }
+            }
+        }
+        
+        // add the response details
         if (lastResponse != null)
         {
             ret.put("status", lastResponse.status());

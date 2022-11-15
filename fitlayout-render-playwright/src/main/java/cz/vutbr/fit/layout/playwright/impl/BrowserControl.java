@@ -22,8 +22,6 @@ import com.microsoft.playwright.Response;
 import com.microsoft.playwright.options.ScreenshotType;
 import com.microsoft.playwright.options.WaitUntilState;
 
-import cz.vutbr.fit.layout.playwright.App;
-
 /**
  * Runs the browser via Playwright and gets the rendered page description.
  *  
@@ -334,7 +332,7 @@ public class BrowserControl implements AutoCloseable
     
     protected static String loadResource(String filePath)
     {
-        try (Scanner scanner = new Scanner(App.class.getResourceAsStream(filePath), "UTF-8")) {
+        try (Scanner scanner = new Scanner(BrowserControl.class.getResourceAsStream(filePath), "UTF-8")) {
             scanner.useDelimiter("\\A");
             return scanner.next();
         }

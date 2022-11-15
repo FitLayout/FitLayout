@@ -18,6 +18,7 @@ import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.impl.ParameterBoolean;
 import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.impl.ParameterString;
+import cz.vutbr.fit.layout.json.impl.PageImpl;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.ontology.BOX;
@@ -193,7 +194,7 @@ public class PlaywrightTreeProvider extends BaseArtifactService
 
     public Page getPage() throws IOException, InterruptedException
     {
-        /*builder = new BoxTreeBuilder(width, height, false, true);
+        builder = new BoxTreeBuilder(width, height, false, true);
         builder.setPersist(persist);
         builder.setAcquireImages(acquireImages);
         builder.setIncludeScreenshot(includeScreenshot);
@@ -201,8 +202,7 @@ public class PlaywrightTreeProvider extends BaseArtifactService
         PageImpl page = (PageImpl) builder.getPage();
         page.setCreator(getId());
         page.setCreatorParams(getParamString());
-        return page;*/
-        return null;
+        return page;
     }
 
 

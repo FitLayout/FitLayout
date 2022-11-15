@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 
 import cz.vutbr.fit.layout.json.impl.JSONBoxTreeBuilder;
 import cz.vutbr.fit.layout.json.parser.InputFile;
@@ -75,8 +76,23 @@ public class BoxTreeBuilder extends JSONBoxTreeBuilder
      */
     protected InputFile invokeRenderer(URL url) throws IOException, InterruptedException
     {
-        // TODO
-        return null;
+        try (BrowserControl bc = new BrowserControl()) {
+            
+            bc.setNoHeadless(true);
+            bc.setWidth(width);
+            bc.setHeight(height);
+            bc.setPersist(persist);
+            bc.setIncludeScreenshot(includeScreenshot);
+            bc.setAcquireImages(acquireImages);
+
+            log.debug("Visit " + url.toString());
+            var pg = bc.visit(url.toString());
+            
+            Gson gson = new Gson();
+            JsonElement jsonPage = gson.toJsonTree(pg);
+            InputFile file = gson.fromJson(jsonPage, InputFile.class);
+            return file;
+        }
     }
     
 }

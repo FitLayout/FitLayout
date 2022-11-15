@@ -3,10 +3,10 @@
  *
  * Created on 12. 11. 2020, 11:05:07 by burgetr
  */
-package cz.vutbr.fit.layout.puppeteer.impl;
+package cz.vutbr.fit.layout.json.impl;
 
+import cz.vutbr.fit.layout.json.parser.BoxInfo;
 import cz.vutbr.fit.layout.model.TextStyle;
-import cz.vutbr.fit.layout.puppeteer.parser.BoxInfo;
 import cz.vutbr.web.css.NodeData;
 import cz.vutbr.web.css.TermLength;
 import cz.vutbr.web.css.CSSProperty.FontSize;
@@ -33,7 +33,7 @@ public class CSSTextStyle extends TextStyle
             setFontSizeSum(fsizeVal.getValue() * textLen);
         }
         else
-            setFontSizeSum(BoxTreeBuilder.DEFAULT_FONT_SIZE * textLen);
+            setFontSizeSum(JSONBoxTreeBuilder.DEFAULT_FONT_SIZE * textLen);
         
         FontWeight fweight = style.getProperty("font-weight");
         if (fweight != null)

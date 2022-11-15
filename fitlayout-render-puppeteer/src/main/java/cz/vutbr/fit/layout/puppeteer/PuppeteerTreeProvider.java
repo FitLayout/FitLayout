@@ -18,11 +18,11 @@ import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.impl.ParameterBoolean;
 import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.impl.ParameterString;
+import cz.vutbr.fit.layout.json.impl.PageImpl;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.puppeteer.impl.BoxTreeBuilder;
-import cz.vutbr.fit.layout.puppeteer.impl.PageImpl;
 
 /**
  * 

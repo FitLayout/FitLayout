@@ -25,6 +25,10 @@
 			<artifactId>fitlayout-core</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>cz.vutbr.fit.layout</groupId>
+			<artifactId>fitlayout-render-json</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>

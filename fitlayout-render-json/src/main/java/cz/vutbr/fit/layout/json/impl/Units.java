@@ -3,7 +3,7 @@
  *
  * Created on 24. 3. 2020, 12:12:00 by burgetr
  */
-package cz.vutbr.fit.layout.puppeteer.impl;
+package cz.vutbr.fit.layout.json.impl;
 
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;

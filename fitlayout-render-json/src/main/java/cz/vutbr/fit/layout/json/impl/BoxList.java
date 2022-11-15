@@ -3,7 +3,7 @@
  *
  * Created on 13. 11. 2020, 9:38:30 by burgetr
  */
-package cz.vutbr.fit.layout.puppeteer.impl;
+package cz.vutbr.fit.layout.json.impl;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -18,15 +18,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.impl.DefaultContentImage;
+import cz.vutbr.fit.layout.json.parser.Attribute;
+import cz.vutbr.fit.layout.json.parser.BoxInfo;
+import cz.vutbr.fit.layout.json.parser.ImageInfo;
+import cz.vutbr.fit.layout.json.parser.InputFile;
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.TextStyle;
-import cz.vutbr.fit.layout.puppeteer.parser.Attribute;
-import cz.vutbr.fit.layout.puppeteer.parser.BoxInfo;
-import cz.vutbr.fit.layout.puppeteer.parser.ImageInfo;
-import cz.vutbr.fit.layout.puppeteer.parser.InputFile;
 import cz.vutbr.web.css.CSSException;
 import cz.vutbr.web.css.CSSFactory;
 import cz.vutbr.web.css.CSSProperty;
@@ -115,7 +115,7 @@ public class BoxList
                 Math.round(input.getPage().getHeight())));
         box.applyIntrinsicBounds();
         box.setAbsolute(true);
-        box.setFontFamily(BoxTreeBuilder.DEFAULT_FONT_FAMILY);
+        box.setFontFamily(JSONBoxTreeBuilder.DEFAULT_FONT_FAMILY);
         box.setColor(Color.BLACK);
         box.setBackgroundColor(Color.WHITE);
         return box;
@@ -340,7 +340,7 @@ public class BoxList
         else if (pos == CSSProperty.Position.FIXED)
             box.setFixed(true);
         
-        box.setFontFamily(getUsedFont(style, BoxTreeBuilder.DEFAULT_FONT_FAMILY));
+        box.setFontFamily(getUsedFont(style, JSONBoxTreeBuilder.DEFAULT_FONT_FAMILY));
         
         CSSProperty.Color color = style.getProperty("color");
         if (color == CSSProperty.Color.color)

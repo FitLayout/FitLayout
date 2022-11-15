@@ -3,7 +3,7 @@
  *
  * Created on 6. 11. 2020, 10:40:37 by burgetr
  */
-package cz.vutbr.fit.layout.puppeteer.impl;
+package cz.vutbr.fit.layout.json.impl;
 
 import cz.vutbr.fit.layout.impl.DefaultBox;
 import cz.vutbr.fit.layout.model.Rectangular;

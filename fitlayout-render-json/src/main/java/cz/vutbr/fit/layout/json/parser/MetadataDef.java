@@ -3,7 +3,7 @@
  *
  * Created on 20. 5. 2022, 13:50:00 by burgetr
  */
-package cz.vutbr.fit.layout.puppeteer.parser;
+package cz.vutbr.fit.layout.json.parser;
 
 import cz.vutbr.fit.layout.model.Metadata;
 

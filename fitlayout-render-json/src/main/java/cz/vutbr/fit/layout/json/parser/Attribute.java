@@ -3,7 +3,7 @@
  *
  * Created on 14. 11. 2020, 15:52:56 by burgetr
  */
-package cz.vutbr.fit.layout.puppeteer.parser;
+package cz.vutbr.fit.layout.json.parser;
 
 /**
  * 

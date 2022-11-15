@@ -48,6 +48,7 @@
 		<module>fitlayout-core</module>
 		<module>fitlayout-render-cssbox</module>
 		<module>fitlayout-render-pdf</module>
+		<module>fitlayout-render-json</module>
 		<module>fitlayout-render-puppeteer</module>
 		<module>fitlayout-render-playwright</module>
 		<module>fitlayout-segm-base</module>
@@ -152,7 +153,17 @@
 			</dependency>
 			<dependency>
 				<groupId>cz.vutbr.fit.layout</groupId>
+				<artifactId>fitlayout-render-json</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>cz.vutbr.fit.layout</groupId>
 				<artifactId>fitlayout-render-puppeteer</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>cz.vutbr.fit.layout</groupId>
+				<artifactId>fitlayout-render-playwright</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -335,7 +346,7 @@
 										</group>
 										<group>
 											<title>Page rendering</title>
-											<packages>cz.vutbr.fit.layout.cssbox*:cz.vutbr.fit.layout.puppeteer*</packages>
+											<packages>cz.vutbr.fit.layout.cssbox*:cz.vutbr.fit.layout.json*:cz.vutbr.fit.layout.puppeteer*:cz.vutbr.fit.layout.playwright*</packages>
 										</group>
 										<group>
 											<title>Page segmentation</title>

@@ -1,10 +1,13 @@
-FitLayout/2 - Puppeteer-based Page Renderer
-===========================================
+FitLayout/2 - Playwright-based Page Renderer
+============================================
 
 (c) 2015-2022 Radek Burget (burgetr@fit.vutbr.cz)
 
 
-This module provides a page renderer that internally uses the [fitlayout-puppeteer](https://github.com/FitLayout/fitlayout-puppeteer) project as a rendering backend. The rendering itself is provided by a built-in Chromium web browser. This ensures reliable rendering of complex web pages including JavaScript support. In comparison with the [Playwright renderer](https://github.com/FitLayout/FitLayout/tree/main/fitlayout-render-playwright) (which provides the same rendering results), it requires the installation of a separate rendering backend based on Node.js as described below. On the other hand, the separate backend provides more flexibility when running the browser including for example running in a virtual framebuffer or using pre-installed browser extensions.
+This module provides a page renderer that uses a Chrome browser in the background, which is remotely controlled using the Playwright tool.
+This renderer provides the same rendering results as the [Puppeteer renderer](https://github.com/FitLayout/FitLayout/tree/main/fitlayout-render-puppeteer) with no installation required (the browsers are installed automatically when used for the first time). On the other hand, since
+the browser is controlled directly from Java, its configuration options are limited in comparison with the separate Node.js backend provided
+by puppeteer.
 
 
 ## Installation
@@ -16,7 +19,7 @@ The FitLayout [docker images](https://github.com/FitLayout/docker-images) contai
 
 ## Services and parameters
 
-Artifact service ID: `FitLayout.Puppeteer`
+Artifact service ID: `FitLayout.Playwright`
 
 Consumes: *no input*
 

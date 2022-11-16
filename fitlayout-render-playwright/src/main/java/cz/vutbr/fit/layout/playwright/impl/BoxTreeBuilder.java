@@ -78,7 +78,7 @@ public class BoxTreeBuilder extends JSONBoxTreeBuilder
     {
         try (BrowserControl bc = new BrowserControl()) {
             
-            bc.setNoHeadless(true);
+            bc.setNoHeadless(false);
             bc.setWidth(width);
             bc.setHeight(height);
             bc.setPersist(persist);

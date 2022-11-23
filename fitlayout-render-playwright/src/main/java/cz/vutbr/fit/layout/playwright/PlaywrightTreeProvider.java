@@ -1,9 +1,9 @@
 /**
- * PuppeteerTreeProvider.java
+ * PlaywrightTreeProvider.java
  *
- * Created on 5. 11. 2020, 20:43:10 by burgetr
+ * Created on 12. 11. 2022, 17:12:40 by burgetr
  */
-package cz.vutbr.fit.layout.puppeteer;
+package cz.vutbr.fit.layout.playwright;
 
 import java.io.IOException;
 import java.net.URL;
@@ -22,13 +22,15 @@ import cz.vutbr.fit.layout.json.impl.PageImpl;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.ontology.BOX;
-import cz.vutbr.fit.layout.puppeteer.impl.BoxTreeBuilder;
+import cz.vutbr.fit.layout.playwright.impl.BoxTreeBuilder;
 
 /**
+ * A tree provider that uses the remotely controlled Firefox or Chromium 
+ * browser for obtaining the box tree.
  * 
  * @author burgetr
  */
-public class PuppeteerTreeProvider extends BaseArtifactService
+public class PlaywrightTreeProvider extends BaseArtifactService
 {
     private String urlstring;
     private int width;
@@ -36,11 +38,10 @@ public class PuppeteerTreeProvider extends BaseArtifactService
     private int persist;
     private boolean acquireImages;
     private boolean includeScreenshot;
-    private boolean replaceImagesWithAlt; //not published as a parameter now
     
     private BoxTreeBuilder builder;
     
-    public PuppeteerTreeProvider()
+    public PlaywrightTreeProvider()
     {
         urlstring = null;
         width = 1200;
@@ -50,7 +51,7 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         includeScreenshot = true;
     }
     
-    public PuppeteerTreeProvider(URL url, int width, int height)
+    public PlaywrightTreeProvider(URL url, int width, int height)
     {
         this.urlstring = url.toString();
         this.width = width;
@@ -60,7 +61,7 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         this.includeScreenshot = true;
     }
     
-    public PuppeteerTreeProvider(URL url, int width, int height, int persist, boolean acquireImages, boolean includeScreenshot)
+    public PlaywrightTreeProvider(URL url, int width, int height, int persist, boolean acquireImages, boolean includeScreenshot)
     {
         this.urlstring = url.toString();
         this.width = width;
@@ -73,19 +74,19 @@ public class PuppeteerTreeProvider extends BaseArtifactService
     @Override
     public String getId()
     {
-        return "FitLayout.Puppeteer";
+        return "FitLayout.Playwright";
     }
 
     @Override
     public String getName()
     {
-        return "Puppeteer-based HTML renderer";
+        return "Playwright-based HTML renderer";
     }
 
     @Override
     public String getDescription()
     {
-        return "Uses the remotely controlled Chromium browser for obtaining the box tree.";
+        return "Uses the remotely controlled Firefox or Chromium browser for obtaining the box tree.";
     }
 
     @Override
@@ -161,16 +162,6 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         this.includeScreenshot = includeScreenshot;
     }
 
-    public boolean getReplaceImagesWithAlt()
-    {
-        return replaceImagesWithAlt;
-    }
-
-    public void setReplaceImagesWithAlt(boolean replaceImagesWithAlt)
-    {
-        this.replaceImagesWithAlt = replaceImagesWithAlt;
-    }
-
     @Override
     public IRI getConsumes()
     {
@@ -213,5 +204,6 @@ public class PuppeteerTreeProvider extends BaseArtifactService
         page.setCreatorParams(getParamString());
         return page;
     }
+
 
 }

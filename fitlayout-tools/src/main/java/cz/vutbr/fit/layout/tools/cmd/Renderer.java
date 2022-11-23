@@ -29,7 +29,7 @@ import picocli.CommandLine.Parameters;
     description = "Renders a page")
 public class Renderer extends CliCommand implements Callable<Integer>
 {
-    public enum Backend { cssbox, puppeteer, pdf };
+    public enum Backend { cssbox, puppeteer, playwright, pdf };
     
     @Option(order = 100, names = {"-h", "--help"}, usageHelp = true, description = "print help")
     protected boolean help;
@@ -86,6 +86,9 @@ public class Renderer extends CliCommand implements Callable<Integer>
                 break;
             case puppeteer:
                 serviceId = "FitLayout.Puppeteer";
+                break;
+            case playwright:
+                serviceId = "FitLayout.Playwright";
                 break;
             case pdf:
                 serviceId = "FitLayout.PDF";

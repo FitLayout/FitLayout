@@ -8,11 +8,11 @@
 		<version>2.0.4-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>fitlayout-render-puppeteer</artifactId>
+	<artifactId>fitlayout-render-playwright</artifactId>
 
-	<name>FitLayout Puppeteer Client</name>
+	<name>FitLayout Playwright Renderer</name>
 	<description>
-		FitLayout - Puppeteer/Chromium renderer client
+		FitLayout - Playwright-based renderer
 	</description>
 
 	<build>
@@ -31,6 +31,15 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.playwright</groupId>
+			<artifactId>playwright</artifactId>
+			<version>1.27.1</version>
+		</dependency>
+		<dependency>
+			 <groupId>info.picocli</groupId>
+			 <artifactId>picocli</artifactId>
 		</dependency>
 	</dependencies>
 

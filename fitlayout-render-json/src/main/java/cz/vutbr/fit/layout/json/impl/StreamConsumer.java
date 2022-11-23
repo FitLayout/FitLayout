@@ -3,7 +3,7 @@
  *
  * Created on 14. 11. 2020, 22:10:42 by burgetr
  */
-package cz.vutbr.fit.layout.puppeteer.impl;
+package cz.vutbr.fit.layout.json.impl;
 
 import java.io.InputStream;
 

@@ -3,7 +3,7 @@
  *
  * Created on 11. 11. 2020, 8:57:57 by burgetr
  */
-package cz.vutbr.fit.layout.puppeteer.impl;
+package cz.vutbr.fit.layout.json.impl;
 
 import java.net.URL;
 

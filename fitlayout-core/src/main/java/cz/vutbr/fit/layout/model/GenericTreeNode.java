@@ -6,6 +6,7 @@
 package cz.vutbr.fit.layout.model;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * A generic tree node interface.
@@ -58,6 +59,20 @@ public interface GenericTreeNode<T extends GenericTreeNode<T>>
     public int getDepth();
     
     public int getLeafCount();
+    
+    /**
+     * Traverses the tree rooted in this node preorder and finds all nodes by a predicate.
+     * @param predicate The predicate to test or {@code null} when all nodes should be returned.
+     * @return The list of nodes found.
+     */
+    public List<T> findNodesPreOrder(Predicate<T> predicate);
+    
+    /**
+     * Traverses the tree rooted in this node postorder and finds all nodes by a predicate.
+     * @param predicate The predicate to test or {@code null} when all nodes should be returned.
+     * @return The list of nodes found.
+     */
+    public List<T> findNodesPostOrder(Predicate<T> predicate);
     
     /**
      * Signals that some children have been added or removed or their state changed.

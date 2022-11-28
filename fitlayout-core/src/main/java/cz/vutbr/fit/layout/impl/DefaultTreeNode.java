@@ -6,7 +6,9 @@
 package cz.vutbr.fit.layout.impl;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import cz.vutbr.fit.layout.model.GenericTreeNode;
 
@@ -236,6 +238,38 @@ public class DefaultTreeNode<T extends GenericTreeNode<T>> implements GenericTre
         }
     }
     
+    @Override
+    public List<T> findNodesPreOrder(Predicate<T> predicate)
+    {
+        final List<T> ret = new LinkedList<>();
+        recursiveFindPreOrder(myself, predicate, ret);
+        return ret;
+    }
+    
+    private void recursiveFindPreOrder(T root, Predicate<T> predicate, List<T> dest)
+    {
+        if (predicate == null || predicate.test(root))
+            dest.add(root);
+        for (T child : root.getChildren())
+            recursiveFindPreOrder(child, predicate, dest);
+    }
+
+    @Override
+    public List<T> findNodesPostOrder(Predicate<T> predicate)
+    {
+        final List<T> ret = new LinkedList<>();
+        recursiveFindPostOrder(myself, predicate, ret);
+        return ret;
+    }
+    
+    private void recursiveFindPostOrder(T root, Predicate<T> predicate, List<T> dest)
+    {
+        for (T child : root.getChildren())
+            recursiveFindPostOrder(child, predicate, dest);
+        if (predicate == null || predicate.test(root))
+            dest.add(root);
+    }
+
     /**
      * This method is called after some child nodes have been added or removed.
      * Subclasses may override this method in order to update their own internal structures.

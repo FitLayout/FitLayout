@@ -13,7 +13,6 @@ function fitlayoutExportBoxes() {
 		"position",
 		"color",
 		"background-color",
-		"font",
 		"border-top",
 		"border-right",
 		"border-bottom",
@@ -22,6 +21,13 @@ function fitlayoutExportBoxes() {
 		"transform",
 		"visibility",
 		"opacity"
+	];
+
+	const fontProps = [
+		"font-family",
+		"font-size",
+		"font-style",
+		"font-weight"
 	];
 
 	const replacedElements = [
@@ -156,8 +162,17 @@ function fitlayoutExportBoxes() {
 			}
 		}
 
-		//encode the remaining style properties
+		//encode font style properties
 		let css = "";
+		if (style['font']) { //use the 'font' property if available
+			css += 'font:' + style['font'] + ';';
+		} else { //use the partial properties when font is not available
+			fontProps.forEach((name) => {
+				css += name + ':' + style[name] + ';';
+			});
+		}
+
+		//encode the remaining style properties
 		styleProps.forEach((name) => {
 			css += name + ":" + style[name] + ";";
 		});

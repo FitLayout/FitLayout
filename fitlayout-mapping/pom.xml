@@ -40,6 +40,11 @@
 			<groupId>cz.vutbr.fit.layout</groupId>
 			<artifactId>fitlayout-text</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>io.github.natty-parser</groupId>
+			<artifactId>natty</artifactId>
+		</dependency>		
 	</dependencies>
 
 </project>

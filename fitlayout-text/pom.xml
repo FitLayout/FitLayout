@@ -48,9 +48,8 @@
 			</exclusions>			
 		</dependency>
 		<dependency>
-			<groupId>com.joestelmach</groupId>
+			<groupId>io.github.natty-parser</groupId>
 			<artifactId>natty</artifactId>
-			<version>0.13</version>
 		</dependency>		
 	</dependencies>
 

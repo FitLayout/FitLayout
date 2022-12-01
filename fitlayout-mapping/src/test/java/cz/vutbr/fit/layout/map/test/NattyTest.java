@@ -5,9 +5,11 @@
  */
 package cz.vutbr.fit.layout.map.test;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 
@@ -34,10 +36,12 @@ public class NattyTest
             for (Date date : dates)
             {
                 System.out.println("    " + date.toString() + " ~ " + date.toInstant());
+                Instant ins = date.toInstant();
+                ins = ins.truncatedTo(ChronoUnit.MINUTES);
                 if (group.isTimeInferred())
-                    System.out.println("    Local " + LocalDate.ofInstant(date.toInstant(), ZoneId.systemDefault()));
+                    System.out.println("    Local " + LocalDate.ofInstant(ins, ZoneId.systemDefault()));
                 else
-                    System.out.println("    Local " + LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()));
+                    System.out.println("    Local " + LocalDateTime.ofInstant(ins, ZoneId.systemDefault()));
             }
         }
     }
@@ -47,7 +51,7 @@ public class NattyTest
      */
     public static void main(String[] args)
     {
-        String s = "today 12:30";
+        String s = "today 12:31";
 
         dumpParserResult(s);
     }

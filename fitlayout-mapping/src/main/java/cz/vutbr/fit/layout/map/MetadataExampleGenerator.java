@@ -5,6 +5,13 @@
  */
 package cz.vutbr.fit.layout.map;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,9 +34,16 @@ import cz.vutbr.fit.layout.rdf.StorageException;
  */
 public class MetadataExampleGenerator
 {
+    public static final ZoneId TIME_ZONE = ZoneId.systemDefault();
+    
+    public enum TempPrecision { DATES, MINUTES, SECONDS };
+    
     private RDFArtifactRepository repo;
     private IRI contextIri;
     private Function<String, String> stringFilter;
+    
+    private List<Example> examples;
+    
     
     /**
      * Creates an example generator for a metadata context in a repository with a identity
@@ -65,6 +79,13 @@ public class MetadataExampleGenerator
      * @return A list of ocurrence examples.
      */
     public List<Example> getExamples()
+    {
+        if (examples == null)
+            examples = readExamples();
+        return examples;
+    }
+    
+    protected List<Example> readExamples()
     {
         try {
             final String query = "SELECT ?s ?p ?text WHERE {"
@@ -149,6 +170,34 @@ public class MetadataExampleGenerator
     }
 
     /**
+     * Creates the mapping from temporal types to examples for the examples that may be converted
+     * to LocalDate or LocalDateTIme.
+     * 
+     * @return A map that maps LocalDate and LocalDateTime values to the individual examples. 
+     * Generally a list of examples may be mapped to a single string.
+     */
+    public Map<TemporalAccessor, List<Example>> getTemporalExamples(TempPrecision precision)
+    {
+        var allExamples = getExamples();
+        Map<TemporalAccessor, List<Example>> ret = new HashMap<>();
+        for (Example ex : allExamples)
+        {
+            final TemporalAccessor key = getTemporalValue(ex.getText(), precision);
+            if (key != null)
+            {
+                List<Example> list = ret.get(key);
+                if (list == null)
+                {
+                    list = new ArrayList<>(1);
+                    ret.put(key, list);
+                }
+                list.add(ex);
+            }
+        }
+        return ret;
+    }
+
+    /**
      * Applies the configured keyFilter function to a source string.
      * 
      * @param src
@@ -173,6 +222,49 @@ public class MetadataExampleGenerator
             } catch (NumberFormatException e) {
                 return null;
             }
+        }
+        else
+            return null;
+    }
+    
+    /**
+     * Converts a string to a float value if possible.
+     * @param src the source string value containing an ISO Date or DateTime
+     * @param precision the required precision of the returned TemporalAccessor
+     * @return the temporal acessor corresponding to the given value and the required precision
+     */
+    public TemporalAccessor getTemporalValue(String src, TempPrecision precision)
+    {
+        if (src != null && !src.isBlank())
+        {
+            TemporalAccessor ret = null;
+            // try the schema:DateTime format of the value
+            try {
+                var ta = DateTimeFormatter.ISO_DATE_TIME.parse(src); 
+                switch (precision) // choose the representation based on the required precision
+                {
+                    case DATES:
+                        ret = LocalDate.ofInstant(Instant.from(ta), TIME_ZONE);
+                        break;
+                    case MINUTES:
+                        ret = LocalDateTime.ofInstant(Instant.from(ta).truncatedTo(ChronoUnit.MINUTES), TIME_ZONE);
+                        break;
+                    case SECONDS:
+                        ret = LocalDateTime.ofInstant(Instant.from(ta).truncatedTo(ChronoUnit.SECONDS), TIME_ZONE);
+                        break;
+                }
+            } catch (Exception e) {
+            }
+            // if not succeeded, try the schema:Date format of the value
+            if (ret == null)
+            {
+                try {
+                    var ta = DateTimeFormatter.ISO_DATE.parse(src);
+                    ret = LocalDate.ofInstant(Instant.from(ta), ZoneId.systemDefault()); // can only be represented as a date
+                } catch (Exception e) {
+                }
+            }
+            return ret;
         }
         else
             return null;

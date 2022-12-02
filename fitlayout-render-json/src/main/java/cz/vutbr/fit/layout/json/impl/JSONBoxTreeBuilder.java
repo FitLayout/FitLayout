@@ -74,7 +74,8 @@ public abstract class JSONBoxTreeBuilder extends BaseBoxTreeBuilder
         inputFile = invokeRenderer(url);
         if (inputFile != null && inputFile.getError() == null)
         {
-            if (inputFile.getStatus() >= 200 && inputFile.getStatus() < 300)
+            if (inputFile.getStatus() == 0 //status 0 occurs for example for file: urls
+                    || (inputFile.getStatus() >= 200 && inputFile.getStatus() < 300))
                 parseInputFile(inputFile, url);
             else
                 throw new IOException("HTTP status: " + inputFile.getStatus() + " " + inputFile.getStatusText());

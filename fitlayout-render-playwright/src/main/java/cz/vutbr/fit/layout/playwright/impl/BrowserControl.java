@@ -140,12 +140,13 @@ public class BrowserControl implements AutoCloseable
                 waitOptions = new Page.NavigateOptions()
                     .setWaitUntil(WaitUntilState.DOMCONTENTLOADED)
                     .setTimeout(10000);
-                scrollPages = 1;
+                scrollPages = 0;
                 break;
             case 1:
                 waitOptions = new Page.NavigateOptions()
                     .setWaitUntil(WaitUntilState.LOAD)
                     .setTimeout(15000);
+                scrollPages = 5;
                 break;
             case 2:
                 waitOptions = new Page.NavigateOptions()
@@ -170,11 +171,17 @@ public class BrowserControl implements AutoCloseable
             lastError = e.getMessage();
         }
 
-        // scroll the page to load more content
-        String scrollFn = loadResource("/common/scroll.js");
-        var totalHeight = page.evaluate(scrollFn, scrollPages);
-        if (totalHeight instanceof Integer)
-            page.setViewportSize(width, ((Integer) totalHeight).intValue());
+        // try total height as 2 window heights to make sure that everything is displayed correctly above the fold
+        int totalHeight = getHeight() * 2;
+        // scroll the page to load more content (and update total height)
+        if (scrollPages > 0)
+        {
+            String scrollFn = loadResource("/common/scroll.js");
+            var computedTotalHeight = page.evaluate(scrollFn, scrollPages);
+            if (computedTotalHeight instanceof Integer)
+                totalHeight = ((Integer) computedTotalHeight).intValue();
+        }
+        page.setViewportSize(width, ((Integer) totalHeight).intValue());
         
         // take the screenshot
         byte[] screenshot = page.screenshot(

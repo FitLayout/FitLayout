@@ -122,6 +122,7 @@ public class BoxTreeBuilder extends JSONBoxTreeBuilder
         if (wrapper != null)
             cmds.add("-N"); //when the wrapper is used, we don't use the headless mode
         
+        log.info("Running backend {}", cmds);
         ProcessBuilder pb = new ProcessBuilder(cmds);
         pb.directory(new File(rendererPath));
         Process backend = pb.start();
@@ -135,7 +136,18 @@ public class BoxTreeBuilder extends JSONBoxTreeBuilder
                 Gson gson = new Gson();
                 BufferedReader outReader = new BufferedReader(
                         new InputStreamReader(backend.getInputStream()));
-                InputFile file = gson.fromJson(outReader, InputFile.class);
+                /*String line;
+                try {
+                    while ((line = outReader.readLine()) != null)
+                        System.err.println(line);
+                } catch (IOException ee) {
+                }*/
+                InputFile file = null;
+                try {
+                    file = gson.fromJson(outReader, InputFile.class);
+                } catch (Exception e) {
+                    log.error("Couldn't parse JSON page description: {}", e.getMessage());
+                }
                 return file;
             }
         };
@@ -174,9 +186,13 @@ public class BoxTreeBuilder extends JSONBoxTreeBuilder
         if (exitCode != 0)
         {
             String msg = (String) errConsumer.getResult();
-            throw new IOException(msg);
+            throw new IOException("Backend returned exit code " + exitCode + ": " + msg);
         }
         InputFile file = (InputFile) outConsumer.getResult();
+        if (file == null) //exit code 0 but no input obtained - this should not happen
+        {
+            throw new IOException("No page data obtained from backend");
+        }
         return file;
     }
     

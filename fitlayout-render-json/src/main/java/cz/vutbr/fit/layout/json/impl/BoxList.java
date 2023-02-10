@@ -25,6 +25,7 @@ import cz.vutbr.fit.layout.json.parser.InputFile;
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
+import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.TextStyle;
 import cz.vutbr.web.css.CSSException;
@@ -52,6 +53,8 @@ public class BoxList
     
     private static final int BOX_OFFSET = 1; //the index of the first real box in the list (excluding the artificial viewport)
     
+    private Page page;
+    
     /** Accepted generic font families */
     private Set<String> defaultFonts = Set.of("serif", "sans-serif", "monospace");
     
@@ -70,8 +73,9 @@ public class BoxList
      * 
      * @param inputFile
      */
-    public BoxList(InputFile inputFile)
+    public BoxList(InputFile inputFile, Page page)
     {
+        this.page = page;
         availFonts = Set.of(inputFile.getFonts());
         viewport = createViewport(inputFile);
         createBoxList(inputFile);
@@ -106,6 +110,7 @@ public class BoxList
     private BoxImpl createViewport(InputFile input)
     {
         BoxImpl box = new BoxImpl(this);
+        box.setPage(page);
         box.setOrder(0);
         box.setId(0);
         box.setTagName("viewport");
@@ -202,6 +207,7 @@ public class BoxList
     private BoxImpl createElementBox(BoxInfo src, NodeData style, int order)
     {
         BoxImpl ret = new BoxImpl(this);
+        ret.setPage(page);
         setupCommonProperties(ret, src, style, order);
         setupParents(ret, src);
         if (src.getReplaced() != null && src.getReplaced())
@@ -261,6 +267,7 @@ public class BoxList
     private BoxImpl createTextBox(BoxInfo src, NodeData style, int order)
     {
         BoxImpl ret = new BoxImpl(this);
+        ret.setPage(page);
         setupCommonProperties(ret, src, style, order);
         setupParents(ret, src);
         ret.setType(Box.Type.TEXT_CONTENT);

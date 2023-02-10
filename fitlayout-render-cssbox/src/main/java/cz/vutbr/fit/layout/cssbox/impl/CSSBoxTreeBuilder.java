@@ -167,7 +167,7 @@ public class CSSBoxTreeBuilder extends BaseBoxTreeBuilder
 
         page = new PageImpl(list.get(0));
         DefaultBox main = new DefaultBox();
-        main.setPageIri(page.getIri());
+        main.setPage(page);
         main.setTagName("pageset");
         
         for (URL url : list)
@@ -349,7 +349,7 @@ public class CSSBoxTreeBuilder extends BaseBoxTreeBuilder
      */
     private List<Box> createBoxList(Viewport vp)
     {
-        BoxListRenderer renderer = new BoxListRenderer(page.getIri(), zoom);
+        BoxListRenderer renderer = new BoxListRenderer(page, zoom);
         renderer.init(vp);
         vp.draw(renderer);
         List<Box> ret = renderer.getBoxList();

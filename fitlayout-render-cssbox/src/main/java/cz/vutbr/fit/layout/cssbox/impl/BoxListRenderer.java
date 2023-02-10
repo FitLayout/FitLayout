@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.rdf4j.model.IRI;
 import org.fit.cssbox.awt.Transform;
 import org.fit.cssbox.css.BackgroundDecoder;
 import org.fit.cssbox.layout.ElementBox;
@@ -24,6 +23,7 @@ import org.fit.cssbox.render.StructuredRenderer;
 
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
+import cz.vutbr.fit.layout.model.Page;
 
 /**
  * A CSSBox renderer that produces a list of boxes.
@@ -32,7 +32,7 @@ import cz.vutbr.fit.layout.model.Color;
  */
 public class BoxListRenderer extends StructuredRenderer
 {
-    private IRI pageIri;
+    private Page page;
     private float zoom;
     
     /** the resulting list */
@@ -47,9 +47,9 @@ public class BoxListRenderer extends StructuredRenderer
     private int orderCounter;
     
     
-    public BoxListRenderer(IRI pageIri, float zoom)
+    public BoxListRenderer(Page page, float zoom)
     {
-        this.pageIri = pageIri;
+        this.page = page;
         this.zoom = zoom;
         boxList = new ArrayList<>();
         savedTransforms = new HashMap<ElementBox, AffineTransform>();
@@ -95,7 +95,7 @@ public class BoxListRenderer extends StructuredRenderer
         Color bgColor = (bg == null) ? null : Units.toColor(bg.getBgcolor());
         if (bgColor == null && elem instanceof Viewport)
             bgColor = Color.WHITE; //viewport should always have a background
-        BoxNode newnode = new BoxNode(elem, pageIri, bgColor, zoom);
+        BoxNode newnode = new BoxNode(elem, page, bgColor, zoom);
         if (newnode.isVisible())
         {
             newnode.setOrder(orderCounter++);
@@ -113,7 +113,7 @@ public class BoxListRenderer extends StructuredRenderer
     @Override
     public void renderTextContent(TextBox text)
     {
-        BoxNode newnode = new BoxNode(text, pageIri, zoom);
+        BoxNode newnode = new BoxNode(text, page, zoom);
         if (newnode.isVisible())
         {
             newnode.setOrder(orderCounter++);

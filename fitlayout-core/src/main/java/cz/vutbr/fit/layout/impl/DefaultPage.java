@@ -177,6 +177,7 @@ public class DefaultPage extends BaseArtifact implements Page
     {
         final DefaultBox ret = new DefaultBox();
         ret.setId(getNextBoxId());
+        ret.setPage(this);
         return ret;
     }
 
@@ -185,6 +186,7 @@ public class DefaultPage extends BaseArtifact implements Page
     {
         final DefaultBox ret = new DefaultBox(src);
         ret.setId(getNextBoxId());
+        ret.setPage(this);
         return ret;
     }
     

@@ -122,7 +122,7 @@ public abstract class JSONBoxTreeBuilder extends BaseBoxTreeBuilder
         }
         
         //create the box tree
-        BoxList boxlist = new BoxList(inputFile);
+        BoxList boxlist = new BoxList(inputFile, page);
         Box root = buildTree(boxlist.getVisibleBoxes(), Color.WHITE);
         page.setRoot(root);
         

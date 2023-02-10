@@ -9,11 +9,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.rdf4j.model.IRI;
+
 import cz.vutbr.fit.layout.api.BoxConcatenator;
 import cz.vutbr.fit.layout.api.Concatenators;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.ContentObject;
+import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
@@ -23,6 +26,7 @@ import cz.vutbr.fit.layout.model.Rectangular;
  */
 public class DefaultBox extends DefaultTreeContentRect<Box> implements Box
 {
+    private Page page;
     private int order;
     
     private boolean visible;
@@ -73,6 +77,31 @@ public class DefaultBox extends DefaultTreeContentRect<Box> implements Box
         displayType = src.getDisplayType();
     }
     
+    public Page getPage()
+    {
+        return page;
+    }
+
+    public void setPage(Page page)
+    {
+        this.page = page;
+    }
+
+    @Override
+    public IRI getPageIri()
+    {
+        if (page == null)
+            return null;
+        else
+            return page.getIri();
+    }
+
+    @Override
+    public void setPageIri(IRI pageIri)
+    {
+        throw new IllegalArgumentException("box.setPageIri() should cannot be used, use setPage() instead");
+    }
+
     public int getOrder()
     {
         return order;

@@ -19,6 +19,12 @@ import cz.vutbr.fit.layout.api.Concatenators;
  */
 public interface Box extends ContentRect, GenericTreeNode<Box>
 {
+    
+    /**
+     * Obtains the source page for this box.
+     * @return the source page or {@code null} when the box has not been assigned to any page.
+     */
+    public Page getPage();
 
     /**
      * Gets the order of precedence of the box in the page. A box that precedes another box in the

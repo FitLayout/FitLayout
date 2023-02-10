@@ -8,7 +8,6 @@ package cz.vutbr.fit.layout.cssbox.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.rdf4j.model.IRI;
 import org.fit.cssbox.css.CSSUnits;
 import org.fit.cssbox.layout.Box;
 import org.fit.cssbox.layout.ElementBox;
@@ -25,6 +24,7 @@ import cz.vutbr.fit.layout.impl.DefaultBox;
 import cz.vutbr.fit.layout.model.Border;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.ContentObject;
+import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.TextStyle;
 import cz.vutbr.fit.layout.model.Border.Side;
@@ -60,12 +60,12 @@ public class BoxNode extends DefaultBox
      * Creates a new node containing a box with a transparent background.
      * 
      * @param box the contained box
-     * @param pageIri containing page IRI
+     * @param page containing page
      * @param zoom zoom factor to apply
      */
-    public BoxNode(Box box, IRI pageIri, float zoom)
+    public BoxNode(Box box, Page page, float zoom)
     {
-        this(box, pageIri, null, zoom);
+        this(box, page, null, zoom);
     }
     
     /**
@@ -74,17 +74,17 @@ public class BoxNode extends DefaultBox
      * table elements) are treated in a special way.
      * 
      * @param box the contained box
-     * @param pageIri containing page IRI
+     * @param page containing page
      * @param bgColor computed backgound color to be used for the box
      * @param zoom zoom factor to apply
      */
-    public BoxNode(Box box, IRI pageIri, Color bgColor, float zoom)
+    public BoxNode(Box box, Page page, Color bgColor, float zoom)
     {
         super();
         this.box = box;
         this.zoom = zoom;
         setBackgroundColor(bgColor);
-        setPageIri(pageIri);
+        setPage(page);
         //copy the bounds from the box
         if (box != null)
         {

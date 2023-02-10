@@ -13,6 +13,7 @@ import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
+import cz.vutbr.fit.layout.impl.ParameterFloat;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaConnection;
 import cz.vutbr.fit.layout.model.AreaTree;
@@ -27,9 +28,20 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  */
 public class AreaConnectionProvider extends ConnectionSetArtifactService
 {
+    private float minRelationWeight = 0.1f;
 
     public AreaConnectionProvider()
     {
+    }
+
+    public float getMinRelationWeight()
+    {
+        return minRelationWeight;
+    }
+
+    public void setMinRelationWeight(float minRelationWeight)
+    {
+        this.minRelationWeight = minRelationWeight;
     }
 
     @Override
@@ -54,6 +66,8 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
     public List<Parameter> defineParams()
     {
         List<Parameter> ret = new ArrayList<>(1);
+        ret.add(new ParameterFloat("minRelationWeight", 
+                "Minimal required weight of extracted relations", -1000.0f, 1000.0f));
         return ret;
     }
 
@@ -106,6 +120,7 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
         findLeafAreas(input.getRoot(), leafAreas);
         
         RelationAnalyzer ra = new RelationAnalyzerSymmetric(page, leafAreas);
+        ra.setMinRelationWeight(minRelationWeight);
         ra.extractConnections();
         return ra.getConnections();
     }

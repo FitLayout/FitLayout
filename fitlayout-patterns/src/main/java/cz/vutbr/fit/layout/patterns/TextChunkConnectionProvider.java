@@ -15,6 +15,7 @@ import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
+import cz.vutbr.fit.layout.impl.ParameterFloat;
 import cz.vutbr.fit.layout.model.AreaConnection;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.ChunkSet;
@@ -28,9 +29,20 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  */
 public class TextChunkConnectionProvider extends ConnectionSetArtifactService
 {
+    private float minRelationWeight = 0.1f;
 
     public TextChunkConnectionProvider()
     {
+    }
+
+    public float getMinRelationWeight()
+    {
+        return minRelationWeight;
+    }
+
+    public void setMinRelationWeight(float minRelationWeight)
+    {
+        this.minRelationWeight = minRelationWeight;
     }
 
     @Override
@@ -55,6 +67,8 @@ public class TextChunkConnectionProvider extends ConnectionSetArtifactService
     public List<Parameter> defineParams()
     {
         List<Parameter> ret = new ArrayList<>(1);
+        ret.add(new ParameterFloat("minRelationWeight", 
+                "Minimal required weight of extracted relations", -1000.0f, 1000.0f));
         return ret;
     }
 
@@ -105,6 +119,7 @@ public class TextChunkConnectionProvider extends ConnectionSetArtifactService
     {
         Set<ContentRect> chunks = new HashSet<>(input.getTextChunks());
         RelationAnalyzer ra = new RelationAnalyzerSymmetric(page, chunks);
+        ra.setMinRelationWeight(minRelationWeight);
         ra.extractConnections();
         return ra.getConnections();
     }

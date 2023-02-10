@@ -81,20 +81,20 @@ public class RelationAnalyzerSymmetric extends RelationAnalyzer
                             if (distLL > 0)
                             {
                                 final float w = 1.0f - ((float) distLL / tw);
-                                if (w > RelationAnalyzer.MIN_RELATION_WEIGHT)
+                                if (w > getMinRelationWeight())
                                     addAreaConnection(new AreaConnection(a1, a2, Relations.SAMELINE, w));
                             }
                             //after / before
                             if (distRL > 0)
                             {
                                 final float w = 1.0f - (distRL / 3) * 3.0f / tw;
-                                if (w > RelationAnalyzer.MIN_RELATION_WEIGHT)
+                                if (w > getMinRelationWeight())
                                     addAreaConnection(new AreaConnection(a1, a2, Relations.AFTER, w));
                             }
                             else if (distLR > 0)
                             {
                                 final float w = 1.0f - (distLR / 3) * 3.0f / tw;
-                                if (w > RelationAnalyzer.MIN_RELATION_WEIGHT)
+                                if (w > getMinRelationWeight())
                                     addAreaConnection(new AreaConnection(a1, a2, Relations.BEFORE, w));
                             }
                             //onRight / onLeft
@@ -150,7 +150,7 @@ public class RelationAnalyzerSymmetric extends RelationAnalyzer
             if (dist >= -0.5f*em)
             {
                 final float w = 1.0f - dist / th;
-                if (w > RelationAnalyzer.MIN_RELATION_WEIGHT)
+                if (w > getMinRelationWeight())
                 {
                     addAreaConnection(new AreaConnection(a1, a2, Relations.BELOW, w));
                     addAreaConnection(new AreaConnection(a2, a1, Relations.ABOVE, w));

@@ -24,8 +24,7 @@ import cz.vutbr.fit.layout.model.Relation;
  */
 public abstract class RelationAnalyzer
 {
-    public static final float MIN_RELATION_WEIGHT = 0.1f;
-    
+    private float minRelationWeight;
     private Page page;
     private Collection<ContentRect> areas;
     private AreaTopology topology;
@@ -39,6 +38,25 @@ public abstract class RelationAnalyzer
         this.areas = areas;
         topology = new AreaListGridTopology(areas);
         connections = new HashSet<>();
+        minRelationWeight = 0.1f;
+    }
+
+    /**
+     * The minimal weight of the relations to be discovered.
+     * @return minimal weight
+     */
+    public float getMinRelationWeight()
+    {
+        return minRelationWeight;
+    }
+
+    /**
+     * Sets the minimal weight of the relations to be discovered.
+     * @param minRelationWeight the minimal weight to be considered
+     */
+    public void setMinRelationWeight(float minRelationWeight)
+    {
+        this.minRelationWeight = minRelationWeight;
     }
 
     public abstract List<Relation> getAnalyzedRelations();

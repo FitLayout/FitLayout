@@ -8,6 +8,7 @@ package cz.vutbr.fit.layout.text.taggers;
 import cz.vutbr.fit.layout.api.Tagger;
 import cz.vutbr.fit.layout.impl.BaseParametrizedOperation;
 import cz.vutbr.fit.layout.model.Area;
+import cz.vutbr.fit.layout.segm.AreaLayout;
 import cz.vutbr.fit.layout.segm.AreaStyle;
 
 /**
@@ -38,8 +39,9 @@ public abstract class BaseTagger extends BaseParametrizedOperation implements Ta
      */
     protected boolean isHomogeneous(Area a)
     {
-        //TODO consider layout? (e.g. separators)
-        return a.isLeaf() || AreaStyle.hasConsistentStyle(a);
+        //TODO consider separators?
+        return a.isLeaf() || 
+                (AreaStyle.hasConsistentStyle(a) && AreaLayout.hasInFlowLayout(a));
     }
     
 }

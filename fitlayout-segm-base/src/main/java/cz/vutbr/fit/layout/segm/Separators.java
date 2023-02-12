@@ -25,11 +25,13 @@ public class Separators
     /**
      * Creates a separators set of an area and stores it as an attribute of the area.
      * @param area the area to process
+     * @return the created separator set that has been also attached to the area
      */
-    public static void createSeparatorsForArea(Area area)
+    public static SeparatorSet createSeparatorsForArea(Area area)
     {
-        SeparatorSet seps = Config.createSeparators(area);
+        final SeparatorSet seps = Config.createSeparators(area);
         area.addUserAttribute(ATTR_SEPARATORS, seps);
+        return seps;
     }
 
     public static SeparatorSet getSeparatorsForArea(Area area)
@@ -43,7 +45,7 @@ public class Separators
      */
     public static void removeSimpleSeparators(Area area)
     {
-        SeparatorSet seps = getSeparatorsForArea(area);
+        final SeparatorSet seps = getSeparatorsForArea(area);
         removeSimpleSeparators(area, seps.getHorizontal());
         removeSimpleSeparators(area, seps.getVertical());
         removeSimpleSeparators(area, seps.getBoxsep());

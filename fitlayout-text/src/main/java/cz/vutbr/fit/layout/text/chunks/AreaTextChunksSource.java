@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
  * A text chunks source that extracts the tagged chunks only.
  * 
  * @author Martin Kotras
+ * @author burgetr
  */
 public class AreaTextChunksSource extends ChunksSource
 {
@@ -46,11 +47,28 @@ public class AreaTextChunksSource extends ChunksSource
 	private Stream<TextChunk> createChunksForArea(Area area)
 	{
 		if (area.isLeaf())
+		{
+		    // leaf areas - extract the chunks
 			return this.createChunksForLeaf(area);
-
-		return area.getChildren()
-			.stream()
-			.flatMap(this::createChunksForArea);
+		}
+		else if (area.getChildCount() > 1 && !area.getTags().isEmpty())
+		{
+		    // tagged non-leaf areas with multiple children
+		    // e.g. a field consisting of multiple lines
+		    // try to extract the chunks and continue to subareas
+		    var ret1 = this.createChunksForLeaf(area);
+		    var ret2 = area.getChildren()
+	                .stream()
+	                .flatMap(this::createChunksForArea);
+		    return Stream.concat(ret1, ret2);
+		}
+		else
+		{
+		    // just continue to subareas
+    		return area.getChildren()
+    			.stream()
+    			.flatMap(this::createChunksForArea);
+		}
 	}
 
 	private Stream<TextChunk> createChunksForLeaf(Area area)
@@ -93,7 +111,7 @@ public class AreaTextChunksSource extends ChunksSource
 
 	private String getText(Area area)
 	{
-		return area.getBoxes()
+		return area.getAllBoxes()
 			.stream()
 			.map(Box::getOwnText)
 			.collect(Collectors.joining());

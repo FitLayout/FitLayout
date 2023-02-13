@@ -23,7 +23,6 @@ public class AfterFunction extends RectComparisonFunction
     public AfterFunction()
     {
         super(fname);
-        System.err.println("NEW!!!");
     }
 
     @Override

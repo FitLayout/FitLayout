@@ -32,6 +32,7 @@ import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.FL;
+import cz.vutbr.fit.layout.ontology.FLFN;
 import cz.vutbr.fit.layout.ontology.MAPPING;
 import cz.vutbr.fit.layout.ontology.RESOURCE;
 import cz.vutbr.fit.layout.ontology.SEGM;
@@ -104,6 +105,7 @@ public class Serialization
         writer.handleNamespace("map", MAPPING.NAMESPACE);
         writer.handleNamespace("fl", FL.NAMESPACE);
         writer.handleNamespace("r", RESOURCE.NAMESPACE);
+        writer.handleNamespace("flfn", FLFN.NAMESPACE);
     }
     
     public static RDFWriter createRioWriterJsonLD(OutputStream os) throws RDFHandlerException

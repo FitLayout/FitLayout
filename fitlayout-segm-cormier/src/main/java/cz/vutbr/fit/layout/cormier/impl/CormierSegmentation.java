@@ -245,8 +245,6 @@ public class CormierSegmentation {
         for (int col = segment.getX1() + getMinSegmentLength(); col < segment.getX2() - getMinSegmentLength(); col++) {
             final int colF = col;
             double colProb = getLineDetector().lineProbability(
-                // TODO: Maybe transpose the vertical edge probabilities first, so we don't need to iterate over each row with
-                //       every column? (i.e. possible optimization)
                 Arrays.stream(Arrays.copyOfRange(edgeProbabilities.getValue1(), segment.getY1(), segment.getY2()))
                     .mapToDouble(row -> row[colF]).toArray()
             );

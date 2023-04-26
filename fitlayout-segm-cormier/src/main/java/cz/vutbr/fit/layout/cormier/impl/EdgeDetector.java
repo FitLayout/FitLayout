@@ -180,6 +180,8 @@ public class EdgeDetector {
             Pair<Mat, Mat> edges = sobel(pyramid[i]);
             edges.getValue0().convertTo(edges.getValue0(), CvType.CV_32F);
             edges.getValue1().convertTo(edges.getValue1(), CvType.CV_32F);
+            Core.multiply(edges.getValue0(), edges.getValue0(), edges.getValue0());
+            Core.multiply(edges.getValue1(), edges.getValue1(), edges.getValue1());
 
             if (i > 0) { // Upsale back, so it can be added to the total sum.
                 Imgproc.resize(edges.getValue0(), edges.getValue0(), greyscaleImage.size());
@@ -190,9 +192,8 @@ public class EdgeDetector {
             Core.add(vEdges, edges.getValue1(), vEdges);
         }
 
-        Mat divisor = new Mat(greyscaleImage.size(), CvType.CV_32F, Scalar.all(getPyramidLevels()));
-        Core.divide(hEdges, divisor, hEdges);
-        Core.divide(vEdges, divisor, vEdges);
+        Core.sqrt(hEdges, hEdges);
+        Core.sqrt(vEdges, vEdges);
 
         return new Pair<>(hEdges, vEdges);
     }
@@ -297,15 +298,15 @@ public class EdgeDetector {
     private double relativeEdgeStrength(double targetPixelValue, Rectangular neighborhood,
                                         NormalDistribution[][] normalDistributions) {
 
-        double sum = 0.5; // include the target pixel which has always cumulative probability 0.5
+        double sum = 0.5; // Include the target pixel which has always cumulative probability 0.5.
 
         for (int row = neighborhood.getY1(); row < neighborhood.getY2(); row++) { // y
             for (int col = neighborhood.getX1(); col < neighborhood.getX2(); col++) { // x
-                sum += normalDistributions[row][col].cumulativeProbability(targetPixelValue); // at the target pixel
+                sum += normalDistributions[row][col].cumulativeProbability(targetPixelValue); // At the target pixel.
             }
         }
 
-        // +1 for the target pixel outside the neighborhood
+        // +1 for the target pixel outside the neighborhood.
         return 1 - sum / ((neighborhood.getX2() - neighborhood.getX1())
             * (neighborhood.getY2() - neighborhood.getY1()) + 1);
     }
@@ -324,7 +325,7 @@ public class EdgeDetector {
             (getPriorProbability() * (1 + edgeStrength2 - getPriorProbability() * edgeStrength2)
                 / (getPriorProbability() + edgeStrength2 - getPriorProbability() * edgeStrength2));
 
-        // OR of two independent events (of an edge on either of the sides of the neighborhood).
+        // Probability of an edge on either of the sides of the neighborhood.
         return edgeProbability + edgeProbability2 - edgeProbability * edgeProbability2;
     }
 }

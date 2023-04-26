@@ -92,13 +92,13 @@ public class LineDetector {
             return lineProbability(Arrays.copyOfRange(edgeProbabilities, 0, length/2))
                 * lineProbability(Arrays.copyOfRange(edgeProbabilities, length/2 + 1, length - 1));
 
-        } else { // Otherwise, calculate the probability using a Monte Carlo simulation.
+        } else { // Otherwise, calculate the probability using the Monte Carlo method.
 
             Random rng = new Random();
             int successCount = 0; // Number of MC trials that succeeded.
             for (int i = 0; i < getMonteCarloTrials(); i++) {
 
-                // The higher probability of locally significant edge at the pixel, the higher the chance of considering it significant.
+                // Pick significant pixels with probability of their local significance.
                 long significantPixels = Arrays.stream(edgeProbabilities)
                     .filter(prob -> prob > rng.nextFloat())
                     .count();

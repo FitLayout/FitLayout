@@ -139,9 +139,9 @@ public class CormierSegmentation {
         atree.setParentIri(iri);
 
         long startTime = System.currentTimeMillis();
-        logger.debug("Starting the segmentation process...");
+        logger.debug("Creating segmentation tree...");
         atree.setRoot(segment(root, split(root, edgeProbs), edgeProbs));
-        logger.debug("Segmentation process finished in {} seconds.",
+        logger.debug("Segmentation tree created in {} seconds.",
             String.format("%.2f", (System.currentTimeMillis() - startTime) / 1e3));
 
         return atree;

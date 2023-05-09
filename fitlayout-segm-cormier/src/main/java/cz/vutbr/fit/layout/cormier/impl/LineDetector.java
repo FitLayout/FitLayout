@@ -9,6 +9,7 @@ import java.util.Random;
  * Detector for semantically significant lines for the {@link CormierSegmentation}.
  * @see <a href="https://uwspace.uwaterloo.ca/handle/10012/13523">Michael Cormier (2018). Computer Vision on Web Pages:
  * A Study of Man-Made Images. UWSpace.</a>
+ * @author <a href="mailto:xmaste02@stud.fit.vutbr.cz">František Maštera</a>
  */
 public class LineDetector {
 

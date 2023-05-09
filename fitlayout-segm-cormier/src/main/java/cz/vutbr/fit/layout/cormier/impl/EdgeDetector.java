@@ -3,7 +3,10 @@ package cz.vutbr.fit.layout.cormier.impl;
 import cz.vutbr.fit.layout.model.Rectangular;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.javatuples.Pair;
-import org.opencv.core.*;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
@@ -16,6 +19,7 @@ import java.util.stream.IntStream;
  * Detector for locally significant edges for the {@link CormierSegmentation}.
  * @see <a href="https://uwspace.uwaterloo.ca/handle/10012/13523">Michael Cormier (2018). Computer Vision on Web Pages:
  * A Study of Man-Made Images. UWSpace.</a>
+ * @author <a href="mailto:xmaste02@stud.fit.vutbr.cz">František Maštera</a>
  */
 public class EdgeDetector {
 
@@ -31,6 +35,9 @@ public class EdgeDetector {
     private float priorProbability;
     private int pyramidLevels;
 
+    private boolean ndPregenEnabled = true;
+    private boolean parallelEnabled = true;
+
     /**
      * @param halfWindowWidth Range of the neighborhood (around the pixel) taken into account when applying kernel
      *                        density estimation using a Gaussian kernel.
@@ -44,6 +51,22 @@ public class EdgeDetector {
         this.standardDeviation = standardDeviation;
         this.priorProbability = priorProbability;
         this.pyramidLevels = pyramidLevels;
+    }
+
+    /**
+     * @param ndPregenEnabled If the {@link #edgeProbabilities(Mat, Mat)} optimization by pre-generating and storing
+     *                        the {@link NormalDistribution} instances will be enabled.
+     * @param parallelEnabled If the {@link #edgeProbabilities(Mat, Mat)} parallelization will be enabled.
+     * @see #EdgeDetector(int, float, float, int)
+     */
+    public EdgeDetector(int halfWindowWidth, float standardDeviation, float priorProbability, int pyramidLevels,
+                        boolean ndPregenEnabled, boolean parallelEnabled) {
+        this.halfWindowWidth = halfWindowWidth;
+        this.standardDeviation = standardDeviation;
+        this.priorProbability = priorProbability;
+        this.pyramidLevels = pyramidLevels;
+        this.ndPregenEnabled = ndPregenEnabled;
+        this.parallelEnabled = parallelEnabled;
     }
 
     /**
@@ -216,20 +239,25 @@ public class EdgeDetector {
         Core.convertScaleAbs(hEdges, hEdges);
         Core.convertScaleAbs(vEdges, vEdges);
 
-        logger.debug("Pre-generating normal distributions...");
         NormalDistribution[][] hNormalDistributions = new NormalDistribution[height][width];
         NormalDistribution[][] vNormalDistributions = new NormalDistribution[height][width];
-        for (int row = 0; row < height; row++) { // y of the whole image
-            for (int col = 0; col < width; col++) { // x
-                hNormalDistributions[row][col] = new NormalDistribution(null, hEdges.get(row, col)[0], getStandardDeviation());
-                vNormalDistributions[row][col] = new NormalDistribution(null, vEdges.get(row, col)[0], getStandardDeviation());
+        if (ndPregenEnabled) {
+            logger.debug("Pre-generating normal distributions...");
+            for (int row = 0; row < height; row++) { // y of the whole image
+                for (int col = 0; col < width; col++) { // x
+                    hNormalDistributions[row][col] = new NormalDistribution(null, hEdges.get(row, col)[0], getStandardDeviation());
+                    vNormalDistributions[row][col] = new NormalDistribution(null, vEdges.get(row, col)[0], getStandardDeviation());
+                }
             }
         }
 
         logger.debug("Calculating probabilities...");
         long startTime = System.currentTimeMillis();
         AtomicInteger rowsDoneA = new AtomicInteger(0);
-        IntStream.range(0, height).parallel().forEach(row -> { // y of the whole image
+
+        IntStream rowRange = IntStream.range(0, height);
+        if (parallelEnabled) rowRange = rowRange.parallel();
+        rowRange.forEach(row -> { // y of the whole image
 
             for (int col = 0; col < width; col++) { // x
 
@@ -260,14 +288,25 @@ public class EdgeDetector {
                 );
 
                 // Calculate the edge probabilities with given edge strength for each neighborhood.
-                hEdgeProbability[row][col] = edgeProbability(
-                    relativeEdgeStrength(hEdges.get(row, col)[0], topNeighborhood, hNormalDistributions),
-                    relativeEdgeStrength(hEdges.get(row, col)[0], bottomNeighborhood, hNormalDistributions)
-                );
-                vEdgeProbability[row][col] = edgeProbability(
-                    relativeEdgeStrength(vEdges.get(row, col)[0], leftNeighborhood, vNormalDistributions),
-                    relativeEdgeStrength(vEdges.get(row, col)[0], rightNeighborhood, vNormalDistributions)
-                );
+                if (ndPregenEnabled) {
+                    hEdgeProbability[row][col] = edgeProbability(
+                        relativeEdgeStrength(hEdges.get(row, col)[0], topNeighborhood, hNormalDistributions),
+                        relativeEdgeStrength(hEdges.get(row, col)[0], bottomNeighborhood, hNormalDistributions)
+                    );
+                    vEdgeProbability[row][col] = edgeProbability(
+                        relativeEdgeStrength(vEdges.get(row, col)[0], leftNeighborhood, vNormalDistributions),
+                        relativeEdgeStrength(vEdges.get(row, col)[0], rightNeighborhood, vNormalDistributions)
+                    );
+                } else {
+                    hEdgeProbability[row][col] = edgeProbability(
+                        relativeEdgeStrength(hEdges.get(row, col)[0], topNeighborhood, hEdges),
+                        relativeEdgeStrength(hEdges.get(row, col)[0], bottomNeighborhood, hEdges)
+                    );
+                    vEdgeProbability[row][col] = edgeProbability(
+                        relativeEdgeStrength(vEdges.get(row, col)[0], leftNeighborhood, vEdges),
+                        relativeEdgeStrength(vEdges.get(row, col)[0], rightNeighborhood, vEdges)
+                    );
+                }
             }
 
             // Performance logging.
@@ -288,6 +327,27 @@ public class EdgeDetector {
         logger.debug("Edge probablities calculated in {} seconds.",
             String.format("%.2f", (System.currentTimeMillis() - totalStartTime) / 1e3));
         return new Pair<>(hEdgeProbability, vEdgeProbability);
+    }
+
+    /**
+     * @return Edge strength at the target pixel relative to its neighborhood (i.e. how the edge stands out from the
+     * neighborhood), determined using the kernel density estimation (using the given normal distributions, which are
+     * indexed using the given neighborhood).
+     */
+    private double relativeEdgeStrength(double targetPixelValue, Rectangular neighborhood, Mat edges) {
+
+        double sum = 0.5; // Include the target pixel which has always cumulative probability 0.5.
+
+        for (int row = neighborhood.getY1(); row < neighborhood.getY2(); row++) { // y
+            for (int col = neighborhood.getX1(); col < neighborhood.getX2(); col++) { // x
+                sum += new NormalDistribution(null,
+                    edges.get(row, col)[0], getStandardDeviation()).cumulativeProbability(targetPixelValue); // At the target pixel.
+            }
+        }
+
+        // +1 for the target pixel outside the neighborhood.
+        return 1 - sum / ((neighborhood.getX2() - neighborhood.getX1())
+            * (neighborhood.getY2() - neighborhood.getY1()) + 1);
     }
 
     /**

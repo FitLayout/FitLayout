@@ -2,6 +2,9 @@ package cz.vutbr.fit.layout.cormier.impl;
 
 import cz.vutbr.fit.layout.model.GenericTreeNode;
 
+/**
+ * @author <a href="mailto:xmaste02@stud.fit.vutbr.cz">František Maštera</a>
+ */
 public class Utils {
 
     /**

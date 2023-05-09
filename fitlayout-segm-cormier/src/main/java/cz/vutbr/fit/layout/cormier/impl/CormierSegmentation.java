@@ -26,6 +26,7 @@ import java.util.concurrent.RecursiveTask;
  * Implementation of the Cormier web segmentation method.
  * @see <a href="https://uwspace.uwaterloo.ca/handle/10012/13523">Michael Cormier (2018). Computer Vision on Web Pages:
  * A Study of Man-Made Images. UWSpace.</a>
+ * @author <a href="mailto:xmaste02@stud.fit.vutbr.cz">František Maštera</a>
  */
 public class CormierSegmentation {
 
@@ -41,17 +42,33 @@ public class CormierSegmentation {
     private int minSegmentLength;
     private float signLineProbThreshold;
 
+    private boolean parallelEnabled = true;
+
     /**
      * @param edgeDetector Edge detector instance used for getting probabilities of locally significant edges.
      * @param lineDetector Line detector instance used for gettine probabilities of semantically significant lines.
      * @param minSegmentLength Minimum length of any side of each segment.
      * @param signLineProbThreshold Minimum probability that line is significant for it to be used for segmentation.
      */
-    public CormierSegmentation(EdgeDetector edgeDetector, LineDetector lineDetector, int minSegmentLength, float signLineProbThreshold) {
+    public CormierSegmentation(EdgeDetector edgeDetector, LineDetector lineDetector, int minSegmentLength,
+                               float signLineProbThreshold) {
         this.edgeDetector = edgeDetector;
         this.lineDetector = lineDetector;
         this.minSegmentLength = minSegmentLength;
         this.signLineProbThreshold = signLineProbThreshold;
+    }
+
+    /**
+     * @param parallelEnabled If the {@link #segment(Area, Pair, Pair)} parallelization will be enabled.
+     * @see #CormierSegmentation(EdgeDetector, LineDetector, int, float)
+     */
+    public CormierSegmentation(EdgeDetector edgeDetector, LineDetector lineDetector, int minSegmentLength,
+                               float signLineProbThreshold, boolean parallelEnabled) {
+        this.edgeDetector = edgeDetector;
+        this.lineDetector = lineDetector;
+        this.minSegmentLength = minSegmentLength;
+        this.signLineProbThreshold = signLineProbThreshold;
+        this.parallelEnabled = parallelEnabled;
     }
 
     /**
@@ -209,7 +226,12 @@ public class CormierSegmentation {
                 }
             }
 
-            invokeAll(childrenSegm);
+            if (parallelEnabled) {
+                invokeAll(childrenSegm);
+            } else {
+                for (SegmentTask task : childrenSegm) task.invoke();
+            }
+
             return rootSegment;
         }
     }

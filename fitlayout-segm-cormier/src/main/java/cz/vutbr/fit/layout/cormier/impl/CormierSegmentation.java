@@ -59,7 +59,8 @@ public class CormierSegmentation {
     }
 
     /**
-     * @param parallelEnabled If the {@link #segment(Area, Pair, Pair)} parallelization will be enabled.
+     * @param parallelEnabled If the {@link #segment(Area, Pair, Pair)} parallelization will be enabled. Disabling
+     *                        this will cause significant slow down on multithreaded systems.
      * @see #CormierSegmentation(EdgeDetector, LineDetector, int, float)
      */
     public CormierSegmentation(EdgeDetector edgeDetector, LineDetector lineDetector, int minSegmentLength,

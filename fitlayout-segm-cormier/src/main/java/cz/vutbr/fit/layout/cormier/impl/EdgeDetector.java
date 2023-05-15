@@ -55,8 +55,10 @@ public class EdgeDetector {
 
     /**
      * @param ndPregenEnabled If the {@link #edgeProbabilities(Mat, Mat)} optimization by pre-generating and storing
-     *                        the {@link NormalDistribution} instances will be enabled.
-     * @param parallelEnabled If the {@link #edgeProbabilities(Mat, Mat)} parallelization will be enabled.
+     *                        the {@link NormalDistribution} instances will be enabled. Disabling this will reduce the
+     *                        memory requirements significantly, but also slows down the process.
+     * @param parallelEnabled If the {@link #edgeProbabilities(Mat, Mat)} parallelization will be enabled. Disabling
+     *                        this will cause significant slow down on multithreaded systems.
      * @see #EdgeDetector(int, float, float, int)
      */
     public EdgeDetector(int halfWindowWidth, float standardDeviation, float priorProbability, int pyramidLevels,

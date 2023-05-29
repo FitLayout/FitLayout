@@ -140,4 +140,12 @@ public interface IRIFactory
      */
     public IRI createRelatedIri(IRI source, String relation);
 
+    /**
+     * Creates a saved query IRI fromt its sequence number.
+     * 
+     * @param seq
+     * @return
+     */
+    public IRI createSavedQueryURI(long seq);
+    
 }

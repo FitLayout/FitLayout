@@ -109,6 +109,17 @@ public class FL {
 	public static final IRI paramValue;
 
 	/**
+	 * SavedQuery
+	 * <p>
+	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#SavedQuery}.
+	 * <p>
+	 * A saved SPARQL query
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#SavedQuery">SavedQuery</a>
+	 */
+	public static final IRI SavedQuery;
+
+	/**
 	 * service
 	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#service}.
@@ -141,6 +152,7 @@ public class FL {
 		param = factory.createIRI(FL.NAMESPACE, "param");
 		paramName = factory.createIRI(FL.NAMESPACE, "paramName");
 		paramValue = factory.createIRI(FL.NAMESPACE, "paramValue");
+		SavedQuery = factory.createIRI(FL.NAMESPACE, "SavedQuery");
 		service = factory.createIRI(FL.NAMESPACE, "service");
 		Tagger = factory.createIRI(FL.NAMESPACE, "Tagger");
 	}

@@ -193,6 +193,15 @@
     
 
 
+    <!-- http://fitlayout.github.io/ontology/fitlayout.owl#SavedQuery -->
+
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/fitlayout.owl#SavedQuery">
+        <rdfs:comment>A saved SPARQL query</rdfs:comment>
+        <rdfs:label>SavedQuery</rdfs:label>
+    </owl:Class>
+    
+
+
     <!-- http://fitlayout.github.io/ontology/fitlayout.owl#Tagger -->
 
     <owl:Class rdf:about="http://fitlayout.github.io/ontology/fitlayout.owl#Tagger">

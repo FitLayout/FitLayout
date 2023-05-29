@@ -19,6 +19,7 @@ import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
+import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.query.Binding;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.ontology.BOX;
+import cz.vutbr.fit.layout.ontology.FL;
 import cz.vutbr.fit.layout.ontology.SEGM;
 
 /**
@@ -39,6 +41,9 @@ import cz.vutbr.fit.layout.ontology.SEGM;
  */
 public class RDFArtifactRepository implements ArtifactRepository
 {
+    private static final String METADATA_CONTEXT_PREFIX = "file://resources/rdf/";
+    private static final String SAVED_QUERIES_CONTEXT = "http://fitlayout.github.io/queries/";
+
     private static Logger log = LoggerFactory.getLogger(RDFArtifactRepository.class);
     
     public static String METADATA_SUFFIX = "meta";
@@ -164,7 +169,7 @@ public class RDFArtifactRepository implements ArtifactRepository
             for (String owl : owls)
             {
                 final ValueFactory vf = SimpleValueFactory.getInstance();
-                final IRI context = vf.createIRI("file://resources/rdf/" + owl);
+                final IRI context = vf.createIRI(METADATA_CONTEXT_PREFIX + owl);
                 String owlFile = loadResource("/rdf/" + owl);
                 getStorage().importXML(owlFile, context);
             }
@@ -190,7 +195,7 @@ public class RDFArtifactRepository implements ArtifactRepository
             for (String owl : owls)
             {
                 final ValueFactory vf = SimpleValueFactory.getInstance();
-                final IRI context = vf.createIRI("file://resources/rdf/" + owl);
+                final IRI context = vf.createIRI(METADATA_CONTEXT_PREFIX + owl);
                 getStorage().clear(context);
             }        
         } catch (Exception e) {
@@ -514,5 +519,58 @@ public class RDFArtifactRepository implements ArtifactRepository
             throw new StorageException(e);
         }
     }
+
+    //= Saved queries =========================================================================
     
+    public void saveQuery(SavedQuery query)
+    {
+        if (query.getIri() == null)
+        {
+            long seq = storage.getNextSequenceValue(iriFactory.createSequenceURI("query"));
+            IRI iri = iriFactory.createSavedQueryURI(seq);
+            query.setIri(iri);
+        }
+        final ValueFactory vf = SimpleValueFactory.getInstance();
+        final IRI context = vf.createIRI(SAVED_QUERIES_CONTEXT);
+        storage.add(query.getIri(), RDF.TYPE, FL.SavedQuery, context);
+        storage.addValue(query.getIri(), RDFS.LABEL, query.getTitle(), context);
+        storage.addValue(query.getIri(), RDF.VALUE, query.getQueryString(), context);
+    }
+    
+    public Map<IRI, SavedQuery> getSavedQueries()
+    {
+        try {
+            final String query = iriDecoder.declarePrefixes()
+                    + "SELECT ?query ?label ?queryString WHERE { "
+                    + "    ?query rdfs:label ?label . "
+                    + "    ?query rdf:value ?queryString . "
+                    + "    ?query rdf:type fl:SavedQuery "
+                    + "}";
+            
+            Map<IRI, SavedQuery> ret = new HashMap<>();
+            List<BindingSet> data = storage.executeSafeTupleQuery(query);
+            for (BindingSet binding : data)
+            {
+                Binding bIri = binding.getBinding("query");
+                Binding bLabel = binding.getBinding("label");
+                Binding bQuery = binding.getBinding("queryString");
+                if (bIri != null && bLabel != null && bQuery != null && bIri.getValue() instanceof IRI)
+                {
+                    SavedQuery newq = new SavedQuery((IRI) bIri.getValue(), bLabel.getValue().stringValue(), bQuery.getValue().stringValue());
+                    ret.put(newq.getIri(), newq);
+                }
+            }
+            return ret;
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    public void deleteSavedQuery(IRI iri)
+    {
+        final ValueFactory vf = SimpleValueFactory.getInstance();
+        final IRI context = vf.createIRI(SAVED_QUERIES_CONTEXT);
+        storage.removeStatements(iri, null, null, context);
+    }
+
 }

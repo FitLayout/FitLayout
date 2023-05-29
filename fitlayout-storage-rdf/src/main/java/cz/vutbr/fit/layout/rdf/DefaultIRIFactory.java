@@ -147,5 +147,11 @@ public class DefaultIRIFactory implements IRIFactory
     {
         return factory.createIRI(source.getNamespace(), source.getLocalName() + "-" + relation);
     }
+
+    @Override
+    public IRI createSavedQueryURI(long seq)
+    {
+        return factory.createIRI(NAMESPACE, "query-" + seq);
+    }
     
 }

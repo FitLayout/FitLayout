@@ -522,6 +522,10 @@ public class RDFArtifactRepository implements ArtifactRepository
 
     //= Saved queries =========================================================================
     
+    /**
+     * Updates an existing query when the IRI is set or creates a new one when the IRI is not set.
+     * @param query the saved query to update
+     */
     public void saveQuery(SavedQuery query)
     {
         if (query.getIri() == null)
@@ -530,6 +534,11 @@ public class RDFArtifactRepository implements ArtifactRepository
             IRI iri = iriFactory.createSavedQueryURI(seq);
             query.setIri(iri);
         }
+        else
+        {
+            deleteSavedQuery(query.getIri());
+        }
+        
         final ValueFactory vf = SimpleValueFactory.getInstance();
         final IRI context = vf.createIRI(SAVED_QUERIES_CONTEXT);
         storage.add(query.getIri(), RDF.TYPE, FL.SavedQuery, context);
@@ -564,6 +573,17 @@ public class RDFArtifactRepository implements ArtifactRepository
         } catch (Exception e) {
             throw new StorageException(e);
         }
+    }
+    
+    public SavedQuery getSavedQueryByTitle(String title)
+    {
+        var all = getSavedQueries();
+        for (var q : all.values())
+        {
+            if (q.getTitle().trim().equals(title.trim()))
+                return q;
+        }
+        return null;
     }
     
     public void deleteSavedQuery(IRI iri)

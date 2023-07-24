@@ -1,7 +1,7 @@
 FitLayout/2 - Improved Vision-Based Web Page Segmentation Algorithm Algorithm
 =============================================================================
 
-(c) 2023 [František Maštera](https://github.com/MightyW0lf)
+(c) 2023 [František Maštera](https://github.com/MightyW0lf), Radek Burget (burgetr@fit.vutbr.cz)
 
 This is a new FitLayout implementation of the Improved Vision-Based Web Page Segmentation Algorithm algorithm as published in
 

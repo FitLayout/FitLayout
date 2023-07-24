@@ -55,6 +55,7 @@
 		<module>fitlayout-tools</module>
 		<module>fitlayout-storage-rdf</module>
 		<module>fitlayout-segm-vips</module>
+		<module>fitlayout-segm-cormier</module>
 		<module>fitlayout-io</module>
 		<module>fitlayout-segm-bcs</module>
 		<module>fitlayout-text</module>
@@ -179,6 +180,11 @@
 			<dependency>
 				<groupId>cz.vutbr.fit.layout</groupId>
 				<artifactId>fitlayout-segm-vips</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>cz.vutbr.fit.layout</groupId>
+				<artifactId>fitlayout-segm-cormier</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

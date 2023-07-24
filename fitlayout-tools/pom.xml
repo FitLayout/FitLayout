@@ -93,6 +93,10 @@
 		</dependency>
 		<dependency>
 			<groupId>cz.vutbr.fit.layout</groupId>
+			<artifactId>fitlayout-segm-cormier</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cz.vutbr.fit.layout</groupId>
 			<artifactId>fitlayout-segm-bcs</artifactId>
 		</dependency>
 		<dependency>
@@ -127,6 +131,6 @@
 			 <groupId>info.picocli</groupId>
 			 <artifactId>picocli</artifactId>
 		</dependency>
-	</dependencies>
+    </dependencies>
 
 </project>

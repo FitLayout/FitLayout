@@ -9,6 +9,7 @@ import cz.vutbr.fit.layout.api.AreaTreeOperator;
 import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.api.ServiceManager;
 import cz.vutbr.fit.layout.bcs.BCSProvider;
+import cz.vutbr.fit.layout.cormier.CormierProvider;
 import cz.vutbr.fit.layout.cssbox.CSSBoxTreeProvider;
 import cz.vutbr.fit.layout.map.chunks.MetadataTextChunksProvider;
 import cz.vutbr.fit.layout.map.op.TagByExamplesOperator;
@@ -68,6 +69,7 @@ public class FLConfig
         sm.addArtifactService(new BasicSegmProvider());
         sm.addArtifactService(new VipsProvider());
         sm.addArtifactService(new BCSProvider());
+        sm.addArtifactService(new CormierProvider());
         
         //standard operators
         addAreaTreeOperator(sm, new CollapseAreasOperator());

@@ -1,5 +1,5 @@
-FitLayout/2 - Visual Page Segmentation (VIPS) Algorithm
-=======================================================
+FitLayout/2 - Improved Vision-Based Web Page Segmentation Algorithm Algorithm
+=============================================================================
 
 (c) 2023 [František Maštera](https://github.com/MightyW0lf)
 

@@ -29,7 +29,7 @@ import picocli.CommandLine.Option;
     description = "Performs segmentation on a page")
 public class Segmentator extends CliCommand implements Callable<Integer>
 {
-    public enum Method { vips, bcs, cormier };
+    public enum Method { simple, vips, bcs, cormier };
     
     @Option(order = 100, names = {"-h", "--help"}, usageHelp = true, description = "print help")
     protected boolean help;
@@ -70,6 +70,9 @@ public class Segmentator extends CliCommand implements Callable<Integer>
         String serviceId = "";
         switch (method)
         {
+            case simple:
+                serviceId = "FitLayout.BasicAreas";
+                break;
             case bcs:
                 serviceId = "FitLayout.BCS";
                 break;

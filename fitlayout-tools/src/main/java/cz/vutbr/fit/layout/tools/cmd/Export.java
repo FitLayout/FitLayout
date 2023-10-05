@@ -36,7 +36,7 @@ import picocli.CommandLine.Option;
     description = "Exports the last created artifact (page or area tree)")
 public class Export extends CliCommand implements Callable<Integer>
 {
-    public enum Format { xml, turtle, html, png, pngi };
+    public enum Format { xml, json, turtle, html, png, pngi };
 
     @Option(order = 100, names = {"-h", "--help"}, usageHelp = true, description = "print help")
     protected boolean help;
@@ -110,6 +110,8 @@ public class Export extends CliCommand implements Callable<Integer>
             case xml:
                 ArtifactStreamOutput.outputXML(page, os);
                 break;
+            case json:
+                throw new IOException("JSON output is not supported for Pages at the moment");
             case html:
                 ArtifactStreamOutput.outputHTML(page, os);
                 break;
@@ -139,6 +141,9 @@ public class Export extends CliCommand implements Callable<Integer>
                 break;
             case xml:
                 ArtifactStreamOutput.outputXML(atree, os);
+                break;
+            case json:
+                ArtifactStreamOutput.outputJSON(atree, os);
                 break;
             case html:
                 ArtifactStreamOutput.outputHTML(atree, page, os);

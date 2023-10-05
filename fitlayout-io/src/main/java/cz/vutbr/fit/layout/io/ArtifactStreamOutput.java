@@ -97,7 +97,21 @@ public class ArtifactStreamOutput
     }
     
     /**
-     * Serializes an area tree to an output stream in XML format.
+     * Serializes an area tree to an output stream in JSON format.
+     * @param atree the source area tree
+     * @param os the target output stream
+     * @throws IOException
+     */
+    public static void outputJSON(AreaTree atree, OutputStream os) throws IOException
+    {
+        JSONOutputOperator out = new JSONOutputOperator(null);
+        PrintWriter writer = new PrintWriter(os);
+        out.dumpTo(atree, writer);
+        writer.close();
+    }
+    
+    /**
+     * Serializes an area tree to an output stream in HTML format.
      * @param atree the source area tree
      * @param page the page artifact the area tree was created from
      * @param os the target output stream
@@ -105,8 +119,6 @@ public class ArtifactStreamOutput
      */
     public static void outputHTML(AreaTree atree, Page page, OutputStream os) throws IOException
     {
-        if (page == null)
-            throw new IllegalArgumentException("HTML export requires a page available (use RENDER or LOAD).");
         PrintWriter out = new PrintWriter(os);
         HTMLOutputOperator html = new HTMLOutputOperator();
         html.dumpTo(atree, page, out);

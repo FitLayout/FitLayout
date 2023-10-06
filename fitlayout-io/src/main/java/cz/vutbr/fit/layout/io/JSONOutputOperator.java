@@ -145,33 +145,30 @@ public class JSONOutputOperator extends BaseOperator
     private void recursivelyDumpTo(Area area, int level, PrintWriter writer)
     {
         this.idCount++;
-        String start = tab(level - 1) + "{\n" + tab(level) + "\"id\": "
-                + idCount + ",\n" + tab(level) + "\"level\": " + level + ",\n"
-                + tab(level) + "\"x1\": " + area.getX1() + ",\n" + tab(level)
-                + "\"y1\": " + area.getY1() + ",\n" + tab(level) + "\"x2\": "
-                + area.getX2() + ",\n" + tab(level) + "\"y2\": " + area.getY2()
-                + ",\n" + tab(level) + "\"height\": " + area.getHeight() + ",\n"
-                + tab(level) + "\"width\": " + area.getWidth() + ",\n"
-                + tab(level) + "\"background\": \""
-                + this.getColor(area.getEffectiveBackgroundColor()) + "\",\n"
-                + tab(level) + "\"fontsize\": "
-                + area.getTextStyle().getFontSize() + ",\n" + tab(level)
-                + "\"fontweight\": " + area.getTextStyle().getFontWeight()
-                + ",\n" + tab(level) + "\"exp_separated\": "
-                + (area.isExplicitlySeparated() ? "true" : "false") + ",\n"
-                + tab(level) + "\"hor_separator\": "
-                + (area.isHorizontalSeparator() ? "true" : "false") + ",\n"
-                + tab(level) + "\"ver_separator\": "
-                + (area.isVerticalSeparator() ? "true" : "false") + ",\n"
-                + tab(level) + "\"fontstyle\": "
-                + area.getTextStyle().getFontStyle();
-        String end = "\n" + tab(level - 1) + "}";
+        String start =  tab(level - 1) + "{\n" +
+                tab(level) + "\"id\": " + idCount + ",\n" +
+                tab(level) + "\"level\": " + level + ",\n" +
+                tab(level) + "\"x1\": " + area.getX1() + ",\n" +
+                tab(level) + "\"y1\": " + area.getY1() + ",\n" +
+                tab(level) + "\"x2\": " + area.getX2() + ",\n" +
+                tab(level) + "\"y2\": " + area.getY2() + ",\n" +
+                tab(level) + "\"height\": " + area.getHeight()+ ",\n" +
+                tab(level) + "\"width\": " + area.getWidth() + ",\n" +
+                tab(level) + "\"background\": \"" + this.getColor(area.getEffectiveBackgroundColor()) + "\",\n" +
+                tab(level) + "\"fontsize\": " + area.getTextStyle().getFontSize() + ",\n" +
+                tab(level) + "\"fontweight\": " + area.getTextStyle().getFontWeight() + ",\n" +
+                tab(level) + "\"exp_separated\": " + (area.isExplicitlySeparated() ? "true" : "false")  + ",\n" +
+                tab(level) + "\"hor_separator\": " + (area.isHorizontalSeparator() ? "true" : "false")  + ",\n" +
+                tab(level) + "\"ver_separator\": " + (area.isVerticalSeparator() ? "true" : "false")  + ",\n" +
+                tab(level) + "\"fontstyle\": " + area.getTextStyle().getFontStyle();
+        String end = "\n" + tab(level - 1) +"}";
 
         if (area.getChildCount() == 0)
         {
-            start += ",\n" + tab(level) + "\"box\":\n";
+            start += ",\n" + tab(level) + "\"boxes\": [\n";
+            end = tab(level) + "]" + end;
             writer.print(start);
-            dumpBox(area, level + 1, writer);
+            dumpBoxes(area.getBoxes(), level + 1, writer, false);
             writer.print(end);
         }
         else
@@ -204,9 +201,8 @@ public class JSONOutputOperator extends BaseOperator
      * @param writer
      *            output writer
      */
-    private void dumpBox(Area area, int level, PrintWriter writer)
+    private void dumpBoxes(List<Box> boxes, int level, PrintWriter writer, boolean recursive)
     {
-        List<Box> boxes = area.getAllBoxes();
         Iterator<Box> iBoxes = boxes.iterator();
 
         while (iBoxes.hasNext())
@@ -226,51 +222,49 @@ public class JSONOutputOperator extends BaseOperator
                 }
             }
             Rectangular pos = box.getVisualBounds();
-            String sBox = tab(level) + "{\n" + tab(level + 1) + "\"x1\": "
-                    + pos.getX1() + ",\n" + tab(level + 1) + "\"y1\": "
-                    + pos.getY1() + ",\n" + tab(level + 1) + "\"x2\": "
-                    + pos.getX2() + ",\n" + tab(level + 1) + "\"y2\": "
-                    + pos.getY2() + ",\n" + tab(level + 1) + "\"height\": "
-                    + pos.getHeight() + ",\n" + tab(level + 1) + "\"width\": "
-                    + pos.getWidth() + ",\n" + tab(level + 1) + "\"color\": \""
-                    + this.getColor(box.getColor()) + "\",\n" + tab(level + 1)
-                    + "\"fontfamily\": \"" + box.getFontFamily() + "\",\n"
-                    + tab(level + 1) + "\"fontsize\": "
-                    + box.getTextStyle().getFontSize() + ",\n" + tab(level + 1)
-                    + "\"fontweight\": " + box.getTextStyle().getFontWeight()
-                    + ",\n" + tab(level + 1) + "\"fontstyle\": "
-                    + box.getTextStyle().getFontStyle() + ",\n" + tab(level + 1)
-                    + "\"underline\": " + box.getTextStyle().getUnderline()
-                    + ",\n" + tab(level + 1) + "\"linethrough\": "
-                    + box.getTextStyle().getLineThrough() + ",\n"
-                    + tab(level + 1) + "\"type\": " + box.getType().ordinal()
-                    + ",\n" + tab(level + 1) + "\"exp_separated\": "
-                    + (area.isExplicitlySeparated() ? "true" : "false") + ",\n"
-                    + tab(level + 1) + "\"hor_separator\": "
-                    + (area.isHorizontalSeparator() ? "true" : "false") + ",\n"
-                    + tab(level + 1) + "\"ver_separator\": "
-                    + (area.isVerticalSeparator() ? "true" : "false") + ",\n"
-                    + tab(level + 1) + "\"displayType\": "
-                    + box.getDisplayType().ordinal() + ",\n" + tab(level + 1)
-                    + "\"tag\": \"" + box.getTagName() + "\",\n"
-                    + tab(level + 1) + "\"visible\": \""
-                    + (box.isVisible() ? "true" : "false") + "\",\n"
-                    + tab(level + 1) + "\"separated\": \""
-                    + (box.isVisuallySeparated() ? "true" : "false") + "\",\n"
-                    + tab(level + 1) + "\"text\": \""
-                    + box.getText().replace("\"", "\\\"") + "\"";
+            String sBox = tab(level) + "{\n" +
+                    tab(level+1) + "\"x1\": " + pos.getX1() + ",\n" +
+                    tab(level+1) + "\"y1\": " + pos.getY1() + ",\n" +
+                    tab(level+1) + "\"x2\": " + pos.getX2() + ",\n" +
+                    tab(level+1) + "\"y2\": " + pos.getY2() + ",\n" +
+                    tab(level+1) + "\"height\": " + pos.getHeight()+ ",\n" +
+                    tab(level+1) + "\"width\": " + pos.getWidth() + ",\n" +
+                    tab(level+1) + "\"color\": \"" + this.getColor(box.getColor()) + "\",\n" +
+                    tab(level+1) + "\"fontfamily\": \"" + box.getFontFamily() + "\",\n" +
+                    tab(level+1) + "\"fontsize\": " + box.getTextStyle().getFontSize() + ",\n" +
+                    tab(level+1) + "\"fontweight\": " + box.getTextStyle().getFontWeight() + ",\n" +
+                    tab(level+1) + "\"fontstyle\": " + box.getTextStyle().getFontStyle() + ",\n" +
+                    tab(level+1) + "\"underline\": " + box.getTextStyle().getUnderline() + ",\n" +
+                    tab(level+1) + "\"linethrough\": " + box.getTextStyle().getLineThrough() + ",\n" +
+                    tab(level+1) + "\"type\": " + box.getType().ordinal() + ",\n" +
+                    //tab(level+1) + "\"exp_separated\": " + (area.isExplicitlySeparated() ? "true" : "false")  + ",\n" +
+                    //tab(level+1) + "\"hor_separator\": " + (area.isHorizontalSeparator() ? "true" : "false")  + ",\n" +
+                    //tab(level+1) + "\"ver_separator\": " + (area.isVerticalSeparator() ? "true" : "false")  + ",\n" +
+                    tab(level+1) + "\"displayType\": " + box.getDisplayType().ordinal() + ",\n" +
+                    tab(level+1) + "\"tag\": \"" + box.getTagName() + "\",\n" +
+                    tab(level+1) + "\"visible\": \"" + (box.isVisible() ? "true" : "false")+ "\",\n" +
+                    tab(level+1) + "\"separated\": \"" + (box.isVisuallySeparated() ? "true" : "false") + "\",\n" +
+                    tab(level+1) + "\"text\": \"" + box.getText().replace("\"", "\\\"") + "\"";
             if (train == 1)
             {
                 sBox += ",\n" + tab(level + 1) + "\"label\": " + label;
             }
-            sBox += tab(level) + "\n" + tab(level) + "}";
+            writer.print(sBox);
+            
+            String eBox = tab(level) + "\n" + tab(level) + "}";
+            if (recursive && box.getChildCount() > 0)
+            {
+                writer.print(tab(level+1) + "\"boxes\": [\n");
+                dumpBoxes(box.getChildren(), level + 1, writer, recursive);
+                writer.print("]\n");
+            }
+            
             if (iBoxes.hasNext())
             {
-                sBox += ",";
+                eBox += ",";
             }
-            sBox += "\n";
-            writer.print(sBox);
-
+            eBox += "\n";
+            writer.print(eBox);
         }
     }
 

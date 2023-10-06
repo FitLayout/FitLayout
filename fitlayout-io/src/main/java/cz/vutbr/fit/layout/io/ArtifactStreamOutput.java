@@ -37,6 +37,20 @@ public class ArtifactStreamOutput
     }
     
     /**
+     * Serializes a page to an output stream in JSON format.
+     * @param atree the source area tree
+     * @param os the target output stream
+     * @throws IOException
+     */
+    public static void outputJSON(Page page, OutputStream os) throws IOException
+    {
+        JSONOutputOperator out = new JSONOutputOperator(null);
+        PrintWriter writer = new PrintWriter(os);
+        out.dumpTo(page, writer);
+        writer.close();
+    }
+    
+    /**
      * Serializes a page to an output stream in HTML format.
      * @param page the source page
      * @param os the target output stream

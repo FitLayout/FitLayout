@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.unbescape.json.JsonEscape;
+
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.impl.BaseOperator;
 import cz.vutbr.fit.layout.impl.ParameterString;
@@ -19,6 +21,7 @@ import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
+import cz.vutbr.fit.layout.model.Page;
 import cz.vutbr.fit.layout.model.Rectangular;
 
 /**
@@ -109,7 +112,7 @@ public class JSONOutputOperator extends BaseOperator
             dumpTo(atree, out);
             out.close();
         } catch (FileNotFoundException e) {
-            System.err.println("Couldn't create output XML file " + filename);
+            System.err.println("Couldn't create output file " + filename);
         }
     }
 
@@ -130,6 +133,23 @@ public class JSONOutputOperator extends BaseOperator
         countPages++;
         Arrays.fill(labels, Boolean.FALSE);
         recursivelyDumpTo(atree.getRoot(), 1, writer);
+    }
+
+    /**
+     * Dumps a Page to JSON.
+     *
+     * @param atree
+     *            input area tree
+     * @param writer
+     *            output writer
+     */
+    public void dumpTo(Page page, PrintWriter writer)
+    {
+        idCount = 0;
+        labelCount = 0;
+        countPages++;
+        Arrays.fill(labels, Boolean.FALSE);
+        dumpBoxes(List.of(page.getRoot()), 1, writer, true);
     }
 
     /**
@@ -243,8 +263,18 @@ public class JSONOutputOperator extends BaseOperator
                     tab(level+1) + "\"displayType\": " + box.getDisplayType().ordinal() + ",\n" +
                     tab(level+1) + "\"tag\": \"" + box.getTagName() + "\",\n" +
                     tab(level+1) + "\"visible\": \"" + (box.isVisible() ? "true" : "false")+ "\",\n" +
-                    tab(level+1) + "\"separated\": \"" + (box.isVisuallySeparated() ? "true" : "false") + "\",\n" +
-                    tab(level+1) + "\"text\": \"" + box.getText().replace("\"", "\\\"") + "\"";
+                    tab(level+1) + "\"separated\": \"" + (box.isVisuallySeparated() ? "true" : "false") + "\",\n";
+            if (recursive)
+            {
+                // for recursive dump only use the own text of the box
+                if (box.getOwnText() != null)
+                    sBox += tab(level+1) + "\"text\": \"" + JsonEscape.escapeJson(box.getOwnText()) + "\"";
+            }
+            else
+            {
+                // for non-recursive dump use the complete text
+                sBox += tab(level+1) + "\"text\": \"" + JsonEscape.escapeJson(box.getText()) + "\"";
+            }
             if (train == 1)
             {
                 sBox += ",\n" + tab(level + 1) + "\"label\": " + label;
@@ -255,8 +285,8 @@ public class JSONOutputOperator extends BaseOperator
             if (recursive && box.getChildCount() > 0)
             {
                 writer.print(tab(level+1) + "\"boxes\": [\n");
-                dumpBoxes(box.getChildren(), level + 1, writer, recursive);
-                writer.print("]\n");
+                dumpBoxes(box.getChildren(), level + 2, writer, recursive);
+                writer.print(tab(level+1) + "]\n");
             }
             
             if (iBoxes.hasNext())

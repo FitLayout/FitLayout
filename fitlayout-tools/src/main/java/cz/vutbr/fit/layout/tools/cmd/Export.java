@@ -111,7 +111,8 @@ public class Export extends CliCommand implements Callable<Integer>
                 ArtifactStreamOutput.outputXML(page, os);
                 break;
             case json:
-                throw new IOException("JSON output is not supported for Pages at the moment");
+                ArtifactStreamOutput.outputJSON(page, os);
+                break;
             case html:
                 ArtifactStreamOutput.outputHTML(page, os);
                 break;

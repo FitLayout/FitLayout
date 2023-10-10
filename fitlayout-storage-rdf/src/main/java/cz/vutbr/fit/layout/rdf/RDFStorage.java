@@ -177,13 +177,9 @@ public class RDFStorage implements Closeable
     {
         Value ret = null;
         try (RepositoryConnection con = repo.getConnection()) {
-            RepositoryResult<Statement> result = con.getStatements(subject, predicate, null, true);
-            try {
+            try (RepositoryResult<Statement> result = con.getStatements(subject, predicate, null, true)) {
                 if (result.hasNext())
                     ret = result.next().getObject();
-            }
-            finally {
-                result.close();
             }
         } catch (Exception e) {
             throw new StorageException(e);
@@ -216,13 +212,14 @@ public class RDFStorage implements Closeable
     public IRI getSubjectType(Resource subject) throws StorageException 
     {
         try (RepositoryConnection con = repo.getConnection()) {
-            final RepositoryResult<Statement> result = con.getStatements(subject, RDF.TYPE, null, true);
-            for (Statement st : result)
-            {
-                if (st.getObject() instanceof IRI)
-                    return (IRI) st.getObject(); 
+            try (final RepositoryResult<Statement> result = con.getStatements(subject, RDF.TYPE, null, true)) {
+                for (Statement st : result)
+                {
+                    if (st.getObject() instanceof IRI)
+                        return (IRI) st.getObject(); 
+                }
+                return null; //no type statement found
             }
-            return null; //no type statement found
         } catch (Exception e) {
             throw new StorageException(e);
         }
@@ -697,17 +694,13 @@ public class RDFStorage implements Closeable
     {
         long ret = 0;
         try (RepositoryConnection con = repo.getConnection()) {
-            RepositoryResult<Statement> result = con.getStatements(sequenceIri, RDF.VALUE, null, false);
-            try {
+            try (RepositoryResult<Statement> result = con.getStatements(sequenceIri, RDF.VALUE, null, false)) {
                 if (result.hasNext())
                 {
                     Value val = result.next().getObject();
                     if (val instanceof Literal)
                         ret = ((Literal) val).longValue();
                 }
-            }
-            finally {
-                result.close();
             }
         }
         catch (Exception e) {
@@ -740,8 +733,7 @@ public class RDFStorage implements Closeable
             try {
                 con.begin(IsolationLevels.SERIALIZABLE);
                 long val = 0;
-                RepositoryResult<Statement> result = con.getStatements(sequenceIri, RDF.VALUE, null, false);
-                try {
+                try (RepositoryResult<Statement> result = con.getStatements(sequenceIri, RDF.VALUE, null, false)) {
                     if (result.hasNext())
                     {
                         Statement statement = result.next();
@@ -750,9 +742,6 @@ public class RDFStorage implements Closeable
                             val = ((Literal) vval).longValue();
                         con.remove(statement);
                     }
-                }
-                finally {
-                    result.close();
                 }
                 val++;
                 con.add(sequenceIri, RDF.VALUE, getValueFactory().createLiteral(val));
@@ -774,15 +763,11 @@ public class RDFStorage implements Closeable
     {
         List<Namespace> ret = new ArrayList<>();
         try (RepositoryConnection con = repo.getConnection()) {
-            RepositoryResult<Namespace> result = con.getNamespaces();
-            try {
+            try (RepositoryResult<Namespace> result = con.getNamespaces()) {
                 while (result.hasNext())
                 {
                     ret.add(result.next());
                 }
-            }
-            finally {
-                result.close();
             }
         }
         catch (Exception e) {
@@ -837,15 +822,11 @@ public class RDFStorage implements Closeable
     {
         List<Resource> ret = new ArrayList<>();
         try (RepositoryConnection con = repo.getConnection()) {
-            RepositoryResult<Resource> result = con.getContextIDs();
-            try {
+            try (RepositoryResult<Resource> result = con.getContextIDs()) {
                 while (result.hasNext())
                 {
                     ret.add(result.next());
                 }
-            }
-            finally {
-                result.close();
             }
         }
         catch (Exception e) {

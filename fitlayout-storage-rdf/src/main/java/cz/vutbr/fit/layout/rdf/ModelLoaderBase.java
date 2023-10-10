@@ -389,13 +389,9 @@ public abstract class ModelLoaderBase extends ModelTransformer
     public Value getPropertyValue(RepositoryConnection con, Resource subject, IRI predicate) throws StorageException
     {
         Value ret = null;
-        RepositoryResult<Statement> result = con.getStatements(subject, predicate, null, true);
-        try {
+        try (RepositoryResult<Statement> result = con.getStatements(subject, predicate, null, true)) {
             if (result.hasNext())
                 ret = result.next().getObject();
-        }
-        finally {
-            result.close();
         }
         return ret;
     }

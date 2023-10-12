@@ -32,6 +32,7 @@ import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.FL;
+import cz.vutbr.fit.layout.ontology.RESOURCE;
 import cz.vutbr.fit.layout.ontology.SEGM;
 
 /**
@@ -173,6 +174,8 @@ public class RDFArtifactRepository implements ArtifactRepository
                 String owlFile = loadResource("/rdf/" + owl);
                 getStorage().importXML(owlFile, context);
             }
+            // explicitly declare the resource namespace prefix, which is not mentioned in the imported owls
+            getStorage().addNamespace("r", RESOURCE.NAMESPACE);
         } catch (Exception e) {
             log.error("Could import metadata: {}", e);
             return false;

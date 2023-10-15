@@ -116,6 +116,28 @@ public class SEGM {
 	public static final IRI hasAreaTree;
 
 	/**
+	 * hasRelatedRect
+	 * <p>
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasRelatedRect}.
+	 * <p>
+	 * Defines a related Area or TextChunk for a relation description
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasRelatedRect">hasRelatedRect</a>
+	 */
+	public static final IRI hasRelatedRect;
+
+	/**
+	 * hasRelationType
+	 * <p>
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasRelationType}.
+	 * <p>
+	 * Assigns a relation type to a relation description
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#hasRelationType">hasRelationType</a>
+	 */
+	public static final IRI hasRelationType;
+
+	/**
 	 * hasSourceArea
 	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasSourceArea}.
@@ -159,6 +181,18 @@ public class SEGM {
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#isChildOf">isChildOf</a>
 	 */
 	public static final IRI isChildOf;
+
+	/**
+	 * isInRelation
+	 * <p>
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#isInRelation}.
+	 * <p>
+	 * Assigns an Area or TextChunk a description of a relation with another
+	 * Area or TextChunk
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#isInRelation">isInRelation</a>
+	 */
+	public static final IRI isInRelation;
 
 	/**
 	 * isSubordinateTo
@@ -205,6 +239,17 @@ public class SEGM {
 	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#name">name</a>
 	 */
 	public static final IRI name;
+
+	/**
+	 * RelationDescription
+	 * <p>
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#RelationDescription}.
+	 * <p>
+	 * Describes a relation between two Areas or TextChunks
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#RelationDescription">RelationDescription</a>
+	 */
+	public static final IRI RelationDescription;
 
 	/**
 	 * support
@@ -288,15 +333,19 @@ public class SEGM {
 		containsArea = factory.createIRI(SEGM.NAMESPACE, "containsArea");
 		containsBox = factory.createIRI(SEGM.NAMESPACE, "containsBox");
 		hasAreaTree = factory.createIRI(SEGM.NAMESPACE, "hasAreaTree");
+		hasRelatedRect = factory.createIRI(SEGM.NAMESPACE, "hasRelatedRect");
+		hasRelationType = factory.createIRI(SEGM.NAMESPACE, "hasRelationType");
 		hasSourceArea = factory.createIRI(SEGM.NAMESPACE, "hasSourceArea");
 		hasSourceBox = factory.createIRI(SEGM.NAMESPACE, "hasSourceBox");
 		hasSourcePage = factory.createIRI(SEGM.NAMESPACE, "hasSourcePage");
 		hasTag = factory.createIRI(SEGM.NAMESPACE, "hasTag");
 		isChildOf = factory.createIRI(SEGM.NAMESPACE, "isChildOf");
+		isInRelation = factory.createIRI(SEGM.NAMESPACE, "isInRelation");
 		isSubordinateTo = factory.createIRI(SEGM.NAMESPACE, "isSubordinateTo");
 		LogicalArea = factory.createIRI(SEGM.NAMESPACE, "LogicalArea");
 		LogicalAreaTree = factory.createIRI(SEGM.NAMESPACE, "LogicalAreaTree");
 		name = factory.createIRI(SEGM.NAMESPACE, "name");
+		RelationDescription = factory.createIRI(SEGM.NAMESPACE, "RelationDescription");
 		support = factory.createIRI(SEGM.NAMESPACE, "support");
 		Tag = factory.createIRI(SEGM.NAMESPACE, "Tag");
 		tagger = factory.createIRI(SEGM.NAMESPACE, "tagger");

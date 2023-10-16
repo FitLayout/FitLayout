@@ -15,6 +15,7 @@ import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaConnection;
 import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.TextChunk;
+import cz.vutbr.fit.layout.ontology.SEGM;
 import cz.vutbr.fit.layout.rdf.IRIFactory;
 import cz.vutbr.fit.layout.rdf.ModelBuilderBase;
 
@@ -49,8 +50,15 @@ public class ConnectionSetModelBuilder extends ModelBuilderBase
         IRI iri2 = getContentRectIRI(artifactIri, con.getA2());
         if (iri1 != null && iri2 != null)
         {
+            // add a plain relation between the rectangles
             final IRI relationIri = getIriFactory().createRelationURI(con.getRelation());
             graph.add(iri1, relationIri, iri2);
+            // add a relation description including support
+            final IRI descrIri = getIriFactory().createRelationDescriptionURI(iri1, iri2, con.getRelation());
+            graph.add(iri1, SEGM.isInRelation, descrIri);
+            graph.add(descrIri, SEGM.hasRelatedRect, iri2);
+            graph.add(descrIri, SEGM.hasRelationType, relationIri);
+            graph.add(descrIri, SEGM.support, getValueFactory().createLiteral(con.getWeight()));
         }
     }
     

@@ -39,6 +39,11 @@ public class ModelBuilderBase extends ModelTransformer
         vf = SimpleValueFactory.getInstance();
     }
 
+    public ValueFactory getValueFactory()
+    {
+        return vf;
+    }
+
     /**
      * Stores the common information about an artifact to a model.
      * 

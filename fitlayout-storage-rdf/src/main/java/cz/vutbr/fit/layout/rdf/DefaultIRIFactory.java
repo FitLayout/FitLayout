@@ -131,6 +131,19 @@ public class DefaultIRIFactory implements IRIFactory
             return null;
     }
 
+    @Override
+    public IRI createRelationDescriptionURI(IRI areaUri1, IRI areaUri2, Relation rel)
+    {
+        // Try to guess the artifact IRI from the area IRI
+        String artPrefix = areaUri1.getNamespace();
+        if (artPrefix.startsWith(NAMESPACE))
+            artPrefix = artPrefix.substring(NAMESPACE.length()); // strip the name space prefix
+        if (!artPrefix.isEmpty())
+            artPrefix = artPrefix.substring(0, artPrefix.length() - 1); // strip trailing '#'
+       
+        return factory.createIRI(NAMESPACE, "rd-" + artPrefix + "-" + areaUri1.getLocalName() + "-" + rel.getName() + "-" + areaUri2.getLocalName());
+    }
+
     /**
      * Creates a sequence IRI from its name.
      * @param name the name of the sequence (alphabetical characters only)

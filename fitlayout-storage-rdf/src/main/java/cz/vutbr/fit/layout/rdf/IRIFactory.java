@@ -118,6 +118,15 @@ public interface IRIFactory
     public IRI createRelationURI(Relation rel);
     
     /**
+     * Creates an IRI for a description of a relation between two areas.
+     * @param areaUri1 The IRI of the first area
+     * @param areaUri2 The IRI of the second area
+     * @param rel The relation
+     * @return the created IRI
+     */
+    public IRI createRelationDescriptionURI(IRI areaUri1, IRI areaUri2, Relation rel);
+    
+    /**
      * Decodes the relation name from the relation IRI.
      * @param iri the relation IRI
      * @return the relation name or {@code null} if the iri doesn't seem to identify a relation.

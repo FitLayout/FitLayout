@@ -37,6 +37,8 @@ import org.eclipse.rdf4j.query.QueryResults;
 import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.query.Update;
+import org.eclipse.rdf4j.query.impl.MapBindingSet;
+import org.eclipse.rdf4j.query.impl.SimpleBinding;
 import org.eclipse.rdf4j.query.resultio.text.csv.SPARQLResultsCSVWriter;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -204,6 +206,22 @@ public class RDFStorage implements Closeable
     }
     
     /**
+     * Obtains a model for the specific object.
+     * @param object
+     * @return
+     * @throws StorageException
+     */
+    public Model getObjectModel(Resource object) throws StorageException 
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            final RepositoryResult<Statement> result = con.getStatements(null, null, object, true);
+            return QueryResults.asModel(result);
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    /**
      * Determines the type of the subject as determined by the corresponding rdf:type predicate (if present)
      * @param subject the subject IRI
      * @return the type IRI or {@code null} when the type is not defined
@@ -220,6 +238,39 @@ public class RDFStorage implements Closeable
                 }
                 return null; //no type statement found
             }
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+    }
+    
+    /**
+     * Retrieves all statements where the given resource is a subject or object and creates
+     * a list of binding sets that describe the resource. Each binding sets contains a "p"
+     * binding for the predicate and "v" for value, where the value is the object when the
+     * resource is the subject and vice versa.
+     * 
+     * @param res the resource to describe
+     * @param isSubject <code>true</code> when the resource is the subject, <code>false</code>for object
+     * @param limit the maximal number of bindings produced
+     * @return A list of binding sets describing the statements (may be empty)
+     */
+    public List<BindingSet> describeResource(Resource res, boolean isSubject, long limit)
+    {
+        try (RepositoryConnection con = repo.getConnection()) {
+            List<BindingSet> ret = new ArrayList<>();
+            try (final RepositoryResult<Statement> result = isSubject ? con.getStatements(res, null, null, true) : con.getStatements(null, null, res, true)) {
+                long cnt = 0;
+                for (Statement st : result)
+                {
+                    MapBindingSet bset = new MapBindingSet(2);
+                    bset.addBinding(new SimpleBinding("p", st.getPredicate()));
+                    bset.addBinding(new SimpleBinding("v", isSubject ? st.getObject() : st.getSubject()));
+                    ret.add(bset);
+                    if (++cnt >= limit)
+                        break;
+                }
+            }
+            return ret;
         } catch (Exception e) {
             throw new StorageException(e);
         }

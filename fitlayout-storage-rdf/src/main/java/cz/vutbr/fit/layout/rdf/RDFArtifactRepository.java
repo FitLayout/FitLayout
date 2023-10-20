@@ -27,13 +27,12 @@ import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.api.IRIDecoder;
-import cz.vutbr.fit.layout.impl.DefaultTag;
 import cz.vutbr.fit.layout.model.Artifact;
-import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.FL;
 import cz.vutbr.fit.layout.ontology.RESOURCE;
 import cz.vutbr.fit.layout.ontology.SEGM;
+import cz.vutbr.fit.layout.rdf.model.RDFTag;
 
 /**
  * Implementation of an ArtifactRepository on top of an RDFStorage.
@@ -494,26 +493,30 @@ public class RDFArtifactRepository implements ArtifactRepository
     //Tags =============================================================
     
     //@Override
-    public Collection<Tag> getTags() throws StorageException
+    public Collection<RDFTag> getTags() throws StorageException
     {
         try {
             final String query = iriDecoder.declarePrefixes()
-                    + "SELECT ?tag ?name ?type WHERE { "
+                    + "SELECT ?tag ?name ?type ?context WHERE { "
+                    + "  GRAPH ?context {"
                     + "    ?tag segm:name ?name . "
                     + "    ?tag segm:type ?type . "
                     + "    ?tag rdf:type segm:Tag "
-                    + "}";
+                    + "}}";
             
             List<BindingSet> data = storage.executeSafeTupleQuery(query);
-            List<Tag> ret = new ArrayList<>(data.size());
+            List<RDFTag> ret = new ArrayList<>(data.size());
             for (BindingSet binding : data)
             {
                 Binding bIri = binding.getBinding("tag");
                 Binding bName = binding.getBinding("name");
                 Binding bType = binding.getBinding("type");
-                if (bIri != null && bName != null && bType != null && bIri.getValue() instanceof IRI)
+                Binding bContext = binding.getBinding("context");
+                if (bIri != null && bName != null && bType != null && bContext != null && 
+                        bIri.getValue() instanceof IRI && bContext.getValue() instanceof IRI)
                 {
-                    Tag tag = new DefaultTag((IRI) bIri.getValue(), bType.getValue().stringValue(), bName.getValue().stringValue());
+                    final RDFTag tag = new RDFTag((IRI) bIri.getValue(), bType.getValue().stringValue(), 
+                            bName.getValue().stringValue(), (IRI) bContext.getValue());
                     ret.add(tag);
                 }
             }

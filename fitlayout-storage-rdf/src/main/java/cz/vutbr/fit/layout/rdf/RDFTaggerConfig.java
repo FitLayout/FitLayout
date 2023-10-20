@@ -19,6 +19,7 @@ import cz.vutbr.fit.layout.api.Tagger;
 import cz.vutbr.fit.layout.api.TaggerConfig;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.ontology.SEGM;
+import cz.vutbr.fit.layout.rdf.model.RDFTag;
 
 /**
  * A tagger config implementation that uses a ServiceManager and the configured RDF
@@ -41,7 +42,7 @@ public class RDFTaggerConfig implements TaggerConfig
     public Map<Tag, Tagger> getTaggers()
     {
         Map<Tag, Tagger> ret = new HashMap<>();
-        Collection<Tag> tags = repo.getTags();
+        Collection<RDFTag> tags = repo.getTags();
         for (Tag tag : tags)
         {
             Tagger tagger = getTaggerForTag(tag);

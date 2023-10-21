@@ -15,7 +15,7 @@
         <dc:description>Document visual area (segmentation) ontology.</dc:description>
         <dc:title>Visual Area Ontology</dc:title>
         <rdfs:comment>Document visual area (segmentation) ontology.</rdfs:comment>
-        <owl:versionInfo>1.0.0</owl:versionInfo>
+        <owl:versionInfo>1.0.1</owl:versionInfo>
     </owl:Ontology>
     
 
@@ -104,6 +104,34 @@
     
 
 
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasRelatedRect -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasRelatedRect">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#RelationDescription"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#TextChunk"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+        <rdfs:comment>Defines a related Area or TextChunk for a relation description</rdfs:comment>
+        <rdfs:label>hasRelatedRect</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasRelationType -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasRelationType">
+        <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#RelationDescription"/>
+        <rdfs:comment>Assigns a relation type to a relation description</rdfs:comment>
+        <rdfs:label>hasRelationType</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://fitlayout.github.io/ontology/segmentation.owl#hasSourceArea -->
 
     <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#hasSourceArea">
@@ -170,6 +198,24 @@
         <rdfs:domain rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
         <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
         <rdfs:label>isChildOf</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#isInRelation -->
+
+    <owl:ObjectProperty rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#isInRelation">
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#Area"/>
+                    <rdf:Description rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#TextChunk"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range rdf:resource="http://fitlayout.github.io/ontology/segmentation.owl#RelationDescription"/>
+        <rdfs:comment>Assigns an Area or TextChunk a description of a relation with another Area or TextChunk</rdfs:comment>
+        <rdfs:label>isInRelation</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -364,6 +410,15 @@
         <rdfs:subClassOf rdf:resource="http://fitlayout.github.io/ontology/fitlayout.owl#Artifact"/>
         <rdfs:comment>A tree of logical areas created from an area tree by some kind of logical structure analysis.</rdfs:comment>
         <rdfs:label>LogicalAreaTree</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://fitlayout.github.io/ontology/segmentation.owl#RelationDescription -->
+
+    <owl:Class rdf:about="http://fitlayout.github.io/ontology/segmentation.owl#RelationDescription">
+        <rdfs:comment>Describes a relation between two Areas or TextChunks</rdfs:comment>
+        <rdfs:label>RelationDescription</rdfs:label>
     </owl:Class>
     
 

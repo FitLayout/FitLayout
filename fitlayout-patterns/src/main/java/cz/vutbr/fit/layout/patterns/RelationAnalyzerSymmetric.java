@@ -26,7 +26,7 @@ import java.util.Map.Entry;
  * A relation analyzer that includes both the normal and inverse relations where applicable.
  * @author burgetr
  */
-public class RelationAnalyzerSymmetric extends RelationAnalyzer
+public class RelationAnalyzerSymmetric extends AreaSetRelationAnalyzer
 {
     private static final List<Relation> ANALYZED_RELATIONS =
             List.of(Relations.ONRIGHT, Relations.ONLEFT, Relations.AFTER, Relations.BEFORE, 

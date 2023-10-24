@@ -119,7 +119,7 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
         List<ContentRect> leafAreas = new ArrayList<>();
         findLeafAreas(input.getRoot(), leafAreas);
         
-        RelationAnalyzer ra = new RelationAnalyzerSymmetric(page, leafAreas);
+        AreaSetRelationAnalyzer ra = new RelationAnalyzerSymmetric(page, leafAreas);
         ra.setMinRelationWeight(minRelationWeight);
         ra.extractConnections();
         return ra.getConnections();

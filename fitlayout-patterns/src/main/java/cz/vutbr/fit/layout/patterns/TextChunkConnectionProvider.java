@@ -118,7 +118,7 @@ public class TextChunkConnectionProvider extends ConnectionSetArtifactService
     public Collection<AreaConnection> extractConnections(ChunkSet input, Page page)
     {
         Set<ContentRect> chunks = new HashSet<>(input.getTextChunks());
-        RelationAnalyzer ra = new RelationAnalyzerSymmetric(page, chunks);
+        AreaSetRelationAnalyzer ra = new RelationAnalyzerSymmetric(page, chunks);
         ra.setMinRelationWeight(minRelationWeight);
         ra.extractConnections();
         return ra.getConnections();

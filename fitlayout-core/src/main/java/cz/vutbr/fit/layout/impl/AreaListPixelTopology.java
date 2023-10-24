@@ -7,11 +7,9 @@ package cz.vutbr.fit.layout.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import cz.vutbr.fit.layout.api.OutputDisplay;
 import cz.vutbr.fit.layout.model.AreaTopology;
@@ -32,7 +30,7 @@ public class AreaListPixelTopology implements AreaTopology
     private List<ContentRect> areas;
     private Rectangular abspos;
     private Map<ContentRect, Rectangular> positions;
-    private RTree areaTree;
+    private RTree areaRTree;
     
     
     public AreaListPixelTopology(List<ContentRect> areas, Rectangular abspos)
@@ -99,10 +97,10 @@ public class AreaListPixelTopology implements AreaTopology
     @Override
     public ContentRect findAreaAt(int x, int y)
     {
-        AreaMatch match = new AreaMatch(false);
-        areaTree.nearest(new Spot(x, y), match, 0.05f);
-        if (!match.getIds().isEmpty())
-            return areas.get(match.getIds().get(0));
+        final AreaMatch match = new AreaMatch(false);
+        areaRTree.nearest(new Spot(x, y), match, 0.05f);
+        if (!match.getRects().isEmpty())
+            return match.getRects().get(0);
         else
             return null;
     }
@@ -110,24 +108,18 @@ public class AreaListPixelTopology implements AreaTopology
     @Override
     public Collection<ContentRect> findAllAreasAt(int x, int y)
     {
-        AreaMatch match = new AreaMatch(false);
-        areaTree.nearest(new Spot(x, y), match, 0.05f);
-        if (!match.getIds().isEmpty())
-            return match.getIds().stream().map((id) -> areas.get(id)).collect(Collectors.toList());
-        else
-            return Collections.emptyList();
+        final AreaMatch match = new AreaMatch(true);
+        areaRTree.nearest(new Spot(x, y), match, 0.05f);
+        return match.getRects();
     }
 
     @Override
     public Collection<ContentRect> findAllAreasIntersecting(Rectangular r)
     {
-        Collection<ContentRect> ret = new ArrayList<>();
-        for (Map.Entry<ContentRect, Rectangular> entry : positions.entrySet())
-        {
-            if (entry.getValue().intersects(r))
-                ret.add(entry.getKey());
-        }
-        return ret;
+        final Area query = new Area(r.getX1(), r.getY1(), r.getX2(), r.getY2());
+        final AreaMatch match = new AreaMatch(true);
+        areaRTree.intersects(query, match);
+        return match.getRects();
     }
     
     @Override
@@ -173,39 +165,41 @@ public class AreaListPixelTopology implements AreaTopology
     {
     }
 
-    private void updateIndex()
+    protected void updateIndex()
     {
-        areaTree = new RTree();
+        areaRTree = new RTree();
         for (int i = 0; i < areas.size(); i++)
         {
             final ContentRect rect = areas.get(i);
             final Area area = new Area(rect.getX1(), rect.getY1(), rect.getX2(), rect.getY2());
-            areaTree.add(area, i);
+            areaRTree.add(area, i);
         }
     }
     
+    //=========================================================================
+
+    class AreaMatch implements AreaCallback
+    {
+        private final List<ContentRect> rects;
+        private final boolean processAll;
+
+        public AreaMatch(boolean processAll)
+        {
+            this.rects = new ArrayList<>();
+            this.processAll = processAll;
+        }
+
+        @Override
+        public boolean processArea(int id)
+        {
+            rects.add(areas.get(id));
+            return processAll;
+        }
+
+        public List<ContentRect> getRects() 
+        {
+            return rects;
+        }
+    };
+
 }
-
-class AreaMatch implements AreaCallback
-{
-    private final List<Integer> ids;
-    private final boolean processAll;
-
-    public AreaMatch(boolean processAll)
-    {
-        this.ids = new ArrayList<>();
-        this.processAll = processAll;
-    }
-
-    @Override
-    public boolean processArea(int id)
-    {
-        ids.add(id);
-        return processAll;
-    }
-
-    public List<Integer> getIds() 
-    {
-        return ids;
-    }
-};

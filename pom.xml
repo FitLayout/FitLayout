@@ -262,7 +262,7 @@
 			<dependency>
 				<groupId>cz.vutbr.fit.layout</groupId>
 				<artifactId>jsi</artifactId>
-				<version>1.1.0.fitlayout-SNAPSHOT</version>
+				<version>1.1.0.fitlayout</version>
 			</dependency>
 			<dependency>
 				<groupId>org.eclipse.rdf4j</groupId>

@@ -36,7 +36,7 @@ public abstract class RelationAnalyzer
     {
         this.page = page;
         this.areas = areas;
-        topology = new AreaListGridTopology(areas);
+        topology = createTopology(areas);
         connections = new HashSet<>();
         minRelationWeight = 0.1f;
     }
@@ -65,6 +65,11 @@ public abstract class RelationAnalyzer
      * Extracts all the connections based on the evaluated relations.
      */
     public abstract void extractConnections();
+    
+    protected AreaTopology createTopology(Collection<ContentRect> areas)
+    {
+        return new AreaListGridTopology(areas);
+    }
     
     protected void addAreaConnection(AreaConnection conn)
     {

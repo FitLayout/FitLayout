@@ -10,11 +10,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.infomatiq.jsi.Rectangle;
-import com.infomatiq.jsi.SpatialIndex;
-import com.infomatiq.jsi.rtree.RTree;
+import net.sf.jsi.Area;
+import net.sf.jsi.AreaCallback;
+import net.sf.jsi.RTree;
 
-import gnu.trove.TIntProcedure;
 
 public class AreaProcessor2
 {
@@ -23,8 +22,8 @@ public class AreaProcessor2
     private boolean DEBUG = false;
     private final ArrayList<PageArea> areas;
 
-    private final SpatialIndex areaTree;
-    private final SpatialIndex groupTree;
+    private final RTree areaTree;
+    private final RTree groupTree;
 
     private final HashMap<Integer, PageArea> groupMap;
     private final ArrayList<PageArea> ungrouped;
@@ -43,11 +42,9 @@ public class AreaProcessor2
         /* Note: we store only leaf areas */
         this.areas = new ArrayList<>();
         this.areaTree = new RTree();
-        this.areaTree.init(null);
 
         this.groupMap = new HashMap<>();
         this.groupTree = new RTree();
-        this.groupTree.init(null);
 
         this.ungrouped = new ArrayList<>();
 
@@ -692,7 +689,7 @@ public class AreaProcessor2
         ArrayList<PageAreaRelation> tmpRelations = new ArrayList<>();
         int edge;
         PageArea a, b;
-        Rectangle selector;
+        Area selector;
         double similarity;
 
 
@@ -702,27 +699,27 @@ public class AreaProcessor2
             /* First go right */
             /* DOC: the a.right+1 is for optimization, originally it was a.left */
             /* DOC: the selector is 1px from each side narrower so we can detect true overlaps */
-            selector = new Rectangle(a.getRight()+1, a.getTop()+1, this.pageWidth, a.getBottom()-1);
+            selector = new Area(a.getRight()+1, a.getTop()+1, this.pageWidth, a.getBottom()-1);
             tmpRelations = this.findRelations(a, selector, PageAreaRelation.DIRECTION_HORIZONTAL);
             this.processRelations(tmpRelations, relations, true);
 
             /* Now go down */
             /* DOC: the a.bottom+1 is for optimization, originally it was a.top */
             /* DOC: the selector is 1px from each side narrower so we can detect true overlaps */
-            selector = new Rectangle(a.getLeft()+1, a.getBottom()+1, a.getRight()-1, this.pageHeight);
+            selector = new Area(a.getLeft()+1, a.getBottom()+1, a.getRight()-1, this.pageHeight);
             tmpRelations = this.findRelations(a, selector, PageAreaRelation.DIRECTION_VERTICAL);
             this.processRelations(tmpRelations, relations, true);
 
             /* DOC: Now just to be sure, go up and left, but don't add those into the global list, as we already have them */
             /* First left */
             edge = (a.getLeft()>0)?(a.getLeft()-1):0;
-            selector = new Rectangle(0, a.getTop()+1, edge, a.getBottom()-1);
+            selector = new Area(0, a.getTop()+1, edge, a.getBottom()-1);
             tmpRelations = this.findRelations(a, selector, PageAreaRelation.DIRECTION_HORIZONTAL);
             this.processRelations(tmpRelations, relations, false);
 
             /* And finally up */
             edge = (a.getTop()>0)?(a.getTop()-1):0;
-            selector = new Rectangle(a.getLeft()+1, 0, a.getRight()-1, edge);
+            selector = new Area(a.getLeft()+1, 0, a.getRight()-1, edge);
             tmpRelations = this.findRelations(a, selector, PageAreaRelation.DIRECTION_VERTICAL);
             this.processRelations(tmpRelations, relations, false);
         }
@@ -749,7 +746,7 @@ public class AreaProcessor2
         return relations;
     }
 
-    private ArrayList<PageAreaRelation> findRelations(PageArea area, Rectangle selector, int direction)
+    private ArrayList<PageAreaRelation> findRelations(PageArea area, Area selector, int direction)
     {
         AreaMatch match;
         PageArea b;
@@ -802,7 +799,7 @@ public class AreaProcessor2
     }
 }
 
-class AreaMatch implements TIntProcedure
+class AreaMatch implements AreaCallback
 {
     private final ArrayList<Integer> ids;
 
@@ -812,7 +809,7 @@ class AreaMatch implements TIntProcedure
     }
 
     @Override
-    public boolean execute(int id) 
+    public boolean processArea(int id)
     {
         ids.add(id);
         return true;

@@ -10,15 +10,13 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.infomatiq.jsi.Rectangle;
-import com.infomatiq.jsi.SpatialIndex;
-import com.infomatiq.jsi.rtree.RTree;
-
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Box.Type;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.ContentImage;
 import cz.vutbr.fit.layout.model.Rectangular;
+import net.sf.jsi.Area;
+import net.sf.jsi.RTree;
 
 public class AreaCreator
 {
@@ -34,7 +32,7 @@ public class AreaCreator
     private final int pageWidth;
     private final int pageHeight;
 
-    private SpatialIndex areaTree;
+    private RTree areaTree;
 
     public AreaCreator(int w, int h)
     {
@@ -47,7 +45,6 @@ public class AreaCreator
         ArrayList<PageArea> ret;
 
         this.areaTree = new RTree();
-        this.areaTree.init(null);
         this.areas = new ArrayList<>();
         this.mask = new HashSet<>();
         ret = new ArrayList<>();
@@ -367,7 +364,7 @@ public class AreaCreator
     private void addArea(PageArea area, int allowedOverlap) 
     {
         //allow overlaps for intersection detection
-        Rectangle areaRect = new Rectangle(area.getLeft() + allowedOverlap, area.getTop() + allowedOverlap,
+        Area areaRect = new Area(area.getLeft() + allowedOverlap, area.getTop() + allowedOverlap,
                 area.getRight() - allowedOverlap, area.getBottom() - allowedOverlap);
         //detect overlaps
         AreaMatch match = new AreaMatch();

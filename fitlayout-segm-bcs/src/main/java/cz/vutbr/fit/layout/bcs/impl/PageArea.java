@@ -5,11 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.infomatiq.jsi.Rectangle;
-
 import cz.vutbr.fit.layout.model.Box;
 import cz.vutbr.fit.layout.model.Color;
 import cz.vutbr.fit.layout.model.Rectangular;
+import net.sf.jsi.Area;
 
 public class PageArea
 {
@@ -28,7 +27,7 @@ public class PageArea
     private int meanNeighborDistance;
     private int maxNeighborDistance;
 
-    private Rectangle rectangle;
+    private Area rectangle;
     private int vEdgeCount;
     private int hEdgeCount;
 
@@ -754,11 +753,11 @@ public class PageArea
         return lch;
     }
 
-    public Rectangle getRectangle()
+    public Area getRectangle()
     {
         if (this.rectangle == null)
         {
-            this.rectangle = new Rectangle(this.left, this.top, this.right, this.bottom);
+            this.rectangle = new Area(this.left, this.top, this.right, this.bottom);
         }
 
         return this.rectangle;

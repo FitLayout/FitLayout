@@ -14,6 +14,7 @@ import org.eclipse.rdf4j.model.IRI;
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.ParameterFloat;
+import cz.vutbr.fit.layout.impl.ParameterString;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaConnection;
 import cz.vutbr.fit.layout.model.AreaTree;
@@ -29,6 +30,8 @@ import cz.vutbr.fit.layout.ontology.SEGM;
 public class AreaConnectionProvider extends ConnectionSetArtifactService
 {
     private float minRelationWeight = 0.1f;
+    private String method = "symmetric";
+    
 
     public AreaConnectionProvider()
     {
@@ -42,6 +45,16 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
     public void setMinRelationWeight(float minRelationWeight)
     {
         this.minRelationWeight = minRelationWeight;
+    }
+
+    public String getMethod()
+    {
+        return method;
+    }
+
+    public void setMethod(String method)
+    {
+        this.method = method;
     }
 
     @Override
@@ -68,6 +81,8 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
         List<Parameter> ret = new ArrayList<>(1);
         ret.add(new ParameterFloat("minRelationWeight", 
                 "Minimal required weight of extracted relations", -1000.0f, 1000.0f));
+        ret.add(new ParameterString("method", 
+                "Used analysis method {symmetric, aligned}", 1, 32));
         return ret;
     }
 
@@ -116,11 +131,32 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
 
     public Collection<AreaConnection> extractConnections(AreaTree input, Page page)
     {
+        switch (method)
+        {
+            case "symmetric":
+                return extractConnectionsSymmetric(input, page);
+            case "aligned":
+                return extractConnectionsAligned(input, page);
+            default:
+                throw new ServiceException("Unsupported analysis method, use {symmetric, aligned}");
+        }
+    }
+    
+    public Collection<AreaConnection> extractConnectionsSymmetric(AreaTree input, Page page)
+    {
         List<ContentRect> leafAreas = new ArrayList<>();
         findLeafAreas(input.getRoot(), leafAreas);
         
-        AreaSetRelationAnalyzer ra = new RelationAnalyzerSymmetric(page, leafAreas);
+        RelationAnalyzerSymmetric ra = new RelationAnalyzerSymmetric(page, leafAreas);
         ra.setMinRelationWeight(minRelationWeight);
+        ra.extractConnections();
+        return ra.getConnections();
+    }
+
+    public Collection<AreaConnection> extractConnectionsAligned(AreaTree input, Page page)
+    {
+        RelationAnalyzerAligned ra = new RelationAnalyzerAligned(input.getRoot());
+        //ra.setMinRelationWeight(minRelationWeight); // TODO
         ra.extractConnections();
         return ra.getConnections();
     }

@@ -5,6 +5,7 @@
  */
 package cz.vutbr.fit.layout.patterns;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -77,20 +78,38 @@ public class RelationAnalyzerAligned implements RelationAnalyzer
             final Rectangular pos = src.getBounds();
             addFromRegion(topology, src, 
                     new Rectangular(pos.getX2() + 1, pos.getY1() + 1, parent.getBounds().getX2(), pos.getY2() - 1),
-                    Relations.ONRIGHT);
+                    Relations.ONLEFT, true);
+            addFromRegion(topology, src, 
+                    new Rectangular(pos.getX1() + 1, pos.getY2() + 1, pos.getX2() - 1, parent.getBounds().getY2()),
+                    Relations.ABOVE, false);
         }
     }
     
-    private void addFromRegion(AreaTopology topology, ContentRect src, Rectangular region, Relation rel)
+    private void addFromRegion(AreaTopology topology, ContentRect src, Rectangular region, Relation rel, boolean isHorizontal)
     {
-        Collection<ContentRect> all = topology.findAllAreasIntersecting(region);
+        final Collection<ContentRect> all = topology.findAllAreasIntersecting(region);
+        // find minimal distance
+        int minDist = Integer.MAX_VALUE;
         for (ContentRect cand : all)
+        {
+            final int dist = rectDistance(cand, src, isHorizontal);
+            minDist = Math.min(dist, minDist);
+        }
+        // use the minimal ones
+        final List<ContentRect> selected = new ArrayList<>();
+        for (ContentRect cand : all)
+        {
+            if (rectDistance(cand, src, isHorizontal) == minDist)
+                selected.add(cand);
+        }
+        // create relations
+        for (ContentRect cand : selected)
         {
             if (cand != src)
             {
-                addAreaConnection(new AreaConnection(src, cand, rel, 1.0f));
+                addAreaConnection(new AreaConnection(src, cand, rel, minDist));
                 if (rel.getInverse() != null)
-                    addAreaConnection(new AreaConnection(cand, src, rel.getInverse(), 1.0f));
+                    addAreaConnection(new AreaConnection(cand, src, rel.getInverse(), minDist));
             }
         }
     }
@@ -98,6 +117,35 @@ public class RelationAnalyzerAligned implements RelationAnalyzer
     protected void addAreaConnection(AreaConnection conn)
     {
         connections.add(conn);
+    }
+    
+    protected int rectDistance(ContentRect a1, ContentRect a2, boolean isHorizontal)
+    {
+        if (a1 != a2)
+        {
+            final Rectangular r1 = a1.getBounds();
+            final Rectangular r2 = a2.getBounds();
+            if (isHorizontal)
+            {
+                if (r1.getX2() <= r2.getX1()) // r1 - r2
+                    return r2.getX1() - r1.getX2();
+                else if (r2.getX2() <= r1.getX1()) // r2 - r1
+                    return r1.getX1() - r2.getX2();
+                else // other (overlap?)
+                    return Integer.MAX_VALUE; 
+            }
+            else
+            {
+                if (r1.getY2() <= r2.getY1()) // r1 / r2
+                    return r2.getY1() - r1.getY2();
+                else if (r2.getY2() <= r1.getY1()) // r2 / r1
+                    return r1.getY1() - r2.getY2();
+                else // other (overlap?)
+                    return Integer.MAX_VALUE; 
+            }
+        }
+        else
+            return Integer.MAX_VALUE;
     }
 
 }

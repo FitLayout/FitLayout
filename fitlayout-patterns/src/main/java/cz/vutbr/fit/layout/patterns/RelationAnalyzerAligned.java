@@ -97,10 +97,13 @@ public class RelationAnalyzerAligned implements RelationAnalyzer
         }
         // use the minimal ones
         final List<ContentRect> selected = new ArrayList<>();
-        for (ContentRect cand : all)
+        if (minDist != Integer.MAX_VALUE) // at least one applicable area found
         {
-            if (rectDistance(cand, src, isHorizontal) == minDist)
-                selected.add(cand);
+            for (ContentRect cand : all)
+            {
+                if (rectDistance(cand, src, isHorizontal) == minDist)
+                    selected.add(cand);
+            }
         }
         // create relations
         for (ContentRect cand : selected)

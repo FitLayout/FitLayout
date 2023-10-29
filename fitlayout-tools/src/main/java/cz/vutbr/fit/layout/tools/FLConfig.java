@@ -32,6 +32,7 @@ import cz.vutbr.fit.layout.segm.op.MultiLineOperator;
 import cz.vutbr.fit.layout.segm.op.SortByLinesOperator;
 import cz.vutbr.fit.layout.segm.op.SortByPositionOperator;
 import cz.vutbr.fit.layout.segm.op.SuperAreaOperator;
+import cz.vutbr.fit.layout.segm.op.TagByAttributeOperator;
 import cz.vutbr.fit.layout.text.chunks.TextChunksProvider;
 import cz.vutbr.fit.layout.text.op.TagEntitiesOperator;
 import cz.vutbr.fit.layout.vips.VipsProvider;
@@ -81,6 +82,7 @@ public class FLConfig
         addAreaTreeOperator(sm, new SuperAreaOperator());
         addAreaTreeOperator(sm, new GroupByDOMOperator());
         addAreaTreeOperator(sm, new HomogeneousLeafOperator());
+        addAreaTreeOperator(sm, new TagByAttributeOperator());
         
         //text module when the tags are configured in the repo metadata
         if (repo != null && repo instanceof RDFArtifactRepository)

@@ -47,8 +47,15 @@ public class Invoke extends CliCommand implements Callable<Integer>
             }
             
             Artifact result = invokeService(srcArt, serviceId, sopts);
-            getCli().setLastArtifact(result);
-            System.err.println("  Created: " + result);
+            if (result != null)
+            {
+                getCli().setLastArtifact(result);
+                System.err.println("  Created: " + result);
+            }
+            else
+            {
+                System.err.println("  no artifact created");
+            }
             
             return 0;
             
@@ -65,9 +72,9 @@ public class Invoke extends CliCommand implements Callable<Integer>
     {
         
         ParametrizedOperation op = getCli().getServiceManager().findParmetrizedService(serviceId);
-        System.err.println("Invoke: " + op + " srcArt=" + srcArt);
         if (op != null)
         {
+            System.err.println("Invoke: " + op + " srcArt=" + srcArt);
             if (sopts != null)
             {
                 Map<String, Object> sparams = new HashMap<>(sopts);
@@ -80,6 +87,7 @@ public class Invoke extends CliCommand implements Callable<Integer>
         }
         else
         {
+            System.err.println("Invoke: service " + serviceId + " not found");
             return null;
         }
     }

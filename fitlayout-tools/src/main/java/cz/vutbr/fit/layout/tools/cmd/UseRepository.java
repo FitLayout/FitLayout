@@ -9,6 +9,7 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.rdf4j.repository.RepositoryException;
 
+import cz.vutbr.fit.layout.api.ArtifactRepository;
 import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
 import cz.vutbr.fit.layout.tools.CliCommand;
 import picocli.CommandLine.Command;
@@ -32,7 +33,13 @@ public class UseRepository extends CliCommand implements Callable<Integer>
     @Option(order = 100, names = {"-h", "--help"}, usageHelp = true, description = "print help")
     protected boolean help;
     
-    @Option(order = 1, names = {"-s", "--suffix"}, description = "Repository path suffix to be used with the local repository (to distinguish multiple local repositories)")
+    @Option(order = 1, names = {"-a", "--alias"}, description = "Repository alias; if a repository with the same alias was already created, it will be reused")
+    protected String alias;
+    
+    @Option(order = 2, names = {"-d", "--disconnect"}, description = "Disconnect the repository instead of connecting it")
+    protected boolean disconnect;
+    
+    @Option(order = 3, names = {"-s", "--suffix"}, description = "Repository path suffix to be used with the local repository (to distinguish multiple local repositories)")
     protected String pathSuffix;
     
     @Parameters(arity = "1", index = "0", description = "Repository type: ${COMPLETION-CANDIDATES}")
@@ -43,16 +50,39 @@ public class UseRepository extends CliCommand implements Callable<Integer>
     {
         try {
             
-            // try to properly close an old repository if applicable
-            final var oldRepo = getCli().getArtifactRepository();
-            if (oldRepo != null && oldRepo instanceof RDFArtifactRepository)
+            if (disconnect)
             {
-                ((RDFArtifactRepository) oldRepo).disconnect();
+                // try to properly close an old repository if applicable
+                final ArtifactRepository oldRepo;
+                if (alias != null)
+                    oldRepo = getCli().getRepositories().remove(alias);
+                else
+                    oldRepo = getCli().getArtifactRepository();
+                
+                if (oldRepo != null && oldRepo instanceof RDFArtifactRepository)
+                {
+                    ((RDFArtifactRepository) oldRepo).disconnect();
+                }
             }
-            
-            // open the new repository
-            RDFArtifactRepository repo = createArtifactRepository();
-            getCli().setArtifactRepository(repo);
+            else
+            {
+                // open the new repository, try to reuse an existing one
+                RDFArtifactRepository repo = null;
+                if (alias != null)
+                    repo = getCli().getRepositories().get(alias);
+                
+                if (repo != null)
+                    System.err.println("Reusing RDF repository " + alias);
+                else
+                {
+                    repo = createArtifactRepository();
+                    System.err.println("  alias " + alias);
+                    if (alias != null)
+                        getCli().getRepositories().put(alias, repo);
+                }
+                
+                getCli().setArtifactRepository(repo);
+            }
             
             return 0;
             

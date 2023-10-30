@@ -10,7 +10,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -20,6 +22,7 @@ import cz.vutbr.fit.layout.impl.DefaultArtifactRepository;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.Page;
+import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
 import cz.vutbr.fit.layout.tools.cmd.Batch;
 import cz.vutbr.fit.layout.tools.cmd.Clear;
 import cz.vutbr.fit.layout.tools.cmd.Dump;
@@ -61,6 +64,7 @@ public class Cli
     private static final String CONFIG_FILE_TEST = "config.test.properties";
 
     private ArtifactRepository artifactRepository;
+    private Map<String, RDFArtifactRepository> repositories;
     private Page page;
     private AreaTree areaTree;
     private Artifact lastArtifact;
@@ -69,12 +73,13 @@ public class Cli
     public Cli()
     {
         //use a default in-memory repository for start, the USE command may change it later
-        artifactRepository = new DefaultArtifactRepository();
+        this(new DefaultArtifactRepository());
     }
     
     public Cli(ArtifactRepository repo)
     {
         artifactRepository = repo;
+        repositories = new HashMap<>();
     }
     
     /**
@@ -85,6 +90,7 @@ public class Cli
     public Cli copy()
     {
         Cli ret = new Cli(this.artifactRepository);
+        ret.getRepositories().putAll(getRepositories());
         ret.page = page;
         ret.areaTree = areaTree;
         ret.lastArtifact = lastArtifact;
@@ -99,6 +105,11 @@ public class Cli
     public void setArtifactRepository(ArtifactRepository artifactRepository)
     {
         this.artifactRepository = artifactRepository;
+    }
+
+    public Map<String, RDFArtifactRepository> getRepositories()
+    {
+        return repositories;
     }
 
     public Page getPage()

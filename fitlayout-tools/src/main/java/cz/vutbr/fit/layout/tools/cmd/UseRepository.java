@@ -76,9 +76,11 @@ public class UseRepository extends CliCommand implements Callable<Integer>
                 else
                 {
                     repo = createArtifactRepository();
-                    System.err.println("  alias " + alias);
                     if (alias != null)
+                    {
+                        System.err.println("  alias " + alias);
                         getCli().getRepositories().put(alias, repo);
+                    }
                 }
                 
                 getCli().setArtifactRepository(repo);

@@ -7,6 +7,9 @@ package cz.vutbr.fit.layout.json.impl;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -162,6 +165,22 @@ public abstract class JSONBoxTreeBuilder extends BaseBoxTreeBuilder
     protected InputFile loadJSON(String path) throws IOException
     {
         FileReader fin = new FileReader(path);
+        Gson gson = new Gson();
+        InputFile file = gson.fromJson(fin, InputFile.class);
+        fin.close();
+        return file;
+    }
+    
+    /**
+     * Parses an input stream and creates an input file representation
+     * @param istream the input stream to parse
+     * @param charsetName charset used in the input stream
+     * @return the parsed file
+     * @throws IOException
+     */
+    protected InputFile loadJSON(InputStream istream, String charsetName) throws IOException
+    {
+        Reader fin = new InputStreamReader(istream, charsetName);
         Gson gson = new Gson();
         InputFile file = gson.fromJson(fin, InputFile.class);
         fin.close();

@@ -78,7 +78,7 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
     @Override
     public List<Parameter> defineParams()
     {
-        List<Parameter> ret = new ArrayList<>(1);
+        List<Parameter> ret = new ArrayList<>(2);
         ret.add(new ParameterFloat("minRelationWeight", 
                 "Minimal required weight of extracted relations", -1000.0f, 1000.0f));
         ret.add(new ParameterString("method", 

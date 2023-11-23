@@ -16,6 +16,7 @@ import org.eclipse.rdf4j.model.IRI;
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.ParameterFloat;
+import cz.vutbr.fit.layout.impl.ParameterString;
 import cz.vutbr.fit.layout.model.AreaConnection;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.model.ChunkSet;
@@ -30,6 +31,8 @@ import cz.vutbr.fit.layout.ontology.SEGM;
 public class TextChunkConnectionProvider extends ConnectionSetArtifactService
 {
     private float minRelationWeight = 0.1f;
+    private String method = "symmetric";
+    
 
     public TextChunkConnectionProvider()
     {
@@ -43,6 +46,16 @@ public class TextChunkConnectionProvider extends ConnectionSetArtifactService
     public void setMinRelationWeight(float minRelationWeight)
     {
         this.minRelationWeight = minRelationWeight;
+    }
+
+    public String getMethod()
+    {
+        return method;
+    }
+
+    public void setMethod(String method)
+    {
+        this.method = method;
     }
 
     @Override
@@ -66,9 +79,11 @@ public class TextChunkConnectionProvider extends ConnectionSetArtifactService
     @Override
     public List<Parameter> defineParams()
     {
-        List<Parameter> ret = new ArrayList<>(1);
+        List<Parameter> ret = new ArrayList<>(2);
         ret.add(new ParameterFloat("minRelationWeight", 
                 "Minimal required weight of extracted relations", -1000.0f, 1000.0f));
+        ret.add(new ParameterString("method", 
+                "Used analysis method {symmetric, aligned}", 1, 32));
         return ret;
     }
 
@@ -117,6 +132,19 @@ public class TextChunkConnectionProvider extends ConnectionSetArtifactService
 
     public Collection<AreaConnection> extractConnections(ChunkSet input, Page page)
     {
+        switch (method)
+        {
+            case "symmetric":
+                return extractConnectionsSymmetric(input, page);
+            case "aligned":
+                return extractConnectionsAligned(input, page);
+            default:
+                throw new ServiceException("Unsupported analysis method, use {symmetric, aligned}");
+        }
+    }
+    
+    public Collection<AreaConnection> extractConnectionsSymmetric(ChunkSet input, Page page)
+    {
         Set<ContentRect> chunks = new HashSet<>(input.getTextChunks());
         AreaSetRelationAnalyzer ra = new RelationAnalyzerSymmetric(page, chunks);
         ra.setMinRelationWeight(minRelationWeight);
@@ -124,5 +152,11 @@ public class TextChunkConnectionProvider extends ConnectionSetArtifactService
         return ra.getConnections();
     }
     
+    public Collection<AreaConnection> extractConnectionsAligned(ChunkSet input, Page page)
+    {
+        RelationAnalyzerAligned ra = new RelationAnalyzerAligned(input);
+        ra.extractConnections();
+        return ra.getConnections();
+    }
 
 }

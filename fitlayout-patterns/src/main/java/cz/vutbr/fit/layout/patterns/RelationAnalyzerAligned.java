@@ -16,13 +16,15 @@ import cz.vutbr.fit.layout.impl.AreaListPixelTopology;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaConnection;
 import cz.vutbr.fit.layout.model.AreaTopology;
+import cz.vutbr.fit.layout.model.ChunkSet;
 import cz.vutbr.fit.layout.model.ContentRect;
 import cz.vutbr.fit.layout.model.Rectangular;
 import cz.vutbr.fit.layout.model.Relation;
+import cz.vutbr.fit.layout.model.TextChunk;
 
 /**
  * This relation analyzer just creates the above/below, onleft/onright relations on the aligned
- * areas within each sub-area.
+ * areas within each sub-area (for area tree) or the text chunks (for a chunk set).
  * @author burgetr
  */
 public class RelationAnalyzerAligned implements RelationAnalyzer
@@ -32,12 +34,19 @@ public class RelationAnalyzerAligned implements RelationAnalyzer
                     Relations.BELOW, Relations.ABOVE);
 
     private Area rootArea;
+    private ChunkSet chunkSet;
     private Set<AreaConnection> connections;
 
     
     public RelationAnalyzerAligned(Area rootArea)
     {
         this.rootArea = rootArea;
+        connections = new HashSet<>();
+    }
+    
+    public RelationAnalyzerAligned(ChunkSet chunkSet)
+    {
+        this.chunkSet = chunkSet;
         connections = new HashSet<>();
     }
 
@@ -50,7 +59,10 @@ public class RelationAnalyzerAligned implements RelationAnalyzer
     @Override
     public void extractConnections()
     {
-        recursiveExtractConnections(rootArea);
+        if (rootArea!= null)
+            recursiveExtractConnections(rootArea);
+        else if (chunkSet!= null)
+            extractConnectionsInChunkSet(chunkSet);
     }
 
     @Override
@@ -72,15 +84,37 @@ public class RelationAnalyzerAligned implements RelationAnalyzer
     private void extractConnectionsInArea(Area parent)
     {
         final List<ContentRect> rects = AreaUtils.getChildrenAsContentRects(parent);
-        AreaTopology topology = new AreaListPixelTopology(rects, parent.getBounds());
+        final Rectangular parentBounds = parent.getBounds();
+        extractConnectionsFromList(rects, parentBounds);
+    }
+
+    private void extractConnectionsInChunkSet(ChunkSet chunkSet)
+    {
+        final List<ContentRect> rects = new ArrayList<>();
+        int maxX = 0;
+        int maxY = 0;
+        for (TextChunk textChunk : chunkSet.getTextChunks())
+        {
+            final Rectangular pos = textChunk.getBounds();
+            maxX = Math.max(maxX, pos.getX2());
+            maxY = Math.max(maxY, pos.getY2());
+            rects.add(textChunk);
+        }
+        extractConnectionsFromList(rects, new Rectangular(0, 0, maxX, maxY));
+    }
+    
+    protected void extractConnectionsFromList(final List<ContentRect> rects,
+            final Rectangular parentBounds)
+    {
+        AreaTopology topology = new AreaListPixelTopology(rects, parentBounds);
         for (ContentRect src : rects)
         {
             final Rectangular pos = src.getBounds();
             addFromRegion(topology, src, 
-                    new Rectangular(pos.getX2() + 1, pos.getY1() + 1, parent.getBounds().getX2(), pos.getY2() - 1),
+                    new Rectangular(pos.getX2() + 1, pos.getY1() + 1, parentBounds.getX2(), pos.getY2() - 1),
                     Relations.ONLEFT, true);
             addFromRegion(topology, src, 
-                    new Rectangular(pos.getX1() + 1, pos.getY2() + 1, pos.getX2() - 1, parent.getBounds().getY2()),
+                    new Rectangular(pos.getX1() + 1, pos.getY2() + 1, pos.getX2() - 1, parentBounds.getY2()),
                     Relations.ABOVE, false);
         }
     }

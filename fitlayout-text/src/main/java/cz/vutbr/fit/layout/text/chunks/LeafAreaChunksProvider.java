@@ -35,7 +35,7 @@ public class LeafAreaChunksProvider extends BaseArtifactService
     @Override
     public String getId()
     {
-        return "FitLayout.LeafTextxtChunks";
+        return "FitLayout.LeafTextChunks";
     }
 
     @Override

@@ -64,21 +64,24 @@ public class LeafAreaChunksSource extends ChunksSource
         if (area.getBoxes().size() > 0)
         {
             String text = area.getText(Concatenators.getDefaultAreaConcatenator());
-            Box box = area.getBoxes().get(0); // use the first box as the source
-            DefaultTextChunk newChunk = new DefaultTextChunk(area.getBounds(), area, box);
-            newChunk.setId(idcnt++);
-            newChunk.setText(text);
-            
-            // copy tags
-            for (Map.Entry<Tag, Float> entry : area.getTags().entrySet())
-                newChunk.addTag(entry.getKey(), entry.getValue());
-            
-            return newChunk;
+            if (!text.isEmpty())
+            {
+                Box box = area.getBoxes().get(0); // use the first box as the source
+                DefaultTextChunk newChunk = new DefaultTextChunk(area.getBounds(), area, box);
+                newChunk.setId(idcnt++);
+                newChunk.setText(text);
+                
+                // copy tags
+                for (Map.Entry<Tag, Float> entry : area.getTags().entrySet())
+                    newChunk.addTag(entry.getKey(), entry.getValue());
+                
+                return newChunk;
+            }
+            else
+                return null;
         }
         else
-        {
             return null;
-        }
     }
 
 

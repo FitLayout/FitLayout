@@ -9,6 +9,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.impl.DynamicModelFactory;
+import org.eclipse.rdf4j.model.util.Values;
 
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
@@ -18,7 +21,6 @@ import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
 import cz.vutbr.fit.layout.ontology.SEGM;
 import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
-import cz.vutbr.fit.layout.rdf.RDFStorage;
 import cz.vutbr.fit.layout.rdf.model.RDFArea;
 import cz.vutbr.fit.layout.rdf.model.RDFAreaTree;
 
@@ -84,8 +86,12 @@ public class CompleteTextProvider extends BaseArtifactService
             var repo = getServiceManager().getArtifactRepository();
             if (repo instanceof RDFArtifactRepository)
             {
+                // create a new model with the text content triples
+                Model model = (new DynamicModelFactory()).createEmptyModel();
+                recursiveAddText(((AreaTree) input).getRoot(), model);
+                // store the model in the context
                 var storage = ((RDFArtifactRepository) repo).getStorage();
-                recursiveAddText(((AreaTree) input).getRoot(), storage, input.getIri());
+                storage.insertGraph(model, input.getIri());
                 return null;
             }
             else
@@ -95,11 +101,13 @@ public class CompleteTextProvider extends BaseArtifactService
             throw new ServiceException("Source artifact not specified or not an RDF area tree");    
     }
     
-    private void recursiveAddText(Area root, RDFStorage storage, IRI context)
+    private void recursiveAddText(Area root, Model model)
     {
         IRI subj = ((RDFArea) root).getIri();
         String text = root.getText();
-        storage.addValue(subj, SEGM.text, text, context);
+        model.add(subj, SEGM.text, Values.literal(text));
+        for (Area child : root.getChildren())
+            recursiveAddText(child, model);
     }
     
 }

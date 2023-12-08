@@ -22,6 +22,7 @@ import cz.vutbr.fit.layout.provider.VisualBoxTreeProvider;
 import cz.vutbr.fit.layout.puppeteer.PuppeteerTreeProvider;
 import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
 import cz.vutbr.fit.layout.rdf.RDFTaggerConfig;
+import cz.vutbr.fit.layout.rdf.text.CompleteTextProvider;
 import cz.vutbr.fit.layout.segm.BasicSegmProvider;
 import cz.vutbr.fit.layout.segm.op.CollapseAreasOperator;
 import cz.vutbr.fit.layout.segm.op.FindLineOperator;
@@ -119,6 +120,9 @@ public class FLConfig
         //patterns
         sm.addArtifactService(new AreaConnectionProvider());
         sm.addArtifactService(new TextChunkConnectionProvider());
+        
+        //complete text extension
+        sm.addArtifactService(new CompleteTextProvider());
         
         //use RDF storage as the artifact repository
         if (repo != null)

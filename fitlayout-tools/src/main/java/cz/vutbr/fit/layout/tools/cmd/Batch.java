@@ -39,7 +39,7 @@ public class Batch extends CliCommand implements Callable<Integer>
     @Option(order = 1, names = {"-i", "--data"}, description = "Input data file to iterate on")
     protected String inFile;
     
-    @Option(order = 2, names = {"-d", "--delemiter"}, description = "Data field delimiter in the input data file (default \\\t)")
+    @Option(order = 2, names = {"-d", "--delimiter"}, description = "Data field delimiter in the input data file (default \\\t)")
     protected String delim = "\\t";
     
     @Option(order = 3, names = {"-p", "--threads"}, description = "Number of threads to use for iteration (default 1)")

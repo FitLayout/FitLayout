@@ -1,5 +1,5 @@
 # FitLayout/2 - Web Page Analysis Framework
-(c) 2015-2022 Radek Burget (burgetr@fit.vutbr.cz)
+(c) 2015-2024 Radek Burget (burgetr@fit.vutbr.cz)
 
 FitLayout/2 is an extensible framework for web document rendering, modeling and analysis. It provides a Java API as well as the platform-independent Command-line interface (CLI) and the Web API (REST) that allow implementing a complete web page processing workflow including the following features:  
 

@@ -14,8 +14,8 @@ import cz.vutbr.fit.layout.model.Relation;
  */
 public class Relations
 {
-    public static final Relation ONRIGHT = new DefaultRelation("onRight");
-    public static final Relation ONLEFT = new DefaultRelation("onLeft").setInverse(ONRIGHT);
+    public static final Relation RIGHTOF = new DefaultRelation("rightOf");
+    public static final Relation LEFTOF = new DefaultRelation("leftOf").setInverse(RIGHTOF);
     public static final Relation AFTER = new DefaultRelation("after");
     public static final Relation BEFORE = new DefaultRelation("before").setInverse(AFTER);
     public static final Relation SAMELINE = new DefaultRelation("sameLine").setSymmetric(true);

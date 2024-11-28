@@ -30,7 +30,7 @@ import cz.vutbr.fit.layout.model.TextChunk;
 public class RelationAnalyzerAligned implements RelationAnalyzer
 {
     private static final List<Relation> ANALYZED_RELATIONS =
-            List.of(Relations.ONRIGHT, Relations.ONLEFT, 
+            List.of(Relations.RIGHTOF, Relations.LEFTOF, 
                     Relations.BELOW, Relations.ABOVE);
 
     private Area rootArea;
@@ -112,7 +112,7 @@ public class RelationAnalyzerAligned implements RelationAnalyzer
             final Rectangular pos = src.getBounds();
             addFromRegion(topology, src, 
                     new Rectangular(pos.getX2() + 1, pos.getY1() + 1, parentBounds.getX2(), pos.getY2() - 1),
-                    Relations.ONLEFT, true);
+                    Relations.LEFTOF, true);
             addFromRegion(topology, src, 
                     new Rectangular(pos.getX1() + 1, pos.getY2() + 1, pos.getX2() - 1, parentBounds.getY2()),
                     Relations.ABOVE, false);

@@ -29,7 +29,7 @@ import java.util.Map.Entry;
 public class RelationAnalyzerSymmetric extends AreaSetRelationAnalyzer
 {
     private static final List<Relation> ANALYZED_RELATIONS =
-            List.of(Relations.ONRIGHT, Relations.ONLEFT, Relations.AFTER, Relations.BEFORE, 
+            List.of(Relations.RIGHTOF, Relations.LEFTOF, Relations.AFTER, Relations.BEFORE, 
                     Relations.SAMELINE, Relations.UNDER, Relations.UNDERHEADING, 
                     Relations.BELOW, Relations.ABOVE, Relations.LINEBELOW);
 
@@ -100,11 +100,11 @@ public class RelationAnalyzerSymmetric extends AreaSetRelationAnalyzer
                             //onRight / onLeft
                             if (distRL > -0.2*em && distRL < 0.9*em)
                             {
-                                addAreaConnection(new AreaConnection(a1, a2, Relations.ONRIGHT, 1.0f));
+                                addAreaConnection(new AreaConnection(a1, a2, Relations.RIGHTOF, 1.0f));
                             }
                             else if (distLR > -0.2*em && distLR < 0.9*em)
                             {
-                                addAreaConnection(new AreaConnection(a1, a2, Relations.ONLEFT, 1.0f));
+                                addAreaConnection(new AreaConnection(a1, a2, Relations.LEFTOF, 1.0f));
                             }
                         }
                     }

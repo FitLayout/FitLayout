@@ -14,6 +14,7 @@ import cz.vutbr.fit.layout.model.Relation;
  */
 public class Relations
 {
+    // relations with a specific meaning
     public static final Relation RIGHTOF = new DefaultRelation("rightOf");
     public static final Relation LEFTOF = new DefaultRelation("leftOf").setInverse(RIGHTOF);
     public static final Relation AFTER = new DefaultRelation("after");
@@ -24,4 +25,7 @@ public class Relations
     public static final Relation BELOW = new DefaultRelation("below");
     public static final Relation ABOVE = new DefaultRelation("above").setInverse(BELOW);
     public static final Relation LINEBELOW = new DefaultRelation("lineBelow");
+    
+    // generic relations
+    public static final Relation HASNEIGHBOR = new DefaultRelation("hasNeighbor");
 }

@@ -138,8 +138,10 @@ public class TextChunkConnectionProvider extends ConnectionSetArtifactService
                 return extractConnectionsSymmetric(input, page);
             case "aligned":
                 return extractConnectionsAligned(input, page);
+            case "knn":
+                return extractConnectionsKNN(input, page);
             default:
-                throw new ServiceException("Unsupported analysis method, use {symmetric, aligned}");
+                throw new ServiceException("Unsupported analysis method, use {symmetric, aligned, knn}");
         }
     }
     
@@ -155,6 +157,15 @@ public class TextChunkConnectionProvider extends ConnectionSetArtifactService
     public Collection<AreaConnection> extractConnectionsAligned(ChunkSet input, Page page)
     {
         RelationAnalyzerAligned ra = new RelationAnalyzerAligned(input);
+        ra.extractConnections();
+        return ra.getConnections();
+    }
+    
+    public Collection<AreaConnection> extractConnectionsKNN(ChunkSet input, Page page)
+    {
+        Set<ContentRect> chunks = new HashSet<>(input.getTextChunks());
+        AreaSetRelationAnalyzer ra = new RelationAnalyzerKNN(page, chunks);
+        ra.setMinRelationWeight(minRelationWeight);
         ra.extractConnections();
         return ra.getConnections();
     }

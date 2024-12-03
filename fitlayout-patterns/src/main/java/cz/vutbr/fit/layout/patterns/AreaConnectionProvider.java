@@ -137,8 +137,10 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
                 return extractConnectionsSymmetric(input, page);
             case "aligned":
                 return extractConnectionsAligned(input, page);
+            case "knn":
+                return extractConnectionsKNN(input, page);
             default:
-                throw new ServiceException("Unsupported analysis method, use {symmetric, aligned}");
+                throw new ServiceException("Unsupported analysis method, use {symmetric, aligned, knn}");
         }
     }
     
@@ -157,6 +159,17 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
     {
         RelationAnalyzerAligned ra = new RelationAnalyzerAligned(input.getRoot());
         //ra.setMinRelationWeight(minRelationWeight); // TODO
+        ra.extractConnections();
+        return ra.getConnections();
+    }
+    
+    public Collection<AreaConnection> extractConnectionsKNN(AreaTree input, Page page)
+    {
+        List<ContentRect> leafAreas = new ArrayList<>();
+        findLeafAreas(input.getRoot(), leafAreas);
+        
+        RelationAnalyzerKNN ra = new RelationAnalyzerKNN(page, leafAreas);
+        ra.setMinRelationWeight(minRelationWeight);
         ra.extractConnections();
         return ra.getConnections();
     }

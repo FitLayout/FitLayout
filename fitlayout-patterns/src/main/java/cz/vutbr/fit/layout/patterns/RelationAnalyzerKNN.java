@@ -6,11 +6,12 @@
 package cz.vutbr.fit.layout.patterns;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import cz.vutbr.fit.layout.model.AreaConnection;
@@ -23,6 +24,8 @@ import cz.vutbr.fit.layout.model.Relation;
 
 /**
  * Given a list of content rectangles, finds the k nearest rectangles for each one ot them.
+ * Based on the original python source by Emanuele Vivoli and Andrea Gemelli:
+ * https://github.com/AILab-UniFI/GNN-TableExtraction
  * 
  * @author burgetr
  */
@@ -30,18 +33,17 @@ public class RelationAnalyzerKNN extends AreaSetRelationAnalyzer
 {
     private static final List<Relation> ANALYZED_RELATIONS = List.of(Relations.HASNEIGHBOR);
 
-    private int k = 5; // number of nearest neighbors to consider
+    private int k = 10; // number of nearest neighbors to consider
     private int maxDistance = 500; // maximum distance to consider (in pixels)
     
-    private List<ContentRect> bboxs;
-    
+    private List<ContentRect> bboxes;
     
     private Set<AreaConnection> connections;
     
     public RelationAnalyzerKNN(Page page, Collection<ContentRect> areas)
     {
         super(page, areas);
-        bboxs = new ArrayList<>(areas);
+        bboxes = new ArrayList<>(areas);
     }
 
     public int getK()
@@ -75,8 +77,7 @@ public class RelationAnalyzerKNN extends AreaSetRelationAnalyzer
     @Override
     public void extractConnections()
     {
-        // TODO Auto-generated method stub
-        
+        buildGraphKNN();
     }
     
     //=============================================================================================
@@ -86,28 +87,24 @@ public class RelationAnalyzerKNN extends AreaSetRelationAnalyzer
         int width = getPage().getWidth();
         int height = getPage().getHeight();
         
-        List<List<Integer>> verticalProjections = new ArrayList<>(width);
-        List<List<Integer>> horizontalProjections = new ArrayList<>(height);
-
-        // Initialize projections
-        for (int i = 0; i < width; i++)
-            verticalProjections.add(new ArrayList<>());
-        for (int i = 0; i < height; i++)
-            horizontalProjections.add(new ArrayList<>());
+        Projections verticalProjections = new Projections(width);
+        Projections horizontalProjections = new Projections(height);
 
         // Create projections
-        for (int nodeIndex = 0; nodeIndex < bboxs.size(); nodeIndex++)
+        for (int nodeIndex = 0; nodeIndex < bboxes.size(); nodeIndex++)
         {
-            Rect bbox = bboxs.get(nodeIndex);
+            final Rect bbox = bboxes.get(nodeIndex);
             for (int hp = bbox.getX1(); hp < bbox.getX2(); hp++)
             {
-                if (hp >= width) hp = width - 1;
-                verticalProjections.get(hp).add(nodeIndex);
+                //if (hp >= width) hp = width - 1;
+                if (hp >= 0 && hp < width)
+                    verticalProjections.addIndex(hp, nodeIndex);
             }
             for (int vp = bbox.getY1(); vp < bbox.getY2(); vp++)
             {
-                if (vp >= height) vp = height - 1;
-                horizontalProjections.get(vp).add(nodeIndex);
+                //if (vp >= height) vp = height - 1;
+                if (vp >= 0 && vp < height)
+                    horizontalProjections.addIndex(vp, nodeIndex);
             }
         }
 
@@ -127,31 +124,36 @@ public class RelationAnalyzerKNN extends AreaSetRelationAnalyzer
             removeVertical(vEdges, hEdges);
         }*/
 
-        List<int[]> edges = new ArrayList<>();
+        Set<Edge> edges = new HashSet<>();
 
         // Connecting k-nearest nodes
-        for (int nodeIndex = 0; nodeIndex < bboxs.size(); nodeIndex++)
+        for (int nodeIndex = 0; nodeIndex < bboxes.size(); nodeIndex++)
         {
-            Rect nodeBbox = bboxs.get(nodeIndex);
+            Rect nodeBbox = bboxes.get(nodeIndex);
             knn(nodeBbox, nodeIndex, verticalProjections, horizontalProjections, edges);
         }
 
-        // Further processing of edges...
+        // Convert edges to connections
+        connections = new HashSet<>();
+        for (Edge edge : edges)
+        {
+            final float weight = (float) edge.getDistance();
+            connections.add(new AreaConnection(bboxes.get(edge.getStart()), bboxes.get(edge.getEnd()), Relations.HASNEIGHBOR, weight));
+        }
     }    
     
     private void knn(Rect nodeBbox, int nodeIndex, 
-            List<List<Integer>> verticalProjections, List<List<Integer>> horizontalProjections, List<int[]> edges)
+            Projections verticalProjections, Projections horizontalProjections, Set<Edge> edges)
     {
         List<Integer> neighbors = new ArrayList<>();
         int windowMultiplier = 2;
-        boolean wider = (nodeBbox.getX2()
-                - nodeBbox.getX1()) > (nodeBbox.getY2() - nodeBbox.getY1());
+        final boolean wider = (nodeBbox.getX2()- nodeBbox.getX1()) > (nodeBbox.getY2() - nodeBbox.getY1());
 
         // finding neighbors
         while (neighbors.size() < k && windowMultiplier < 100)
         {
-            List<Integer> verticalBboxs = new ArrayList<>();
-            List<Integer> horizontalBboxs = new ArrayList<>();
+            List<Integer> verticalBboxes = new ArrayList<>();
+            List<Integer> horizontalBboxes = new ArrayList<>();
             neighbors.clear();
 
             int hOffset, vOffset;
@@ -169,21 +171,21 @@ public class RelationAnalyzerKNN extends AreaSetRelationAnalyzer
             Rectangular window = new Rectangular( 
                     limit0(nodeBbox.getX1() - hOffset),
                     limit0(nodeBbox.getY1() - vOffset),
-                    limitMax(nodeBbox.getX2() + hOffset, getPage().getWidth()),
-                    limitMax(nodeBbox.getY2() + vOffset, getPage().getHeight()));
+                    limit0Max(nodeBbox.getX2() + hOffset, getPage().getWidth()),
+                    limit0Max(nodeBbox.getY2() + vOffset, getPage().getHeight()));
 
             for (int i = window.getX1(); i < window.getX2(); i++)
             {
-                verticalBboxs.addAll(verticalProjections.get(i));
+                verticalBboxes.addAll(verticalProjections.get(i));
             }
             for (int i = window.getY1(); i < window.getY2(); i++)
             {
-                horizontalBboxs.addAll(horizontalProjections.get(i));
+                horizontalBboxes.addAll(horizontalProjections.get(i));
             }
 
-            for (int v : new HashSet<>(verticalBboxs))
+            for (int v : new HashSet<>(verticalBboxes))
             {
-                for (int h : new HashSet<>(horizontalBboxs))
+                for (int h : new HashSet<>(horizontalBboxes))
                 {
                     if (v == h) neighbors.add(v);
                 }
@@ -199,27 +201,27 @@ public class RelationAnalyzerKNN extends AreaSetRelationAnalyzer
         List<Double> neighborsDistances = new ArrayList<>();
         for (int n : neighbors)
         {
-            neighborsDistances.add(distance(nodeBbox, bboxs.get(n)));
+            final double dist = distance(nodeBbox, bboxes.get(n));
+            neighborsDistances.add(dist);
         }
 
         List<Integer> sortedIndices = sortIndices(neighborsDistances);
-
         for (int i = 0; i < Math.min(k, sortedIndices.size()); i++)
         {
-            int sdIdx = sortedIndices.get(i);
-            if (neighborsDistances.get(sdIdx) <= maxDistance)
+            final int sdIdx = sortedIndices.get(i);
+            final double dist = neighborsDistances.get(sdIdx);
+            if (dist <= maxDistance)
             {
-                int[] edge = { neighbors.get(sdIdx), nodeIndex };
-                if (!containsEdge(edges, edge))
-                {
-                    edges.add(edge);
-                }
+                //System.out.println(dist + " " + bboxes.get(nodeIndex) + " -> " + bboxes.get(neighbors.get(sdIdx)));
+                final Edge edge = new Edge(nodeIndex, neighbors.get(sdIdx), dist);
+                edges.add(edge);
             }
             else
             {
                 break;
             }
         }
+        //System.out.println("====");
     }
 
     private int limit0(int a)
@@ -230,7 +232,7 @@ public class RelationAnalyzerKNN extends AreaSetRelationAnalyzer
             return a;
     }
 
-    private int limitMax(int a, int max)
+    private int limit0Max(int a, int max)
     {
         if (a < 0)
             return 0;
@@ -243,16 +245,16 @@ public class RelationAnalyzerKNN extends AreaSetRelationAnalyzer
     private double distance(Rect rectA, Rect rectB) 
     {
         // Check relative position
-        boolean left = (rectB.getX2() - rectA.getX1()) <= 0;
-        boolean bottom = (rectA.getY2() - rectB.getY1()) <= 0;
-        boolean right = (rectA.getX2() - rectB.getX1()) <= 0;
-        boolean top = (rectB.getY2() - rectA.getY1()) <= 0;
+        final boolean left = (rectB.getX2() - rectA.getX1()) <= 0;
+        final boolean bottom = (rectA.getY2() - rectB.getY1()) <= 0;
+        final boolean right = (rectA.getX2() - rectB.getX1()) <= 0;
+        final boolean top = (rectB.getY2() - rectA.getY1()) <= 0;
         
         // True if two rects "see" each other vertically, above or under
-        boolean vpIntersect = (rectA.getX1() <= rectB.getX2() && rectB.getX1() <= rectA.getX2());
+        final boolean vpIntersect = (rectA.getX1() <= rectB.getX2() && rectB.getX1() <= rectA.getX2());
         // True if two rects "see" each other horizontally, right or left
-        boolean hpIntersect = (rectA.getY1() <= rectB.getY2() && rectB.getY1() <= rectA.getY2());
-        boolean rectIntersect = vpIntersect && hpIntersect;
+        final boolean hpIntersect = (rectA.getY1() <= rectB.getY2() && rectB.getY1() <= rectA.getY2());
+        final boolean rectIntersect = vpIntersect && hpIntersect;
         
         if (rectIntersect)
             return 0;
@@ -276,6 +278,11 @@ public class RelationAnalyzerKNN extends AreaSetRelationAnalyzer
             return Double.POSITIVE_INFINITY;
     }
 
+    /**
+     * Sorts the indices based on the given list of double values.
+     * @param list list of double values to sort indices by.
+     * @return sorted list of indices.
+     */
     private List<Integer> sortIndices(List<Double> list)
     {
         List<Integer> indices = new ArrayList<>();
@@ -287,14 +294,101 @@ public class RelationAnalyzerKNN extends AreaSetRelationAnalyzer
         return indices;
     }
 
-    private boolean containsEdge(List<int[]> edges, int[] edge)
+    /**
+     * The edge is represented as a pair of node indices.
+     * 
+     * @author burgetr
+     */
+    public static class Edge
     {
-        for (int[] e : edges)
+        private final int node1;
+        private final int node2;
+        private final double dist;
+        
+        public Edge(int node1, int node2, double dist)
         {
-            if (Arrays.equals(e, edge))
-                return true;
+            this.node1 = node1;
+            this.node2 = node2;
+            this.dist = dist;
         }
-        return false;
-    }    
+        
+        public int getStart()
+        {
+            return node1;
+        }
+
+        public int getEnd()
+        {
+            return node2;
+        }
+        
+        public double getDistance()
+        {
+            return dist;
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (this == obj)
+                return true;
+            if (obj == null || getClass()!= obj.getClass())
+                return false;
+            Edge other = (Edge) obj;
+            return node1 == other.node1 && node2 == other.node2;
+        }
+        
+        @Override
+        public int hashCode()
+        {
+            return Objects.hash(node1, node2);
+        }
+        
+        @Override
+        public String toString()
+        {
+            return "(" + node1 + ", " + node2 + ")";
+        }
+    }
+    
+    /**
+     * A projection of the 2D space onto a 1D axis. It's an efficient version of list of indices
+     * where empty lists are represented by nulls.
+     * 
+     * @author burgetr
+     */
+    public static class Projections extends ArrayList<List<Integer>>
+    {
+        private static final long serialVersionUID = 1L;
+
+        public Projections(int size)
+        {
+            super(size);
+            for (int i = 0; i < size; i++)
+                add(null);
+        }
+        
+        public void addIndex(int index, int value)
+        {
+            List<Integer> list = super.get(index);
+            if (list == null)
+            {
+                list = new ArrayList<>();
+                set(index, list);
+            }
+            list.add(value);
+        }
+        
+        @Override
+        public List<Integer> get(int index)
+        {
+            final List<Integer> ret = super.get(index);
+            if (ret == null)
+                return Collections.emptyList();
+            else
+                return ret;
+        }
+        
+    }
     
 }

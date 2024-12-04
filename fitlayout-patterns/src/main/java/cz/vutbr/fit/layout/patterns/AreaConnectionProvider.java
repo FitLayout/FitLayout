@@ -82,7 +82,7 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
         ret.add(new ParameterFloat("minRelationWeight", 
                 "Minimal required weight of extracted relations", -1000.0f, 1000.0f));
         ret.add(new ParameterString("method", 
-                "Used analysis method {symmetric, aligned}", 1, 32));
+                "Used analysis method {symmetric, aligned, knn, visibility}", 1, 32));
         return ret;
     }
 
@@ -139,8 +139,10 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
                 return extractConnectionsAligned(input, page);
             case "knn":
                 return extractConnectionsKNN(input, page);
+            case "visibility":
+                return extractConnectionsVisibility(input, page);
             default:
-                throw new ServiceException("Unsupported analysis method, use {symmetric, aligned, knn}");
+                throw new ServiceException("Unsupported analysis method, use {symmetric, aligned, knn, visibility}");
         }
     }
     
@@ -169,6 +171,17 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
         findLeafAreas(input.getRoot(), leafAreas);
         
         RelationAnalyzerKNN ra = new RelationAnalyzerKNN(page, leafAreas);
+        ra.setMinRelationWeight(minRelationWeight);
+        ra.extractConnections();
+        return ra.getConnections();
+    }
+    
+    public Collection<AreaConnection> extractConnectionsVisibility(AreaTree input, Page page)
+    {
+        List<ContentRect> leafAreas = new ArrayList<>();
+        findLeafAreas(input.getRoot(), leafAreas);
+        
+        RelationAnalyzerVisibility ra = new RelationAnalyzerVisibility(page, leafAreas);
         ra.setMinRelationWeight(minRelationWeight);
         ra.extractConnections();
         return ra.getConnections();

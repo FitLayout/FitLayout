@@ -19,6 +19,7 @@ import cz.vutbr.fit.layout.impl.BaseArtifactService;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Artifact;
+import cz.vutbr.fit.layout.ontology.FL;
 import cz.vutbr.fit.layout.ontology.SEGM;
 import cz.vutbr.fit.layout.rdf.RDFArtifactRepository;
 import cz.vutbr.fit.layout.rdf.model.RDFArea;
@@ -89,6 +90,8 @@ public class CompleteTextProvider extends BaseArtifactService
                 // create a new model with the text content triples
                 Model model = (new DynamicModelFactory()).createEmptyModel();
                 recursiveAddText(((AreaTree) input).getRoot(), model);
+                // insert the processedBy statement
+                model.add(input.getIri(), FL.processedBy, Values.literal(getId()));
                 // store the model in the context
                 var storage = ((RDFArtifactRepository) repo).getStorage();
                 storage.insertGraph(model, input.getIri());

@@ -16,6 +16,7 @@ import org.eclipse.rdf4j.model.IRI;
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.ParameterFloat;
+import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.impl.ParameterString;
 import cz.vutbr.fit.layout.model.AreaConnection;
 import cz.vutbr.fit.layout.model.Artifact;
@@ -32,6 +33,9 @@ public class TextChunkConnectionProvider extends ConnectionSetArtifactService
 {
     private float minRelationWeight = 0.1f;
     private String method = "symmetric";
+    
+    private int maxDistance = 500;
+    private int k = 5;
     
 
     public TextChunkConnectionProvider()
@@ -56,6 +60,26 @@ public class TextChunkConnectionProvider extends ConnectionSetArtifactService
     public void setMethod(String method)
     {
         this.method = method;
+    }
+
+    public int getMaxDistance()
+    {
+        return maxDistance;
+    }
+
+    public void setMaxDistance(int maxDistance)
+    {
+        this.maxDistance = maxDistance;
+    }
+
+    public int getK()
+    {
+        return k;
+    }
+
+    public void setK(int k)
+    {
+        this.k = k;
     }
 
     @Override
@@ -83,7 +107,11 @@ public class TextChunkConnectionProvider extends ConnectionSetArtifactService
         ret.add(new ParameterFloat("minRelationWeight", 
                 "Minimal required weight of extracted relations", -1000.0f, 1000.0f));
         ret.add(new ParameterString("method", 
-                "Used analysis method {symmetric, aligned}", 1, 32));
+                "Used analysis method {symmetric, aligned, knn, visibility}", 1, 32));
+        ret.add(new ParameterInt("maxDistance",
+                "Maximum distance for area connections", 1, 10000));
+        ret.add(new ParameterInt("k",
+                "The K parameter for KNN", 1, 50));
         return ret;
     }
 
@@ -140,8 +168,10 @@ public class TextChunkConnectionProvider extends ConnectionSetArtifactService
                 return extractConnectionsAligned(input, page);
             case "knn":
                 return extractConnectionsKNN(input, page);
+            case "visibility":
+                return extractConnectionsVisibility(input, page);
             default:
-                throw new ServiceException("Unsupported analysis method, use {symmetric, aligned, knn}");
+                throw new ServiceException("Unsupported analysis method, use {symmetric, aligned, knn, visibility}");
         }
     }
     
@@ -164,8 +194,20 @@ public class TextChunkConnectionProvider extends ConnectionSetArtifactService
     public Collection<AreaConnection> extractConnectionsKNN(ChunkSet input, Page page)
     {
         Set<ContentRect> chunks = new HashSet<>(input.getTextChunks());
-        AreaSetRelationAnalyzer ra = new RelationAnalyzerKNN(page, chunks);
+        RelationAnalyzerKNN ra = new RelationAnalyzerKNN(page, chunks);
         ra.setMinRelationWeight(minRelationWeight);
+        ra.setK(k);
+        ra.setMaxDistance(maxDistance);
+        ra.extractConnections();
+        return ra.getConnections();
+    }
+
+    public Collection<AreaConnection> extractConnectionsVisibility(ChunkSet input, Page page)
+    {
+        Set<ContentRect> chunks = new HashSet<>(input.getTextChunks());
+        RelationAnalyzerVisibility ra = new RelationAnalyzerVisibility(page, chunks);
+        ra.setMinRelationWeight(minRelationWeight);
+        ra.setMaxDistance(maxDistance);
         ra.extractConnections();
         return ra.getConnections();
     }

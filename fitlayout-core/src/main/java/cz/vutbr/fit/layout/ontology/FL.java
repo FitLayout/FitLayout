@@ -109,6 +109,18 @@ public class FL {
 	public static final IRI paramValue;
 
 	/**
+	 * processedBy
+	 * <p>
+	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#processedBy}.
+	 * <p>
+	 * An identification of the service that (post-)processed the artifact.
+	 * This is used to track the processing steps applied on the artifact.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/fitlayout.owl#processedBy">processedBy</a>
+	 */
+	public static final IRI processedBy;
+
+	/**
 	 * SavedQuery
 	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/fitlayout.owl#SavedQuery}.
@@ -152,6 +164,7 @@ public class FL {
 		param = factory.createIRI(FL.NAMESPACE, "param");
 		paramName = factory.createIRI(FL.NAMESPACE, "paramName");
 		paramValue = factory.createIRI(FL.NAMESPACE, "paramValue");
+		processedBy = factory.createIRI(FL.NAMESPACE, "processedBy");
 		SavedQuery = factory.createIRI(FL.NAMESPACE, "SavedQuery");
 		service = factory.createIRI(FL.NAMESPACE, "service");
 		Tagger = factory.createIRI(FL.NAMESPACE, "Tagger");

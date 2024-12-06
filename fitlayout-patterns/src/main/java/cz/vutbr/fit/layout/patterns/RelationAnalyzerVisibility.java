@@ -187,17 +187,21 @@ public class RelationAnalyzerVisibility extends AreaSetRelationAnalyzer
                 if (pos == 0)
                 { // top
                     vEdges.add(edge);
+                    vEdges.add(reverseEdge);
                 }
                 else if (pos == 3)
                 { // left
                     hEdges.add(edge);
+                    hEdges.add(reverseEdge);
                 }
                 else if (pos == 2)
                 { // bottom
+                    vEdges.add(edge);
                     vEdges.add(reverseEdge);
                 }
                 else if (pos == 1)
                 { // right
+                    hEdges.add(edge);
                     hEdges.add(reverseEdge);
                 }
             }
@@ -217,8 +221,7 @@ public class RelationAnalyzerVisibility extends AreaSetRelationAnalyzer
             {
                 Point h1 = getCenter(bboxes.get(h.getStart()));
                 Point h2 = getCenter(bboxes.get(h.getEnd()));
-                if (!v1.equals(h2) && !v1.equals(h2)
-                        && intersect(v1, v2, h1, h2))
+                if (!v1.equals(h2) && !v2.equals(h1) && intersect(v1, v2, h1, h2))
                 {
                     edgesToRemove.add(v);
                     break;

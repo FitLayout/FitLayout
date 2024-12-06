@@ -14,6 +14,7 @@ import org.eclipse.rdf4j.model.IRI;
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
 import cz.vutbr.fit.layout.impl.ParameterFloat;
+import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.impl.ParameterString;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaConnection;
@@ -31,6 +32,9 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
 {
     private float minRelationWeight = 0.1f;
     private String method = "symmetric";
+    
+    private int maxDistance = 500;
+    private int k = 5;
     
 
     public AreaConnectionProvider()
@@ -55,6 +59,26 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
     public void setMethod(String method)
     {
         this.method = method;
+    }
+
+    public int getMaxDistance()
+    {
+        return maxDistance;
+    }
+
+    public void setMaxDistance(int maxDistance)
+    {
+        this.maxDistance = maxDistance;
+    }
+
+    public int getK()
+    {
+        return k;
+    }
+
+    public void setK(int k)
+    {
+        this.k = k;
     }
 
     @Override
@@ -83,6 +107,10 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
                 "Minimal required weight of extracted relations", -1000.0f, 1000.0f));
         ret.add(new ParameterString("method", 
                 "Used analysis method {symmetric, aligned, knn, visibility}", 1, 32));
+        ret.add(new ParameterInt("maxDistance",
+                "Maximum distance for area connections", 1, 10000));
+        ret.add(new ParameterInt("k",
+                "The K parameter for KNN", 1, 50));
         return ret;
     }
 
@@ -172,6 +200,8 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
         
         RelationAnalyzerKNN ra = new RelationAnalyzerKNN(page, leafAreas);
         ra.setMinRelationWeight(minRelationWeight);
+        ra.setK(k);
+        ra.setMaxDistance(maxDistance);
         ra.extractConnections();
         return ra.getConnections();
     }
@@ -183,6 +213,7 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
         
         RelationAnalyzerVisibility ra = new RelationAnalyzerVisibility(page, leafAreas);
         ra.setMinRelationWeight(minRelationWeight);
+        ra.setMaxDistance(maxDistance);
         ra.extractConnections();
         return ra.getConnections();
     }

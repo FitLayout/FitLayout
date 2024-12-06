@@ -33,7 +33,7 @@ public class RelationAnalyzerKNN extends AreaSetRelationAnalyzer
 {
     private static final List<Relation> ANALYZED_RELATIONS = List.of(Relations.HASNEIGHBOR);
 
-    private int k = 10; // number of nearest neighbors to consider
+    private int k = 5; // number of nearest neighbors to consider
     private int maxDistance = 500; // maximum distance to consider (in pixels)
     
     private List<ContentRect> bboxes;
@@ -54,6 +54,16 @@ public class RelationAnalyzerKNN extends AreaSetRelationAnalyzer
     public void setK(int k)
     {
         this.k = k;
+    }
+
+    public int getMaxDistance()
+    {
+        return maxDistance;
+    }
+
+    public void setMaxDistance(int maxDistance)
+    {
+        this.maxDistance = maxDistance;
     }
 
     @Override

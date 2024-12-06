@@ -28,7 +28,13 @@ import cz.vutbr.fit.layout.model.Relation;
  */
 public class RelationAnalyzerVisibility extends AreaSetRelationAnalyzer
 {
-    private static final List<Relation> ANALYZED_RELATIONS = List.of(Relations.HASNEIGHBOR);
+    private static final List<Relation> ANALYZED_RELATIONS =
+            List.of(Relations.RIGHTOF, Relations.LEFTOF, Relations.ABOVE, Relations.BELOW);
+    
+    private static final int DIR_TOP = 0;
+    private static final int DIR_RIGHT = 1;
+    private static final int DIR_BOTTOM = 2;
+    private static final int DIR_LEFT = 3;
 
     private int maxDistance = 500; // maximum distance to consider (in pixels)
     
@@ -97,7 +103,8 @@ public class RelationAnalyzerVisibility extends AreaSetRelationAnalyzer
         for (Edge edge : edges)
         {
             final float weight = (float) edge.getDistance();
-            connections.add(new AreaConnection(bboxes.get(edge.getStart()), bboxes.get(edge.getEnd()), Relations.HASNEIGHBOR, weight));
+            final Relation rel = directionRelation(edge.getDirection());
+            connections.add(new AreaConnection(bboxes.get(edge.getStart()), bboxes.get(edge.getEnd()), rel, weight));
         }
     }    
     
@@ -182,25 +189,25 @@ public class RelationAnalyzerVisibility extends AreaSetRelationAnalyzer
             NeigborNode v = visibilityList.get(pos);
             if (nodeIndex != v.getIndex())
             {
-                Edge edge = new Edge(nodeIndex, v.getIndex(), v.getDist());
-                Edge reverseEdge = new Edge(v.getIndex(), nodeIndex, v.getDist());
-                if (pos == 0)
-                { // top
+                Edge edge = new Edge(nodeIndex, v.getIndex(), v.getDist(), pos);
+                Edge reverseEdge = new Edge(v.getIndex(), nodeIndex, v.getDist(), opposite(pos));
+                if (pos == DIR_TOP)
+                {
                     vEdges.add(edge);
                     vEdges.add(reverseEdge);
                 }
-                else if (pos == 3)
-                { // left
+                else if (pos == DIR_LEFT)
+                {
                     hEdges.add(edge);
                     hEdges.add(reverseEdge);
                 }
-                else if (pos == 2)
-                { // bottom
+                else if (pos == DIR_BOTTOM)
+                {
                     vEdges.add(edge);
                     vEdges.add(reverseEdge);
                 }
-                else if (pos == 1)
-                { // right
+                else if (pos == DIR_RIGHT)
+                {
                     hEdges.add(edge);
                     hEdges.add(reverseEdge);
                 }
@@ -251,6 +258,28 @@ public class RelationAnalyzerVisibility extends AreaSetRelationAnalyzer
         return ccw(A, C, D) != ccw(B, C, D) && ccw(A, B, C) != ccw(A, B, D);
     }
 
+    private static int opposite(int direction)
+    {
+        return (direction + 2) % 4;
+    }
+    
+    private static Relation directionRelation(int direction)
+    {
+        switch (direction)
+        {
+            case DIR_TOP:
+                return Relations.BELOW;
+            case DIR_LEFT:
+                return Relations.RIGHTOF;
+            case DIR_BOTTOM:
+                return Relations.ABOVE;
+            case DIR_RIGHT:
+                return Relations.LEFTOF;
+            default:
+                return null;
+        }
+    }
+    
     private static class NeigborNode
     {
         private int index;
@@ -283,12 +312,14 @@ public class RelationAnalyzerVisibility extends AreaSetRelationAnalyzer
         private final int node1;
         private final int node2;
         private final double dist;
+        private int direction;
         
-        public Edge(int node1, int node2, double dist)
+        public Edge(int node1, int node2, double dist, int direction)
         {
             this.node1 = node1;
             this.node2 = node2;
             this.dist = dist;
+            this.direction = direction;
         }
         
         public int getStart()
@@ -304,6 +335,11 @@ public class RelationAnalyzerVisibility extends AreaSetRelationAnalyzer
         public double getDistance()
         {
             return dist;
+        }
+
+        public int getDirection()
+        {
+            return direction;
         }
 
         @Override

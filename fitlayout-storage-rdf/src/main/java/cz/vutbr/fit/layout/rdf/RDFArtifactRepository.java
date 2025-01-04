@@ -426,6 +426,14 @@ public class RDFArtifactRepository implements ArtifactRepository
     }
 
     @Override
+    public void setSeqValue(int seqValue)
+    {
+        if (isReadOnly())
+            throw new StorageException("Read-only repository");
+        storage.setSequenceValue(iriFactory.createSequenceURI("page"), seqValue);
+    }
+
+    @Override
     public void clear()
     {
         if (isReadOnly())

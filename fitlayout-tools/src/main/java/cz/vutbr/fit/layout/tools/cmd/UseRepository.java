@@ -42,6 +42,9 @@ public class UseRepository extends CliCommand implements Callable<Integer>
     @Option(order = 3, names = {"-s", "--suffix"}, description = "Repository path suffix to be used with the local repository (to distinguish multiple local repositories)")
     protected String pathSuffix;
     
+    @Option(order = 4, names = {"-S", "--seq"}, description = "Sequence number for the repository; if set, new artifacts will be created with the given sequence number")
+    protected Integer sequence;
+    
     @Parameters(arity = "1", index = "0", description = "Repository type: ${COMPLETION-CANDIDATES}")
     protected RepositoryType repositoryType;
 
@@ -76,6 +79,11 @@ public class UseRepository extends CliCommand implements Callable<Integer>
                 else
                 {
                     repo = createArtifactRepository();
+                    if (sequence != null)
+                    {
+                        repo.setSeqValue(sequence);
+                        System.err.println("ID sequence set to " + sequence);
+                    }
                     if (alias != null)
                     {
                         System.err.println("  alias " + alias);

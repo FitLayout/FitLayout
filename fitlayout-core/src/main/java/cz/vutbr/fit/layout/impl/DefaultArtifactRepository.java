@@ -133,6 +133,12 @@ public class DefaultArtifactRepository implements ArtifactRepository
     }
 
     @Override
+    public void setSeqValue(int seqValue)
+    {
+        idCounter = seqValue;
+    }
+
+    @Override
     public void disconnect()
     {
     }

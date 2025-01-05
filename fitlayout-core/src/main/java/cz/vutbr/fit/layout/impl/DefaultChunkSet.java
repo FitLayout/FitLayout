@@ -134,4 +134,10 @@ public class DefaultChunkSet extends BaseArtifact implements ChunkSet
         return chunk;
     }
 
+    @Override
+    public String toString()
+    {
+        return "ChunkSet [" + getIri() + "]";
+    }
+
 }

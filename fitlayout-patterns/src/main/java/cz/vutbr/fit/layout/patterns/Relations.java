@@ -28,4 +28,5 @@ public class Relations
     
     // generic relations
     public static final Relation HASNEIGHBOR = new DefaultRelation("hasNeighbor");
+    public static final Relation HASCONT = new DefaultRelation("hasCont");
 }

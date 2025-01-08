@@ -15,6 +15,7 @@ import cz.vutbr.fit.layout.map.chunks.MetadataTextChunksProvider;
 import cz.vutbr.fit.layout.map.op.TagByExamplesOperator;
 import cz.vutbr.fit.layout.patterns.AreaConnectionProvider;
 import cz.vutbr.fit.layout.patterns.TextChunkConnectionProvider;
+import cz.vutbr.fit.layout.patterns.TextChunkDOMLinkProvider;
 import cz.vutbr.fit.layout.pdf.PDFBoxTreeProvider;
 import cz.vutbr.fit.layout.playwright.PlaywrightTreeProvider;
 import cz.vutbr.fit.layout.provider.OperatorWrapperProvider;
@@ -126,6 +127,7 @@ public class FLConfig
         //patterns
         sm.addArtifactService(new AreaConnectionProvider());
         sm.addArtifactService(new TextChunkConnectionProvider());
+        sm.addArtifactService(new TextChunkDOMLinkProvider());
         
         //complete text extension
         sm.addArtifactService(new CompleteTextProvider());

@@ -19,6 +19,7 @@ import cz.vutbr.fit.layout.ontology.BOX;
 import cz.vutbr.fit.layout.ontology.FL;
 import cz.vutbr.fit.layout.ontology.FLFN;
 import cz.vutbr.fit.layout.ontology.MAPPING;
+import cz.vutbr.fit.layout.ontology.RESOURCE;
 import cz.vutbr.fit.layout.ontology.SEGM;
 
 
@@ -49,6 +50,7 @@ public class DefaultIRIDecoder implements IRIDecoder
         addPrefix("map", MAPPING.NAMESPACE);
         addPrefix("fl", FL.NAMESPACE);
         addPrefix("flfn", FLFN.NAMESPACE);
+        addPrefix("r", RESOURCE.NAMESPACE);
     }
     
     /**

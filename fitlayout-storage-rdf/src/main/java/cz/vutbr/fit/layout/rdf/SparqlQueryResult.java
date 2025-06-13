@@ -20,20 +20,20 @@ public class SparqlQueryResult
 {
     public enum Type { TUPLE, GRAPH, BOOLEAN };
     
-    private List<BindingSet> tupleResult;
+    private TupleResult tupleResult;
     private List<Statement> graphResult;
     private boolean booleanResult;
     private Type type;
     
     /**
      * Creates a tuple query result from a list of bindings.
-     * @param tupleResult the bindings
+     * @param tuples the bindings
      * @return the new query result
      */
-    public static SparqlQueryResult createTuple(List<BindingSet> tupleResult)
+    public static SparqlQueryResult createTuple(List<String> bindingNames, List<BindingSet> tuples)
     {
         SparqlQueryResult ret = new SparqlQueryResult();
-        ret.tupleResult = tupleResult;
+        ret.tupleResult = new TupleResult(bindingNames, tuples);
         ret.type = Type.TUPLE;
         return ret;
     }
@@ -77,7 +77,7 @@ public class SparqlQueryResult
      * Gets the tuple query result data - a list of variable bindings.
      * @return the list of bindings
      */
-    public List<BindingSet> getTupleResult()
+    public TupleResult getTupleResult()
     {
         return tupleResult;
     }
@@ -100,4 +100,40 @@ public class SparqlQueryResult
         return booleanResult;
     }
 
+    /**
+     * A result of a tuple query consisting of variable names and bindings.
+     * 
+     * @author burgetr
+     */
+    public static class TupleResult
+    {
+        private List<String> variableNames;
+        private List<BindingSet> tuples;
+        
+        public TupleResult(List<String> variableNames, List<BindingSet> tuples)
+        {
+            this.variableNames = variableNames;
+            this.tuples = tuples;
+        }
+
+        /**
+         * Gets the names of the variables in the result.
+         * 
+         * @return A list of variable names
+         */
+        public List<String> getVariableNames()
+        {
+            return variableNames;
+        }
+
+        /**
+         * Gets the bindings - the values of the variables in the result.
+         * @return A list of binding sets, where each set contains a binding for each variable
+         */
+        public List<BindingSet> getTuples()
+        {
+            return tuples;
+        }
+    }
+    
 }

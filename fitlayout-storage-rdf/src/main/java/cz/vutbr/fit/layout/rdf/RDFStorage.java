@@ -254,7 +254,7 @@ public class RDFStorage implements Closeable
      * @param limit the maximal number of bindings produced
      * @return A list of binding sets describing the statements (may be empty)
      */
-    public List<BindingSet> describeResource(Resource res, boolean isSubject, long limit)
+    public SparqlQueryResult.TupleResult describeResource(Resource res, boolean isSubject, long limit)
     {
         try (RepositoryConnection con = repo.getConnection()) {
             List<BindingSet> ret = new ArrayList<>();
@@ -270,7 +270,7 @@ public class RDFStorage implements Closeable
                         break;
                 }
             }
-            return ret;
+            return new SparqlQueryResult.TupleResult(List.of("p", "v"), ret);
         } catch (Exception e) {
             throw new StorageException(e);
         }
@@ -376,7 +376,7 @@ public class RDFStorage implements Closeable
      * @return a query result that holds the result type and data
      * @throws StorageException when the query could not be parsed or executed or is not a SELECT query.
      */
-    public List<BindingSet> executeSparqlTupleQuery(String queryString, boolean distinct, long limit, long offset) throws StorageException
+    public SparqlQueryResult.TupleResult executeSparqlTupleQuery(String queryString, boolean distinct, long limit, long offset) throws StorageException
     {
         try (RepositoryConnection con = repo.getConnection()) {
             TupleQuery query = con.prepareTupleQuery(queryString);
@@ -384,7 +384,7 @@ public class RDFStorage implements Closeable
             if (distinct)
                 result = QueryResults.distinctResults(result);
             result = QueryResults.limitResults(result, limit, offset);
-            return QueryResults.asList(result);
+            return new SparqlQueryResult.TupleResult(result.getBindingNames(), QueryResults.asList(result));
         } catch (Exception e) {
             throw new StorageException(e);
         }
@@ -410,7 +410,7 @@ public class RDFStorage implements Closeable
                 if (distinct)
                     result = QueryResults.distinctResults(result);
                 result = QueryResults.limitResults(result, limit, offset);
-                return SparqlQueryResult.createTuple(QueryResults.asList(result));
+                return SparqlQueryResult.createTuple(result.getBindingNames(), QueryResults.asList(result));
             }
             else if (query instanceof GraphQuery)
             {

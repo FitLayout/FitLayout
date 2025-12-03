@@ -72,7 +72,8 @@ public class WikiExampleSource {
                 + "  OPTIONAL { ?item rdfs:label ?lab_en  FILTER (lang(?lab_en)=\"en\") } "
                 + "  OPTIONAL { ?item rdfs:label ?lab_mul FILTER (lang(?lab_mul)=\"mul\") } "
                 + "  BIND( "
-                + "    COALESCE(?lab_cs, ?lab_en, ?lab_mul) AS ?label\n"
+                //+ "    COALESCE(?lab_cs, ?lab_en, ?lab_mul) AS ?label\n"
+                + "    COALESCE(?lab_en, ?lab_mul, ?lab_cs) AS ?label\n"
                 + "  ) "
                 + "} LIMIT " + MAX_RESULTS;
 
@@ -112,20 +113,27 @@ public class WikiExampleSource {
      * 
      * Q5: "human"
      * Q7725634: "literally work"
+     * Q11424: "film"
      * 
      * @param args Command line arguments. Expects one argument: the Wikidata class ID.
      */
     public static void main(String[] args) {
-        if (args.length != 1) {
+        /*if (args.length != 1) {
             System.out.println("Usage: java cz.vutbr.fit.extract.WikiExampleSource <WikiDataClassID>");
             System.out.println("Example: java cz.vutbr.fit.extract.WikiExampleSource Q5");
             return;
         }
-        String classId = args[0];
+        String classId = args[0];*/
+        
+        //String classId = "Q5";
+        //String classId = "Q7725634";
+        String classId = "Q11424";
+        
         WikiExampleSource exampleSource = new WikiExampleSource(classId);
         Set<String> forms = exampleSource.getSurfaceForms();
-        System.out.println("Surface forms for " + classId + ":");
+        /*System.out.println("Surface forms for " + classId + ":");
         forms.stream().limit(20).forEach(System.out::println);
-        System.out.println("... and " + (forms.size() - 20) + " more.");
+        System.out.println("... and " + (forms.size() - 20) + " more.");*/
+        forms.stream().map(String::trim).filter(s -> !s.isEmpty()).forEach(System.out::println);
     }
 }

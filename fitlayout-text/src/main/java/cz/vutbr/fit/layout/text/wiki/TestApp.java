@@ -21,8 +21,9 @@ public class TestApp
      */
     public static void main(String[] args)
     {
-        if (args.length >= 1) {
-            SSHClient client = new SSHClient(args[0], "~/tmp/embed/predict.sh");
+        String serverHostname = System.getProperty("fitlayout.embeddings.server");
+        if (serverHostname != null) {
+            SSHClient client = new SSHClient(serverHostname, "~/tmp/embed/predict.sh");
             try
             {
                 var ret = client.runQuery("Tom Jones");
@@ -33,7 +34,7 @@ public class TestApp
                 e.printStackTrace();
             }
         } else {
-            System.out.println("Usage: java TestApp <ssh_host>");
+            System.out.println("Please set 'fitlayout.embeddings.server' system property to run the example.");
         }
     }
 

@@ -32,10 +32,13 @@ public class RDFTaggerConfig implements TaggerConfig
     private static Logger log = LoggerFactory.getLogger(RDFTaggerConfig.class);
 
     private RDFArtifactRepository repo;
+    private Map<IRI, Tagger> taggerCache;
+    
     
     public RDFTaggerConfig(RDFArtifactRepository repo)
     {
         this.repo = repo;
+        this.taggerCache = new HashMap<>();
     }
 
     @Override
@@ -57,9 +60,24 @@ public class RDFTaggerConfig implements TaggerConfig
     {
         Value val = repo.getStorage().getPropertyValue(tag.getIri(), SEGM.tagger);
         if (val instanceof IRI)
-            return loadTagger((IRI) val);
+            return getTaggerForIri((IRI) val);
         else
             return null;
+    }
+    
+    protected Tagger getTaggerForIri(IRI iri)
+    {
+        if (taggerCache.containsKey(iri))
+        {
+            return taggerCache.get(iri);
+        }
+        else
+        {
+            Tagger tagger = loadTagger(iri);
+            if (tagger!= null)
+                taggerCache.put(iri, tagger);
+            return tagger;
+        }
     }
 
     // =============================================================================

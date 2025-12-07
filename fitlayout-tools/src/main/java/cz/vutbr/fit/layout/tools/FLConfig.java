@@ -100,7 +100,7 @@ public class FLConfig
             // configure text module using RDF taggers
             sm.addArtifactService(new TextChunksProvider(tc));
             TagEntitiesOperator tagOp = new TagEntitiesOperator();
-            tagOp.setTaggers(tc.getTaggers());
+            tagOp.setTaggerConfig(tc);
             addAreaTreeOperator(sm, tagOp);
         }
         

@@ -169,7 +169,8 @@ public class RDFStorage implements Closeable
     }
     
     /**
-     * Obtains the value of the given predicate for the given subject.
+     * Obtains the value of the given predicate for the given subject. If there are multiple triplets 
+     * with the same subject, predicate, and context, the first value found is returned.
      * @param subject the subject resource
      * @param predicate the predicate IRI
      * @return the resulting Value or {@code null} when there is no corresponding triplet available.
@@ -182,6 +183,28 @@ public class RDFStorage implements Closeable
             try (RepositoryResult<Statement> result = con.getStatements(subject, predicate, null, true)) {
                 if (result.hasNext())
                     ret = result.next().getObject();
+            }
+        } catch (Exception e) {
+            throw new StorageException(e);
+        }
+        return ret;
+    }
+    
+    /**
+     * Obtains the values of the given predicate for the given subject. If there are multiple triplets 
+     * with the same subject, predicate, and context, the values are returned in the order they appear in the repository.
+     * @param subject the subject resource
+     * @param predicate the predicate IRI
+     * @return a list of Values or an empty list when there are no corresponding triplets available.
+     * @throws StorageException
+     */
+    public List<Value> getPropertyValues(Resource subject, IRI predicate) throws StorageException
+    {
+        List<Value> ret = new ArrayList<>();
+        try (RepositoryConnection con = repo.getConnection()) {
+            try (RepositoryResult<Statement> result = con.getStatements(subject, predicate, null, true)) {
+                while (result.hasNext())
+                    ret.add(result.next().getObject());
             }
         } catch (Exception e) {
             throw new StorageException(e);

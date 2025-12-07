@@ -5,8 +5,10 @@
  */
 package cz.vutbr.fit.layout.rdf;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -80,6 +82,19 @@ public class RDFTaggerConfig implements TaggerConfig
         }
     }
 
+    @Override
+    public List<String> getDiscriminatorsForTag(Tag tag)
+    {
+        List<Value> vals = repo.getStorage().getPropertyValues(tag.getIri(), SEGM.discriminator);
+        List<String> ret = new ArrayList<>();
+        for (Value val : vals)
+        {
+            if (val.isLiteral())
+                ret.add(val.stringValue());
+        }
+        return ret;
+    }
+    
     // =============================================================================
     
     private Tagger loadTagger(IRI taggerIri)

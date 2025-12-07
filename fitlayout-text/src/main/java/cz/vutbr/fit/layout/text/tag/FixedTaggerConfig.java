@@ -6,6 +6,7 @@
 package cz.vutbr.fit.layout.text.tag;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import cz.vutbr.fit.layout.api.Tagger;
@@ -23,10 +24,12 @@ public class FixedTaggerConfig implements TaggerConfig
      * Assigns a tagger to each tag.
      */
     private Map<Tag, Tagger> taggers;
+    private Map<Tag, List<String>> discriminators;
 
     public FixedTaggerConfig()
     {
         taggers = new HashMap<>();
+        discriminators = new HashMap<>();
     }
     
     @Override
@@ -35,15 +38,32 @@ public class FixedTaggerConfig implements TaggerConfig
         return taggers;
     }
 
+    public Map<Tag, List<String>> getDiscriminators()
+    {
+        return discriminators;
+    }
+
     @Override
     public Tagger getTaggerForTag(Tag tag)
     {
         return taggers.get(tag);
     }
 
+    @Override
+    public List<String> getDiscriminatorsForTag(Tag tag)
+    {
+        var ret = discriminators.get(tag);
+        return ret == null ? List.of() : ret;
+    }
+
     public void setTagger(Tag tag, Tagger tagger)
     {
         taggers.put(tag, tagger);
+    }
+    
+    public void setDiscriminators(Tag tag, List<String> discriminators)
+    {
+        this.discriminators.put(tag, discriminators);
     }
     
 }

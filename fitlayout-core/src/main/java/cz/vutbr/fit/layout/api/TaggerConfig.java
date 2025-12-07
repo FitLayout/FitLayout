@@ -5,6 +5,7 @@
  */
 package cz.vutbr.fit.layout.api;
 
+import java.util.List;
 import java.util.Map;
 
 import cz.vutbr.fit.layout.model.Tag;
@@ -29,5 +30,13 @@ public interface TaggerConfig
      * @return The assigned tagger or {@code null} when no tagger is assigned.
      */
     public Tagger getTaggerForTag(Tag tag);
+    
+    /**
+     * Retrieves the discriminator for the given tag that allows to distinguish different 
+     * tags assigned by a single tagger.
+     * @param tag the given tag
+     * @return Discriminator values that correspond to the given tag. The list can be empty.
+     */
+    public List<String> getDiscriminatorsForTag(Tag tag);
     
 }

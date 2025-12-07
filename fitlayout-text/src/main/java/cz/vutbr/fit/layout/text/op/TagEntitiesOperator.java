@@ -8,10 +8,8 @@ package cz.vutbr.fit.layout.text.op;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -19,12 +17,14 @@ import org.slf4j.LoggerFactory;
 
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ScriptObject;
-import cz.vutbr.fit.layout.api.Tagger;
+import cz.vutbr.fit.layout.api.TaggerConfig;
 import cz.vutbr.fit.layout.impl.BaseOperator;
 import cz.vutbr.fit.layout.impl.ParameterBoolean;
 import cz.vutbr.fit.layout.model.Area;
 import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Tag;
+import cz.vutbr.fit.layout.text.tag.FilteredTaggerConfig;
+import cz.vutbr.fit.layout.text.tag.FixedTaggerConfig;
 import cz.vutbr.fit.layout.text.tag.TreeTagger;
 
 
@@ -39,16 +39,28 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
     private static Logger log = LoggerFactory.getLogger(TagEntitiesOperator.class);
 
     private TreeTagger tagger;
-    private Map<Tag, Tagger> usedTaggers;
+    private TaggerConfig taggerConfig;
     private Set<String> disabledTags;
 
     
     public TagEntitiesOperator()
     {
-        usedTaggers = new HashMap<>();
         disabledTags = new HashSet<>();
+        // Use an empty tagger config for start. This will be replaced with the actual tagger config
+        // using setTaggerConfig().
+        taggerConfig = new FixedTaggerConfig(); 
     }
     
+    public TaggerConfig getTaggerConfig()
+    {
+        return taggerConfig;
+    }
+
+    public void setTaggerConfig(TaggerConfig taggerConfig)
+    {
+        this.taggerConfig = taggerConfig;
+    }
+
     @Override
     public String getId()
     {
@@ -77,7 +89,7 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
     @Override
     public List<Parameter> defineParams()
     {
-        final var definedTags = usedTaggers.keySet();
+        final var definedTags = taggerConfig.getTaggers().keySet();
         List<Parameter> ret = new ArrayList<>(definedTags.size());
         for (Tag tag : definedTags)
         {
@@ -113,33 +125,6 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
             return false;
     }
 
-    /**
-     * Registers a new tagger that should be used by this operator for assigning a tag.
-     * @param tag the tag to be assigned
-     * @param tagger the tagger instance to be added
-     */
-    public void addTagger(Tag tag, Tagger tagger)
-    {
-        usedTaggers.put(tag, tagger);
-    }
-    
-    /**
-     * Registers a map of taggers that should be used by this operator.
-     * @param taggers the map of taggers to be used for assigning the tags
-     */
-    public void setTaggers(Map<Tag, Tagger> taggers)
-    {
-        usedTaggers = taggers;
-    }
-    
-    /**
-     * Unregisters all taggers from the operator.
-     */
-    public void clearTaggers()
-    {
-        usedTaggers.clear();
-    }
-    
     //==============================================================================
 
     @Override
@@ -151,18 +136,12 @@ public class TagEntitiesOperator extends BaseOperator implements ScriptObject
     @Override
     public void apply(AreaTree atree, Area root)
     {
+        var usedTaggers = taggerConfig.getTaggers();
         if (usedTaggers.isEmpty())
             log.warn("Applying TagEntitiesOperator with no taggers configured");
-        // collect enabled taggers
-        Map<Tag, Tagger> activeTaggers = new HashMap<>();
-        for (var entry : usedTaggers.entrySet())
-        {
-            final String tagName = entry.getKey().getName();
-            if (!disabledTags.contains(tagName))
-                activeTaggers.put(entry.getKey(), entry.getValue());
-        }
+        TaggerConfig filteredConfig = new FilteredTaggerConfig(taggerConfig, disabledTags);
         // perform tagging
-        tagger = new TreeTagger(root, activeTaggers);
+        tagger = new TreeTagger(root, filteredConfig);
         tagger.tagTree();
     }
 

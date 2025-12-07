@@ -107,6 +107,18 @@ public class SEGM {
 	public static final IRI containsBox;
 
 	/**
+	 * discriminator
+	 * <p>
+	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#discriminator}.
+	 * <p>
+	 * Adds a string discriminator to the given tag. It may be used to
+	 * distinguish the tags when a single tagger assigns multiple tags.
+	 *
+	 * @see <a href="http://fitlayout.github.io/ontology/segmentation.owl#discriminator">discriminator</a>
+	 */
+	public static final IRI discriminator;
+
+	/**
 	 * hasAreaTree
 	 * <p>
 	 * {@code http://fitlayout.github.io/ontology/segmentation.owl#hasAreaTree}.
@@ -332,6 +344,7 @@ public class SEGM {
 		ChunkSet = factory.createIRI(SEGM.NAMESPACE, "ChunkSet");
 		containsArea = factory.createIRI(SEGM.NAMESPACE, "containsArea");
 		containsBox = factory.createIRI(SEGM.NAMESPACE, "containsBox");
+		discriminator = factory.createIRI(SEGM.NAMESPACE, "discriminator");
 		hasAreaTree = factory.createIRI(SEGM.NAMESPACE, "hasAreaTree");
 		hasRelatedRect = factory.createIRI(SEGM.NAMESPACE, "hasRelatedRect");
 		hasRelationType = factory.createIRI(SEGM.NAMESPACE, "hasRelationType");

@@ -9,6 +9,8 @@ import java.io.IOException;
 
 import com.google.gson.JsonSyntaxException;
 
+import cz.vutbr.fit.layout.text.taggers.EmbeddingTagger;
+
 /**
  * 
  * @author burgetr
@@ -21,9 +23,10 @@ public class TestApp
      */
     public static void main(String[] args)
     {
-        String serverHostname = System.getProperty("fitlayout.embeddings.server");
-        if (serverHostname != null) {
-            SSHClient client = new SSHClient(serverHostname, "~/tmp/embed/predict.sh");
+        String sshHost = System.getProperty(EmbeddingTagger.SSH_HOST_PROPERTY);
+        String sshScriptPath = System.getProperty(EmbeddingTagger.SSH_SCRIPT_PATH_PROPERTY);
+        if (sshHost != null && sshScriptPath != null) {
+            SSHClient client = new SSHClient(sshHost, sshScriptPath);
             try
             {
                 var ret = client.runQuery("Tom Jones");
@@ -34,7 +37,8 @@ public class TestApp
                 e.printStackTrace();
             }
         } else {
-            System.out.println("Please set 'fitlayout.embeddings.server' system property to run the example.");
+            System.out.println("Please set the " + EmbeddingTagger.SSH_HOST_PROPERTY + " and " + EmbeddingTagger.SSH_SCRIPT_PATH_PROPERTY
+                    + " system properties properly.");
         }
     }
 

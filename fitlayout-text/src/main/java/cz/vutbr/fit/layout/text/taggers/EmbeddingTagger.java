@@ -34,6 +34,9 @@ import cz.vutbr.fit.layout.text.wiki.SSHClient;
 public class EmbeddingTagger extends BaseTagger implements MultiTagger
 {
     private static Logger log = LoggerFactory.getLogger(EmbeddingTagger.class);
+    
+    public static final String SSH_HOST_PROPERTY = "fitlayout.embeddings.sshHost";
+    public static final String SSH_SCRIPT_PATH_PROPERTY = "fitlayout.embeddings.sshScriptPath";
             
     private int minLength = 3;
     private int maxLength = 50;
@@ -48,11 +51,12 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
     public EmbeddingTagger()
     {
         concat = new TextFlowConcatenator();
-        String sshHost = System.getProperty("fitlayout.embedding.sshHost");
-        if (sshHost != null)
-            sshClient = new SSHClient(sshHost, "~/tmp/embed/predict.sh");
+        String sshHost = System.getProperty(SSH_HOST_PROPERTY);
+        String sshScriptPath = System.getProperty(SSH_SCRIPT_PATH_PROPERTY);
+        if (sshHost != null && sshScriptPath != null)
+            sshClient = new SSHClient(sshHost, sshScriptPath);
         else
-            log.error("Missing property fitlayout.embedding.sshHost, embedding tagger will not assign any tags");
+            log.error("The {} and {} properties are not set, embedding tagger will not assign any tags", SSH_HOST_PROPERTY, SSH_SCRIPT_PATH_PROPERTY);
     }
     
     public EmbeddingTagger(int minLength, int maxLength, float minScore)

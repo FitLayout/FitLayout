@@ -8,8 +8,10 @@ package cz.vutbr.fit.layout.text.tag;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,12 +37,15 @@ public class TreeTagger
     private TaggerConfig tc;
     private Map<Tag, Tagger> taggers;
     private Map<Tagger, List<Tag>> tagAssignment;
+    private Set<String> multiTaggers; // multi-tagger IDs
+    
     
     public TreeTagger(Area root, TaggerConfig tc)
     {
         this.root = root;
         this.tc = tc;
         this.taggers = tc.getTaggers();
+        checkMultiTaggers();
         // Group the assigned tags by taggers because some taggers may assign multiple tags
         this.tagAssignment = createTagAssignmentMap();
     }
@@ -83,16 +88,21 @@ public class TreeTagger
         {
             final Tagger t = entry.getKey();
             final List<Tag> tags = entry.getValue();
-            if (tags.size() == 1)
+            if (!multiTaggers.contains(t.getId()))
             {
-                // a single tag assigned by the tagger
+                // no discriminators, assign all tags (usually one)
                 float support = t.belongsTo(area);
                 if (support > MIN_SUPPORT)
-                    area.addTag(tags.get(0), support);
+                {
+                    for (Tag tag : tags)
+                    {
+                        area.addTag(tag, support);
+                    }
+                }
             }
             else
             {
-                // the tagger assigns multiple tags -- we need to use discriminators
+                // discriminators used - the tagger assigns multiple tags (must be a multi-tagger)
                 if (t instanceof MultiTagger)
                 {
                     MultiTagger mt = (MultiTagger) t;
@@ -100,24 +110,38 @@ public class TreeTagger
                     for (Tag tag : tags)
                     {
                         List<String> discrs = tc.getDiscriminatorsForTag(tag);
+                        float maxRelevance = 0.0f;
                         for (String d : discrs)
                         {
                             float relSupport = rel.getOrDefault(d, 0.0f);
-                            if (relSupport > MIN_SUPPORT)
-                                area.addTag(tag, relSupport);
+                            if (relSupport > maxRelevance)
+                                maxRelevance = relSupport;
                         }
+                        if (maxRelevance > MIN_SUPPORT)
+                            area.addTag(tag, maxRelevance);
                     }
                 }
             }
         }
-        
-        
-        for (Tag tag : taggers.keySet())
+    }
+    
+    /**
+     * Checks if the taggers that use discriminators are actually multi-taggers.
+     */
+    private void checkMultiTaggers()
+    {
+        multiTaggers = new HashSet<>();
+        for (Map.Entry<Tag, Tagger> entry : taggers.entrySet())
         {
-            final Tagger t = taggers.get(tag);
-            float support = t.belongsTo(area); 
-            if (support > MIN_SUPPORT)
-                area.addTag(tag, support);
+            Tag tag = entry.getKey();
+            Tagger tagger = entry.getValue();
+            if (!tc.getDiscriminatorsForTag(tag).isEmpty())
+            {
+                if (tagger instanceof MultiTagger)
+                    multiTaggers.add(tagger.getId());
+                else
+                    log.error("Tagger {} is used for tag {} with discriminators, but it is not a multi-tagger", tagger, tag);
+            }
         }
     }
     
@@ -126,13 +150,6 @@ public class TreeTagger
         Map<Tagger, List<Tag>> ret = new HashMap<>();
         for (Map.Entry<Tag, Tagger> entry : taggers.entrySet())
             ret.computeIfAbsent(entry.getValue(), k -> new ArrayList<>()).add(entry.getKey());
-        // check if the taggers used for multiple tags are actually multi-taggers
-        for (Map.Entry<Tagger, List<Tag>> entry : ret.entrySet())
-        {
-            Tagger t = entry.getKey();
-            if (entry.getValue().size() > 1 && !(t instanceof MultiTagger))
-                log.warn("Tagger {} is used for multiple tags, but it is not a multi-tagger", t);
-        }
         return ret;
     }
     

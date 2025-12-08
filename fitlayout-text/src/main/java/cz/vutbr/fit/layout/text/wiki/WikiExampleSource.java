@@ -125,9 +125,11 @@ public class WikiExampleSource {
         }
         String classId = args[0];*/
         
-        //String classId = "Q5";
-        //String classId = "Q7725634";
-        String classId = "Q11424";
+        //String classId = "Q5"; // human
+        //String classId = "Q7725634"; // literally work
+        //String classId = "Q11424"; // film
+        //String classId = "Q2424752"; // product
+        String classId = "Q47461344"; // written work
         
         WikiExampleSource exampleSource = new WikiExampleSource(classId);
         Set<String> forms = exampleSource.getSurfaceForms();

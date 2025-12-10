@@ -31,6 +31,18 @@ public abstract class BaseTagger extends BaseParametrizedOperation implements Ta
         return null;
     }
 
+    @Override
+    public void startSubtree(Area root)
+    {
+        // do nothing by default
+    }
+    
+    @Override
+    public void finishSubtree(Area root)
+    {
+        // do nothing by default
+    }
+    
     /**
      * Checks whether an area is homogeneous regarding the contents style and layout
      * so that it can be treated as an atomic entity for tagging.

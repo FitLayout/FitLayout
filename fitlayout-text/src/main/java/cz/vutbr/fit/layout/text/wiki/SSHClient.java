@@ -3,6 +3,8 @@ package cz.vutbr.fit.layout.text.wiki;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -76,6 +78,71 @@ public class SSHClient {
 
         Gson gson = new Gson();
         return gson.fromJson(jsonLine, JsonElement.class);
+    }
+    
+    public JsonElement runMultiQuery(List<PredictQuery> queries) throws IOException, InterruptedException, JsonSyntaxException
+    {
+        String cmd = scriptPath + " -"; // the script will read queries from stdin
+        String[] command = new String[]{"ssh", "-q", host, cmd};
+        ProcessBuilder pb = new ProcessBuilder(command);
+        Process process = pb.start();
+
+        // Serialize queries to JSON and write them to stdin
+        var out = new PrintWriter(process.getOutputStream());
+        out.println("{ \"examples\": [");
+        for (PredictQuery query : queries) {
+            out.println("{ \"id\": \"" + query.getId() + "\", \"query\": \"" + query.getQuery() + "\" }");
+        }
+        out.println("]}");
+        out.close();
+        
+        String jsonLine;
+        try (BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            jsonLine = stdout.readLine();
+        }
+
+        try (BufferedReader stderr = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+            String errorOutput = stderr.lines().collect(Collectors.joining("\n"));
+            if (!errorOutput.isEmpty()) {
+                log.error("SSH stderr: {}", errorOutput);
+            }
+        }
+
+        boolean finished = process.waitFor(120, TimeUnit.SECONDS);
+        if (!finished) {
+            log.warn("Process did not terminate in time, forcing shutdown.");
+            process.destroyForcibly();
+        }
+
+        if (jsonLine == null) {
+            throw new IOException("No output received from process.");
+        }
+
+        Gson gson = new Gson();
+        return gson.fromJson(jsonLine, JsonElement.class);
+        
+    }
+    
+    public static class PredictQuery
+    {
+        private String id;
+        private String query;
+        
+        public PredictQuery(String id, String query)
+        {
+            this.id = id;
+            this.query = query;
+        }
+        
+        public String getId()
+        {
+            return id;
+        }
+     
+        public String getQuery()
+        {
+            return query;
+        }
     }
 
 }

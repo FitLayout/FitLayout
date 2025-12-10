@@ -64,7 +64,16 @@ public class TreeTagger
      */
     public void tagTree()
     {
+        // start tagging for all taggers
+        for (Tagger t : tagAssignment.keySet())
+            t.startSubtree(root);
+        
+        // tag the whole tree
         tagSubtree(root);
+        
+        // finish tagging for all taggers
+        for (Tagger t : tagAssignment.keySet())
+            t.finishSubtree(root);
     }
 
     /**

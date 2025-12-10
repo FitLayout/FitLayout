@@ -134,6 +134,22 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
     //==========================================================================================
     
     @Override
+    public void startSubtree(Area root)
+    {
+        // TODO Auto-generated method stub
+        super.startSubtree(root);
+    }
+
+    @Override
+    public void finishSubtree(Area root)
+    {
+        // TODO Auto-generated method stub
+        super.finishSubtree(root);
+    }
+    
+    //==========================================================================================
+    
+    @Override
     public float belongsTo(Area node)
     {
         String text = getText(node);
@@ -211,6 +227,12 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
         }
     }
     
+    /**
+     * Obtains the scores for the text.
+     * @param text
+     * @param minScore
+     * @return
+     */
     protected Map<String, Float> getScores(String text, float minScore)
     {
         if (sshClient != null)
@@ -234,6 +256,19 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
         } else {
             return Collections.emptyMap();
         }
+    }
+    
+    protected void addPredictQueriesForSubtree(Area root, List<SSHClient.PredictQuery> dest)
+    {
+        String text = getText(root);
+        if (text.length() >= minLength && text.length() <= maxLength)
+        {
+            String id = String.valueOf(root.getId());
+            dest.add(new SSHClient.PredictQuery(id, text));
+        }
+        
+        for (Area child : root.getChildren())
+            addPredictQueriesForSubtree(child, dest);
     }
     
     protected String getText(Area node)

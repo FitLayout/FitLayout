@@ -19,6 +19,19 @@ import cz.vutbr.fit.layout.model.TagOccurrence;
  */
 public interface Tagger extends Service, ParametrizedOperation
 {
+    
+    /**
+     * Starts the tagging of a subtree. The tagger may initialize its internal data structures
+     * when necessary.
+     * @param root the subtree root node.
+     */
+    public void startSubtree(Area root);
+    
+    /**
+     * Finishes the tagging of a subtree. The tagger may free unneccessary resources.
+     * @param root the subtree root node.
+     */
+    public void finishSubtree(Area root);
 
     /**
      * Checks whether the area may be tagged with the tag. This method does not actually assign the tag to the area.

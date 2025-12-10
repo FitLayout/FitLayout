@@ -6,6 +6,7 @@
 package cz.vutbr.fit.layout.text.taggers;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,7 @@ import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.impl.ParameterFloat;
 import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.model.Area;
+import cz.vutbr.fit.layout.model.AreaTree;
 import cz.vutbr.fit.layout.model.Tag;
 import cz.vutbr.fit.layout.model.TagOccurrence;
 import cz.vutbr.fit.layout.text.TextFlowConcatenator;
@@ -44,12 +46,14 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
 
     /** The concatenator used for converting areas to text */
     private AreaConcatenator concat; 
-    
     private SSHClient sshClient;
+    /** A cache of relevances for each area tree and area ID */
+    private Map<AreaTree, Map<Integer, Map<String, Float>>> relevances;
     
 
     public EmbeddingTagger()
     {
+        relevances = new HashMap<>();
         concat = new TextFlowConcatenator();
         String sshHost = System.getProperty(SSH_HOST_PROPERTY);
         String sshScriptPath = System.getProperty(SSH_SCRIPT_PATH_PROPERTY);
@@ -136,15 +140,22 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
     @Override
     public void startSubtree(Area root)
     {
-        // TODO Auto-generated method stub
-        super.startSubtree(root);
+        if (root.getAreaTree() != null)
+        {
+            var subtreeRelevances = getRelevancesForSubtree(root);
+            relevances.put(root.getAreaTree(), subtreeRelevances);
+        }
+        else
+            log.error("Cannot assign tags to area without area tree: {}", root);
     }
 
     @Override
     public void finishSubtree(Area root)
     {
-        // TODO Auto-generated method stub
-        super.finishSubtree(root);
+        if (root.getAreaTree() != null)
+        {
+            relevances.remove(root.getAreaTree());
+        }
     }
     
     //==========================================================================================
@@ -155,10 +166,30 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
         String text = getText(node);
         if (text.length() >= minLength && text.length() <= maxLength)
         {
-            float score = getScore(text);
-            if (score >= minScore)
+            if (node.getAreaTree() == null)
             {
-                return score;
+                // no area tree -- classify the node separately (inefficient)
+                float score = getScore(text);
+                if (score >= minScore)
+                {
+                    return score;
+                }
+            }
+            else
+            {
+                var subtreeRelevances = relevances.get(node.getAreaTree());
+                if (subtreeRelevances != null)
+                {
+                    var areaRelevances = subtreeRelevances.get(node.getId());
+                    if (areaRelevances != null)
+                    {
+                        float max = 0.0f;
+                        for (var entry : areaRelevances.entrySet())
+                            max = Math.max(max, entry.getValue());
+                        return max;
+                    }
+                }
+                
             }
         }
         return 0.0f;
@@ -167,12 +198,30 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
     @Override
     public Map<String, Float> getRelevances(Area node)
     {
-        String text = getText(node);
+        final String text = getText(node);
         if (text.length() >= minLength && text.length() <= maxLength)
         {
-            return getScores(text, minScore);
+            if (node.getAreaTree() == null)
+            {
+                // no area tree -- classify the node separately (inefficient)
+                return getScores(text, minScore);
+            }
+            else
+            {
+                var subtreeRelevances = relevances.get(node.getAreaTree());
+                if (subtreeRelevances != null)
+                {
+                    var areaRelevances = subtreeRelevances.get(node.getId());
+                    if (areaRelevances != null)
+                        return areaRelevances;
+                }
+                return Collections.emptyMap();
+            }
         }
-        return Collections.emptyMap();
+        else
+        {
+            return Collections.emptyMap();
+        }
     }
 
     @Override
@@ -200,7 +249,7 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
     }
 
     /**
-     * Obtains the maximal score for the text.
+     * Obtains the maximal score for the text using the SSH client.
      * @param text
      * @return
      */
@@ -258,7 +307,43 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
         }
     }
     
-    protected void addPredictQueriesForSubtree(Area root, List<SSHClient.PredictQuery> dest)
+    protected Map<Integer, Map<String, Float>> getRelevancesForSubtree(Area root)
+    {
+        if (sshClient != null)
+        {
+            List<SSHClient.PredictQuery> queries = new ArrayList<>();
+            createPredictQueriesForSubtree(root, queries);
+            try {
+                var embedData = sshClient.runMultiQuery(queries);
+                Map<Integer, Map<String, Float>> ret = new HashMap<>();
+                var retList = embedData.getAsJsonArray();
+                for (var item : retList)
+                {
+                    final var itemObj = item.getAsJsonObject();
+                    String id = itemObj.get("id").getAsString();
+                    
+                    var scores = itemObj.get("scores");
+                    Map<String, Float> scoresMap = new HashMap<>();
+                    for (var entry : scores.getAsJsonObject().entrySet()) {
+                        String group = entry.getKey();
+                        float score = entry.getValue().getAsFloat();
+                        scoresMap.put(group, score);
+                    }
+                    ret.put(Integer.parseInt(id), scoresMap);
+                }
+                return ret;
+            } catch (JsonSyntaxException | IOException | InterruptedException e) {
+                log.error("Failed to run embedder query: {}", e.getMessage());
+                return Collections.emptyMap();
+            }
+        }
+        else
+        {
+            return Collections.emptyMap();
+        }
+    }
+    
+    protected void createPredictQueriesForSubtree(Area root, List<SSHClient.PredictQuery> dest)
     {
         String text = getText(root);
         if (text.length() >= minLength && text.length() <= maxLength)
@@ -268,7 +353,7 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
         }
         
         for (Area child : root.getChildren())
-            addPredictQueriesForSubtree(child, dest);
+            createPredictQueriesForSubtree(child, dest);
     }
     
     protected String getText(Area node)

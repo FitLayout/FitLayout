@@ -25,6 +25,9 @@ import com.google.gson.JsonSyntaxException;
 public class SSHClient {
     private static Logger log = LoggerFactory.getLogger(SSHClient.class);
 
+    private static final int SINGLE_QUERY_TIMEOUT = 15; // timeouts in seconds
+    private static final int BATCH_QUERY_TIMEOUT = 120;
+
     private String host;
     private String scriptPath;
     
@@ -66,7 +69,7 @@ public class SSHClient {
             }
         }
 
-        boolean finished = process.waitFor(15, TimeUnit.SECONDS);
+        boolean finished = process.waitFor(SINGLE_QUERY_TIMEOUT, TimeUnit.SECONDS);
         if (!finished) {
             log.warn("Process did not terminate in time, forcing shutdown.");
             process.destroyForcibly();
@@ -88,12 +91,10 @@ public class SSHClient {
         Process process = pb.start();
 
         // Serialize queries to JSON and write them to stdin
+        Gson gson = new Gson();
+
         var out = new PrintWriter(process.getOutputStream());
-        out.println("{ \"examples\": [");
-        for (PredictQuery query : queries) {
-            out.println("{ \"id\": \"" + query.getId() + "\", \"query\": \"" + query.getQuery() + "\" }");
-        }
-        out.println("]}");
+        out.println("{ \"examples\": " + gson.toJson(queries) + " }");
         out.close();
         
         String jsonLine;
@@ -108,7 +109,7 @@ public class SSHClient {
             }
         }
 
-        boolean finished = process.waitFor(120, TimeUnit.SECONDS);
+        boolean finished = process.waitFor(BATCH_QUERY_TIMEOUT, TimeUnit.SECONDS);
         if (!finished) {
             log.warn("Process did not terminate in time, forcing shutdown.");
             process.destroyForcibly();
@@ -118,7 +119,6 @@ public class SSHClient {
             throw new IOException("No output received from process.");
         }
 
-        Gson gson = new Gson();
         return gson.fromJson(jsonLine, JsonElement.class);
         
     }
@@ -126,12 +126,12 @@ public class SSHClient {
     public static class PredictQuery
     {
         private String id;
-        private String query;
+        private String text;
         
-        public PredictQuery(String id, String query)
+        public PredictQuery(String id, String text)
         {
             this.id = id;
-            this.query = query;
+            this.text = text;
         }
         
         public String getId()
@@ -139,9 +139,9 @@ public class SSHClient {
             return id;
         }
      
-        public String getQuery()
+        public String getText()
         {
-            return query;
+            return text;
         }
     }
 

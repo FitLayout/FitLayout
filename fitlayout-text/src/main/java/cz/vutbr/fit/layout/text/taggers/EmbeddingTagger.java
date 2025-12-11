@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,9 +172,7 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
                 // no area tree -- classify the node separately (inefficient)
                 float score = getScore(text);
                 if (score >= minScore)
-                {
                     return score;
-                }
             }
             else
             {
@@ -186,7 +185,8 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
                         float max = 0.0f;
                         for (var entry : areaRelevances.entrySet())
                             max = Math.max(max, entry.getValue());
-                        return max;
+                        if (max >= minScore)
+                            return max;
                     }
                 }
                 
@@ -213,7 +213,13 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
                 {
                     var areaRelevances = subtreeRelevances.get(node.getId());
                     if (areaRelevances != null)
-                        return areaRelevances;
+                    {
+                        // filter out results below the minimum score
+                        return areaRelevances.entrySet()
+                               .stream()
+                               .filter(entry -> entry.getValue() >= minScore)
+                               .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    }
                 }
                 return Collections.emptyMap();
             }

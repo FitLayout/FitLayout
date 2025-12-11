@@ -21,6 +21,7 @@ import com.google.gson.JsonSyntaxException;
 import cz.vutbr.fit.layout.api.AreaConcatenator;
 import cz.vutbr.fit.layout.api.MultiTagger;
 import cz.vutbr.fit.layout.api.Parameter;
+import cz.vutbr.fit.layout.impl.ParameterBoolean;
 import cz.vutbr.fit.layout.impl.ParameterFloat;
 import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.model.Area;
@@ -44,6 +45,7 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
     private int minLength = 3;
     private int maxLength = 50;
     private float minScore = 0.4f;
+    private boolean useMax = false; // use only the maximum score
 
     /** The concatenator used for converting areas to text */
     private AreaConcatenator concat; 
@@ -96,9 +98,10 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
     public List<Parameter> defineParams()
     {
         return List.of(
-                new ParameterInt("minLength", 0, 10000),
-                new ParameterInt("maxLength", 0, 10000),
-                new ParameterFloat("minScore", 0.0f, 1.0f));
+                new ParameterInt("minLength", "Minimal text length to process", 0, 10000),
+                new ParameterInt("maxLength", "Maximal text length to process", 0, 10000),
+                new ParameterFloat("minScore", "Minimal similarity score", 0.0f, 1.0f),
+                new ParameterBoolean("useMax", "Use only the maximum similarity score"));
     }
 
     public int getMinLength()
@@ -129,6 +132,16 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
     public void setMinScore(float minScore)
     {
         this.minScore = minScore;
+    }
+
+    public boolean getUseMax()
+    {
+        return useMax;
+    }
+
+    public void setUseMax(boolean useMax)
+    {
+        this.useMax = useMax;
     }
 
     public AreaConcatenator getConcatenator()
@@ -214,11 +227,23 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
                     var areaRelevances = subtreeRelevances.get(node.getId());
                     if (areaRelevances != null)
                     {
-                        // filter out results below the minimum score
-                        return areaRelevances.entrySet()
-                               .stream()
-                               .filter(entry -> entry.getValue() >= minScore)
-                               .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                        if (useMax)
+                        {
+                            // return the highest score only
+                            return areaRelevances.entrySet().stream()
+                                    .max(Map.Entry.comparingByValue())
+                                    .filter(entry -> entry.getValue() >= minScore)
+                                    .map(entry -> Map.of(entry.getKey(), entry.getValue()))
+                                    .orElse(Collections.emptyMap());
+                        }
+                        else
+                        {
+                            // filter out results below the minimum score
+                            return areaRelevances.entrySet()
+                                   .stream()
+                                   .filter(entry -> entry.getValue() >= minScore)
+                                   .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                        }
                     }
                 }
                 return Collections.emptyMap();
@@ -297,13 +322,25 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
                 var embedData = sshClient.runQuery(text);
                 var scores = embedData.getAsJsonObject().get("scores");
                 Map<String, Float> ret = new HashMap<>();
+                String maxGroup = null;
+                float maxScore = 0.0f;
                 for (var entry : scores.getAsJsonObject().entrySet()) {
                     String group = entry.getKey();
                     float score = entry.getValue().getAsFloat();
                     if (score >= minScore)
+                    {
                         ret.put(group, score);
+                        if (score > maxScore) 
+                        {
+                            maxGroup = group;
+                            maxScore = score;
+                        }
+                    }
                 }
-                return ret;
+                if (useMax && maxGroup != null)
+                    return Map.of(maxGroup, maxScore);
+                else
+                    return ret;
             } catch (JsonSyntaxException | IOException | InterruptedException e) {
                 log.error("Failed to run embedder query: {}", e.getMessage());
                 return Collections.emptyMap();

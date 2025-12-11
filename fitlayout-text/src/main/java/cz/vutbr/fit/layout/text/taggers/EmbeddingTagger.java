@@ -314,24 +314,20 @@ public class EmbeddingTagger extends BaseTagger implements MultiTagger
             List<SSHClient.PredictQuery> queries = new ArrayList<>();
             createPredictQueriesForSubtree(root, queries);
             try {
-                var embedData = sshClient.runMultiQuery(queries);
-                Map<Integer, Map<String, Float>> ret = new HashMap<>();
-                var retList = embedData.getAsJsonArray();
-                for (var item : retList)
+                var predictResult = sshClient.runMultiQuery(queries);
+                if (predictResult.getResults() != null) 
                 {
-                    final var itemObj = item.getAsJsonObject();
-                    String id = itemObj.get("id").getAsString();
-                    
-                    var scores = itemObj.get("scores");
-                    Map<String, Float> scoresMap = new HashMap<>();
-                    for (var entry : scores.getAsJsonObject().entrySet()) {
-                        String group = entry.getKey();
-                        float score = entry.getValue().getAsFloat();
-                        scoresMap.put(group, score);
-                    }
-                    ret.put(Integer.parseInt(id), scoresMap);
+                    // Convert result IDs back to integers
+                    Map<Integer, Map<String, Float>> ret = new HashMap<>();
+                    for (var result : predictResult.getResults()) 
+                        ret.put(Integer.parseInt(result.getId()), result.getScores());
+                    return ret;
                 }
-                return ret;
+                else
+                {
+                    log.error("Empty embedder results");
+                    return Collections.emptyMap();
+                }
             } catch (JsonSyntaxException | IOException | InterruptedException e) {
                 log.error("Failed to run embedder query: {}", e.getMessage());
                 return Collections.emptyMap();

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -83,7 +84,7 @@ public class SSHClient {
         return gson.fromJson(jsonLine, JsonElement.class);
     }
     
-    public JsonElement runMultiQuery(List<PredictQuery> queries) throws IOException, InterruptedException, JsonSyntaxException
+    public PredictResults runMultiQuery(List<PredictQuery> queries) throws IOException, InterruptedException, JsonSyntaxException
     {
         String cmd = scriptPath + " -"; // the script will read queries from stdin
         String[] command = new String[]{"ssh", "-q", host, cmd};
@@ -119,7 +120,7 @@ public class SSHClient {
             throw new IOException("No output received from process.");
         }
 
-        return gson.fromJson(jsonLine, JsonElement.class);
+        return gson.fromJson(jsonLine, PredictResults.class);
         
     }
     
@@ -142,6 +143,73 @@ public class SSHClient {
         public String getText()
         {
             return text;
+        }
+    }
+
+    public static class PredictResults
+    {
+        private List<PredictResult> results;
+        
+        public PredictResults()
+        {
+        }
+        
+        public List<PredictResult> getResults()
+        {
+            return results;
+        }
+        
+        public void setResults(List<PredictResult> results)
+        {
+            this.results = results;
+        }
+    }
+    
+    public static class PredictResult
+    {
+        private String id;
+        private String text;
+        private Map<String, Float> scores;
+        
+        public PredictResult()
+        {
+        }
+        
+        public PredictResult(String id, String text, Map<String, Float> scores)
+        {
+            this.id = id;
+            this.text = text;
+            this.scores = scores;
+        }
+
+        public String getId()
+        {
+            return id;
+        }
+
+        public void setId(String id)
+        {
+            this.id = id;
+        }
+
+        public String getText()
+        {
+            return text;
+        }
+
+        public void setText(String text)
+        {
+            this.text = text;
+        }
+
+        public Map<String, Float> getScores()
+        {
+            return scores;
+        }
+
+        public void setScores(Map<String, Float> scores)
+        {
+            this.scores = scores;
         }
     }
 

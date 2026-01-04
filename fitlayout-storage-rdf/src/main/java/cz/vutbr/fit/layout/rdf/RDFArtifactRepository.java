@@ -456,7 +456,7 @@ public class RDFArtifactRepository implements ArtifactRepository
     private IRI getArtifactType(IRI artifactIRI)
     {
         final Value val = storage.getPropertyValue(artifactIRI, RDF.TYPE);
-        if (val.isIRI())
+        if (val != null && val.isIRI())
             return (IRI) val;
         else
             return null;

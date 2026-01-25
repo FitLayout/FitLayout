@@ -7,12 +7,15 @@ package cz.vutbr.fit.layout.patterns;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.rdf4j.model.IRI;
 
 import cz.vutbr.fit.layout.api.Parameter;
 import cz.vutbr.fit.layout.api.ServiceException;
+import cz.vutbr.fit.layout.impl.ParameterBoolean;
 import cz.vutbr.fit.layout.impl.ParameterFloat;
 import cz.vutbr.fit.layout.impl.ParameterInt;
 import cz.vutbr.fit.layout.impl.ParameterString;
@@ -35,6 +38,7 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
     
     private int maxDistance = 500;
     private int k = 5;
+    private boolean leafOnly = true;
     
 
     public AreaConnectionProvider()
@@ -81,6 +85,16 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
         this.k = k;
     }
 
+    public boolean getLeafOnly()
+    {
+        return leafOnly;
+    }
+
+    public void setLeafOnly(boolean leafOnly)
+    {
+        this.leafOnly = leafOnly;
+    }
+
     @Override
     public String getId()
     {
@@ -111,6 +125,8 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
                 "Maximum distance for area connections", 1, 10000));
         ret.add(new ParameterInt("k",
                 "The K parameter for KNN", 1, 50));
+        ret.add(new ParameterBoolean("leafOnly",
+                "Only consider leaf areas for connections"));
         return ret;
     }
 
@@ -187,6 +203,7 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
 
     public Collection<AreaConnection> extractConnectionsAligned(AreaTree input, Page page)
     {
+        // TODO leafOnly is not supported in this method
         RelationAnalyzerAligned ra = new RelationAnalyzerAligned(input.getRoot());
         //ra.setMinRelationWeight(minRelationWeight); // TODO
         ra.extractConnections();
@@ -215,7 +232,10 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
         ra.setMinRelationWeight(minRelationWeight);
         ra.setMaxDistance(maxDistance);
         ra.extractConnections();
-        return ra.getConnections();
+        if (leafOnly)
+            return ra.getConnections();
+        else
+            return reduceConnections(input.getRoot(), ra.getConnections());
     }
     
     private void findLeafAreas(Area root, List<ContentRect> areas)
@@ -231,4 +251,73 @@ public class AreaConnectionProvider extends ConnectionSetArtifactService
         }
     }
     
+    /**
+     * Recursively reduces the connections in a bottom-up manner (post-order traversal).
+     * For each area in the tree, it first processes the children and then the area itself
+     * using {@link #reduceParentConnections(Area, Collection)}.
+     * 
+     * @param root the root area of the subtree to process
+     * @param connections the current collection of connections
+     * @return the modified collection of connections
+     */
+    Collection<AreaConnection> reduceConnections(Area root, Collection<AreaConnection> connections)
+    {
+        Collection<AreaConnection> currentConnections = connections;
+        //recursively for children
+        for (Area child : root.getChildren())
+        {
+            currentConnections = reduceConnections(child, currentConnections);
+        }
+        //for the root
+        currentConnections = reduceParentConnections(root, currentConnections);
+        return currentConnections;
+    }
+    
+    /**
+     * Reduces the connetions so that the connections from outside to the child areas of the
+     * specified parent are moved to the parent area.
+     * @param parent the parent area
+     * @param connections the connections to be reduced
+     * @return a new collection of connections with duplicates removed.
+     */
+    private Collection<AreaConnection> reduceParentConnections(Area parent, Collection<AreaConnection> connections)
+    {
+        if (parent.isLeaf())
+        {
+            return connections; //nothing to do
+        }
+        
+        Set<Area> children = new HashSet<>(parent.getChildren());
+        Set<AreaConnection> ret = new HashSet<>();
+        
+        for (AreaConnection conn : connections)
+        {
+            final ContentRect a1 = conn.getA1();
+            final ContentRect a2 = conn.getA2();
+            
+            boolean a1child = children.contains(a1);
+            boolean a2child = children.contains(a2);
+            
+            if (a1child && !a2child)
+            {
+                // connection from child to outside -> move to parent
+                var newconn = new AreaConnection(parent, a2, conn.getRelation(), conn.getWeight());
+                ret.add(newconn);
+            }
+            else if (!a1child && a2child)
+            {
+                // connection from outside to child -> move to parent
+                var newconn = new AreaConnection(a1, parent, conn.getRelation(), conn.getWeight());
+                ret.add(newconn);
+            }
+            else
+            {
+                // connection between children or outside -> keep as is
+                ret.add(conn);
+            }
+        }
+        
+        return ret;
+    }
+
 }

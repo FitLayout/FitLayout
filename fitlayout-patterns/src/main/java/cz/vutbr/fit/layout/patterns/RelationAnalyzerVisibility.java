@@ -147,39 +147,39 @@ public class RelationAnalyzerVisibility extends AreaSetRelationAnalyzer
             {
                 if (top)
                 {
-                    visibilityList.set(0, new NeigborNode(otherIndex, 0));
+                    visibilityList.set(DIR_TOP, new NeigborNode(otherIndex, 0));
                 }
                 else if (bottom)
                 {
-                    visibilityList.set(2, new NeigborNode(otherIndex, 0));
+                    visibilityList.set(DIR_BOTTOM, new NeigborNode(otherIndex, 0));
                 }
             }
             else if (vpIntersect)
             {
-                if (top && height / 2.0 > visibilityList.get(0).getDist()
-                        && visibilityList.get(0).getDist() > (nodeBbox.getY1() - otherBbox.getY2()))
+                if (top && height / 2.0 > visibilityList.get(DIR_TOP).getDist()
+                        && visibilityList.get(DIR_TOP).getDist() > (nodeBbox.getY1() - otherBbox.getY2()))
                 {
                     int dist = nodeBbox.getY1() - otherBbox.getY2();
-                    visibilityList.set(0, new NeigborNode(otherIndex, dist));
+                    visibilityList.set(DIR_TOP, new NeigborNode(otherIndex, dist));
                 }
-                else if (bottom && visibilityList.get(2).getDist() > (otherBbox.getY1() - nodeBbox.getY2()))
+                else if (bottom && visibilityList.get(DIR_BOTTOM).getDist() > (otherBbox.getY1() - nodeBbox.getY2()))
                 {
                     int dist = otherBbox.getY1() - nodeBbox.getY2();
-                    visibilityList.set(2, new NeigborNode(otherIndex, dist));
+                    visibilityList.set(DIR_BOTTOM, new NeigborNode(otherIndex, dist));
                 }
             }
             else if (hpIntersect)
             {
-                if (right && width / 2.0 > visibilityList.get(1).getDist()
-                        && visibilityList.get(1).getDist() > (otherBbox.getX1()- nodeBbox.getX2()))
+                if (right && width / 2.0 > visibilityList.get(DIR_RIGHT).getDist()
+                        && visibilityList.get(DIR_RIGHT).getDist() > (otherBbox.getX1()- nodeBbox.getX2()))
                 {
                     int dist = otherBbox.getX1() - nodeBbox.getX2();
-                    visibilityList.set(1, new NeigborNode(otherIndex, dist));
+                    visibilityList.set(DIR_RIGHT, new NeigborNode(otherIndex, dist));
                 }
-                else if (left && visibilityList.get(3).getDist() > (nodeBbox.getX1() - otherBbox.getX2()))
+                else if (left && visibilityList.get(DIR_LEFT).getDist() > (nodeBbox.getX1() - otherBbox.getX2()))
                 {
                     int dist = nodeBbox.getX1() - otherBbox.getX2();
-                    visibilityList.set(3, new NeigborNode(otherIndex, dist));
+                    visibilityList.set(DIR_LEFT, new NeigborNode(otherIndex, dist));
                 }
             }
         }

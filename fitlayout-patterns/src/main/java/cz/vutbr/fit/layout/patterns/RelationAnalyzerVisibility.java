@@ -108,10 +108,19 @@ public class RelationAnalyzerVisibility extends AreaSetRelationAnalyzer
         }
     }    
     
+    /**
+     * For a given node, finds the nearest visible nodes in the four cardinal directions
+     * (top, bottom, left, right) within the maximum distance. The resulting edges
+     * are added to the corresponding edge sets.
+     * @param nodeBbox The bounding box of the node to process.
+     * @param nodeIndex The index of the node to process.
+     * @param vEdges The set of vertical edges to be populated.
+     * @param hEdges The set of horizontal edges to be populated.
+     */
     public void visibility(Rect nodeBbox, int nodeIndex, Set<Edge> vEdges, Set<Edge> hEdges)
     {
-        int width = getPage().getWidth();
-        int height = getPage().getHeight();
+        final int width = getPage().getWidth();
+        final int height = getPage().getHeight();
 
         List<NeigborNode> visibilityList = new ArrayList<>(
                 // the visible boxes from the current node: top, right, bottom, left 
@@ -216,18 +225,25 @@ public class RelationAnalyzerVisibility extends AreaSetRelationAnalyzer
 
     }
 
+    /**
+     * Removes vertical edges that are intersected by any horizontal edge and creates a unified set of edges.
+     * @param vEdges The set of vertical edges.
+     * @param hEdges The set of horizontal edges.
+     * @param edges The output set of edges to be populated with the filtered vertical edges 
+     * and all horizontal edges.
+     */
     public void removeVertical(Set<Edge> vEdges, Set<Edge> hEdges, Set<Edge> edges)
     {
         Set<Edge> edgesToRemove = new HashSet<>();
         for (Edge v : vEdges)
         {
-            Point v1 = getCenter(bboxes.get(v.getStart()));
-            Point v2 = getCenter(bboxes.get(v.getEnd()));
+            Point v1 = getEdgePoint(bboxes.get(v.getStart()), v.getDirection());
+            Point v2 = getEdgePoint(bboxes.get(v.getEnd()), opposite(v.getDirection()));
 
             for (Edge h : hEdges)
             {
-                Point h1 = getCenter(bboxes.get(h.getStart()));
-                Point h2 = getCenter(bboxes.get(h.getEnd()));
+                Point h1 = getEdgePoint(bboxes.get(h.getStart()), h.getDirection());
+                Point h2 = getEdgePoint(bboxes.get(h.getEnd()), opposite(h.getDirection()));
                 if (!v1.equals(h2) && !v2.equals(h1) && intersect(v1, v2, h1, h2))
                 {
                     edgesToRemove.add(v);
@@ -241,11 +257,23 @@ public class RelationAnalyzerVisibility extends AreaSetRelationAnalyzer
         edges.addAll(hEdges);
     }
 
-    private Point getCenter(Rect rect)
+    private Point getEdgePoint(Rect rect, int direction)
     {
-        double centerX = rect.getX2() - (rect.getX2() - rect.getX1()) / 2.0;
-        double centerY = rect.getY2() - (rect.getY2() - rect.getY1()) / 2.0;
-        return new Point(centerX, centerY);
+        final double centerX = rect.getX2() - (rect.getX2() - rect.getX1()) / 2.0;
+        final double centerY = rect.getY2() - (rect.getY2() - rect.getY1()) / 2.0;
+        switch (direction)
+        {
+            case DIR_TOP:
+                return new Point(centerX, rect.getY1());
+            case DIR_RIGHT:
+                return new Point(rect.getX2(), centerY);
+            case DIR_BOTTOM:
+                return new Point(centerX, rect.getY2());
+            case DIR_LEFT:
+                return new Point(rect.getX1(), centerY);
+            default:
+                return new Point(centerX, centerY); //should not happen
+        }
     }
 
     private boolean ccw(Point A, Point B, Point C)
@@ -268,7 +296,7 @@ public class RelationAnalyzerVisibility extends AreaSetRelationAnalyzer
         switch (direction)
         {
             case DIR_TOP:
-                return Relations.BELOW;
+                return Relations.BELOW; // the direction from node1 to node2 is TOP, i.e. node1 is below node2
             case DIR_LEFT:
                 return Relations.RIGHTOF;
             case DIR_BOTTOM:
@@ -303,17 +331,30 @@ public class RelationAnalyzerVisibility extends AreaSetRelationAnalyzer
     }
 
     /**
-     * The edge is represented as a pair of node indices.
+     * A directed edge between two nodes (content rectangles). The edge represents
+     * a visibility relationship from a source node to a target node in a certain
+     * direction.
      * 
      * @author burgetr
      */
     private static class Edge
     {
+        /** The index of the source node (area). */
         private final int node1;
+        /** The index of the target node (area). */
         private final int node2;
+        /** The distance between the nodes. */
         private final double dist;
+        /** The direction from node1 to node2. */
         private int direction;
         
+        /**
+         * Creates a new edge between two nodes.
+         * @param node1 The index of the source node.
+         * @param node2 The index of the target node.
+         * @param dist The distance between the nodes.
+         * @param direction The direction from node1 to node2.
+         */
         public Edge(int node1, int node2, double dist, int direction)
         {
             this.node1 = node1;
@@ -337,6 +378,10 @@ public class RelationAnalyzerVisibility extends AreaSetRelationAnalyzer
             return dist;
         }
 
+        /**
+         * Gets the direction from node1 to node2.
+         * @return
+         */
         public int getDirection()
         {
             return direction;

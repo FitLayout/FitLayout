@@ -834,8 +834,10 @@ public class RDFStorage implements Closeable
     public void setSequenceValue(IRI sequenceIri, long val) throws StorageException
     {
         try (RepositoryConnection con = repo.getConnection()) {
+            con.begin(IsolationLevels.SERIALIZABLE);
             con.remove(sequenceIri, RDF.VALUE, null);
             con.add(sequenceIri, RDF.VALUE, getValueFactory().createLiteral(val));
+            con.commit();
         }
         catch (Exception e) {
             throw new StorageException(e);
